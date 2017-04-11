@@ -111,6 +111,52 @@ public class Main {
 	    return client;
 	}
 	
+	public static class Route {
+		public static class Location {
+			public String addr;
+			public String name;
+			public String[] details;
+			public Double lat;  // degrees
+			public Double lng;  // degrees
+		}
+		
+		public static class Distance {
+			public Integer val;  // meters
+			public String  txt;   
+			public Integer total; // meters
+		}
+		
+		public static class Point {
+			public Double lat;  // degrees
+			public Double lng;  // degrees
+			public Distance dist;
+			public String step;
+			public String dir;
+			public String nextturn;
+			public String type;
+		}
+		
+		public static class Waypoint {
+			public Double lat;  // degrees
+			public double lng;  // degrees
+		}
+		
+		Location start;
+		Location end;
+		Location[] dest;
+		
+		String[] countries;
+		
+		String  mode;
+		
+		Point[] points;
+		
+		Integer totaldist;
+		
+		Waypoint[] wpts;
+		
+	}
+	
 	
 	private static String mapToJson( String mapUrl ) {
 		String base = "https://mapstogpx.com/load.php" + 
@@ -126,8 +172,9 @@ public class Main {
 				"&w=on" + 
 				"&dtstr=20170411_083945" + 
 				"&gdata=";
+		mapUrl = mapUrl.replace("https://www.google.com/maps/dir/", "");
 		try {
-			URL url = new URL(base + URLEncoder.encode(mapUrl.replace("https://www.google.com/maps/dir/", "")) );
+			URL url = new URL(base + URLEncoder.encode(mapUrl) );
 			System.out.println(url);
 //			url = new URL("https://mapstogpx.com/load.php?d=default&lang=en&elev=on&tmode=off&pttype=route&o=json&cmt=on&desc=on&descasname=off&w=on&dtstr=20170411_091225&gdata=3533%2BCarambola%2BCir%2C%2BMelbourne%2C%2BFL%2B32940%2FNew%2BBaltimore%2BTravel%2BPlaza%2C%2B127%2BNew%2BYork%2BState%2BThruway%2C%2BHannacroix%2C%2BNY%2B12087%2F7%2BManor%2BLn%2C%2BSullivan%2C%2BME%2B04664%2F%4036.1938353%2C-83.9469478%2C5z%2Fam%3Dt%2Fdata%3D!3m1!4b1!4m25!4m24!1m10!1m1!1s0x88de06ef0ba04fe1%3A0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!3m4!1m2!1d-77.2875753!2d37.4965621!3s0x89b11b7c8ac52005%3A0x8afb4d10805f3f31!1m5!1m1!1s0x89dde9a4a6faef3d%3A0xac1113996de4a061!2m2!1d-73.8055448!2d42.4279567!1m5!1m1!1s0x4caee844875d1295%3A0xd2bc1dd5aaaf365d!2m2!1d-68.2087797!2d44.523031!3e0%3Fhl%3Den-US");
 //			System.out.println(url);
@@ -188,10 +235,16 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		String mapUrl = "https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940/New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087/7+Manor+Ln,+Sullivan,+ME+04664/@36.1938353,-83.9469478,5z/am=t/data=!3m1!4b1!4m25!4m24!1m10!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!3m4!1m2!1d-77.2875753!2d37.4965621!3s0x89b11b7c8ac52005:0x8afb4d10805f3f31!1m5!1m1!1s0x89dde9a4a6faef3d:0xac1113996de4a061!2m2!1d-73.8055448!2d42.4279567!1m5!1m1!1s0x4caee844875d1295:0xd2bc1dd5aaaf365d!2m2!1d-68.2087797!2d44.523031!3e0?hl=en-US";
+		String mapUrl = "https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940,+USA/Jekyll+Island+Campground,+Riverview+Drive,+Brunswick,+GA/Walmart+Supercenter,+1550+Skibo+Rd,+Fayetteville,+NC+28303/38.67118,-77.17452/Patapsco+Valley+State+Park,+8020+Baltimore+National+Pike,+Ellicott+City,+MD+21043/@35.1225427,-79.2581005,8.75z/am=t/data=!4m27!4m26!1m5!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!1m5!1m1!1s0x88e4dbc92d7c68d7:0x29d0308d10819d72!2m2!1d-81.4128!2d31.1072326!1m5!1m1!1s0x89ab6b142d902c5b:0xc299c532d93859dc!2m2!1d-78.957215!2d35.081892!1m0!1m5!1m1!1s0x89c81f7c74c6818d:0xbb46cc34aae2e03f!2m2!1d-76.7828076!2d39.2885596!3e0"; 
+				//"https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940/New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087/7+Manor+Ln,+Sullivan,+ME+04664/@36.1938353,-83.9469478,5z/am=t/data=!3m1!4b1!4m25!4m24!1m10!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!3m4!1m2!1d-77.2875753!2d37.4965621!3s0x89b11b7c8ac52005:0x8afb4d10805f3f31!1m5!1m1!1s0x89dde9a4a6faef3d:0xac1113996de4a061!2m2!1d-73.8055448!2d42.4279567!1m5!1m1!1s0x4caee844875d1295:0xd2bc1dd5aaaf365d!2m2!1d-68.2087797!2d44.523031!3e0?hl=en-US";
 		String json = mapToJson( mapUrl );
 		if (json != null) {
-			System.out.println(json);
+			//System.out.println(json);
+			Gson gson = new Gson();
+			Route route = gson.fromJson(json, Route.class );
+			for (Route.Point point : route.points) {
+				System.out.println( point.nextturn + " | " + point.dir );
+			}
 			return;
 		}
 		HttpInterceptorHandler interceptor = new HttpInterceptorHandler();
