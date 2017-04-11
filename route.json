@@ -1,0 +1,1613 @@
+{  
+   "start":{  
+      "addr":"3533 Carambola Cir, Melbourne, FL 32940",
+      "name":"3533 Carambola Cir",
+      "details":[  
+         "3533 Carambola Cir",
+         "Melbourne, FL 32940, USA"
+      ],
+      "lat":28.23448,
+      "lng":-80.7531311
+   },
+   "end":{  
+      "addr":"7 Manor Ln, Sullivan, ME 04664",
+      "name":"7 Manor Ln",
+      "details":[  
+         "7 Manor Ln",
+         "Sullivan, ME 04664, USA"
+      ],
+      "lat":44.523031,
+      "lng":-68.2087797
+   },
+   "dest":[  
+      {  
+         "addr":"3533 Carambola Cir, Melbourne, FL 32940",
+         "name":"3533 Carambola Cir",
+         "details":[  
+            "3533 Carambola Cir",
+            "Melbourne, FL 32940, USA"
+         ],
+         "lat":28.23448,
+         "lng":-80.7531311
+      },
+      {  
+         "addr":"New Baltimore Travel Plaza, 127 New York State Thruway, Hannacroix, NY 12087",
+         "name":"New Baltimore Travel Plaza",
+         "details":[  
+            "New Baltimore Travel Plaza",
+            "127 New York State Thruway, Hannacroix, NY 12087, USA"
+         ],
+         "lat":42.4279567,
+         "lng":-73.8055448
+      },
+      {  
+         "addr":"7 Manor Ln, Sullivan, ME 04664",
+         "name":"7 Manor Ln",
+         "details":[  
+            "7 Manor Ln",
+            "Sullivan, ME 04664, USA"
+         ],
+         "lat":44.523031,
+         "lng":-68.2087797
+      }
+   ],
+   "countries":[  
+      "US"
+   ],
+   "mode":"driving",
+   "points":[  
+      {  
+         "lng":-80.7531845,
+         "lat":28.2347044,
+         "dist":{  
+            "val":526,
+            "txt":"0.3 mi",
+            "total":526
+         },
+         "img":null,
+         "step":"<step maneuver='DEPART' meters='526'>Head <direction dir='NORTH_EAST'>north-east<\/direction> on <roadlist><road lang='en'>Carambola Cir<\/road><\/roadlist> towards <roadlist><road lang='en'>Floristana Dr<\/road><\/roadlist><\/step>",
+         "dir":"Head north-east on Carambola Cir towards Floristana Dr",
+         "nextturn":"Floristana Dr",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-80.7478942,
+         "lat":28.2345421,
+         "dist":{  
+            "val":581,
+            "txt":"0.4 mi",
+            "total":1107
+         },
+         "img":null,
+         "step":"<step maneuver='TURN' meters='581'>Turn <turn side='RIGHT'>right<\/turn> onto <roadlist><road lang='en'>Legacy Blvd<\/road><\/roadlist><\/step>",
+         "dir":"Turn right onto Legacy Blvd",
+         "nextturn":"Legacy Blvd",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-80.7485933,
+         "lat":28.2294274,
+         "dist":{  
+            "val":2212,
+            "txt":"1.4 mi",
+            "total":3319
+         },
+         "img":{  
+            "panoid":"bxqizMDrvPWv6oet3m5SbA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=bxqizMDrvPWv6oet3m5SbA&w=203&h=100&yaw=180&pitch=0&thumbfov=114&ll=28.229653,-80.748592",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Turn left onto N Wickham Rd",
+         "nextturn":"N Wickham Rd",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-80.7260224,
+         "lat":28.2296711,
+         "dist":{  
+            "val":844,
+            "txt":"0.5 mi",
+            "total":4163
+         },
+         "img":{  
+            "panoid":"0iHHCOcszpaDZemsRdkLQw",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=0iHHCOcszpaDZemsRdkLQw&w=203&h=100&yaw=90&pitch=0&thumbfov=114&ll=28.229672,-80.726223",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='ROUNDABOUT_ENTER_AND_EXIT' meters='844'>At the roundabout, take the <exit number='SECOND'>2nd<\/exit> exit<\/step>",
+         "dir":"At the roundabout, take the 2nd exit and stay on N Wickham Rd",
+         "nextturn":"N Wickham Rd",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-80.7176111,
+         "lat":28.2302516,
+         "dist":{  
+            "val":1437,
+            "txt":"0.9 mi",
+            "total":5600
+         },
+         "img":{  
+            "panoid":"t3qBwNCLQuQnvii6M5OdiA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=t3qBwNCLQuQnvii6M5OdiA&w=203&h=100&yaw=90&pitch=0&thumbfov=114&ll=28.230252,-80.717776",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='ON_RAMP' meters='1437'>Turn <turn side='LEFT'>left<\/turn>  onto the <signlist><sign is_route_number='true' lang='en'>I-95 E<\/sign><\/signlist> slip road<\/step>",
+         "dir":"Turn left  onto the I-95 E slip road to Jacksonville",
+         "nextturn":"Jacksonville",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-80.7219392,
+         "lat":28.2425072,
+         "dist":{  
+            "val":226705,
+            "txt":"141 mi",
+            "total":232305
+         },
+         "img":{  
+            "panoid":"Y79saAqT2y6zRAyrFyblng",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=Y79saAqT2y6zRAyrFyblng&w=203&h=100&yaw=320&pitch=0&thumbfov=114&ll=28.242389,-80.721843",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Merge onto I-95 N",
+         "nextturn":"I-95 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-81.509936,
+         "lat":30.1105556,
+         "dist":{  
+            "val":8119,
+            "txt":"5.0 mi",
+            "total":240424
+         },
+         "img":{  
+            "panoid":"s-YMZxG6m12JlSYIzvLYoA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=s-YMZxG6m12JlSYIzvLYoA&w=203&h=100&yaw=315&pitch=0&thumbfov=114&ll=30.110408,-81.509792",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='8119'>Take the exit<\/step>",
+         "dir":"Take the exit onto FL-9B N",
+         "nextturn":"FL-9B N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-81.512973,
+         "lat":30.181864,
+         "dist":{  
+            "val":36782,
+            "txt":"22.9 mi",
+            "total":277206
+         },
+         "img":{  
+            "panoid":"tel6qYT1fwGne1qSqfn8Iw",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=tel6qYT1fwGne1qSqfn8Iw&w=203&h=100&yaw=345&pitch=0&thumbfov=114&ll=30.181668,-81.512923",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Merge onto I-295 N",
+         "nextturn":"I-295 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-81.6434886,
+         "lat":30.4589219,
+         "dist":{  
+            "val":867,
+            "txt":"0.5 mi",
+            "total":278073
+         },
+         "img":{  
+            "panoid":"vEdYRvRk6z4q8Qp4ARKFjA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=vEdYRvRk6z4q8Qp4ARKFjA&w=203&h=100&yaw=283&pitch=0&thumbfov=114&ll=30.458870,-81.643277",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='867'>Take exit <exitlist><exit>35B<\/exit><\/exitlist><\/step>",
+         "dir":"Take exit 35B for Interstate 95 N towards Savannah",
+         "nextturn":"Exit 35B",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-81.6476532,
+         "lat":30.4653288,
+         "dist":{  
+            "val":899567,
+            "txt":"559 mi",
+            "total":1177640
+         },
+         "img":{  
+            "panoid":"-s8RRHDStUEvmkaJa0EkNg",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=-s8RRHDStUEvmkaJa0EkNg&w=203&h=100&yaw=355&pitch=0&thumbfov=114&ll=30.465123,-81.647638",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='MERGE' meters='899567'>Merge onto <roadlist><road is_route_number='true' lang='en'>I-95 N<\/road><\/roadlist><\/step>",
+         "dir":"Merge onto I-95 N",
+         "nextturn":"I-95 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-77.3516893,
+         "lat":37.1588224,
+         "dist":{  
+            "val":1034,
+            "txt":"0.6 mi",
+            "total":1178674
+         },
+         "img":{  
+            "panoid":"DdaVa9HrTRMspLGxveLsjQ",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=DdaVa9HrTRMspLGxveLsjQ&w=203&h=100&yaw=26&pitch=0&thumbfov=114&ll=37.158655,-77.351772",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='1034'>Use the right 2 lanes to take exit <exitlist><exit lang='en'>46<\/exit><\/exitlist><\/step>",
+         "dir":"Use the right 2 lanes to take exit 46 for I-295 N towards Washington\/Richmond International Airport",
+         "nextturn":"Exit 46",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-77.3447424,
+         "lat":37.1662673,
+         "dist":{  
+            "val":66411,
+            "txt":"41.3 mi",
+            "total":1245085
+         },
+         "img":{  
+            "panoid":"f8cOLvjAn0Yqa9LmKsbg8Q",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=f8cOLvjAn0Yqa9LmKsbg8Q&w=203&h=100&yaw=45&pitch=0&thumbfov=114&ll=37.166134,-77.344880",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Continue onto I-295 N",
+         "nextturn":"I-295 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-77.4247828,
+         "lat":37.6525757,
+         "dist":{  
+            "val":3619,
+            "txt":"2.2 mi",
+            "total":1248704
+         },
+         "img":{  
+            "panoid":"YyzuYwN2j_X1XAMJ0wX6Ag",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=YyzuYwN2j_X1XAMJ0wX6Ag&w=203&h=100&yaw=279&pitch=0&thumbfov=114&ll=37.652540,-77.424558",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='3619'>Use the left 2 lanes to take exit <exitlist><exit>43A<\/exit><\/exitlist><\/step>",
+         "dir":"Use the left 2 lanes to take exit 43A for Interstate 95 N towards Washington",
+         "nextturn":"Exit 43A",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-77.4480736,
+         "lat":37.6726418,
+         "dist":{  
+            "val":106909,
+            "txt":"66.4 mi",
+            "total":1355613
+         },
+         "img":{  
+            "panoid":"J9s6C8OTI0ukXqpuQFny-Q",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=J9s6C8OTI0ukXqpuQFny-Q&w=203&h=100&yaw=349&pitch=0&thumbfov=114&ll=37.672417,-77.448031",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Merge onto I-95 N",
+         "nextturn":"I-95 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-77.3303309,
+         "lat":38.5726028,
+         "dist":{  
+            "val":27296,
+            "txt":"17.0 mi",
+            "total":1382909
+         },
+         "img":{  
+            "panoid":"N9yZWwrvWC4RVYpr_r-7eg",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=N9yZWwrvWC4RVYpr_r-7eg&w=203&h=100&yaw=45&pitch=0&thumbfov=114&ll=38.572446,-77.330489",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Keep right to stay on I-95 N",
+         "nextturn":"I-95 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-77.1817303,
+         "lat":38.7730427,
+         "dist":{  
+            "val":14592,
+            "txt":"9.1 mi",
+            "total":1397501
+         },
+         "img":{  
+            "panoid":"mWbpIr1Kfhfg8wxQveVmUg",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=mWbpIr1Kfhfg8wxQveVmUg&w=203&h=100&yaw=20&pitch=0&thumbfov=114&ll=38.772867,-77.181796",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='FORK' meters='14592'>Keep <turn side='RIGHT' type='KEEP'>right<\/turn> at the fork to continue on <roadlist><road is_route_number='true' lang='en'>I-395 N<\/road><\/roadlist><\/step>",
+         "dir":"Keep right at the fork to continue on I-395 N, follow signs for Interstate 495 N\/Washington\/Tysons Corner\/Interstate 395 N",
+         "nextturn":"Interstate 395 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-77.0690539,
+         "lat":38.8621106,
+         "dist":{  
+            "val":3738,
+            "txt":"2.3 mi",
+            "total":1401239
+         },
+         "img":{  
+            "panoid":"VtMO2dHJ3F6_AKzG9Tym0Q",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=VtMO2dHJ3F6_AKzG9Tym0Q&w=203&h=100&yaw=6&pitch=0&thumbfov=114&ll=38.861895,-77.069080",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='TURN' meters='3738'>Keep <turn side='LEFT' type='KEEP'>left<\/turn> to stay on <roadlist><road is_route_number='true' lang='en'>I-395 N<\/road><\/roadlist><\/step>",
+         "dir":"Keep left to stay on I-395 N",
+         "nextturn":"I-395 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-77.037219,
+         "lat":38.8782794,
+         "dist":{  
+            "val":1751,
+            "txt":"1.1 mi",
+            "total":1402990
+         },
+         "img":{  
+            "panoid":"o6CPEgAq92w9QPHoAI_wvA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=o6CPEgAq92w9QPHoAI_wvA&w=203&h=100&yaw=45&pitch=0&thumbfov=114&ll=38.878135,-77.037367",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Keep right to stay on I-395 N",
+         "nextturn":"I-395 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-77.018571,
+         "lat":38.8823371,
+         "dist":{  
+            "val":3087,
+            "txt":"1.9 mi",
+            "total":1406077
+         },
+         "img":{  
+            "panoid":"0sfjf4YBJaPIDpPMk4emdg",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=0sfjf4YBJaPIDpPMk4emdg&w=203&h=100&yaw=90&pitch=0&thumbfov=114&ll=38.882339,-77.018769",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Keep left at the fork to continue on I-695",
+         "nextturn":"I-695",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-76.9899539,
+         "lat":38.8721261,
+         "dist":{  
+            "val":887,
+            "txt":"0.6 mi",
+            "total":1406964
+         },
+         "img":{  
+            "panoid":"FF5soIxxDnvUh78QUJs79g",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=FF5soIxxDnvUh78QUJs79g&w=203&h=100&yaw=136&pitch=0&thumbfov=114&ll=38.872308,-76.990126",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='887'>Use the right 2 lanes to take exit <exitlist><exit lang='en'>2B<\/exit><\/exitlist><\/step>",
+         "dir":"Use the right 2 lanes to take exit 2B for State Hwy 295 N towards US-50 S",
+         "nextturn":"Exit 2B",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-76.9816169,
+         "lat":38.8720659,
+         "dist":{  
+            "val":6797,
+            "txt":"4.2 mi",
+            "total":1413761
+         },
+         "img":{  
+            "panoid":"byffbPWp61_cy5YhJ5-b2A",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=byffbPWp61_cy5YhJ5-b2A&w=203&h=100&yaw=68&pitch=0&thumbfov=114&ll=38.871991,-76.981806",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='MERGE' meters='6797'>Merge onto <roadlist><road is_route_number='true' lang='en'>State Hwy 295<\/road><\/roadlist><\/step>",
+         "dir":"Merge onto State Hwy 295",
+         "nextturn":"State Hwy 295",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-76.9323079,
+         "lat":38.9165922,
+         "dist":{  
+            "val":263,
+            "txt":"0.2 mi",
+            "total":1414024
+         },
+         "img":{  
+            "panoid":"KHWU7z_rRjNzMLJkvMjTrw",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=KHWU7z_rRjNzMLJkvMjTrw&w=203&h=100&yaw=4&pitch=0&thumbfov=114&ll=38.916444,-76.932321",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='TURN' meters='263'>Use the left 2 lanes to continue on <roadlist><road lang='en'>Baltimore-Washington Pkwy<\/road><\/roadlist><\/step>",
+         "dir":"Use the left 2 lanes to continue on Baltimore-Washington Pkwy and follow signs for Interstate 95\/Baltimore-Washington Parkway N\/Baltimore",
+         "nextturn":"Baltimore",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-76.932127,
+         "lat":38.918953,
+         "dist":{  
+            "val":17361,
+            "txt":"10.8 mi",
+            "total":1431385
+         },
+         "img":{  
+            "panoid":"qoDua_LimbMpyMU6CHZyEg",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=qoDua_LimbMpyMU6CHZyEg&w=203&h=100&yaw=3&pitch=0&thumbfov=114&ll=38.918738,-76.932141",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Keep left to stay on Baltimore-Washington Pkwy",
+         "nextturn":"Baltimore-Washington Pkwy",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-76.8414583,
+         "lat":39.051428,
+         "dist":{  
+            "val":12545,
+            "txt":"7.8 mi",
+            "total":1443930
+         },
+         "img":{  
+            "panoid":"d12lfSN3lEXoDc34dsV0vw",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=d12lfSN3lEXoDc34dsV0vw&w=203&h=100&yaw=27&pitch=0&thumbfov=114&ll=39.051283,-76.841534",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Keep left to stay on Baltimore-Washington Pkwy",
+         "nextturn":"Baltimore-Washington Pkwy",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-76.7553332,
+         "lat":39.1403167,
+         "dist":{  
+            "val":14090,
+            "txt":"8.8 mi",
+            "total":1458020
+         },
+         "img":{  
+            "panoid":"6wMitrI7xmCaQyNGqNN3Mg",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=6wMitrI7xmCaQyNGqNN3Mg&w=203&h=100&yaw=23&pitch=0&thumbfov=114&ll=39.140196,-76.755386",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='NAME_CHANGE' meters='14090'>Continue onto <roadlist><road is_route_number='true' lang='en'>MD-295 N<\/road><\/roadlist><\/step>",
+         "dir":"Continue onto MD-295 N\/Baltimore-Washington Pkwy",
+         "nextturn":"Baltimore-Washington Pkwy",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-76.6498683,
+         "lat":39.2309046,
+         "dist":{  
+            "val":379,
+            "txt":"0.2 mi",
+            "total":1458399
+         },
+         "img":{  
+            "panoid":"oqwy1t0XawDaRiqdroFsEQ",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=oqwy1t0XawDaRiqdroFsEQ&w=203&h=100&yaw=8&pitch=0&thumbfov=114&ll=39.230739,-76.649892",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='379'>Take the <signlist><sign lang='en'>Harbor Tunnel Thrwy<\/sign><\/signlist> exit<\/step>",
+         "dir":"Take the Harbor Tunnel Thrwy\/I-895 N exit",
+         "nextturn":"exit",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-76.6460456,
+         "lat":39.2313403,
+         "dist":{  
+            "val":16676,
+            "txt":"10.4 mi",
+            "total":1475075
+         },
+         "img":{  
+            "panoid":"p5FUtjs0qOJgFk8ZhiyxNA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=p5FUtjs0qOJgFk8ZhiyxNA&w=203&h=100&yaw=82&pitch=0&thumbfov=114&ll=39.231318,-76.646227",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='MERGE' meters='16676'>Merge onto <roadlist><road is_route_number='true' lang='en'>I-895 N<\/road><\/roadlist><\/step>",
+         "dir":"Merge onto I-895 N",
+         "nextturn":"I-895 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-76.5291404,
+         "lat":39.3228783,
+         "dist":{  
+            "val":78336,
+            "txt":"48.7 mi",
+            "total":1553411
+         },
+         "img":{  
+            "panoid":"bDn-BKYhCUJry_vq6VQIfQ",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=bDn-BKYhCUJry_vq6VQIfQ&w=203&h=100&yaw=13&pitch=0&thumbfov=114&ll=39.322725,-76.529176",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='MERGE' meters='78336'>Merge onto <roadlist><road is_route_number='true' lang='en'>I-95 N<\/road><\/roadlist><\/step>",
+         "dir":"Merge onto I-95 N",
+         "nextturn":"I-95 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-75.7778131,
+         "lat":39.6408039,
+         "dist":{  
+            "val":16087,
+            "txt":"10.0 mi",
+            "total":1569498
+         },
+         "img":{  
+            "panoid":"fDaf_P8AOb0wONIm8kCNRA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=fDaf_P8AOb0wONIm8kCNRA&w=203&h=100&yaw=72&pitch=0&thumbfov=114&ll=39.640738,-75.778017",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='FORK' meters='16087'>Keep <turn side='LEFT' type='KEEP'>left<\/turn> at the fork to stay on <roadlist><road is_route_number='true' lang='en'>I-95 N<\/road><\/roadlist><\/step>",
+         "dir":"Keep left at the fork to stay on I-95 N",
+         "nextturn":"I-95 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-75.6102704,
+         "lat":39.6982746,
+         "dist":{  
+            "val":10379,
+            "txt":"6.4 mi",
+            "total":1579877
+         },
+         "img":{  
+            "panoid":"nNRFoIeGJO9JabyLBaBf8Q",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=nNRFoIeGJO9JabyLBaBf8Q&w=203&h=100&yaw=73&pitch=0&thumbfov=114&ll=39.698218,-75.610464",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='FORK' meters='10379'>Keep <turn side='RIGHT' type='KEEP'>right<\/turn> at the fork to continue on <roadlist><road is_route_number='true' lang='en'>I-295 N<\/road><\/roadlist><\/step>",
+         "dir":"Keep right at the fork to continue on I-295 N\/Delaware Turnpike, follow signs for Del Mem Br\/NJ-Ny",
+         "nextturn":"NJ-Ny",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-75.4959992,
+         "lat":39.6808723,
+         "dist":{  
+            "val":1431,
+            "txt":"0.9 mi",
+            "total":1581308
+         },
+         "img":{  
+            "panoid":"vwFRpPgxwLWtveUzjW77YA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=vwFRpPgxwLWtveUzjW77YA&w=203&h=100&yaw=107&pitch=0&thumbfov=114&ll=39.680947,-75.496232",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='FORK' meters='1431'>Keep <turn side='LEFT' type='KEEP'>left<\/turn> at the fork to continue on <roadlist><road is_route_number='true' lang='en'>US-40 E<\/road><\/roadlist><\/step>",
+         "dir":"Keep left at the fork to continue on US-40 E",
+         "nextturn":"US-40 E",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-75.4797089,
+         "lat":39.6793699,
+         "dist":{  
+            "val":78355,
+            "txt":"48.7 mi",
+            "total":1659663
+         },
+         "img":{  
+            "panoid":"UwDtEt3gO4gVq8uRrStkNA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=UwDtEt3gO4gVq8uRrStkNA&w=203&h=100&yaw=80&pitch=0&thumbfov=114&ll=39.679323,-75.479994",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='NAME_CHANGE' meters='78355'>Continue onto <roadlist><road lang='en'>NJ Tpke<\/road><\/roadlist><\/step>",
+         "dir":"Continue onto NJ Tpke",
+         "nextturn":"NJ Tpke",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.7489469,
+         "lat":40.0792445,
+         "dist":{  
+            "val":16981,
+            "txt":"10.6 mi",
+            "total":1676644
+         },
+         "img":{  
+            "panoid":"wl1sz1GSl4FZmMakA7UqzQ",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=wl1sz1GSl4FZmMakA7UqzQ&w=203&h=100&yaw=53&pitch=0&thumbfov=114&ll=40.079143,-74.749082",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='FORK' meters='16981'>Keep <turn side='LEFT' type='KEEP'>left<\/turn> at the fork to stay on <roadlist><road lang='en'>NJ Tpke<\/road><\/roadlist><\/step>",
+         "dir":"Keep left at the fork to stay on NJ Tpke, follow signs for New Jersey Turnpike",
+         "nextturn":"New Jersey Turnpike",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.6100896,
+         "lat":40.1881314,
+         "dist":{  
+            "val":49483,
+            "txt":"30.7 mi",
+            "total":1726127
+         },
+         "img":{  
+            "panoid":"hs8Uby7O9wJcXybSpiz-_w",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=hs8Uby7O9wJcXybSpiz-_w&w=203&h=100&yaw=60&pitch=0&thumbfov=114&ll=40.188029,-74.610269",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='NAME_CHANGE' meters='49483'>Continue onto <roadlist><road is_route_number='true' lang='en'>I-95<\/road><\/roadlist><\/step>",
+         "dir":"Continue onto I-95\/NJ Tpke",
+         "nextturn":"NJ Tpke",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.2985649,
+         "lat":40.5423253,
+         "dist":{  
+            "val":806,
+            "txt":"0.5 mi",
+            "total":1726933
+         },
+         "img":{  
+            "panoid":"f8CDusjQ2_nECCH-6RFL0Q",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=f8CDusjQ2_nECCH-6RFL0Q&w=203&h=100&yaw=80&pitch=0&thumbfov=114&ll=40.542278,-74.298839",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='806'>Use the right 2 lanes to take exit <exitlist><exit lang='en'>11<\/exit><\/exitlist><\/step>",
+         "dir":"Use the right 2 lanes to take exit 11 towards Woodbridge\/Garden State Pkwy",
+         "nextturn":"Exit 11",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.3019976,
+         "lat":40.5399744,
+         "dist":{  
+            "val":54186,
+            "txt":"33.7 mi",
+            "total":1781119
+         },
+         "img":{  
+            "panoid":"UtF-ps5RpjL6K7aygqgqKQ",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=UtF-ps5RpjL6K7aygqgqKQ&w=203&h=100&yaw=262&pitch=0&thumbfov=114&ll=40.540001,-74.301795",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='FORK' meters='54186'>Keep <turn side='RIGHT' type='KEEP'>right<\/turn> at the fork<\/step>",
+         "dir":"Keep right at the fork, follow signs for Garden State Parkway N and merge onto Garden State Pkwy",
+         "nextturn":"Garden State Pkwy",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.0725424,
+         "lat":40.9364344,
+         "dist":{  
+            "val":714,
+            "txt":"0.4 mi",
+            "total":1781833
+         },
+         "img":{  
+            "panoid":"u7tTmxAs2PnbUTQMoWg5Jw",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=u7tTmxAs2PnbUTQMoWg5Jw&w=203&h=100&yaw=1&pitch=0&thumbfov=114&ll=40.936219,-74.072550",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='714'>Take the <signlist><sign is_route_number='true' lang='en'>N Rte 17<\/sign><\/signlist> exit<\/step>",
+         "dir":"Take the N Rte 17 exit",
+         "nextturn":"exit",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.0714793,
+         "lat":40.9422797,
+         "dist":{  
+            "val":1217,
+            "txt":"0.8 mi",
+            "total":1783050
+         },
+         "img":null,
+         "step":"<step maneuver='MERGE' meters='1217'>Merge onto <roadlist><road is_route_number='true' lang='en'>NJ-17 N<\/road><\/roadlist><\/step>",
+         "dir":"Merge onto NJ-17 N\/Rte 17 N",
+         "nextturn":"Rte 17 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.0728294,
+         "lat":40.9531649,
+         "dist":{  
+            "val":15954,
+            "txt":"9.9 mi",
+            "total":1799004
+         },
+         "img":{  
+            "panoid":"hQqWcF_Mvhvyo9TN98heGw",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=hQqWcF_Mvhvyo9TN98heGw&w=203&h=100&yaw=345&pitch=0&thumbfov=114&ll=40.953003,-74.072789",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Keep left to continue on NJ-17 N",
+         "nextturn":"NJ-17 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.1494528,
+         "lat":41.0795571,
+         "dist":{  
+            "val":3087,
+            "txt":"1.9 mi",
+            "total":1802091
+         },
+         "img":{  
+            "panoid":"01IAthWNvmO-JgZSxR5h8Q",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=01IAthWNvmO-JgZSxR5h8Q&w=203&h=100&yaw=326&pitch=0&thumbfov=114&ll=41.079402,-74.149350",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Keep left to stay on NJ-17 N",
+         "nextturn":"NJ-17 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.1671453,
+         "lat":41.1027307,
+         "dist":{  
+            "val":1505,
+            "txt":"0.9 mi",
+            "total":1803596
+         },
+         "img":{  
+            "panoid":"0Tk0IpI0ArbMfbYZpPcVig",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=0Tk0IpI0ArbMfbYZpPcVig&w=203&h=100&yaw=329&pitch=0&thumbfov=114&ll=41.102576,-74.167053",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='1505'>Use the left 3 lanes to take the exit towards <signlist><sign lang='en'>NY Thruway<\/sign><\/signlist><\/step>",
+         "dir":"Use the left 3 lanes to merge onto I-287 N\/NJ-17 N towards NY Thruway",
+         "nextturn":"NY Thruway",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.1613122,
+         "lat":41.1152404,
+         "dist":{  
+            "val":23042,
+            "txt":"14.3 mi",
+            "total":1826638
+         },
+         "img":{  
+            "panoid":"0G40bhbSRLR_SsWM7m7c9A",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=0G40bhbSRLR_SsWM7m7c9A&w=203&h=100&yaw=11&pitch=0&thumbfov=114&ll=41.115074,-74.161346",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='23042'>Use the left 2 lanes to take the exit towards <signlist><sign lang='en'>Albany<\/sign><\/signlist><\/step>",
+         "dir":"Use the left 2 lanes to merge onto I-87 N\/NY-17 N towards Albany",
+         "nextturn":"Albany",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-74.133879,
+         "lat":41.3012183,
+         "dist":{  
+            "val":145625,
+            "txt":"90.5 mi",
+            "total":1972263
+         },
+         "img":{  
+            "panoid":"wjyoDxrfr9K8Qr-IUtJX6g",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=wjyoDxrfr9K8Qr-IUtJX6g&w=203&h=100&yaw=40&pitch=0&thumbfov=114&ll=41.301095,-74.133984",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='FORK' meters='145625'>Keep <turn side='LEFT' type='KEEP'>left<\/turn> at the fork to stay on <roadlist><road is_route_number='true' lang='en'>I-87 N<\/road><\/roadlist><\/step>",
+         "dir":"Keep left at the fork to stay on I-87 N",
+         "nextturn":"I-87 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.7846119,
+         "lat":42.5314167,
+         "dist":{  
+            "val":648,
+            "txt":"0.4 mi",
+            "total":1972911
+         },
+         "img":{  
+            "panoid":"A2VwpvFtNES1qRhhE3vtZg",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=A2VwpvFtNES1qRhhE3vtZg&w=203&h=100&yaw=22&pitch=0&thumbfov=114&ll=42.531254,-73.784680",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='OFF_RAMP' meters='648'>Take exit <exitlist><exit>22<\/exit><\/exitlist><\/step>",
+         "dir":"Take exit 22 for NY-144 towards NY-396\/Selkirk",
+         "nextturn":"Exit 22",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.7788276,
+         "lat":42.5340099,
+         "dist":{  
+            "val":718,
+            "txt":"0.4 mi",
+            "total":1973629
+         },
+         "img":{  
+            "panoid":"jR_ggB3-yVC7AbfTer3uvQ",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=jR_ggB3-yVC7AbfTer3uvQ&w=203&h=100&yaw=92&pitch=0&thumbfov=114&ll=42.534020,-73.779024",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"<step maneuver='TURN' meters='718'>Turn <turn side='RIGHT'>right<\/turn> onto <roadlist><road is_route_number='true' lang='en'>NY-144 S<\/road><\/roadlist><\/step>",
+         "dir":"Turn right onto NY-144 S (signs for NY-396)",
+         "nextturn":")",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.7841466,
+         "lat":42.5293079,
+         "dist":{  
+            "val":1239,
+            "txt":"0.8 mi",
+            "total":1974868
+         },
+         "img":{  
+            "panoid":"Qdf_U4Gvz8bnKicvVc1RjA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=Qdf_U4Gvz8bnKicvVc1RjA&w=203&h=100&yaw=235&pitch=0&thumbfov=114&ll=42.529434,-73.783963",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Turn right onto NY-396 W",
+         "nextturn":"NY-396 W",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.798529,
+         "lat":42.53245,
+         "dist":{  
+            "val":22,
+            "txt":"72 ft",
+            "total":1974890
+         },
+         "img":{  
+            "panoid":"-CV-NF8zRr_xpKDWF0Sphg",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=-CV-NF8zRr_xpKDWF0Sphg&w=203&h=100&yaw=301&pitch=0&thumbfov=114&ll=42.532306,-73.798297",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Turn left onto Thatcher St",
+         "nextturn":"Thatcher St",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.798602,
+         "lat":42.532261,
+         "dist":{  
+            "val":25,
+            "txt":"82 ft",
+            "total":1974915
+         },
+         "img":{  
+            "panoid":"b8BxutnITQkO2gpnfdqzdg",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=b8BxutnITQkO2gpnfdqzdg&w=203&h=100&yaw=201&pitch=0&thumbfov=114&ll=42.532424,-73.798537",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Turn left to stay on Thatcher St",
+         "nextturn":"Thatcher St",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.798297,
+         "lat":42.532306,
+         "dist":{  
+            "val":1214,
+            "txt":"0.8 mi",
+            "total":1976129
+         },
+         "img":{  
+            "panoid":"DlVrt6v_eSNt4U4yKGckKA",
+            "sview":{  
+               "url":"\/\/geo0.ggpht.com\/cbk?cb_client=maps_sv.tactile&output=thumbnail&thumb=2&panoid=DlVrt6v_eSNt4U4yKGckKA&w=203&h=100&yaw=81&pitch=0&thumbfov=114&ll=42.532268,-73.798554",
+               "width":203,
+               "height":100
+            }
+         },
+         "step":"",
+         "dir":"Slight right onto NY-396 E",
+         "nextturn":"NY-396 E",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.7841466,
+         "lat":42.5293079,
+         "dist":{  
+            "val":658,
+            "txt":"0.4 mi",
+            "total":1976787
+         },
+         "img":null,
+         "step":"",
+         "dir":"Turn left onto NY-144 N",
+         "nextturn":"NY-144 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.7785732,
+         "lat":42.5335555,
+         "dist":{  
+            "val":396,
+            "txt":"0.2 mi",
+            "total":1977183
+         },
+         "img":null,
+         "step":"<step maneuver='ON_RAMP' meters='396'>Turn <turn side='LEFT'>left<\/turn>  onto the <signlist><sign is_route_number='true' lang='en'>Interstate 87<\/sign><\/signlist> slip road<\/step>",
+         "dir":"Turn left  onto the Interstate 87\/New York State Thruway slip road",
+         "nextturn":"slip road",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.7824546,
+         "lat":42.5342227,
+         "dist":{  
+            "val":12644,
+            "txt":"7.9 mi",
+            "total":1989827
+         },
+         "img":null,
+         "step":"<step maneuver='FORK' meters='12644'>Keep <turn side='LEFT' type='KEEP'>left<\/turn> at the fork<\/step>",
+         "dir":"Keep left at the fork and merge onto I-87 S\/New York State Thruway",
+         "nextturn":"New York State Thruway",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.8039878,
+         "lat":42.429795,
+         "dist":{  
+            "val":247,
+            "txt":"0.2 mi",
+            "total":1990074
+         },
+         "img":null,
+         "step":"<step maneuver='OFF_RAMP' meters='247'>Take the exit<\/step>",
+         "dir":"Take the exit",
+         "nextturn":"Take the exit",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.8052179,
+         "lat":42.4277706,
+         "dist":{  
+            "val":255,
+            "txt":"0.2 mi",
+            "total":1990329
+         },
+         "img":null,
+         "step":"",
+         "dir":"Head south towards I-87 S",
+         "nextturn":"I-87 S",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.8059468,
+         "lat":42.4255762,
+         "dist":{  
+            "val":3632,
+            "txt":"2.3 mi",
+            "total":1993961
+         },
+         "img":null,
+         "step":"<step maneuver='MERGE' meters='3632'>Merge onto <roadlist><road is_route_number='true' lang='en'>I-87 S<\/road><\/roadlist><\/step>",
+         "dir":"Merge onto I-87 S",
+         "nextturn":"I-87 S",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.8243436,
+         "lat":42.3967419,
+         "dist":{  
+            "val":559,
+            "txt":"0.3 mi",
+            "total":1994520
+         },
+         "img":null,
+         "step":"<step maneuver='OFF_RAMP' meters='559'>Take exit <exitlist><exit lang='en'>21B<\/exit><\/exitlist><\/step>",
+         "dir":"Take exit 21B for US-9 towards NY-81\/Coxsackle\/Ravena",
+         "nextturn":"Exit 21B",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.8286552,
+         "lat":42.3942299,
+         "dist":{  
+            "val":1080,
+            "txt":"0.7 mi",
+            "total":1995600
+         },
+         "img":null,
+         "step":"<step maneuver='TURN' meters='1080'>Turn <turn side='LEFT'>left<\/turn> onto <roadlist><road is_route_number='true' lang='en'>US-9W S<\/road><\/roadlist><\/step>",
+         "dir":"Turn left onto US-9W S (signs for Coxsackie\/NY-81)",
+         "nextturn":")",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.8326786,
+         "lat":42.385431,
+         "dist":{  
+            "val":291,
+            "txt":"0.2 mi",
+            "total":1995891
+         },
+         "img":null,
+         "step":"",
+         "dir":"Turn right onto Scheller Park Rd",
+         "nextturn":"Scheller Park Rd",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.835171,
+         "lat":42.384056,
+         "dist":{  
+            "val":38,
+            "txt":"125 ft",
+            "total":1995929
+         },
+         "img":null,
+         "step":"<step maneuver='TURN' meters='38'>Turn <turn side='RIGHT'>right<\/turn> onto <roadlist><road lang='en'>Schiller Park Exd<\/road><\/roadlist><\/step>",
+         "dir":"Turn right at the 1st cross street onto Schiller Park Exd",
+         "nextturn":"Schiller Park Exd",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.835583,
+         "lat":42.384147,
+         "dist":{  
+            "val":79,
+            "txt":"259 ft",
+            "total":1996008
+         },
+         "img":null,
+         "step":"",
+         "dir":"Turn left onto Roberts Hill Rd",
+         "nextturn":"Roberts Hill Rd",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.835476,
+         "lat":42.3834389,
+         "dist":{  
+            "val":365,
+            "txt":"0.2 mi",
+            "total":1996373
+         },
+         "img":null,
+         "step":"",
+         "dir":"Sharp left onto Scheller Park Rd",
+         "nextturn":"Scheller Park Rd",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.8326786,
+         "lat":42.385431,
+         "dist":{  
+            "val":985,
+            "txt":"0.6 mi",
+            "total":1997358
+         },
+         "img":null,
+         "step":"<step maneuver='TURN' meters='985'>Turn <turn side='LEFT'>left<\/turn> onto <roadlist><road is_route_number='true' lang='en'>US-9W N<\/road><\/roadlist><\/step>",
+         "dir":"Turn left at the 2nd cross street onto US-9W N",
+         "nextturn":"US-9W N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.8292614,
+         "lat":42.3938138,
+         "dist":{  
+            "val":259,
+            "txt":"0.2 mi",
+            "total":1997617
+         },
+         "img":null,
+         "step":"<step maneuver='ON_RAMP' meters='259'>Turn <turn side='RIGHT'>right<\/turn>  onto the slip road to <roadlist><road is_route_number='true' lang='en'>I-87 N<\/road><\/roadlist><\/step>",
+         "dir":"Turn right  onto the slip road to I-87 N",
+         "nextturn":"I-87 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.8263488,
+         "lat":42.3938492,
+         "dist":{  
+            "val":14719,
+            "txt":"9.1 mi",
+            "total":2012336
+         },
+         "img":null,
+         "step":"<step maneuver='FORK' meters='14719'>Keep <turn side='LEFT' type='KEEP'>left<\/turn> at the fork<\/step>",
+         "dir":"Keep left at the fork, follow signs for Interstate 87 N\/Albany and merge onto I-87 N",
+         "nextturn":"I-87 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.7907781,
+         "lat":42.5097147,
+         "dist":{  
+            "val":703,
+            "txt":"0.4 mi",
+            "total":2013039
+         },
+         "img":null,
+         "step":"<step maneuver='OFF_RAMP' meters='703'>Take exit <exitlist><exit lang='en'>21A<\/exit><\/exitlist><\/step>",
+         "dir":"Take exit 21A towards Interstate 90 E\/Mass Turnpike\/Boston",
+         "nextturn":"Exit 21A",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.7865413,
+         "lat":42.5137412,
+         "dist":{  
+            "val":10269,
+            "txt":"6.4 mi",
+            "total":2023308
+         },
+         "img":null,
+         "step":"<step maneuver='NAME_CHANGE' meters='10269'>Continue onto <roadlist><road is_route_number='true' lang='en'>NY-912M E<\/road><\/roadlist><\/step>",
+         "dir":"Continue onto NY-912M E",
+         "nextturn":"NY-912M E",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-73.6701737,
+         "lat":42.4817182,
+         "dist":{  
+            "val":172647,
+            "txt":"107 mi",
+            "total":2195955
+         },
+         "img":null,
+         "step":"<step maneuver='NAME_CHANGE' meters='172647'>Continue onto <roadlist><road is_route_number='true' lang='en'>I-90 E<\/road><\/roadlist><\/step>",
+         "dir":"Continue onto I-90 E",
+         "nextturn":"I-90 E",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-71.857729,
+         "lat":42.1915721,
+         "dist":{  
+            "val":1724,
+            "txt":"1.1 mi",
+            "total":2197679
+         },
+         "img":null,
+         "step":"<step maneuver='OFF_RAMP' meters='1724'>Use the right 2 lanes to take exit <exitlist><exit lang='en'>10<\/exit><\/exitlist><\/step>",
+         "dir":"Use the right 2 lanes to take exit 10 towards MA-12 N\/Auburn\/Worcester",
+         "nextturn":"Exit 10",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-71.8468995,
+         "lat":42.1896242,
+         "dist":{  
+            "val":31755,
+            "txt":"19.7 mi",
+            "total":2229434
+         },
+         "img":null,
+         "step":"",
+         "dir":"Merge onto I-290 E",
+         "nextturn":"I-290 E",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-71.5963755,
+         "lat":42.3611465,
+         "dist":{  
+            "val":606,
+            "txt":"0.4 mi",
+            "total":2230040
+         },
+         "img":null,
+         "step":"",
+         "dir":"Use the left lane to stay on I-290 E",
+         "nextturn":"I-290 E",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-71.5893879,
+         "lat":42.3628723,
+         "dist":{  
+            "val":1024,
+            "txt":"0.6 mi",
+            "total":2231064
+         },
+         "img":null,
+         "step":"<step maneuver='OFF_RAMP' meters='1024'>Use the left lane to take exit <exitlist><exit lang='en'>26B<\/exit><\/exitlist><\/step>",
+         "dir":"Use the left lane to take exit 26B for Interstate 495 N towards Lowell",
+         "nextturn":"Exit 26B",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-71.5930547,
+         "lat":42.3663293,
+         "dist":{  
+            "val":88352,
+            "txt":"54.9 mi",
+            "total":2319416
+         },
+         "img":null,
+         "step":"",
+         "dir":"Merge onto I-495 N",
+         "nextturn":"I-495 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-70.8960942,
+         "lat":42.856679,
+         "dist":{  
+            "val":958,
+            "txt":"0.6 mi",
+            "total":2320374
+         },
+         "img":null,
+         "step":"<step maneuver='NAME_CHANGE' meters='958'>Continue onto <roadlist><road lang='en'>Exit 60<\/road><\/roadlist><\/step>",
+         "dir":"Continue onto Exit 60 (signs for MA-286\/Beaches\/Salisburry)",
+         "nextturn":"Exit 60",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-70.8923243,
+         "lat":42.8640465,
+         "dist":{  
+            "val":10834,
+            "txt":"6.7 mi",
+            "total":2331208
+         },
+         "img":null,
+         "step":"<step maneuver='MERGE' meters='10834'>Merge onto <roadlist><road is_route_number='true' lang='en'>I-95 N<\/road><\/roadlist><\/step>",
+         "dir":"Merge onto I-95 N",
+         "nextturn":"I-95 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-70.8572321,
+         "lat":42.9574163,
+         "dist":{  
+            "val":12645,
+            "txt":"7.9 mi",
+            "total":2343853
+         },
+         "img":null,
+         "step":"<step maneuver='FORK' meters='12645'>Keep <turn side='LEFT' type='KEEP'>left<\/turn> at the fork to stay on <roadlist><road is_route_number='true' lang='en'>I-95 N<\/road><\/roadlist><\/step>",
+         "dir":"Keep left at the fork to stay on I-95 N",
+         "nextturn":"I-95 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-70.7993634,
+         "lat":43.0609536,
+         "dist":{  
+            "val":74644,
+            "txt":"46.4 mi",
+            "total":2418497
+         },
+         "img":null,
+         "step":"<step maneuver='TURN' meters='74644'>Keep <turn side='RIGHT' type='KEEP'>right<\/turn> to stay on <roadlist><road is_route_number='true' lang='en'>I-95 N<\/road><\/roadlist><\/step>",
+         "dir":"Keep right to stay on I-95 N",
+         "nextturn":"I-95 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-70.3527745,
+         "lat":43.6237882,
+         "dist":{  
+            "val":84549,
+            "txt":"52.5 mi",
+            "total":2503046
+         },
+         "img":null,
+         "step":"<step maneuver='FORK' meters='84549'>Keep <turn side='RIGHT' type='KEEP'>right<\/turn> at the fork to continue on <roadlist><road is_route_number='true' lang='en'>I-295 N<\/road><\/roadlist><\/step>",
+         "dir":"Keep right at the fork to continue on I-295 N, follow signs for S Portland\/Downtown Portland",
+         "nextturn":"Downtown Portland",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-69.8184682,
+         "lat":44.2234719,
+         "dist":{  
+            "val":127221,
+            "txt":"79.1 mi",
+            "total":2630267
+         },
+         "img":null,
+         "step":"<step maneuver='MERGE' meters='127221'>Merge onto <roadlist><road is_route_number='true' lang='en'>I-95 N<\/road><\/roadlist><\/step>",
+         "dir":"Merge onto I-95 N",
+         "nextturn":"I-95 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-68.810417,
+         "lat":44.7842178,
+         "dist":{  
+            "val":7516,
+            "txt":"4.7 mi",
+            "total":2637783
+         },
+         "img":null,
+         "step":"<step maneuver='OFF_RAMP' meters='7516'>Take exit <exitlist><exit lang='en'>182A<\/exit><\/exitlist><\/step>",
+         "dir":"Take exit 182A to merge onto I-395 E\/ME-15 S towards Bangor-Brewer\/U.S. 1A\/ME-9",
+         "nextturn":"Exit 182A",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-68.7244066,
+         "lat":44.7695295,
+         "dist":{  
+            "val":577,
+            "txt":"0.4 mi",
+            "total":2638360
+         },
+         "img":null,
+         "step":"<step maneuver='OFF_RAMP' meters='577'>Take exit <exitlist><exit lang='en'>6A<\/exit><\/exitlist><\/step>",
+         "dir":"Take exit 6A to merge onto US-1A E\/Wilson St towards Ellsworth\/Bar Harbor\/US-1\/Coastal Route",
+         "nextturn":"Exit 6A",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-68.7175995,
+         "lat":44.7695979,
+         "dist":{  
+            "val":34099,
+            "txt":"21.2 mi",
+            "total":2672459
+         },
+         "img":null,
+         "step":"<step maneuver='MERGE' meters='34099'>Merge onto <roadlist><road is_route_number='true' lang='en'>US-1A E<\/road><\/roadlist><\/step>",
+         "dir":"Merge onto US-1A E\/Wilson St",
+         "nextturn":"Wilson St",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-68.4385525,
+         "lat":44.5621293,
+         "dist":{  
+            "val":2093,
+            "txt":"1.3 mi",
+            "total":2674552
+         },
+         "img":null,
+         "step":"",
+         "dir":"Continue onto Bangor Rd",
+         "nextturn":"Bangor Rd",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-68.4232386,
+         "lat":44.5468783,
+         "dist":{  
+            "val":502,
+            "txt":"0.3 mi",
+            "total":2675054
+         },
+         "img":null,
+         "step":"",
+         "dir":"Continue onto Oak St",
+         "nextturn":"Oak St",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-68.4201006,
+         "lat":44.5429612,
+         "dist":{  
+            "val":2952,
+            "txt":"1.8 mi",
+            "total":2678006
+         },
+         "img":null,
+         "step":"",
+         "dir":"Turn left onto Main St",
+         "nextturn":"Main St",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-68.3859763,
+         "lat":44.5499347,
+         "dist":{  
+            "val":3782,
+            "txt":"2.4 mi",
+            "total":2681788
+         },
+         "img":null,
+         "step":"",
+         "dir":"Continue straight onto Washington Junction Rd",
+         "nextturn":"Washington Junction Rd",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-68.3547116,
+         "lat":44.5354262,
+         "dist":{  
+            "val":12460,
+            "txt":"7.7 mi",
+            "total":2694248
+         },
+         "img":null,
+         "step":"",
+         "dir":"Turn left onto US-1 N",
+         "nextturn":"US-1 N",
+         "type":"waypoint"
+      },
+      {  
+         "lng":-68.2090045,
+         "lat":44.5225637,
+         "dist":{  
+            "val":52,
+            "txt":"171 ft",
+            "total":2694300
+         },
+         "img":null,
+         "step":"<step maneuver='TURN' meters='52'>Turn <turn side='LEFT'>left<\/turn> onto <roadlist><road lang='en'>Manor Ln<\/road><\/roadlist><\/step>",
+         "dir":"Turn left onto Manor Ln",
+         "nextturn":"Manor Ln",
+         "type":"waypoint"
+      }
+   ],
+   "totaldist":2694300,
+   "wpts":[  
+      {  
+         "lat":37.4965621,
+         "lng":-77.2875753
+      }
+   ],
+   "avoid":{  
+      "highways":false,
+      "tolls":false,
+      "ferries":false
+   },
+   "elevation":null
+}
