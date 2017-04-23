@@ -1,22 +1,47 @@
 package robauto;
 
+/***
+ * https://www.allstays.com/DL/join.htm
+ */
+
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.security.cert.CertificateException;
 import javax.security.cert.X509Certificate;
+import javax.swing.event.ListSelectionEvent;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -35,6 +60,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.gavaghan.geodesy.Ellipsoid;
+import org.gavaghan.geodesy.GeodeticCalculator;
+import org.gavaghan.geodesy.GeodeticCurve;
+import org.gavaghan.geodesy.GlobalCoordinates;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,6 +80,7 @@ import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
+import com.google.maps.PendingResult;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.PlacesApi;
 import com.google.maps.RoadsApi;
@@ -55,16 +92,23 @@ import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
+import com.google.maps.model.PlaceType;
 import com.google.maps.model.PlacesSearchResponse;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.model.SnappedPoint;
 import com.google.maps.model.TransitMode;
 import com.google.maps.model.TransitRoutingPreference;
 import com.google.maps.model.TravelMode;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.x5.util.Base64;
+
+import ch.qos.logback.classic.LoggerContext;
 
 public class Main {
 	
 	static final String apiKey = "AIzaSyCA9cRJXpWLwxM4IccF9o3BCp2varIqm24";
+	
 	
 	@SuppressWarnings("deprecation")
 	public static CloseableHttpClient createHttpClient() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
@@ -233,39 +277,263 @@ public class Main {
 				RoadsApi.snapToRoads(context, pathList.subList(j, pathList.size()).toArray(empty) ).await() ) );
 		return path;
 	}
-
-	public static void main(String[] args) {
-		String mapUrl = "https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940,+USA/Jekyll+Island+Campground,+Riverview+Drive,+Brunswick,+GA/Walmart+Supercenter,+1550+Skibo+Rd,+Fayetteville,+NC+28303/38.67118,-77.17452/Patapsco+Valley+State+Park,+8020+Baltimore+National+Pike,+Ellicott+City,+MD+21043/@35.1225427,-79.2581005,8.75z/am=t/data=!4m27!4m26!1m5!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!1m5!1m1!1s0x88e4dbc92d7c68d7:0x29d0308d10819d72!2m2!1d-81.4128!2d31.1072326!1m5!1m1!1s0x89ab6b142d902c5b:0xc299c532d93859dc!2m2!1d-78.957215!2d35.081892!1m0!1m5!1m1!1s0x89c81f7c74c6818d:0xbb46cc34aae2e03f!2m2!1d-76.7828076!2d39.2885596!3e0"; 
-				//"https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940/New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087/7+Manor+Ln,+Sullivan,+ME+04664/@36.1938353,-83.9469478,5z/am=t/data=!3m1!4b1!4m25!4m24!1m10!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!3m4!1m2!1d-77.2875753!2d37.4965621!3s0x89b11b7c8ac52005:0x8afb4d10805f3f31!1m5!1m1!1s0x89dde9a4a6faef3d:0xac1113996de4a061!2m2!1d-73.8055448!2d42.4279567!1m5!1m1!1s0x4caee844875d1295:0xd2bc1dd5aaaf365d!2m2!1d-68.2087797!2d44.523031!3e0?hl=en-US";
-		String json = mapToJson( mapUrl );
-		if (json != null) {
-			//System.out.println(json);
-			Gson gson = new Gson();
-			Route route = gson.fromJson(json, Route.class );
-			for (Route.Point point : route.points) {
-				System.out.println( point.nextturn + " | " + point.dir );
-			}
-			return;
+	/*
+<step maneuver="DEPART" meters="526">
+	Head 
+	<direction dir="NORTH_EAST">
+		north-east
+	</direction> 
+	on
+	<roadlist>
+		<road lang="en">
+			Carambola Cir
+		</road>
+	</roadlist> 
+	towards 
+	<roadlist>
+		<road lang="en">
+			Floristana Dr
+		</road>
+	</roadlist>
+</step>
+	 */
+	
+	protected static PlaceDetails randomNearby(GeoApiContext context, LatLng  center ) {
+		PlacesSearchResponse placeResponse;
+		try {
+			placeResponse = PlacesApi.nearbySearchQuery(context, center )
+					.radius(50000)
+					.type(PlaceType.GAS_STATION)
+					.await();
+		} catch (ApiException e) {
+			System.err.println(e);
+			return null;
+		} catch (InterruptedException e) {
+			System.err.println(e);
+			return null;
+		} catch (IOException e) {
+			System.err.println(e);
+			return null;
 		}
+		if (placeResponse == null) return null;
+		if (placeResponse.results == null) return null;
+		int n = placeResponse.results.length;
+		int i = (int) Math.floor( (double)n * Math.random() );
+		PlacesSearchResult placeResult = placeResponse.results[i];
+		PlaceDetails details = new PlaceDetailsRequest(context)
+				.placeId(placeResult.placeId).awaitIgnoreError();
+		return details;
+	}
+	
+	protected static GeodeticCalculator geoCalc = new GeodeticCalculator();
+	protected static Ellipsoid wgs84 = Ellipsoid.WGS84;
+	
+	protected static PlaceDetails furthestNearby(GeoApiContext context, LatLng  center ) {
+		PlacesSearchResponse placeResponse = PlacesApi.nearbySearchQuery(context, center )
+				.radius(50000)
+				.type(PlaceType.GAS_STATION)
+				.awaitIgnoreError();
+		double max = 0.0;
+		PlaceDetails best = null;
+		for (PlacesSearchResult placeResult : placeResponse.results) {
+			PlaceDetails details = new PlaceDetailsRequest(context)
+					.placeId(placeResult.placeId).awaitIgnoreError();
+			GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84, 
+					new GlobalCoordinates(center.lat, center.lng), 
+					new GlobalCoordinates(details.geometry.location.lat, details.geometry.location.lng));
+			double d = curve.getEllipsoidalDistance();
+			if (d > max) {
+				max = d;
+				best = details;
+			}
+		}
+		return best;
+	}
+	
+	public static String serialize(TreeSet<String> set) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+	        ObjectOutputStream out = new ObjectOutputStream(baos);
+	        out.writeObject(set);
+	        out.close();
+		} catch (Exception x) {
+			return null;
+		}
+		return Base64.encodeBytes( baos.toByteArray() ).replaceAll("\n", "");
+	}
+	
+	
+	protected static boolean roadsFromPoints(GeoApiContext context) {
+		ArrayList<GlobalCoordinates> points = new ArrayList<GlobalCoordinates>();
+		try {
+            File f = new File("../RobautoFX/Directions from mymaps.kml");
+
+            BufferedReader b = new BufferedReader(new FileReader(f));
+
+            String line = "";
+            while ((line = b.readLine()) != null) {
+            	if (line.contains("<coordinates>"))
+            		break;
+            }
+            while ((line = b.readLine()) != null) {
+            	if (line.contains("</coordinates>"))
+            		break;
+            	int i = line.indexOf(',');
+            	int j = line.lastIndexOf(',');
+            	double lng = Double.parseDouble( line.substring(0, i));
+            	double lat = Double.parseDouble(line.substring(i+1, j));
+            	points.add( new GlobalCoordinates( lat, lng ) ); 
+            }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		double cumd = 0.0;
+		for (int i = 1; i < points.size(); i++) {
+			GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84, 
+					points.get(i-1), 
+					points.get(i));
+			double d = curve.getEllipsoidalDistance();
+			double az = curve.getAzimuth();
+			cumd += d;
+			System.out.println(String.format("%10.3f mi %3.0f deg  %10.3f mi ", 
+					d/0.3048/5280.0, az, cumd/0.3048/5280.0));
+		}	
+		System.out.println( points.size() + " " + cumd / (double) points.size() );
+		
+		ArrayList<LatLng> subset = new ArrayList<LatLng>();
+		for (int i = 360; i < 5*120+0*points.size(); i += 120) {
+			subset.add( new LatLng( points.get(i).getLatitude(), points.get(i).getLongitude()) );
+		}
+		SnappedPoint[] snaps = RoadsApi.nearestRoads(context, subset.toArray( new LatLng[subset.size()]))
+				.awaitIgnoreError();
+		
+		for (SnappedPoint snap : snaps) {
+			PlaceDetails details = new PlaceDetailsRequest(context)
+				.placeId(snap.placeId).awaitIgnoreError();
+			System.out.println(details.name + " " + details.vicinity );
+		}
+		return true;
+	}
+		
+	public static void main(String[] args) {
+		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+		loggerContext.stop();
+//		String mapUrl = "https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940,+USA/Jekyll+Island+Campground,+Riverview+Drive,+Brunswick,+GA/Walmart+Vision+%26+Glasses,+Smithfield,+NC/38.67118,-77.17452/Patapsco+Valley+State+Park,+8020+Baltimore+National+Pike,+Ellicott+City,+MD+21043/@33.6805702,-83.7376603,6z/am=t/data=!4m27!4m26!1m5!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!1m5!1m1!1s0x88e4dbc92d7c68d7:0x29d0308d10819d72!2m2!1d-81.4128!2d31.1072326!1m5!1m1!1s0x89ac6d5928ae5d0f:0x6cd3177e217eabf7!2m2!1d-78.3093638!2d35.5232034!1m0!1m5!1m1!1s0x89c81f7c74c6818d:0xbb46cc34aae2e03f!2m2!1d-76.7828076!2d39.2885596!3e0"; 
+//				//"https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940/New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087/7+Manor+Ln,+Sullivan,+ME+04664/@36.1938353,-83.9469478,5z/am=t/data=!3m1!4b1!4m25!4m24!1m10!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!3m4!1m2!1d-77.2875753!2d37.4965621!3s0x89b11b7c8ac52005:0x8afb4d10805f3f31!1m5!1m1!1s0x89dde9a4a6faef3d:0xac1113996de4a061!2m2!1d-73.8055448!2d42.4279567!1m5!1m1!1s0x4caee844875d1295:0xd2bc1dd5aaaf365d!2m2!1d-68.2087797!2d44.523031!3e0?hl=en-US";
+//		String json = mapToJson( mapUrl );
+//		if (json != null) {
+//			System.out.println(json);
+//			Gson gson = new Gson();
+//			Route route = gson.fromJson(json, Route.class );
+//			for (Route.Point point : route.points) {
+//				System.out.println( /*point.nextturn + " | " + point.dir + " | " +*/ point.step );
+//				if (point.step != null && !point.step.isEmpty()) {
+//					String embed = String.format("<?xml version=\"1.0\"?>%s", point.step );
+//					try {
+//						DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+//						DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+//						Document doc = dBuilder.parse(new ByteArrayInputStream(embed.getBytes()));
+//						doc.getDocumentElement().normalize();
+//						Element top = doc.getDocumentElement();
+//						System.out.println( top.getTextContent() );
+//	//					NodeList nodes = top.getChildNodes();
+//	//					for (int i = 0; i < nodes.getLength(); i++) {
+//	//						Node node = nodes.item(i);
+//	//						//System.out.println( node.getNodeType() + " " + node.getNodeName() );
+//	//						switch (node.getNodeType()) {
+//	//						case Node.TEXT_NODE:
+//	//							System.out.println(node.getTextContent());
+//	//							break;
+//	//						case Node.ELEMENT_NODE:
+//	//							System.out.println(node.getNodeName());
+//	//							break;
+//	//						}
+//	//					}
+//					} catch (Exception x) {
+//						x.printStackTrace();
+//					}
+//				} else {
+//					System.out.println(point.dir);
+//				}
+//			}
+//			return;
+//		}
+		
+		LatLng start1 = new LatLng(32.715, -117.1625); //(30.336944, -81.661389);
+		LatLng start2 = new LatLng(40.728333, -73.994167); //(47.609722, -122.333056);
 		HttpInterceptorHandler interceptor = new HttpInterceptorHandler();
 		GeoApiContext context = new GeoApiContext( interceptor ).setApiKey(apiKey);  
 				//.setEnterpriseCredentials(clientID, clientSecret);
+
+		if (roadsFromPoints(context)) return;
+		
+		TreeSet<String> places = new TreeSet<String>();
+		try {
+		     CSVReader reader = new CSVReader(new FileReader("places.csv"));
+		     String [] nextLine;
+		     while ((nextLine = reader.readNext()) != null) {
+		        places.add(nextLine[0]);
+		     }
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		for (int i = 0; i < 50; i++) {
+			PlaceDetails p1 = randomNearby( context, start1 );
+			if (p1 != null) {
+				start1 = p1.geometry.location;
+				places.add(p1.formattedAddress);
+			}
+			PlaceDetails p2 = randomNearby( context, start2 );
+			if (p2 != null) {
+				start2 = p2.geometry.location;
+				places.add(p2.formattedAddress);
+			}
+		}
+		try {
+			CSVWriter writer = new CSVWriter(new FileWriter("places.csv"), '\t');
+			String[] string = new String[1];
+			for (String address : places ) {
+				System.out.println( address );
+				string[0] = address;
+				writer.writeNext(string);
+			}
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+//		String serial = serialize( places );
+//		try {
+//			FileOutputStream fos = new FileOutputStream( "places.obj" );
+//			fos.write( serial.getBytes() );
+//			fos.close();
+//		} catch (FileNotFoundException e1) {
+//			e1.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		if (start2 != null) return;
+		
 		GeocodingResult[] results;
 		try {
-//			results = GeocodingApi.geocode(context,
-//			    "1600 Amphitheatre Parkway Mountain View, CA 94043").await();
-//			System.out.println(results[0].formattedAddress);
-//https://www.google.com/maps?ll=36.532674,-74.947547&z=4&t=m&hl=en-US&gl=US&mapclient=embed&saddr=3533+Carambola+Cir,+Melbourne,+FL+32940&daddr=New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087+to:7+Manor+Ln,+Sullivan,+ME+04664&dirflg=d
-/*			
-https://www.google.com/maps/dir
- * /3533+Carambola+Cir,+Melbourne,+FL+32940
- * /New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087
- * /7+Manor+Lane,+Sullivan,+ME+04664-3126,+USA
- * /@40.2305511,-76.0472951,13.75z
- * /data=!4m25!4m24!1m10!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!3m4!1m2!1d-76.036814!2d40.2489107!3s0x89c66da0509541c3:0x8e8c1db0911f4e88!1m5!1m1!1s0x89dde9a4a6faef3d:0xac1113996de4a061!2m2!1d-73.8055448!2d42.4279567!1m5!1m1!1s0x4caee844875d1295:0xd2bc1dd5aaaf365d!2m2!1d-68.2087797!2d44.523031!3e0
- * ?hl=en-US
-*/
-//https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940/New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087/7+Manor+Lane,+Sullivan,+ME+04664-3126,+USA/@34.7716243,-80.3462902,5z
+////			results = GeocodingApi.geocode(context,
+////			    "1600 Amphitheatre Parkway Mountain View, CA 94043").await();
+////			System.out.println(results[0].formattedAddress);
+////https://www.google.com/maps?ll=36.532674,-74.947547&z=4&t=m&hl=en-US&gl=US&mapclient=embed&saddr=3533+Carambola+Cir,+Melbourne,+FL+32940&daddr=New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087+to:7+Manor+Ln,+Sullivan,+ME+04664&dirflg=d
+///*			
+//https://www.google.com/maps/dir
+// * /3533+Carambola+Cir,+Melbourne,+FL+32940
+// * /New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087
+// * /7+Manor+Lane,+Sullivan,+ME+04664-3126,+USA
+// * /@40.2305511,-76.0472951,13.75z
+// * /data=!4m25!4m24!1m10!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!3m4!1m2!1d-76.036814!2d40.2489107!3s0x89c66da0509541c3:0x8e8c1db0911f4e88!1m5!1m1!1s0x89dde9a4a6faef3d:0xac1113996de4a061!2m2!1d-73.8055448!2d42.4279567!1m5!1m1!1s0x4caee844875d1295:0xd2bc1dd5aaaf365d!2m2!1d-68.2087797!2d44.523031!3e0
+// * ?hl=en-US
+//*/
+////https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940/New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087/7+Manor+Lane,+Sullivan,+ME+04664-3126,+USA/@34.7716243,-80.3462902,5z
 /*
  * https://www.google.com/maps?ll=36.532674,-74.947547&z=4&t=m&hl=en-US&gl=US&mapclient=embed&saddr=3533+Carambola+Cir,+Melbourne,+FL+32940&daddr=New+Baltimore+Travel+Plaza,+127+New+York+State+Thruway,+Hannacroix,+NY+12087+to:7+Manor+Ln,+Sullivan,+ME+04664&dirflg=d
  *
@@ -295,60 +563,59 @@ https://www.google.com/maps/dir
 			final String poi = "NEW BALTIMORE SERVICE PLAZA";
 			
 			for (PlacesSearchResult placeResult : placeResponse.results) {
-				System.out.println( placeResult.placeId + " | " + placeResult.vicinity + " | " + placeResult.name );
+				System.out.println( placeResult.name + " | " + placeResult.vicinity + " | " + placeResult.formattedAddress );
 				
-//				PlaceDetails details = new PlaceDetailsRequest(context)
-//						.placeId(placeResult.placeId).awaitIgnoreError();
-//				for (String type : details.types) {
-//					System.out.print( type + " " );
-//				}
+				PlaceDetails details = new PlaceDetailsRequest(context)
+						.placeId(placeResult.placeId).awaitIgnoreError();
+				System.out.println("  " + details.formattedAddress );
+				System.out.println("  " + details.geometry.location );
 //				if (details.name.toUpperCase().contains(poi)) {
 //					System.out.println( details.name + " " + details.formattedAddress );
 //				}
 			}
-		    DirectionsApiRequest request = DirectionsApi.newRequest(context);
-		    DirectionsResult result = request
-		            .origin("3533 Carambola Circle, Melbourne, FL, USA")
-		            .destination("7 Manor Lane, Sullivan, ME, USA")
-		            //.waypoints( new LatLng(42.426431, -73.805126) ) //		
-		            .waypoints( "via:42.426431,-73.805126" )
-		            .mode(TravelMode.DRIVING)
-		            .await();
-		   System.out.println( request );
-
-		    System.out.println(result.geocodedWaypoints);
-		    System.out.println(result.geocodedWaypoints.length);
-		    System.out.println( result.geocodedWaypoints[0].geocoderStatus);
-		    System.out.println( result.geocodedWaypoints[1].geocoderStatus);
-		    System.out.println( result.geocodedWaypoints[1].types[0]);
-		    for(DirectionsRoute route : result.routes) {
-		    	for (DirectionsLeg leg : route.legs) {
-		    		System.out.println(leg.duration);
-		    		for (DirectionsStep step : leg.steps) {
-		    			//System.out.println(step);
-		    			//System.out.println(step.endLocation);
-		    			System.out.println(step.htmlInstructions);
-		    			System.out.println(step.duration);
-		    		}
-		    	}
-//		    	List<LatLng> pathList = route.overviewPolyline.decodePath();
-//		    	List<SnappedPoint> points = snapToRoads( context, pathList );
-//		    	for (SnappedPoint point : points ) {
-//		    		System.out.println( point);
-//		    		break;
-//		    	}
-//		    	for (LatLng point : path) {
-//		    		System.out.println(point);
-//		    		results = GeocodingApi.reverseGeocode(context, point).await();
-//		    		for (GeocodingResult where : results) {
-//		    			System.out.println(where.formattedAddress);
+//		    DirectionsApiRequest request = DirectionsApi.newRequest(context);
+//		    DirectionsResult result = request
+//		            .origin("3533 Carambola Circle, Melbourne, FL, USA")
+//		            .destination("7 Manor Lane, Sullivan, ME, USA")
+//		            //.waypoints( new LatLng(42.426431, -73.805126) ) //		
+//		            .waypoints( "via:42.426431,-73.805126" )
+//		            .mode(TravelMode.DRIVING)
+//		            .await();
+//		   System.out.println( request );
+//
+//		    System.out.println(result.geocodedWaypoints);
+//		    System.out.println(result.geocodedWaypoints.length);
+//		    System.out.println( result.geocodedWaypoints[0].geocoderStatus);
+//		    System.out.println( result.geocodedWaypoints[1].geocoderStatus);
+//		    System.out.println( result.geocodedWaypoints[1].types[0]);
+//		    for(DirectionsRoute route : result.routes) {
+//		    	for (DirectionsLeg leg : route.legs) {
+//		    		System.out.println(leg.duration);
+//		    		for (DirectionsStep step : leg.steps) {
+//		    			//System.out.println(step);
+//		    			//System.out.println(step.endLocation);
+//		    			System.out.println(step.htmlInstructions);
+//		    			System.out.println(step.duration);
 //		    		}
 //		    	}
-		    }
-		    
+////		    	List<LatLng> pathList = route.overviewPolyline.decodePath();
+////		    	List<SnappedPoint> points = snapToRoads( context, pathList );
+////		    	for (SnappedPoint point : points ) {
+////		    		System.out.println( point);
+////		    		break;
+////		    	}
+////		    	for (LatLng point : path) {
+////		    		System.out.println(point);
+////		    		results = GeocodingApi.reverseGeocode(context, point).await();
+////		    		for (GeocodingResult where : results) {
+////		    			System.out.println(where.formattedAddress);
+////		    		}
+////		    	}
+//		    }
+//		    
 		    System.out.println( interceptor.getRequestUrl() );
 		    
-		} catch (ApiException | InterruptedException | IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
