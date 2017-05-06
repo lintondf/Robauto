@@ -415,8 +415,32 @@ public class Main {
 		}
 		return true;
 	}
+	
+	protected static String toDms( double angle, String hemispheres ) {
+		StringBuffer sb = new StringBuffer();
+		String hemisphere = hemispheres.substring(0,1);
+		if (angle < 0) {
+			hemisphere = hemispheres.substring(1,2);
+			angle = -angle;
+		}
+		sb.append( String.format("%d", (int) Math.floor(angle)) );
+		sb.append("°");
+		angle = 60.0 * (angle - Math.floor(angle));
+		sb.append( String.format("%d", (int) Math.floor(angle)) );
+		sb.append("'");
+		angle = 60.0 * (angle - Math.floor(angle));
+		sb.append( String.format("%f", angle) );
+		sb.append("\"");
+		sb.append(hemisphere);
+		return sb.toString();
+	}
 		
 	public static void main(String[] args) {
+		System.out.println(String.format("https://www.google.com/maps/place/%s+%s",
+				toDms(29.697742, "NS"), toDms(-81.326182, "EW")) );
+		
+		//Google Maps to Lat/Lng: -81.326182	29.697742
+ 		//https://www.google.com/maps/place/29°41'51.9"N+81°19'34.3"W
 		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		loggerContext.stop();
 //		String mapUrl = "https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940,+USA/Jekyll+Island+Campground,+Riverview+Drive,+Brunswick,+GA/Walmart+Vision+%26+Glasses,+Smithfield,+NC/38.67118,-77.17452/Patapsco+Valley+State+Park,+8020+Baltimore+National+Pike,+Ellicott+City,+MD+21043/@33.6805702,-83.7376603,6z/am=t/data=!4m27!4m26!1m5!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!1m5!1m1!1s0x88e4dbc92d7c68d7:0x29d0308d10819d72!2m2!1d-81.4128!2d31.1072326!1m5!1m1!1s0x89ac6d5928ae5d0f:0x6cd3177e217eabf7!2m2!1d-78.3093638!2d35.5232034!1m0!1m5!1m1!1s0x89c81f7c74c6818d:0xbb46cc34aae2e03f!2m2!1d-76.7828076!2d39.2885596!3e0"; 
