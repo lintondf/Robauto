@@ -1,5 +1,7 @@
 package com.bluelightning;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -49,6 +51,8 @@ import com.x5.template.Chunk;
 import com.x5.template.Theme;
 
 public class Here2 {
+	
+	//https://developer.here.com/documentation
 	
 	public static Gson gson = new GsonBuilder()
 		.registerTypeAdapterFactory(new PostProcessingEnabler())
@@ -174,6 +178,11 @@ public class Here2 {
 		nvps.add(new BasicNameValuePair("linkAttributes", "speedLimit,truckRestrictions,roadName"));
 		nvps.add(new BasicNameValuePair("maneuverAttributes", 
 				"position,length,travelTime,roadName,roadNumber,signPost,freewayExit,link"));
+		nvps.add(new BasicNameValuePair("avoidAreas", 
+//				"52.517100760,13.3905424488;52.5169701849,13.391808451"));
+				"41.86547012230937,-73.73199462890625;41.21998578493921,-72.47955322265625" ));
+		//LL X:41.21998578493921,Y:-73.73199462890625, UR X:41.86547012230937,Y:-72.47955322265625
+
 		nvps.add(new BasicNameValuePair("mode", mode));
 		nvps.add(new BasicNameValuePair("limitedWeight", "1"));  //TODO
 		nvps.add(new BasicNameValuePair("height", Double.toString(146.0 / 12.0 * 0.3048)));          // TODO
@@ -203,7 +212,33 @@ public class Here2 {
 //	    return null;
 	}
 	
+	public static String angle2Direction( double angle) {
+		if (angle < 22.5 || angle > 337.5)
+			return "N";
+		else if (angle < 67.5)
+			return "NE";
+		else if (angle < 112.5)
+			return "E";
+		else if (angle < 157.5)
+			return "SE";
+		else if (angle < 202.5)
+			return "S";
+		else if (angle < 247.5)
+			return "SW";
+		else if (angle < 292.5)
+			return "W";
+		return "NW";
+	}
 	
+	
+	public static String toString( List<Object> shape ) {
+		StringBuffer sb = new StringBuffer();
+		for (Object obj : shape) {
+			sb.append( obj.toString() );
+			sb.append("; ");
+		}
+		return sb.toString();
+	}
 
 	public static void main(String[] args) {
 //		LatLon lee = Here.geocodeLookup("Lee Service Plaza Eastbound");
@@ -212,6 +247,8 @@ public class Here2 {
 		try {
 			String json = IOUtils.toString(new FileInputStream("route.json"), "UTF-8");
 			hereRoute = (HereRoute) Here2.gson.fromJson(json, HereRoute.class);
+			if (hereRoute == null || hereRoute.getResponse() == null)
+				throw new NullPointerException();
 		} catch (Exception x) {
 			LatLon sullivan = geocodeLookup("7 Manor Lane, Sullivan, ME");
 			System.out.println( sullivan  );
@@ -238,32 +275,41 @@ public class Here2 {
 				System.out.println( waypoint );
 			}
 			System.out.printf("%d legs\n", route.getLeg().size() );
+			List<GeoPosition> routeShape = route.getShape();
 			for (Leg leg : route.getLeg()) {
 				System.out.println( leg.getSummary() );
 				System.out.printf("%d links\n", leg.getLink().size() );
 				System.out.printf("%d Maneuvers\n", leg.getManeuver().size() );
 				for (Maneuver maneuver : leg.getManeuver()) {
-					System.out.printf("%-5s: %5.1f mi; %s %s [%s/%s] %s\n", maneuver.getId(), 
+					Link link = leg.getLinkMap().get(maneuver.getId());
+					String linkDetails = "";
+					double speed = METERS_PER_SECOND_TO_MILES_PER_HOUR*(maneuver.getLength() / maneuver.getTrafficTime());
+					if (link != null) {
+						String truckRestrictions = (link.getTruckRestrictions() == null || link.getTruckRestrictions().getHeight() == null) ?
+								"None" : String.format("%.1f ft", link.getTruckRestrictions().getHeight()/0.3048);
+						double speedLimit = (link.getSpeedLimit() == null) ? 0.0 : METERS_PER_SECOND_TO_MILES_PER_HOUR*link.getSpeedLimit();
+						// TODO for each maneuver adjust travel times for travel at speed limit
+//						System.out.printf("   %-20s :  %10s / %5.1f vs %5.1f / Clearance: %s\n",
+//								link.getLinkId(), link.getManeuver(), speed, speedLimit, truckRestrictions);
+						linkDetails = String.format("%.0f,%.0f,%s", speed, speedLimit, truckRestrictions);
+					}
+					System.out.printf("%-5s: %5.1f mi; %s %s [%s/%s/%s] %s\n", maneuver.getId(), 
 							maneuver.getLength()*METERS_TO_MILES,
 							Here2.toPeriod(maneuver.getTravelTime()),
 							Here2.toPeriod(maneuver.getBaseTime()),
-							maneuver.getRoadName(), maneuver.getRoadNumber(), maneuver.getInstruction() );
-					Link link = leg.getLinkMap().get(maneuver.getId());
-					double speed = METERS_PER_SECOND_TO_MILES_PER_HOUR*(maneuver.getLength() / maneuver.getTrafficTime());
-					if (link != null) {
-						String truckRestrictions = (link.getTruckRestrictions() == null || link.getTruckRestrictions().getHeight() == null) ? "Unlimited" : 
-							Double.toString(link.getTruckRestrictions().getHeight()/0.3048);
-						double speedLimit = (link.getSpeedLimit() == null) ? 0.0 : METERS_PER_SECOND_TO_MILES_PER_HOUR*link.getSpeedLimit();
-						// TODO for each maneuver adjust travel times for travel at speed limit
-						System.out.printf("   %-20s :  %10s / %5.1f vs %5.1f / Clearance: %s\n",
-								link.getLinkId(), link.getManeuver(), speed, speedLimit, truckRestrictions);
-					}
-
+							maneuver.getRoadName(), maneuver.getRoadNumber(),
+							linkDetails,
+							//angle2Direction(maneuver.getStartAngle()), // angle at start of maneuver
+							maneuver.getInstruction() );
+					System.out.printf("    %s: %s\n", maneuver.getShapeQuality(), toString(maneuver.getShape()));
+//					if (maneuver.getId().equals("M40")) {
+//						routeShape = Route.parseShape(maneuver.getShape());
+//					}
 				}
 				System.out.printf("LEG: %5.1f mi; %s %s\n", 
 						leg.getLength()*METERS_TO_MILES, Here2.toPeriod(leg.getTrafficTime()), Here2.toPeriod(leg.getTrafficTime()) );
 			} // for leg
-			Here2.showMap(route.getShape() );
+			Here2.showMap(routeShape);
 		} // for route
 	}
 
@@ -301,7 +347,15 @@ public class Here2 {
 	        mapViewer.addMouseListener(new CenterMapListener(mapViewer));
 	        mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(mapViewer));
 	        mapViewer.addKeyListener(new PanKeyListener(mapViewer));
-	
+	        mapViewer.addMouseListener(new MouseAdapter(){
+	            public void mouseClicked(MouseEvent e) {
+	                   if(e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3){
+	                       java.awt.Point p = e.getPoint();
+	                       GeoPosition geo = mapViewer.convertPointToGeoPosition(p);
+	                       System.out.println("X:"+geo.getLatitude()+",Y:"+geo.getLongitude());
+	                   }
+	            }
+	       });	
 			
 			// Create waypoints from the geo-positions
 			Set<DefaultWaypoint> waypoints = new HashSet<DefaultWaypoint>(Arrays.asList(

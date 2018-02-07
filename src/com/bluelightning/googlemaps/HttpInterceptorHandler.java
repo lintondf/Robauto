@@ -1,4 +1,4 @@
-package robauto;
+package com.bluelightning.googlemaps;
 
 import java.net.Proxy;
 import java.util.concurrent.TimeUnit;

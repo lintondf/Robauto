@@ -1,4 +1,4 @@
-package robauto;
+package com.bluelightning.googlemaps;
 
 /***
  * https://www.allstays.com/DL/join.htm
@@ -105,7 +105,7 @@ import com.x5.util.Base64;
 
 import ch.qos.logback.classic.LoggerContext;
 
-public class Main {
+public class GoogleMaps {
 	
 	static final String apiKey = "AIzaSyCA9cRJXpWLwxM4IccF9o3BCp2varIqm24";
 	

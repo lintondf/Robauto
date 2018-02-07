@@ -140,8 +140,8 @@ public class Route implements Serializable, PostProcessingEnabler.PostProcessabl
     }
 
 
-	protected static List<LatLon> parseShape( List<Object> points ) {
-		ArrayList<LatLon> out = new ArrayList<>();
+	public static List<GeoPosition> parseShape( List<Object> points ) {
+		ArrayList<GeoPosition> out = new ArrayList<>();
 		for (Object point : points) {
 			if (point instanceof String) {
 				out.add( new LatLon( (String) point ) );
