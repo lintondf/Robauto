@@ -9,10 +9,13 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.swing.JFrame;
 import javax.swing.event.MouseInputListener;
@@ -42,6 +45,7 @@ import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.jxmapviewer.viewer.WaypointPainter;
 
 import com.bluelightning.json.*;
+import com.bluelightning.json.Leg.CumulativeTravel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -288,31 +292,72 @@ public class Here2 {
 						String truckRestrictions = (link.getTruckRestrictions() == null || link.getTruckRestrictions().getHeight() == null) ?
 								"None" : String.format("%.1f ft", link.getTruckRestrictions().getHeight()/0.3048);
 						double speedLimit = (link.getSpeedLimit() == null) ? 0.0 : METERS_PER_SECOND_TO_MILES_PER_HOUR*link.getSpeedLimit();
-						// TODO for each maneuver adjust travel times for travel at speed limit
-//						System.out.printf("   %-20s :  %10s / %5.1f vs %5.1f / Clearance: %s\n",
-//								link.getLinkId(), link.getManeuver(), speed, speedLimit, truckRestrictions);
 						linkDetails = String.format("%.0f,%.0f,%s", speed, speedLimit, truckRestrictions);
 					}
-					System.out.printf("%-5s: %5.1f mi; %s %s [%s/%s/%s] %s\n", maneuver.getId(), 
+					CumulativeTravel progress = leg.getProgress(maneuver);
+					System.out.printf("%-5s: %5.1f mi / %s; %7.1f mi / %s  [%s/%s/%s] %s\n", maneuver.getId(), 
 							maneuver.getLength()*METERS_TO_MILES,
-							Here2.toPeriod(maneuver.getTravelTime()),
-							Here2.toPeriod(maneuver.getBaseTime()),
+							Here2.toPeriod(maneuver.getTrafficTime()),
+							progress.distance*METERS_TO_MILES,
+							Here2.toPeriod(progress.trafficTime),
 							maneuver.getRoadName(), maneuver.getRoadNumber(),
 							linkDetails,
 							//angle2Direction(maneuver.getStartAngle()), // angle at start of maneuver
 							maneuver.getInstruction() );
-					System.out.printf("    %s: %s\n", maneuver.getShapeQuality(), toString(maneuver.getShape()));
+//					System.out.printf("    %s: %s\n", maneuver.getShapeQuality(), toString(maneuver.getShape()));
 //					if (maneuver.getId().equals("M40")) {
 //						routeShape = Route.parseShape(maneuver.getShape());
 //					}
 				}
-				System.out.printf("LEG: %5.1f mi; %s %s\n", 
-						leg.getLength()*METERS_TO_MILES, Here2.toPeriod(leg.getTrafficTime()), Here2.toPeriod(leg.getTrafficTime()) );
+				System.out.printf("LEG: %5.1f mi; %s %s; %5.1f\n", 
+						leg.getLength()*METERS_TO_MILES, 
+						Here2.toPeriod(leg.getTrafficTime()), 
+						Here2.toPeriod(leg.getTravelTime()),
+						leg.getLength()*METERS_TO_MILES / (leg.getTrafficTime()/3600.0) );
 			} // for leg
+			
+			printPointsOfInterestAlongRoute( route, "POI/RestAreasCombined_USA.csv");
+			
 			Here2.showMap(routeShape);
 		} // for route
 	}
 
+	protected static void printPointsOfInterestAlongRoute(Route route, String poiPath) {
+		System.out.println(poiPath);
+		POISet pset = POIBase.factory(poiPath);
+		pset = pset.filter( route.getBoundingBox() );
+		for (Leg leg : route.getLeg()) {
+			Map<POI, POISet.POIResult> nearby = pset.nearBy(leg, 2000.0);
+			// POISet pset =
+			// WalmartPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\SamsClubs_USA.csv");
+			// POISet pset =
+			// TruckStopPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Truck_Stops.csv");
+			// Map<POI, POIResult> nearby = pset.nearBy(
+			// route.getReduced(), 5000.0 );
+	
+			ArrayList<POISet.POIResult> byManeuver = new ArrayList<POISet.POIResult>();
+			for (Entry<POI, POISet.POIResult> e : nearby.entrySet()) {
+				byManeuver.add(e.getValue());
+			}
+			Collections.sort(byManeuver);
+			for (POISet.POIResult r : byManeuver) {
+				//CumulativeTravel progress = leg.getProgress(r);
+				// System.out.println( r.toString() );
+				double angle = r.maneuver.getShapeHeadings().get( r.index );
+				String heading = angle2Direction(angle);
+				String[] fields = r.poi.getName().split(",");
+				if (fields[2].startsWith(heading.substring(0,1))) {
+					System.out.printf("%-5s: %10.3f,%5.2f,%s,%s\n", r.maneuver.getId(),
+							r.progress.distance / (0.3048 * 5280.0), 
+							r.progress.trafficTime / 3600.0,
+							heading,
+							r.poi.getName());
+				}
+			}
+		}
+		System.out.println();
+	}
+	
 	public static void showMap(List<GeoPosition> track) {
 			JXMapViewer mapViewer = new JXMapViewer();
 	

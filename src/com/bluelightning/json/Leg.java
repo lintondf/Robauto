@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.bluelightning.POISet.POIResult;
 import com.bluelightning.PostProcessingEnabler;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -259,20 +261,58 @@ public class Leg implements Serializable, PostProcessingEnabler.PostProcessable
     public String toString() {
         return new ToStringBuilder(this).append("start", start).append("end", end).append("length", length).append("travelTime", travelTime).append("maneuver", maneuver).append("link", link).append("boundingBox", boundingBox).append("shape", shape).append("firstPoint", firstPoint).append("lastPoint", lastPoint).append("trafficTime", trafficTime).append("baseTime", baseTime).append("summary", summary).toString();
     }
+    
+    public static class CumulativeTravel {
+    	public double  heading;
+    	public double  distance;
+    	public double  travelTime;
+    	public double  trafficTime;
+    }
+    
+    protected Map<String, CumulativeTravel> progressMap = new HashMap<>();
+    
+    public CumulativeTravel getProgress( Maneuver maneuver ) {
+    	CumulativeTravel p1 = progressMap.get( maneuver.getId() );
+    	return p1;
+    }
+    
+    public CumulativeTravel getProgress( POIResult r ) {
+    	Maneuver maneuver = r.maneuver;
+    	CumulativeTravel p1 = progressMap.get( maneuver.getId() );
+    	CumulativeTravel p2 = progressMap.get( maneuver.nextId() );
+    	double deltaDistance = p2.distance - p1.distance;
+    	double deltaTravelTime = p2.travelTime - p1.travelTime;
+    	double deltaTrafficTime = p2.trafficTime - p1.trafficTime;
+    	double scale = maneuver.getShapeDistances().get(r.index) / deltaDistance;
+    	CumulativeTravel o = new CumulativeTravel();
+    	o.distance = p1.distance + scale*deltaDistance;
+    	o.trafficTime = p1.trafficTime + scale*deltaTravelTime;
+    	o.travelTime = p1.travelTime + scale*deltaTrafficTime;
+    	return o;
+    }
 
 	@Override
 	public void postProcess() {
 		for (Link link : getLink()) {
 			linkMap.put( link.getManeuver(), link );
 		}
-		double totalTime = 0;
+		double travelTime = 0;
+		double trafficTime = 0;
+		double distance = 0;
 		for (Maneuver maneuver : getManeuver()) {
+			CumulativeTravel note = new CumulativeTravel();
+			note.distance = distance;
+			note.travelTime = travelTime;
+			note.trafficTime = trafficTime;
+			progressMap.put( maneuver.getId(), note);
 			maneuver.adjustSpeeds(this);
-			totalTime += maneuver.getTravelTime();
+			distance += maneuver.getLength();
+			trafficTime += maneuver.getTrafficTime();
+			travelTime += maneuver.getTravelTime();
 		}
-		this.setBaseTime(totalTime);
-		this.setTrafficTime(totalTime);
-		this.setTravelTime(totalTime);
+		this.setBaseTime(travelTime);
+		this.setTrafficTime(trafficTime);
+		this.setTravelTime(travelTime);
 	}
 
 	public HashMap<String, Link> getLinkMap() {

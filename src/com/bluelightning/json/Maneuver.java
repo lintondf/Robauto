@@ -5,12 +5,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bluelightning.LatLon;
+import com.bluelightning.POIBase;
+import com.bluelightning.PostProcessingEnabler;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.gavaghan.geodesy.GeodeticCurve;
+import org.gavaghan.geodesy.GlobalCoordinates;
+import org.jxmapviewer.viewer.GeoPosition;
 
-public class Maneuver implements Serializable
+public class Maneuver implements Serializable, Comparable<Maneuver>, PostProcessingEnabler.PostProcessable
 {
 
     @SerializedName("position")
@@ -43,6 +49,9 @@ public class Maneuver implements Serializable
     @SerializedName("shape")
     @Expose
     private List<Object> shape = new ArrayList<Object>();
+    
+    private List<GeoPosition> shapePoints;
+
     /**
      * 
      * (Required)
@@ -260,8 +269,8 @@ public class Maneuver implements Serializable
         this.length = length;
     }
 
-    public List<Object> getShape() {
-        return shape;
+    public List<GeoPosition> getShape() {
+        return shapePoints;
     }
 
     public void setShape(List<Object> shape) {
@@ -622,17 +631,64 @@ public class Maneuver implements Serializable
     }
     
     public void adjustSpeeds(Leg leg) {
-    	if (getTrafficTime().doubleValue() != getTravelTime().doubleValue())
-    		return;
+    	double trafficDelay = getTrafficTime().doubleValue() / getTravelTime().doubleValue();
 		Link link = leg.getLinkMap().get(getId());
 		double speed = (getLength() / getTrafficTime());
 		if (link != null) {
 			if (link.getSpeedLimit() != null && link.getSpeedLimit() > 0) {
 				double speedLimit = link.getSpeedLimit();
 				this.baseTime = this.length / speedLimit;
-				this.trafficTime = this.travelTime = this.baseTime;
+				this.travelTime = this.baseTime;
+				this.trafficTime = trafficDelay * this.travelTime;
 			}
 		}    	
     }
+    
+    protected Integer ordinal;
+    
+    public String nextId() {
+    	return String.format("M%d", ordinal+1);
+    }
+
+	@Override
+	public int compareTo(Maneuver that) {
+		return ordinal.compareTo(that.ordinal);
+	}
+	
+	List<Double> shapeHeadings = new ArrayList<>();
+	List<Double> shapeDistances = new ArrayList<>();
+	
+	public List<Double> getShapeDistances() {
+		return shapeDistances;
+	}
+
+	public List<Double> getShapeHeadings() {
+		return shapeHeadings;
+	}
+
+	@Override
+	public void postProcess() {
+		ordinal = Integer.parseInt( getId().substring(1) );
+		shapePoints = new ArrayList<>();
+		for (Object point : shape) {
+			if (point instanceof String) {
+				shapePoints.add( new LatLon( (String) point ) );
+			}
+		}
+		shapeDistances.add(0.0);
+		shapeHeadings.add(0.0);
+		double d = 0.0;
+		for (int i = 1; i < shapePoints.size(); i++) {
+			GlobalCoordinates p1 = new GlobalCoordinates( shapePoints.get(i-1) );
+			GlobalCoordinates p2 = new GlobalCoordinates( shapePoints.get(i) );
+			GeodeticCurve curve = POIBase.geoCalc.calculateGeodeticCurve(POIBase.wgs84, p1, p2 );
+			d += curve.getEllipsoidalDistance();
+			shapeDistances.add(d);
+			shapeHeadings.add( curve.getAzimuth() );
+		}
+		if (shapeHeadings.size() > 1) {
+			shapeHeadings.set(0, shapeHeadings.get(1));
+		}
+	}
 
 }
