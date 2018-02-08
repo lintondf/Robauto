@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.bluelightning.POISet.POIResult;
 import com.bluelightning.PostProcessingEnabler;
+import com.bluelightning.poi.POISet.POIResult;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

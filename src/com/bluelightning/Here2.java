@@ -46,6 +46,15 @@ import org.jxmapviewer.viewer.WaypointPainter;
 
 import com.bluelightning.json.*;
 import com.bluelightning.json.Leg.CumulativeTravel;
+import com.bluelightning.map.RoutePainter;
+import com.bluelightning.map.SwingMarker;
+import com.bluelightning.map.SwingMarkerOverlayPainter;
+import com.bluelightning.poi.POI;
+import com.bluelightning.poi.POIBase;
+import com.bluelightning.poi.POISet;
+import com.bluelightning.poi.POISet.POIResult;
+import com.bluelightning.poi.TruckStopPOI;
+import com.bluelightning.poi.WalmartPOI;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -182,10 +191,8 @@ public class Here2 {
 		nvps.add(new BasicNameValuePair("linkAttributes", "speedLimit,truckRestrictions,roadName"));
 		nvps.add(new BasicNameValuePair("maneuverAttributes", 
 				"position,length,travelTime,roadName,roadNumber,signPost,freewayExit,link"));
-		nvps.add(new BasicNameValuePair("avoidAreas", 
-//				"52.517100760,13.3905424488;52.5169701849,13.391808451"));
-				"41.86547012230937,-73.73199462890625;41.21998578493921,-72.47955322265625" ));
-		//LL X:41.21998578493921,Y:-73.73199462890625, UR X:41.86547012230937,Y:-72.47955322265625
+//		nvps.add(new BasicNameValuePair("avoidAreas", 
+//				"41.86547012230937,-73.73199462890625;41.21998578493921,-72.47955322265625" ));
 
 		nvps.add(new BasicNameValuePair("mode", mode));
 		nvps.add(new BasicNameValuePair("limitedWeight", "1"));  //TODO
@@ -254,7 +261,7 @@ public class Here2 {
 			if (hereRoute == null || hereRoute.getResponse() == null)
 				throw new NullPointerException();
 		} catch (Exception x) {
-			LatLon sullivan = geocodeLookup("7 Manor Lane, Sullivan, ME");
+			LatLon sullivan = geocodeLookup("Falmouth, MA" ); //"7 Manor Lane, Sullivan, ME");
 			System.out.println( sullivan  );
 			LatLon viera = geocodeLookup("3533 Carambola Cir, Melbourne, FL");
 			System.out.println( viera );
@@ -316,49 +323,51 @@ public class Here2 {
 						leg.getLength()*METERS_TO_MILES / (leg.getTrafficTime()/3600.0) );
 			} // for leg
 			
-			printPointsOfInterestAlongRoute( route, "POI/RestAreasCombined_USA.csv");
+//			printPointsOfInterestAlongRoute( route, "POI/RestAreasCombined_USA.csv");
+//			printPointsOfInterestAlongRoute( route, "POI/SamsClubs_USA.csv");
+			POISet pset = WalmartPOI.factory(); //TruckStopPOI.factory(); // POIBase.factory("POI/Costco_USA_Canada.csv");
+			ArrayList<POISet.POIResult> nearby = pset.getPointsOfInterestAlongRoute(route, 5e3 );
 			
-			Here2.showMap(routeShape);
+			Here2.showMap(routeShape, nearby);
 		} // for route
 	}
 
-	protected static void printPointsOfInterestAlongRoute(Route route, String poiPath) {
-		System.out.println(poiPath);
-		POISet pset = POIBase.factory(poiPath);
-		pset = pset.filter( route.getBoundingBox() );
-		for (Leg leg : route.getLeg()) {
-			Map<POI, POISet.POIResult> nearby = pset.nearBy(leg, 2000.0);
-			// POISet pset =
-			// WalmartPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\SamsClubs_USA.csv");
-			// POISet pset =
-			// TruckStopPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Truck_Stops.csv");
-			// Map<POI, POIResult> nearby = pset.nearBy(
-			// route.getReduced(), 5000.0 );
+//	protected static void printPointsOfInterestAlongRoute(Route route, String poiPath) {
+//		POISet pset = POIBase.factory(poiPath);
+//		pset = pset.filter( route.getBoundingBox() );
+//		for (Leg leg : route.getLeg()) {
+//			Map<POI, POISet.POIResult> nearby = pset.nearBy(leg, 2000.0);
+//			// POISet pset =
+//			// WalmartPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\SamsClubs_USA.csv");
+//			// POISet pset =
+//			// TruckStopPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Truck_Stops.csv");
+//			// Map<POI, POIResult> nearby = pset.nearBy(
+//			// route.getReduced(), 5000.0 );
+//	
+//			ArrayList<POISet.POIResult> byManeuver = new ArrayList<POISet.POIResult>();
+//			for (Entry<POI, POISet.POIResult> e : nearby.entrySet()) {
+//				byManeuver.add(e.getValue());
+//			}
+//			Collections.sort(byManeuver);
+//			for (POISet.POIResult r : byManeuver) {
+//				//CumulativeTravel progress = leg.getProgress(r);
+//				// System.out.println( r.toString() );
+//				double angle = r.maneuver.getShapeHeadings().get( r.index );
+//				String heading = angle2Direction(angle);
+//				String[] fields = r.poi.getName().split(",");
+//				if (fields.length != 5 || fields[2].startsWith(heading.substring(0,1))) {
+//					System.out.printf("%-5s: %10.3f,%5.2f,%s,%s\n", r.maneuver.getId(),
+//							r.progress.distance / (0.3048 * 5280.0), 
+//							r.progress.trafficTime / 3600.0,
+//							heading,
+//							r.poi.getName());
+//				}
+//			}
+//		}
+//		System.out.println();
+//	}
 	
-			ArrayList<POISet.POIResult> byManeuver = new ArrayList<POISet.POIResult>();
-			for (Entry<POI, POISet.POIResult> e : nearby.entrySet()) {
-				byManeuver.add(e.getValue());
-			}
-			Collections.sort(byManeuver);
-			for (POISet.POIResult r : byManeuver) {
-				//CumulativeTravel progress = leg.getProgress(r);
-				// System.out.println( r.toString() );
-				double angle = r.maneuver.getShapeHeadings().get( r.index );
-				String heading = angle2Direction(angle);
-				String[] fields = r.poi.getName().split(",");
-				if (fields[2].startsWith(heading.substring(0,1))) {
-					System.out.printf("%-5s: %10.3f,%5.2f,%s,%s\n", r.maneuver.getId(),
-							r.progress.distance / (0.3048 * 5280.0), 
-							r.progress.trafficTime / 3600.0,
-							heading,
-							r.poi.getName());
-				}
-			}
-		}
-		System.out.println();
-	}
-	
-	public static void showMap(List<GeoPosition> track) {
+	public static void showMap(List<GeoPosition> track, ArrayList<POIResult> nearby) {
 			JXMapViewer mapViewer = new JXMapViewer();
 	
 			// Display the viewer in a JFrame
@@ -411,13 +420,31 @@ public class Here2 {
 			WaypointPainter<DefaultWaypoint> waypointPainter = new WaypointPainter<DefaultWaypoint>();
 			waypointPainter.setWaypoints(waypoints);
 			
+			Set<SwingMarker> markers = new HashSet<SwingMarker>(); 
+			for (POIResult result : nearby) {
+				markers.add( result.poi.getMarker( result.toReport() ) );
+			};
+//			Arrays.asList(
+//					new SwingMarker( track.get(n), "Label", "ToolTip")));
+			
+	        // Set the overlay painter
+	        WaypointPainter<SwingMarker> swingWaypointPainter = new SwingMarkerOverlayPainter();
+	        swingWaypointPainter.setWaypoints(markers);
+			
 			// Create a compound painter that uses both the route-painter and the waypoint-painter
 			List<Painter<JXMapViewer>> painters = new ArrayList<Painter<JXMapViewer>>();
 			painters.add(routePainter);
 			painters.add(waypointPainter);
+			painters.add(swingWaypointPainter);
 			
 			CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
 			mapViewer.setOverlayPainter(painter);
+			
+	        // Add the JButtons to the map viewer
+	        for (SwingMarker w : markers) {
+	            mapViewer.add(w.getButton());
+	        }
+			
 		}
 
 }

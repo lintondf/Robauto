@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bluelightning.LatLon;
-import com.bluelightning.POIBase;
 import com.bluelightning.PostProcessingEnabler;
+import com.bluelightning.poi.POIBase;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
