@@ -1,8 +1,5 @@
 package com.bluelightning;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -11,14 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-
-import javax.swing.JFrame;
-import javax.swing.event.MouseInputListener;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -29,30 +22,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.OSMTileFactoryInfo;
-import org.jxmapviewer.input.CenterMapListener;
-import org.jxmapviewer.input.PanKeyListener;
-import org.jxmapviewer.input.PanMouseInputListener;
-import org.jxmapviewer.input.ZoomMouseWheelListenerCenter;
-import org.jxmapviewer.painter.CompoundPainter;
-import org.jxmapviewer.painter.Painter;
-import org.jxmapviewer.viewer.DefaultTileFactory;
-import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.GeoPosition;
-import org.jxmapviewer.viewer.LocalResponseCache;
-import org.jxmapviewer.viewer.TileFactoryInfo;
-import org.jxmapviewer.viewer.WaypointPainter;
 
 import com.bluelightning.json.*;
 import com.bluelightning.json.Leg.CumulativeTravel;
-import com.bluelightning.map.RoutePainter;
-import com.bluelightning.map.SwingMarker;
-import com.bluelightning.map.SwingMarkerOverlayPainter;
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POISet;
-import com.bluelightning.poi.POISet.POIResult;
 import com.bluelightning.poi.TruckStopPOI;
 import com.bluelightning.poi.WalmartPOI;
 import com.google.gson.Gson;
@@ -180,10 +156,8 @@ public class Here2 {
 	    return null;
 	}
 	
-	public static HereRoute getRoute( LatLon from, LatLon to, String mode ) {
-		List<BasicNameValuePair> nvps = getBasicValuePair();
-		nvps.add(new BasicNameValuePair("waypoint0", from.toGeo()));
-		nvps.add(new BasicNameValuePair("waypoint1", to.toGeo()));
+
+	public static HereRoute getRouteFinal(List<BasicNameValuePair> nvps, String mode) {
 		nvps.add(new BasicNameValuePair("metricSystem", "imperial"));
 		nvps.add(new BasicNameValuePair("instructionFormat", "text"));
 		nvps.add(new BasicNameValuePair("representation", "navigation"));
@@ -223,6 +197,36 @@ public class Here2 {
 //	    return null;
 	}
 	
+	public static HereRoute getRoute(LatLon from, List<LatLon> vias, LatLon to, String mode) {
+		List<BasicNameValuePair> nvps = getBasicValuePair();
+		int i = 0;
+		nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), from.toGeo()));
+		for (LatLon via : vias) {
+			nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), via.toGeo()));			
+		}
+		nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), to.toGeo()));
+		return getRouteFinal( nvps, mode );
+	}
+
+	public static HereRoute getRoute(List<LatLon> points, String mode) {
+		List<BasicNameValuePair> nvps = getBasicValuePair();
+		int i = 0;
+		for (LatLon via : points) {
+			nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), via.toGeo()));			
+		}
+		return getRouteFinal( nvps, mode );
+	}
+
+	
+	public static HereRoute getRoute( LatLon from, LatLon to, String mode ) {
+		List<BasicNameValuePair> nvps = getBasicValuePair();
+		nvps.add(new BasicNameValuePair("waypoint0", from.toGeo()));
+		nvps.add(new BasicNameValuePair("waypoint1", to.toGeo()));
+		return getRouteFinal( nvps, mode );
+	}
+	
+	
+	
 	public static String angle2Direction( double angle) {
 		if (angle < 22.5 || angle > 337.5)
 			return "N";
@@ -256,16 +260,22 @@ public class Here2 {
 //		System.out.println( lee  );
 		HereRoute hereRoute = null;
 		try {
-			String json = IOUtils.toString(new FileInputStream("route.json"), "UTF-8");
+			String json = IOUtils.toString(new FileInputStream("routex.json"), "UTF-8");
 			hereRoute = (HereRoute) Here2.gson.fromJson(json, HereRoute.class);
 			if (hereRoute == null || hereRoute.getResponse() == null)
 				throw new NullPointerException();
 		} catch (Exception x) {
-			LatLon sullivan = geocodeLookup("Falmouth, MA" ); //"7 Manor Lane, Sullivan, ME");
-			System.out.println( sullivan  );
-			LatLon viera = geocodeLookup("3533 Carambola Cir, Melbourne, FL");
-			System.out.println( viera );
-			hereRoute = getRoute( viera, sullivan, "fastest;truck;traffic:disabled" );
+			ArrayList<LatLon> points = new ArrayList<>();
+			points.add(geocodeLookup("3533 Carambola Cir, Melbourne, FL"));
+			points.add(geocodeLookup("15 Mill Creek Circle, Pooler, GA"));
+			points.add(geocodeLookup("125 Riverside Dr, Banner Elk, NC"));
+			points.add(geocodeLookup("2350 So Pleasant Valley Rd, Winchester, VA 22601"));
+			points.add(geocodeLookup("10654 Breezewood Dr, Woodstock, MD 21163-1317"));
+			points.add(geocodeLookup("1365 Boston Post Road, Milford, CT"));
+			points.add(geocodeLookup("836 Palmer Avenue, Falmouth, MA" ));
+			points.add(geocodeLookup("100 Cabelas Blvd, Scarborough, ME"));
+			points.add(geocodeLookup("7 Manor Lane, Sullivan, ME"));
+			hereRoute = getRoute( points, "fastest;truck;traffic:disabled" );
 		}
 		System.out.println(hereRoute.getResponse().getMetaInfo());
 		Set<Route> routes = hereRoute.getResponse().getRoute();
@@ -328,7 +338,7 @@ public class Here2 {
 			POISet pset = WalmartPOI.factory(); //TruckStopPOI.factory(); // POIBase.factory("POI/Costco_USA_Canada.csv");
 			ArrayList<POISet.POIResult> nearby = pset.getPointsOfInterestAlongRoute(route, 5e3 );
 			
-			Here2.showMap(routeShape, nearby);
+			com.bluelightning.Map.showMap(routeShape, route, nearby);
 		} // for route
 	}
 
@@ -366,85 +376,6 @@ public class Here2 {
 //		}
 //		System.out.println();
 //	}
-	
-	public static void showMap(List<GeoPosition> track, ArrayList<POIResult> nearby) {
-			JXMapViewer mapViewer = new JXMapViewer();
-	
-			// Display the viewer in a JFrame
-			JFrame frame = new JFrame("JXMapviewer2 Example 2");
-			frame.getContentPane().add(mapViewer);
-			frame.setSize(800, 600);
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame.setVisible(true);
-	
-			// Create a TileFactoryInfo for OpenStreetMap
-			TileFactoryInfo info = new OSMTileFactoryInfo();
-			DefaultTileFactory tileFactory = new DefaultTileFactory(info);
-			tileFactory.setThreadPoolSize(8);
-			// Setup local file cache
-			File cacheDir = new File(System.getProperty("user.home") + File.separator + ".jxmapviewer2");
-			LocalResponseCache.installResponseCache(info.getBaseURL(), cacheDir, false);
 
-			mapViewer.setTileFactory(tileFactory);
-			
-
-	
-			RoutePainter routePainter = new RoutePainter(track);
-	
-			// Set the focus
-			mapViewer.zoomToBestFit(new HashSet<GeoPosition>(track), 0.9);
-	
-	        // Add interactions
-	        MouseInputListener mia = new PanMouseInputListener(mapViewer);
-	        mapViewer.addMouseListener(mia);
-	        mapViewer.addMouseMotionListener(mia);
-	        mapViewer.addMouseListener(new CenterMapListener(mapViewer));
-	        mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(mapViewer));
-	        mapViewer.addKeyListener(new PanKeyListener(mapViewer));
-	        mapViewer.addMouseListener(new MouseAdapter(){
-	            public void mouseClicked(MouseEvent e) {
-	                   if(e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3){
-	                       java.awt.Point p = e.getPoint();
-	                       GeoPosition geo = mapViewer.convertPointToGeoPosition(p);
-	                       System.out.println("X:"+geo.getLatitude()+",Y:"+geo.getLongitude());
-	                   }
-	            }
-	       });	
-			
-			// Create waypoints from the geo-positions
-			Set<DefaultWaypoint> waypoints = new HashSet<DefaultWaypoint>(Arrays.asList(
-					new DefaultWaypoint(track.get(0)),
-					new DefaultWaypoint(track.get(track.size()-1))));
-	
-			// Create a waypoint painter that takes all the waypoints
-			WaypointPainter<DefaultWaypoint> waypointPainter = new WaypointPainter<DefaultWaypoint>();
-			waypointPainter.setWaypoints(waypoints);
-			
-			Set<SwingMarker> markers = new HashSet<SwingMarker>(); 
-			for (POIResult result : nearby) {
-				markers.add( result.poi.getMarker( result.toReport() ) );
-			};
-//			Arrays.asList(
-//					new SwingMarker( track.get(n), "Label", "ToolTip")));
-			
-	        // Set the overlay painter
-	        WaypointPainter<SwingMarker> markerPainter = new SwingMarkerOverlayPainter();
-	        markerPainter.setWaypoints(markers);
-			
-			// Create a compound painter that uses both the route-painter and the waypoint-painter
-			List<Painter<JXMapViewer>> painters = new ArrayList<Painter<JXMapViewer>>();
-			painters.add(routePainter);
-			painters.add(waypointPainter);
-			painters.add(markerPainter);
-			
-			CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
-			mapViewer.setOverlayPainter(painter);
-			
-	        // Add the JButtons to the map viewer
-	        for (SwingMarker w : markers) {
-	            mapViewer.add(w.getButton());
-	        }
-			
-		}
 
 }

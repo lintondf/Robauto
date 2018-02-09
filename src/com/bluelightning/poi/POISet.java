@@ -141,7 +141,7 @@ public class POISet extends ArrayList<POI> {
 				String[] fields = r.poi.getName().split(",");
 				if (fields.length != 5 || fields[2].startsWith(heading.substring(0,1))) {
 					output.add( r );
-					System.out.println( r.toReport() );
+//					System.out.println( r.toReport() );
 				}
 			}
 		}

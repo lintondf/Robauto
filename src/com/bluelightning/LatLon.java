@@ -2,6 +2,7 @@ package com.bluelightning;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.json.MappedPosition;
 import com.google.gson.JsonElement;
 
 // 28.23469, -80.7532
@@ -24,6 +25,11 @@ import com.google.gson.JsonElement;
 			longitude = Double.parseDouble(coords[1]);
 		}
 		
+		public LatLon(MappedPosition mappedPosition) {
+			latitude = mappedPosition.getLatitude();
+			longitude = mappedPosition.getLongitude();
+		}
+
 		public String toString() {
 			return String.format("%10.6f, %10.6f", latitude, longitude );
 		}
