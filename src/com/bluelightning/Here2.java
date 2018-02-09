@@ -428,14 +428,14 @@ public class Here2 {
 //					new SwingMarker( track.get(n), "Label", "ToolTip")));
 			
 	        // Set the overlay painter
-	        WaypointPainter<SwingMarker> swingWaypointPainter = new SwingMarkerOverlayPainter();
-	        swingWaypointPainter.setWaypoints(markers);
+	        WaypointPainter<SwingMarker> markerPainter = new SwingMarkerOverlayPainter();
+	        markerPainter.setWaypoints(markers);
 			
 			// Create a compound painter that uses both the route-painter and the waypoint-painter
 			List<Painter<JXMapViewer>> painters = new ArrayList<Painter<JXMapViewer>>();
 			painters.add(routePainter);
 			painters.add(waypointPainter);
-			painters.add(swingWaypointPainter);
+			painters.add(markerPainter);
 			
 			CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
 			mapViewer.setOverlayPainter(painter);

@@ -21,6 +21,12 @@ public class SwingMarker extends DefaultWaypoint {
 	
 	private JButton button;
 	private final String text;
+	
+	private static final Dimension size = new Dimension(18,18);
+	
+	public static Dimension getSize() {
+		return size;
+	}
 
 	public SwingMarker(GeoPosition coord, String label, String tooltip )  {
 		super(coord);
@@ -33,10 +39,8 @@ public class SwingMarker extends DefaultWaypoint {
 			button = new JButton(label);
 		}
 		button.setToolTipText(tooltip);
-		button.setSize(15, 15);
-		button.setPreferredSize(new Dimension(15, 15));
-//		Font font = Font.
-//		button.setFont(font);
+		button.setSize((int) size.getWidth(), (int) size.getHeight());
+		button.setPreferredSize(size);
 		button.addMouseListener(new SwingWaypointMouseListener());
 		button.setVisible(true);
 	}
@@ -47,10 +51,8 @@ public class SwingMarker extends DefaultWaypoint {
 		Icon icon = new ImageIcon(img);
 		button = new JButton(icon);
 		button.setToolTipText(tooltip);
-		button.setSize(15, 15);
-		button.setPreferredSize(new Dimension(15, 15));
-//		Font font = Font.
-//		button.setFont(font);
+		button.setSize((int) size.getWidth(), (int) size.getHeight());
+		button.setPreferredSize(size);
 		button.addMouseListener(new SwingWaypointMouseListener());
 		button.setVisible(true);
 	}

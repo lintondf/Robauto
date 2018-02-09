@@ -1,5 +1,6 @@
 package com.bluelightning.poi;
 
+import java.awt.Image;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;

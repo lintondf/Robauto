@@ -280,6 +280,8 @@ public class Leg implements Serializable, PostProcessingEnabler.PostProcessable
     	Maneuver maneuver = r.maneuver;
     	CumulativeTravel p1 = progressMap.get( maneuver.getId() );
     	CumulativeTravel p2 = progressMap.get( maneuver.nextId() );
+    	if (p2 == null)
+    		return p1;
     	double deltaDistance = p2.distance - p1.distance;
     	double deltaTravelTime = p2.travelTime - p1.travelTime;
     	double deltaTrafficTime = p2.trafficTime - p1.trafficTime;

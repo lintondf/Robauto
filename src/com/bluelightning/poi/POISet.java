@@ -33,13 +33,14 @@ public class POISet extends ArrayList<POI> {
 		public double            distance;
 		public Maneuver          maneuver;
 		public int               index;
-		public CumulativeTravel progress;
+		public CumulativeTravel  progress;
 		
 		public String toReport() {
-			return String.format("%10.3f mi; %5.2f hr:  %s\n", 
+			return String.format("%6.1f mi %5s: %4.1f mi: %s", 
 					progress.distance / (0.3048 * 5280.0), 
-					progress.trafficTime / 3600.0,
-					poi.getName());
+					Here2.toPeriod(progress.trafficTime),
+					distance / (0.3048 * 5280.0),
+					poi.toString());
 		}
 		
 		public String toString() {
