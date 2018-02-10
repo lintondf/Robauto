@@ -29,6 +29,7 @@ import com.bluelightning.json.Leg.CumulativeTravel;
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POISet;
+import com.bluelightning.poi.SamsClubPOI;
 import com.bluelightning.poi.TruckStopPOI;
 import com.bluelightning.poi.WalmartPOI;
 import com.google.gson.Gson;
@@ -259,22 +260,27 @@ public class Here2 {
 //		LatLon lee = Here.geocodeLookup("Lee Service Plaza Eastbound");
 //		System.out.println( lee  );
 		HereRoute hereRoute = null;
+		String[] pointAddresses = {
+				"3533 Carambola Cir, Melbourne, FL",
+				"15 Mill Creek Circle, Pooler, GA",
+				"125 Riverside Dr, Banner Elk, NC",
+				"2350 So Pleasant Valley Rd, Winchester, VA 22601",
+				"10654 Breezewood Dr, Woodstock, MD 21163-1317",
+				"1365 Boston Post Road, Milford, CT",
+				"836 Palmer Avenue, Falmouth, MA" ,
+				"100 Cabelas Blvd, Scarborough, ME",
+				"7 Manor Lane, Sullivan, ME"			
+		};
 		try {
-			String json = IOUtils.toString(new FileInputStream("routex.json"), "UTF-8");
+			String json = IOUtils.toString(new FileInputStream("route.json"), "UTF-8");
 			hereRoute = (HereRoute) Here2.gson.fromJson(json, HereRoute.class);
 			if (hereRoute == null || hereRoute.getResponse() == null)
 				throw new NullPointerException();
 		} catch (Exception x) {
 			ArrayList<LatLon> points = new ArrayList<>();
-			points.add(geocodeLookup("3533 Carambola Cir, Melbourne, FL"));
-			points.add(geocodeLookup("15 Mill Creek Circle, Pooler, GA"));
-			points.add(geocodeLookup("125 Riverside Dr, Banner Elk, NC"));
-			points.add(geocodeLookup("2350 So Pleasant Valley Rd, Winchester, VA 22601"));
-			points.add(geocodeLookup("10654 Breezewood Dr, Woodstock, MD 21163-1317"));
-			points.add(geocodeLookup("1365 Boston Post Road, Milford, CT"));
-			points.add(geocodeLookup("836 Palmer Avenue, Falmouth, MA" ));
-			points.add(geocodeLookup("100 Cabelas Blvd, Scarborough, ME"));
-			points.add(geocodeLookup("7 Manor Lane, Sullivan, ME"));
+			for (String address : pointAddresses) {
+				points.add(geocodeLookup(address));
+			}
 			hereRoute = getRoute( points, "fastest;truck;traffic:disabled" );
 		}
 		System.out.println(hereRoute.getResponse().getMetaInfo());
@@ -297,6 +303,7 @@ public class Here2 {
 			}
 			System.out.printf("%d legs\n", route.getLeg().size() );
 			List<GeoPosition> routeShape = route.getShape();
+			int pointIndex = 1;
 			for (Leg leg : route.getLeg()) {
 				System.out.println( leg.getSummary() );
 				System.out.printf("%d links\n", leg.getLink().size() );
@@ -326,7 +333,8 @@ public class Here2 {
 //						routeShape = Route.parseShape(maneuver.getShape());
 //					}
 				}
-				System.out.printf("LEG: %5.1f mi; %s %s; %5.1f\n", 
+				System.out.printf("LEG TO %s: %5.1f mi; %s %s; %5.1f\n", 
+						pointAddresses[pointIndex++],
 						leg.getLength()*METERS_TO_MILES, 
 						Here2.toPeriod(leg.getTrafficTime()), 
 						Here2.toPeriod(leg.getTravelTime()),
@@ -337,45 +345,12 @@ public class Here2 {
 //			printPointsOfInterestAlongRoute( route, "POI/SamsClubs_USA.csv");
 			POISet pset = WalmartPOI.factory(); //TruckStopPOI.factory(); // POIBase.factory("POI/Costco_USA_Canada.csv");
 			ArrayList<POISet.POIResult> nearby = pset.getPointsOfInterestAlongRoute(route, 5e3 );
+			pset = SamsClubPOI.factory();
+			nearby.addAll(pset.getPointsOfInterestAlongRoute(route, 5e3 ));
 			
 			com.bluelightning.Map.showMap(routeShape, route, nearby);
 		} // for route
 	}
-
-//	protected static void printPointsOfInterestAlongRoute(Route route, String poiPath) {
-//		POISet pset = POIBase.factory(poiPath);
-//		pset = pset.filter( route.getBoundingBox() );
-//		for (Leg leg : route.getLeg()) {
-//			Map<POI, POISet.POIResult> nearby = pset.nearBy(leg, 2000.0);
-//			// POISet pset =
-//			// WalmartPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\SamsClubs_USA.csv");
-//			// POISet pset =
-//			// TruckStopPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Truck_Stops.csv");
-//			// Map<POI, POIResult> nearby = pset.nearBy(
-//			// route.getReduced(), 5000.0 );
-//	
-//			ArrayList<POISet.POIResult> byManeuver = new ArrayList<POISet.POIResult>();
-//			for (Entry<POI, POISet.POIResult> e : nearby.entrySet()) {
-//				byManeuver.add(e.getValue());
-//			}
-//			Collections.sort(byManeuver);
-//			for (POISet.POIResult r : byManeuver) {
-//				//CumulativeTravel progress = leg.getProgress(r);
-//				// System.out.println( r.toString() );
-//				double angle = r.maneuver.getShapeHeadings().get( r.index );
-//				String heading = angle2Direction(angle);
-//				String[] fields = r.poi.getName().split(",");
-//				if (fields.length != 5 || fields[2].startsWith(heading.substring(0,1))) {
-//					System.out.printf("%-5s: %10.3f,%5.2f,%s,%s\n", r.maneuver.getId(),
-//							r.progress.distance / (0.3048 * 5280.0), 
-//							r.progress.trafficTime / 3600.0,
-//							heading,
-//							r.poi.getName());
-//				}
-//			}
-//		}
-//		System.out.println();
-//	}
 
 
 }

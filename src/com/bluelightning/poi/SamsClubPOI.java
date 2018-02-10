@@ -1,5 +1,6 @@
 package com.bluelightning.poi;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
 import java.io.FileReader;
@@ -26,7 +27,22 @@ public class SamsClubPOI extends POIBase {
 	protected String  zip;
 	protected String  exit;
 	protected String  phone;
+	protected boolean isNoOvernight;
 	
+	protected static  Image  imageHasGas;
+	protected static  Image  imageNoGas;
+
+	static {
+		if (imageHasGas == null) try {
+			Dimension size = SwingMarker.getSize();
+			imageHasGas = ImageIO.read(new File("images/samsclub-large.png"))
+					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
+			imageNoGas = ImageIO.read(new File("images/samsclub-nogas-large.png"))
+					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
+		} catch (Exception x) {
+		}		
+	}
+
 
 	public SamsClubPOI() {
 	}
@@ -41,6 +57,7 @@ public class SamsClubPOI extends POIBase {
 		}
 	}
 	
+	
 	public String formatAddress() {
 		return String.format("%s, %s, %s, %s %s",
 				address, city, state, zip,
@@ -48,10 +65,42 @@ public class SamsClubPOI extends POIBase {
 	}
 	
 	public String toString() {
-		return String.format("%s: %s %s/%s %s %s",
-				super.toString(), ""+storeId,
+		return String.format("%s %s %s/%s %s %s %s",
+				/*super.toString(),*/ ""+name, ""+storeId,
 				(hasGas)?"gas":"", (hasDiesel)?"diesel":"",
-						formatAddress(), ""+phone );
+						formatAddress(), ""+phone, (isNoOvernight) ? "(No Overnight)" : "" );
+	}
+	
+	public String toCSV() {
+		StringBuffer columnC = new StringBuffer();
+		columnC.append(name);
+		columnC.append("; ");
+		columnC.append(storeId);
+		columnC.append(",");
+		if (hasGas && hasDiesel)
+			columnC.append(" Gas/Diesel,");
+		else if (hasGas)
+			columnC.append(" Gas,");
+		else if (hasDiesel)
+			columnC.append(" /Diesel,");
+		
+		StringBuffer columnD = new StringBuffer();
+		columnD.append(address);
+		if (exit != null && !exit.isEmpty()) {
+			columnD.append(';');
+			columnD.append(exit);
+		}
+		columnD.append(',');
+		columnD.append(city);
+		columnD.append(',');
+		columnD.append(state);
+		columnD.append(',');
+		columnD.append(zip);
+		columnD.append(',');
+		columnD.append(phone);
+
+		String columnE = (isNoOvernight) ? "No Overnight" : "";
+		return String.format("%f,%f,\"%s\",\"%s\",\"%s\"", longitude, latitude, columnC.toString(), columnD.toString(), columnE );
 	}
 	
 	protected void parseColumnC(String column) {
@@ -106,33 +155,35 @@ public class SamsClubPOI extends POIBase {
 		     String [] nextLine;
 		     while ((nextLine = reader.readNext()) != null) {
 		        POI poi = new SamsClubPOI( nextLine );
-		        list.add(poi);
+	        	list.add(poi);
 		     }
 			 reader.close();
 		} catch (Exception e) {
-			list.clear();;
+			list.clear();
 		}
 		 return list;
 	}
 	
+	protected static String csvPath = "POI/SamsClubs_USA.csv"; 
 	
 	public static POISet factory() {
-		return factory("POI/SamsClubs_USA.csv");
+		return factory(csvPath);
 	}
+	
 	
 	@Override
 	public SwingMarker getMarker(String report) {
-		try {
-			Image img = ImageIO.read(new File("images/samsclub.jpg")); //getClass().getResource("images/costco.png"));
-			return new SwingMarker( img, new GeoPosition(latitude, longitude), getName(), report );
-		} catch (Exception x) {
+		if (imageHasGas != null) {
+			return new SwingMarker( (! hasGas) ? imageNoGas : imageHasGas, 
+					new GeoPosition(latitude, longitude), getName(), report );
+		} else {
 			return new SwingMarker( new GeoPosition(latitude, longitude), getName(), report );
 		}
 	}
 	
 	
 	public static void main(String[] args) {
-    	POISet pset = SamsClubPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\SamsClubs_USA.csv");
+    	POISet pset = SamsClubPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Walmart_United States & Canada.csv");
     	for (int i = 0; i < 15; i++)
     		System.out.println( pset.get(i).toString() );
 	}
