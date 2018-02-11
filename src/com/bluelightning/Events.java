@@ -1,5 +1,6 @@
 package com.bluelightning;
 
+import java.awt.AWTEvent;
 import java.util.concurrent.ForkJoinPool;
 
 import javax.swing.JFrame;
@@ -21,5 +22,12 @@ public class Events {
 		}
 	}
 
-
+	public static class UiEvent {
+		String source;
+		AWTEvent awtEvent;
+		public UiEvent( String source, AWTEvent awtEvent ) {
+			this.source = source;
+			this.awtEvent = awtEvent;
+		}
+	}
 }

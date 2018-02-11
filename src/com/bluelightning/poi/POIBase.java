@@ -1,9 +1,13 @@
 package com.bluelightning.poi;
 
+import java.awt.Dimension;
 import java.awt.Image;
+import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
@@ -11,6 +15,7 @@ import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.map.POIMarker;
 import com.bluelightning.map.SwingMarker;
 import com.opencsv.CSVReader;
 
@@ -20,12 +25,22 @@ public class POIBase implements POI {
 	protected double longitude;
 	protected double tanLatitude;
 	protected double tanLongitude;
+	protected static Image  image;
 	
 	protected String name;
 	
 	public static GeodeticCalculator geoCalc = new GeodeticCalculator();
 	public static Ellipsoid wgs84 = Ellipsoid.WGS84;
 
+	static {
+		if (image == null) try {
+			Dimension size = POIMarker.getImageSize();
+			image = ImageIO.read(new File("images/restarea.png"))
+					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
+		} catch (Exception x) {
+		}		
+	}
+	
 	public static POISet factory( String filePath ) {
 		POISet list = new POISet();
 		try {
@@ -120,14 +135,19 @@ public class POIBase implements POI {
 	}
 
 	@Override
-	public SwingMarker getMarker() {
-		return getMarker( toString() );
+	public Image getImage() {
+		return image;
 	}
-	
-	@Override
-	public SwingMarker getMarker(String report) {
-		return new SwingMarker( new GeoPosition(latitude, longitude), getName(), report );
-	}
+
+//	@Override
+//	public SwingMarker getMarker() {
+//		return getMarker( toString() );
+//	}
+//	
+//	@Override
+//	public SwingMarker getMarker(String report) {
+//		return new SwingMarker( new GeoPosition(latitude, longitude), getName(), report );
+//	}
 //	public static void main(String[] args) {
 //		List<POI> list = factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\RestAreasCombined_USA.csv");
 ////		POI p1 = list.get(0);

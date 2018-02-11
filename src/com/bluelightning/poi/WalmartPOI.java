@@ -12,6 +12,7 @@ import javax.swing.JButton;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.map.POIMarker;
 import com.bluelightning.map.SwingMarker;
 import com.opencsv.CSVReader;
 
@@ -34,7 +35,7 @@ public class WalmartPOI extends POIBase {
 
 	static {
 		if (imageOkToPark == null) try {
-			Dimension size = SwingMarker.getSize();
+			Dimension size = POIMarker.getImageSize();
 			imageOkToPark = ImageIO.read(new File("images/walmart-large.png"))
 					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
 			imageNoParking = ImageIO.read(new File("images/walmart-nopark-large.png"))
@@ -177,13 +178,8 @@ public class WalmartPOI extends POIBase {
 	
 	
 	@Override
-	public SwingMarker getMarker(String report) {
-		if (imageOkToPark != null) {
-			return new SwingMarker( (this.isNoOvernight) ? imageNoParking : imageOkToPark, 
-					new GeoPosition(latitude, longitude), getName(), report );
-		} else {
-			return new SwingMarker( new GeoPosition(latitude, longitude), getName(), report );
-		}
+	public Image getImage() {
+		return (this.isNoOvernight) ? imageNoParking : imageOkToPark;
 	}
 	
 	

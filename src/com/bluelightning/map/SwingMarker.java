@@ -23,28 +23,28 @@ public class SwingMarker extends DefaultWaypoint {
 	private final String text;
 	
 	private static final Dimension size = new Dimension(18,18);
-	
-	public static Dimension getSize() {
-		return size;
-	}
+//	
+//	public static Dimension getSize() {
+//		return size;
+//	}
 
-	public SwingMarker(GeoPosition coord, String label, String tooltip )  {
-		super(coord);
-		this.text = label;
-		try {
-			Image img = ImageIO.read(new File("images/restarea.png")); //getClass().getResource("images/costco.png"));
-			Icon icon = new ImageIcon(img);
-			button = new JButton(icon);
-		} catch (Exception x) {
-			button = new JButton(label);
-		}
-		button.setToolTipText(tooltip);
-		button.setSize((int) size.getWidth(), (int) size.getHeight());
-		button.setPreferredSize(size);
-		button.addMouseListener(new SwingWaypointMouseListener());
-		button.setVisible(true);
-	}
-
+//	public SwingMarker(GeoPosition coord, String label, String tooltip )  {
+//		super(coord);
+//		this.text = label;
+//		try {
+//			Image img = ImageIO.read(new File("images/restarea.png")); //getClass().getResource("images/costco.png"));
+//			Icon icon = new ImageIcon(img);
+//			button = new JButton(icon);
+//		} catch (Exception x) {
+//			button = new JButton(label);
+//		}
+//		button.setToolTipText(tooltip);
+//		button.setSize((int) size.getWidth(), (int) size.getHeight());
+//		button.setPreferredSize(size);
+//		button.addMouseListener(new SwingWaypointMouseListener());
+//		button.setVisible(true);
+//	}
+//
 	public SwingMarker(Image img, GeoPosition coord, String label, String tooltip )  {
 		super(coord);
 		this.text = label;
@@ -66,6 +66,7 @@ public class SwingMarker extends DefaultWaypoint {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			JOptionPane.showMessageDialog(button, "You clicked on " + text);
+			button.setVisible(false);
 		}
 
 		@Override

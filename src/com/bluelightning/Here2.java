@@ -22,10 +22,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.json.*;
 import com.bluelightning.json.Leg.CumulativeTravel;
+import com.bluelightning.map.POIMarker;
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POISet;
@@ -348,7 +350,7 @@ public class Here2 {
 			pset = SamsClubPOI.factory();
 			nearby.addAll(pset.getPointsOfInterestAlongRoute(route, 5e3 ));
 			
-			com.bluelightning.Map.showMap(routeShape, route, nearby);
+			com.bluelightning.Map.showMap(routeShape, route, POIMarker.factory(nearby));
 		} // for route
 	}
 

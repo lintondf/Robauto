@@ -1,5 +1,6 @@
 package com.bluelightning.poi;
 
+import java.awt.Image;
 import java.util.List;
 
 import org.gavaghan.geodesy.GlobalCoordinates;
@@ -18,7 +19,8 @@ public interface POI {
 	public void setLongitude(double longitude);
 	public String getName();
 	public void setName(String name);
-	public SwingMarker getMarker();
-	public SwingMarker getMarker(String report);
+	public Image getImage();
+//	public SwingMarker getMarker();
+//	public SwingMarker getMarker(String report);
 	
 }

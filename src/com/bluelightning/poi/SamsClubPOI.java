@@ -12,6 +12,7 @@ import javax.swing.JButton;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.map.POIMarker;
 import com.bluelightning.map.SwingMarker;
 import com.opencsv.CSVReader;
 
@@ -34,7 +35,7 @@ public class SamsClubPOI extends POIBase {
 
 	static {
 		if (imageHasGas == null) try {
-			Dimension size = SwingMarker.getSize();
+			Dimension size = POIMarker.getImageSize();
 			imageHasGas = ImageIO.read(new File("images/samsclub-large.png"))
 					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
 			imageNoGas = ImageIO.read(new File("images/samsclub-nogas-large.png"))
@@ -170,18 +171,22 @@ public class SamsClubPOI extends POIBase {
 		return factory(csvPath);
 	}
 	
-	
 	@Override
-	public SwingMarker getMarker(String report) {
-		if (imageHasGas != null) {
-			return new SwingMarker( (! hasGas) ? imageNoGas : imageHasGas, 
-					new GeoPosition(latitude, longitude), getName(), report );
-		} else {
-			return new SwingMarker( new GeoPosition(latitude, longitude), getName(), report );
-		}
+	public Image getImage() {
+		return (! hasGas) ? imageNoGas : imageHasGas;
 	}
 	
-	
+//	@Override
+//	public SwingMarker getMarker(String report) {
+//		if (imageHasGas != null) {
+//			return new SwingMarker( (! hasGas) ? imageNoGas : imageHasGas, 
+//					new GeoPosition(latitude, longitude), getName(), report );
+//		} else {
+//			return new SwingMarker( new GeoPosition(latitude, longitude), getName(), report );
+//		}
+//	}
+//	
+//	
 	public static void main(String[] args) {
     	POISet pset = SamsClubPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Walmart_United States & Canada.csv");
     	for (int i = 0; i < 15; i++)

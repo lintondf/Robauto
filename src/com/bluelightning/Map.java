@@ -34,9 +34,10 @@ import org.jxmapviewer.viewer.WaypointPainter;
 
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Route;
+import com.bluelightning.map.POIMarker;
 import com.bluelightning.map.RoutePainter;
 import com.bluelightning.map.SwingMarker;
-import com.bluelightning.map.SwingMarkerOverlayPainter;
+import com.bluelightning.map.POIMarkerOverlayPainter;
 import com.bluelightning.poi.POISet.POIResult;
 
 
@@ -76,7 +77,7 @@ public class Map {
 		Here2.main(args);
 	}
 
-	public static void showMap(List<GeoPosition> track, Route route, ArrayList<POIResult> nearby) {
+	public static void showMap(List<GeoPosition> track, Route route, List<POIMarker> nearby) {
 		JXMapViewer mapViewer = new JXMapViewer();
 
 		// Display the viewer in a JFrame
@@ -139,16 +140,10 @@ public class Map {
 		WaypointPainter<DefaultWaypoint> waypointPainter = new WaypointPainter<DefaultWaypoint>();
 		waypointPainter.setWaypoints(waypoints);
 
-		Set<SwingMarker> markers = new HashSet<SwingMarker>();
-		for (POIResult result : nearby) {
-			markers.add(result.poi.getMarker(result.toReport()));
-		}
-		;
-		// Arrays.asList(
-		// new SwingMarker( track.get(n), "Label", "ToolTip")));
+		Set<POIMarker> markers = new HashSet<POIMarker>(nearby);
 
 		// Set the overlay painter
-		WaypointPainter<SwingMarker> markerPainter = new SwingMarkerOverlayPainter();
+		WaypointPainter<POIMarker> markerPainter = new POIMarkerOverlayPainter();
 		markerPainter.setWaypoints(markers);
 
 		// Create a compound painter that uses both the route-painter and the
@@ -160,12 +155,11 @@ public class Map {
 
 		CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
 		mapViewer.setOverlayPainter(painter);
-
+		
 		// Add the JButtons to the map viewer
-		for (SwingMarker w : markers) {
-			mapViewer.add(w.getButton());
+		for (POIMarker w : nearby) {
+			mapViewer.add(w);
 		}
-
 	}
 
 }
