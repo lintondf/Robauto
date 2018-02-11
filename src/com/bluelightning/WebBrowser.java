@@ -12,6 +12,8 @@ package com.bluelightning;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -22,6 +24,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -88,10 +91,105 @@ public final class WebBrowser extends Canvas {
 	 */
 	private final AtomicReference<SwtThread> swtThreadReference = new AtomicReference<>();
 
+	private static WebBrowser browserCanvas;
 
-	public WebBrowser() {
+	protected static WebBrowser mock;
+
+
+	public WebBrowser() {}
+	
+	public static WebBrowser factory(MainPanel mainPanel) {
+		browserCanvas = new WebBrowser();
+		mainPanel.getRightTabbedPane().addTab("AllStays", null, browserCanvas, null);
+		
+		mock = new WebBrowser();
+		mainPanel.getLeftPanel().add(mock);
+		mock.setVisible(false);
+		
+		Events.eventBus.register(new WebBrowserOpenHandler());
+		Events.eventBus.register(browserCanvas.new UiHandler() );
+		return browserCanvas;
 	}
 
+	public void initialize(JFrame frame) {
+		mock.setVisible(false);
+
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// Dispose of the native component cleanly
+				browserCanvas.dispose();
+				mock.dispose();
+			}
+		});
+
+		if (mock.initialise()) {
+			mock.addLocationListener(new LocationListener() {
+
+				@Override
+				public void changing(LocationEvent event) {
+					System.out.println(Thread.currentThread() + " MOCK CHANGING: " + event);
+					event.doit = false;
+					Events.eventBus.post(new Events.WebBrowserOpenEvent(browserCanvas, event.location));
+				}
+
+				@Override
+				public void changed(LocationEvent event) {
+					System.out.println(Thread.currentThread() + " MOCK CHANGED: " + event);
+				}
+
+			});
+		}
+
+		// Initialise the native browser component, and if successful...
+		if (browserCanvas.initialise()) {
+			// ...navigate to the desired URL
+
+			browserCanvas.addLocationListener(new LocationListener() {
+
+				@Override
+				public void changing(LocationEvent event) {
+					System.out.println(Thread.currentThread() + " CHANGING: " + event);
+				}
+
+				@Override
+				public void changed(LocationEvent event) {
+					System.out.println(Thread.currentThread() + " CHANGED: " + event);
+					frame.setSize(1205, 805);
+				}
+
+			});
+			
+			browserCanvas.addOpenWindowListener(new OpenWindowListener() {
+
+				@Override
+				public void open(org.eclipse.swt.browser.WindowEvent event) {
+					System.out.println(Thread.currentThread() + " OPEN: " + event);
+					event.required = true;
+					event.browser = mock.getBrowser();
+				}
+
+			});
+			
+			browserCanvas.addProgressListener( new ProgressListener() {
+
+				@Override
+				public void changed(ProgressEvent event) {
+				}
+
+				@Override
+				public void completed(ProgressEvent event) {
+					browserCanvas.setUrl("javascript:(function(F,i,r,e,b,u,g,L,I,T,E){if(F.getElementById(b))return;E=F[i+'NS']&&F.documentElement.namespaceURI;E=E?F[i+'NS'](E,'script'):F[i]('script');E[r]('id',b);E[r]('src',I+g+T);E[r](b,u);(F[e]('head')[0]||F[e]('body')[0]).appendChild(E);E=new%20Image;E[r]('src',I+L);})(document,'createElement','setAttribute','getElementsByTagName','FirebugLite','4','firebug-lite.js','releases/lite/latest/skin/xp/sprite.png','https://getfirebug.com/','#startOpened');");
+				}
+				
+			});
+
+			browserCanvas.setUrl("https://www.allstays.com/pro/index.php");
+		} else {
+			System.out.println("Failed to initialise browser");
+		}
+		
+	}
 	/**
 	 * Get the native browser instance.
 	 *
@@ -174,7 +272,7 @@ public final class WebBrowser extends Canvas {
 	 * @return <code>true</code> if the browser component was successfully
 	 *         created; <code>false if it was not</code/
 	 */
-	public boolean initialise() {
+	protected boolean initialise() {
 		CountDownLatch browserCreatedLatch = new CountDownLatch(1);
 		SwtThread swtThread = new SwtThread(browserCreatedLatch);
 		swtThreadReference.set(swtThread);
@@ -276,7 +374,7 @@ public final class WebBrowser extends Canvas {
 		}
 	}
 
-	private static class WebBrowserOpenHandler {
+	public static class WebBrowserOpenHandler {
 		@Subscribe
 		protected void handle(WebBrowserOpenEvent event) {
 			System.out.println("WB Open: " + event.href);
@@ -286,10 +384,12 @@ public final class WebBrowser extends Canvas {
 		}
 	}
 	
-	public String tryCatchWrap(String js) {
+	public static String tryCatchWrap(String js) {
 		return String.format("try{%s} catch(err){console.log(err);}", js);
 	}
-	private class UiHandler {
+	
+	
+	public class UiHandler {
 		@Subscribe
 		protected void handle( UiEvent event ) {
 			System.out.println(event.source + " " + event.awtEvent );
@@ -316,6 +416,7 @@ public final class WebBrowser extends Canvas {
 		
 	}
 	
+	
 
 	/**
 	 * Example implementation.
@@ -324,6 +425,26 @@ public final class WebBrowser extends Canvas {
 	 *            command-line arguments (unused)
 	 */
 	public static void main(String[] args) {
+		// Display the viewer in a JFrame
+		JFrame frame = new JFrame("RobAuto RV Trip Planner");
+//		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+//		frame.setUndecorated(true);
+		MainPanel mainPanel = new MainPanel();
+		mainPanel.getLeftPanel().setLayout(new BorderLayout() );
+		//mainPanel.getLeftPanel().add( new ControlPanel() );
+		WebBrowser browserCanvas = WebBrowser.factory(mainPanel);
+		//mainPanel.getRightLayeredPane().add(layer1, 1);
+		//mainPanel.getRightLayeredPane().add(layer2, 2);
+//		frame.setContentPane(mainPanel);
+		frame.setContentPane(mainPanel);
+		frame.setSize(800, 600);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
+		browserCanvas.initialize(frame);
+	}
+	
+	
+	public static void main1(String[] args) {
 		//run( ()->{int i = 1;});
 		Events.eventBus.register(new WebBrowserOpenHandler());
 		JFrame frame = new JFrame("SWT Browser Embedded in JPanel");
