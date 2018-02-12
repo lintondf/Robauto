@@ -179,7 +179,7 @@ public final class WebBrowser extends Canvas {
 
 				@Override
 				public void completed(ProgressEvent event) {
-					browserCanvas.setUrl("javascript:(function(F,i,r,e,b,u,g,L,I,T,E){if(F.getElementById(b))return;E=F[i+'NS']&&F.documentElement.namespaceURI;E=E?F[i+'NS'](E,'script'):F[i]('script');E[r]('id',b);E[r]('src',I+g+T);E[r](b,u);(F[e]('head')[0]||F[e]('body')[0]).appendChild(E);E=new%20Image;E[r]('src',I+L);})(document,'createElement','setAttribute','getElementsByTagName','FirebugLite','4','firebug-lite.js','releases/lite/latest/skin/xp/sprite.png','https://getfirebug.com/','#startOpened');");
+//					browserCanvas.setUrl("javascript:(function(F,i,r,e,b,u,g,L,I,T,E){if(F.getElementById(b))return;E=F[i+'NS']&&F.documentElement.namespaceURI;E=E?F[i+'NS'](E,'script'):F[i]('script');E[r]('id',b);E[r]('src',I+g+T);E[r](b,u);(F[e]('head')[0]||F[e]('body')[0]).appendChild(E);E=new%20Image;E[r]('src',I+L);})(document,'createElement','setAttribute','getElementsByTagName','FirebugLite','4','firebug-lite.js','releases/lite/latest/skin/xp/sprite.png','https://getfirebug.com/','#startOpened');");
 				}
 				
 			});
@@ -393,22 +393,31 @@ public final class WebBrowser extends Canvas {
 		@Subscribe
 		protected void handle( UiEvent event ) {
 			System.out.println(event.source + " " + event.awtEvent );
-			String geomock = null;
-			try {
-				geomock = IOUtils.toString( new FileReader("scripts/geomock.js") );
-				evaluateJavascript(geomock);
-				String coords = "	navigator.geolocation.waypoints = [{coords: {\r\n" + 
-						"	                                       latitude: 28,\r\n" + 
-						"	                                       longitude: -80,\r\n" + 
-						"	                                       accuracy: 150\r\n" + 
-						"	                                     }}];";
-				evaluateJavascript(coords);
-				String click = tryCatchWrap("document.getElementById('locate').click();");
-				evaluateJavascript(click);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}			
+			switch (event.source) {
+			case "ControlPanel.FireBug":
+				browserCanvas.setUrl("javascript:(function(F,i,r,e,b,u,g,L,I,T,E){if(F.getElementById(b))return;E=F[i+'NS']&&F.documentElement.namespaceURI;E=E?F[i+'NS'](E,'script'):F[i]('script');E[r]('id',b);E[r]('src',I+g+T);E[r](b,u);(F[e]('head')[0]||F[e]('body')[0]).appendChild(E);E=new%20Image;E[r]('src',I+L);})(document,'createElement','setAttribute','getElementsByTagName','FirebugLite','4','firebug-lite.js','releases/lite/latest/skin/xp/sprite.png','https://getfirebug.com/','#startOpened');");
+				break;
+			case "ControlPanel.Geomock":
+				String geomock = null;
+				try {
+					geomock = IOUtils.toString( new FileReader("scripts/geomock.js") );
+					evaluateJavascript(geomock);
+					String coords = "	navigator.geolocation.waypoints = [{coords: {\r\n" + 
+							"	                                       latitude: 28,\r\n" + 
+							"	                                       longitude: -80,\r\n" + 
+							"	                                       accuracy: 150\r\n" + 
+							"	                                     }}];";
+					evaluateJavascript(coords);
+					String click = tryCatchWrap("document.getElementById('locate').click();");
+					evaluateJavascript(click);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}			
+				break;
+			default:
+				break;
+			}
 		}
 	}
 	
@@ -539,7 +548,7 @@ public final class WebBrowser extends Canvas {
 
 				@Override
 				public void completed(ProgressEvent event) {
-					browserCanvas.setUrl("javascript:(function(F,i,r,e,b,u,g,L,I,T,E){if(F.getElementById(b))return;E=F[i+'NS']&&F.documentElement.namespaceURI;E=E?F[i+'NS'](E,'script'):F[i]('script');E[r]('id',b);E[r]('src',I+g+T);E[r](b,u);(F[e]('head')[0]||F[e]('body')[0]).appendChild(E);E=new%20Image;E[r]('src',I+L);})(document,'createElement','setAttribute','getElementsByTagName','FirebugLite','4','firebug-lite.js','releases/lite/latest/skin/xp/sprite.png','https://getfirebug.com/','#startOpened');");
+//					browserCanvas.setUrl("javascript:(function(F,i,r,e,b,u,g,L,I,T,E){if(F.getElementById(b))return;E=F[i+'NS']&&F.documentElement.namespaceURI;E=E?F[i+'NS'](E,'script'):F[i]('script');E[r]('id',b);E[r]('src',I+g+T);E[r](b,u);(F[e]('head')[0]||F[e]('body')[0]).appendChild(E);E=new%20Image;E[r]('src',I+L);})(document,'createElement','setAttribute','getElementsByTagName','FirebugLite','4','firebug-lite.js','releases/lite/latest/skin/xp/sprite.png','https://getfirebug.com/','#startOpened');");
 				}
 				
 			});

@@ -25,6 +25,7 @@ import org.apache.http.util.EntityUtils;
 import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.Events.UiEvent;
 import com.bluelightning.json.*;
 import com.bluelightning.json.Leg.CumulativeTravel;
 import com.bluelightning.map.POIMarker;
@@ -34,6 +35,7 @@ import com.bluelightning.poi.POISet;
 import com.bluelightning.poi.SamsClubPOI;
 import com.bluelightning.poi.TruckStopPOI;
 import com.bluelightning.poi.WalmartPOI;
+import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -257,10 +259,25 @@ public class Here2 {
 		}
 		return sb.toString();
 	}
+	
+	public static class UiHandler {
+		@Subscribe
+		protected void handle( UiEvent event ) {
+			System.out.println(event.source + " " + event.awtEvent );
+			switch (event.source) {
+			case "ControlPanel.Route":
+				break;
+			default:
+				break;
+			}
+		}
+	}
 
-	public static void main(String[] args) {
+//	public static void main(String[] args) {
 //		LatLon lee = Here.geocodeLookup("Lee Service Plaza Eastbound");
 //		System.out.println( lee  );
+	
+	public static Route computeRoute() {
 		HereRoute hereRoute = null;
 		String[] pointAddresses = {
 				"3533 Carambola Cir, Melbourne, FL",
@@ -345,13 +362,15 @@ public class Here2 {
 			
 //			printPointsOfInterestAlongRoute( route, "POI/RestAreasCombined_USA.csv");
 //			printPointsOfInterestAlongRoute( route, "POI/SamsClubs_USA.csv");
-			POISet pset = WalmartPOI.factory(); //TruckStopPOI.factory(); // POIBase.factory("POI/Costco_USA_Canada.csv");
-			ArrayList<POISet.POIResult> nearby = pset.getPointsOfInterestAlongRoute(route, 5e3 );
-			pset = SamsClubPOI.factory();
-			nearby.addAll(pset.getPointsOfInterestAlongRoute(route, 5e3 ));
-			
-			com.bluelightning.Map.showMap(routeShape, route, POIMarker.factory(nearby));
+//			POISet pset = WalmartPOI.factory(); //TruckStopPOI.factory(); // POIBase.factory("POI/Costco_USA_Canada.csv");
+//			ArrayList<POISet.POIResult> nearby = pset.getPointsOfInterestAlongRoute(route, 5e3 );
+//			pset = SamsClubPOI.factory();
+//			nearby.addAll(pset.getPointsOfInterestAlongRoute(route, 5e3 ));
+//			
+//			com.bluelightning.Map.showMap(routeShape, route, POIMarker.factory(nearby));
+			return null;
 		} // for route
+		return null;
 	}
 
 

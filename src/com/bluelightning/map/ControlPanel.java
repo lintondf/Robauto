@@ -34,14 +34,23 @@ public class ControlPanel extends JPanel {
 		chckbxTruckStops.setBounds(22, 103, 97, 23);
 		add(chckbxTruckStops);
 		
-		JButton btnOk = new JButton("OK");
-		btnOk.addActionListener(new ActionListener() {
+		JButton btnRoute = new JButton("Route");
+		btnRoute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				Events.eventBus.post( new Events.UiEvent("ControlPanel.OK", event));
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.Route", event));
 			}
 		});
-		btnOk.setBounds(10, 168, 89, 23);
-		add(btnOk);
+		btnRoute.setBounds(10, 168, 89, 23);
+		add(btnRoute);
+		
+		JButton btnFirebug = new JButton("FireBug");
+		btnFirebug.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.FireBug", event));
+			}
+		});
+		btnFirebug.setBounds(10, 202, 89, 23);
+		add(btnFirebug);
 
 	}
 }
