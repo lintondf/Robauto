@@ -15,7 +15,7 @@ import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
-import com.bluelightning.map.POIMarker;
+import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.SwingMarker;
 import com.opencsv.CSVReader;
 
@@ -34,7 +34,7 @@ public class POIBase implements POI {
 
 	static {
 		if (image == null) try {
-			Dimension size = POIMarker.getImageSize();
+			Dimension size = ButtonWaypoint.getImageSize();
 			image = ImageIO.read(new File("images/restarea.png"))
 					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
 		} catch (Exception x) {

@@ -25,7 +25,6 @@ import org.apache.http.util.EntityUtils;
 import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.GeoPosition;
 
-import com.bluelightning.Events.UiEvent;
 import com.bluelightning.json.*;
 import com.bluelightning.json.Leg.CumulativeTravel;
 import com.bluelightning.map.POIMarker;
@@ -35,7 +34,6 @@ import com.bluelightning.poi.POISet;
 import com.bluelightning.poi.SamsClubPOI;
 import com.bluelightning.poi.TruckStopPOI;
 import com.bluelightning.poi.WalmartPOI;
-import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -260,18 +258,7 @@ public class Here2 {
 		return sb.toString();
 	}
 	
-	public static class UiHandler {
-		@Subscribe
-		protected void handle( UiEvent event ) {
-			System.out.println(event.source + " " + event.awtEvent );
-			switch (event.source) {
-			case "ControlPanel.Route":
-				break;
-			default:
-				break;
-			}
-		}
-	}
+	
 
 //	public static void main(String[] args) {
 //		LatLon lee = Here.geocodeLookup("Lee Service Plaza Eastbound");
@@ -368,7 +355,7 @@ public class Here2 {
 //			nearby.addAll(pset.getPointsOfInterestAlongRoute(route, 5e3 ));
 //			
 //			com.bluelightning.Map.showMap(routeShape, route, POIMarker.factory(nearby));
-			return null;
+			return route;
 		} // for route
 		return null;
 	}

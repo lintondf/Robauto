@@ -13,16 +13,16 @@ import java.awt.geom.Point2D;
  *
  * @author Daniel Stahr
  */
-public class POIMarkerOverlayPainter extends WaypointPainter<POIMarker> {
+public class ButtonWaypointOverlayPainter extends WaypointPainter<ButtonWaypoint> {
 
 	@Override
 	protected void doPaint(Graphics2D g, JXMapViewer jxMapViewer, int width, int height) {
-		for (POIMarker swingWaypoint : getWaypoints()) {
-			Point2D point = jxMapViewer.getTileFactory().geoToPixel(swingWaypoint.getPosition(), jxMapViewer.getZoom());
+		for (ButtonWaypoint waypoint : getWaypoints()) {
+			Point2D point = jxMapViewer.getTileFactory().geoToPixel(waypoint.getPosition(), jxMapViewer.getZoom());
 			Rectangle rectangle = jxMapViewer.getViewportBounds();
 			int buttonX = (int) (point.getX() - rectangle.getX());
 			int buttonY = (int) (point.getY() - rectangle.getY());
-			JButton button = swingWaypoint;
+			JButton button = waypoint;
 			button.setLocation(buttonX - button.getWidth() / 2, buttonY - button.getHeight() / 2);
 		}
 	}

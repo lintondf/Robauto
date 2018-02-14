@@ -12,7 +12,7 @@ import javax.swing.JButton;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
-import com.bluelightning.map.POIMarker;
+import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.SwingMarker;
 import com.opencsv.CSVReader;
 
@@ -35,7 +35,7 @@ public class SamsClubPOI extends POIBase {
 
 	static {
 		if (imageHasGas == null) try {
-			Dimension size = POIMarker.getImageSize();
+			Dimension size = ButtonWaypoint.getImageSize();
 			imageHasGas = ImageIO.read(new File("images/samsclub-large.png"))
 					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
 			imageNoGas = ImageIO.read(new File("images/samsclub-nogas-large.png"))

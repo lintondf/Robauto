@@ -3,7 +3,6 @@
  */
 package com.bluelightning.map;
 
-import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import javax.swing.JOptionPane;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.Waypoint;
 
+import com.bluelightning.Events;
 import com.bluelightning.LatLon;
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POISet;
@@ -25,24 +25,17 @@ import com.bluelightning.poi.POISet;
  * @author NOOK
  *
  */
-public class POIMarker extends JButton implements Waypoint {
+public class POIMarker extends ButtonWaypoint {
 
-	private static final Dimension size = new Dimension(18,18);
-	
-	public static Dimension getImageSize() {
-		return size;
-	}	
-	
 	POISet.POIResult result;
-	GeoPosition      geoPosition;
 	
-	POIMarker(POISet.POIResult result) {
-		super( new ImageIcon(result.poi.getImage()) );
+	public POIMarker(POISet.POIResult result) {
+		super( new ImageIcon(result.poi.getImage()), 
+				new GeoPosition(result.poi.getLatitude(), result.poi.getLongitude() ));
 		this.result = result;
-		geoPosition = new GeoPosition(result.poi.getLatitude(), result.poi.getLongitude() );
 		setToolTipText(result.toReport());
-		setSize((int) size.getWidth(), (int) size.getHeight());
-		setPreferredSize(size);
+		setSize((int) ButtonWaypoint.size.getWidth(), (int) ButtonWaypoint.size.getHeight());
+		setPreferredSize(ButtonWaypoint.size);
 		addMouseListener(new POIMarkerMouseListener());
 		setVisible(true);
 	}
@@ -72,8 +65,8 @@ public class POIMarker extends JButton implements Waypoint {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			JOptionPane.showMessageDialog(POIMarker.this, "You clicked on " + result.toReport(), "POI Marker", JOptionPane.PLAIN_MESSAGE);
-			setVisible(false);
+//			JOptionPane.showMessageDialog(POIMarker.this, "You clicked on " + result.toReport(), "POI Marker", JOptionPane.PLAIN_MESSAGE);
+			Events.eventBus.post( new Events.POIClickEvent(result.poi));
 		}
 
 		@Override

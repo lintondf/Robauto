@@ -12,7 +12,7 @@ import javax.swing.JButton;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
-import com.bluelightning.map.POIMarker;
+import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.SwingMarker;
 import com.opencsv.CSVReader;
 
@@ -35,7 +35,7 @@ public class WalmartPOI extends POIBase {
 
 	static {
 		if (imageOkToPark == null) try {
-			Dimension size = POIMarker.getImageSize();
+			Dimension size = ButtonWaypoint.getImageSize();
 			imageOkToPark = ImageIO.read(new File("images/walmart-large.png"))
 					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
 			imageNoParking = ImageIO.read(new File("images/walmart-nopark-large.png"))

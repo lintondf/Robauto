@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -39,8 +40,11 @@ import com.bluelightning.json.Route;
 import com.bluelightning.map.ControlPanel;
 import com.bluelightning.map.POIMarker;
 import com.bluelightning.map.RoutePainter;
+import com.bluelightning.map.StopMarker;
+import com.bluelightning.map.StopMarker.Kind;
 import com.bluelightning.map.SwingMarker;
-import com.bluelightning.map.POIMarkerOverlayPainter;
+import com.bluelightning.map.ButtonWaypoint;
+import com.bluelightning.map.ButtonWaypointOverlayPainter;
 import com.bluelightning.poi.POISet.POIResult;
 
 
@@ -72,17 +76,26 @@ public class Map {
 			0.596,
 			0.298
 	};
+	protected JXMapViewer mapViewer;
+	protected WaypointPainter<DefaultWaypoint> waypointPainter;
+	protected RoutePainter routePainter;
+	protected List<Painter<JXMapViewer>> painters;
+	protected WaypointPainter<ButtonWaypoint> markerPainter;
+	protected List<ButtonWaypoint> currentMarkers = new ArrayList<>();
+
+	public JXMapViewer getMapViewer() {
+		return mapViewer;
+	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		Here2.main(args);
-	}
+//	public static void main(String[] args) {
+//		Here2.main(args);
+//	}
 	
-	public static JXMapViewer factory() {
-		JXMapViewer mapViewer = new JXMapViewer();
-
+	public Map() {
+		mapViewer = new JXMapViewer();
 		// Create a TileFactoryInfo for OpenStreetMap
 		TileFactoryInfo info = new OSMTileFactoryInfo();
 		DefaultTileFactory tileFactory = new DefaultTileFactory(info);
@@ -120,8 +133,64 @@ public class Map {
 		});
 		mapViewer.setCenterPosition( new GeoPosition(28, -81));
 		mapViewer.setZoom(10);
-		return mapViewer;
 	}
+	
+	public List<ButtonWaypoint> showRoute( Route route) {
+		List<GeoPosition> track = route.getShape();
+		routePainter = new RoutePainter(track);
+		// Set the focus
+		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(track), 0.9);	
+		
+		// Create waypoints from the geo-positions
+		ArrayList<ButtonWaypoint> waylist = new ArrayList<>();
+		StopMarker.Kind kind = Kind.ORIGIN;
+		String lastText = "";
+		for (Leg leg : route.getLeg()) {
+			String text = leg.getStart().getMappedRoadName() + " " + leg.getStart().getSideOfStreet();
+			waylist.add(new StopMarker(kind, text, new LatLon(leg.getStart().getMappedPosition())));
+			kind = Kind.OVERNIGHT;
+			text = leg.getEnd().getMappedRoadName() + " " + leg.getEnd().getSideOfStreet();
+		}
+		waylist.add(new StopMarker(Kind.TERMINUS, lastText, track.get(track.size() - 1)));
+
+		markerPainter = new ButtonWaypointOverlayPainter();
+		markerPainter.setWaypoints( new HashSet<ButtonWaypoint>(waylist));
+		
+        painters = new ArrayList<Painter<JXMapViewer>>();
+		painters.add(routePainter);
+		painters.add(markerPainter);
+
+		CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
+		mapViewer.setOverlayPainter(painter);
+		
+		// Add the JButtons to the map viewer
+		for (ButtonWaypoint w : waylist) {
+			mapViewer.add(w);
+			currentMarkers.add(w);
+		}
+		
+		return waylist;
+	}
+	
+	
+	public void updateWaypoints(List<ButtonWaypoint> waylist) {
+		// remove the old swing markers
+		for (ButtonWaypoint w : currentMarkers) {
+			mapViewer.remove(w);
+		}
+		markerPainter.setWaypoints( new HashSet<ButtonWaypoint>(waylist));
+		currentMarkers.clear();
+		// Add the JButtons to the map viewer
+		for (ButtonWaypoint w : waylist) {
+			mapViewer.add(w);
+			currentMarkers.add(w);
+		}
+		CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
+		mapViewer.setOverlayPainter(painter);
+		mapViewer.validate();
+	}
+	
+//	public static
 
 	public static void showMap(List<GeoPosition> track, Route route, List<POIMarker> nearby) {
 		JXMapViewer mapViewer = new JXMapViewer();
