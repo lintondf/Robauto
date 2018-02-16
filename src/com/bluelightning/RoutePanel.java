@@ -2,22 +2,19 @@ package com.bluelightning;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import java.awt.GridBagLayout;
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import javax.swing.SpringLayout;
+import javax.swing.JSplitPane;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
-import javax.swing.JTextField;
 import javax.swing.JTable;
+import javax.swing.JButton;
+import javax.swing.JTabbedPane;
 
 public class RoutePanel extends JPanel {
+	private JTable      waypointList;
+	protected JTextPane htmlPane;
 
-	protected DefaultListModel<String> listModel = new DefaultListModel<String>();
-	private   JTable wayPointList;
 
 	/**
 	 * Create the panel.
@@ -33,62 +30,55 @@ public class RoutePanel extends JPanel {
 				{"3533 Carambola Cir, Melbourne, FL", new Boolean(false), new Double(28), new Double(-81)}
 		};
 		int[] columnWidths = { 200, 10, 50, 50 };
-		wayPointList = new JTable(data, columnNames);
+		waypointList = new JTable(data, columnNames);
 		TableColumn column = null;
 		for (int i = 0; i < columnWidths.length; i++) {
-		    column = wayPointList.getColumnModel().getColumn(i);
+		    column = waypointList.getColumnModel().getColumn(i);
 	        column.setPreferredWidth(columnWidths[i]);
 		}
-		JScrollPane scrollPane = new JScrollPane(wayPointList);
-		wayPointList.setFillsViewportHeight(true);
-		SpringLayout springLayout = new SpringLayout();
-		springLayout.putConstraint(SpringLayout.EAST, scrollPane, 424, SpringLayout.WEST, this);
-		setLayout(springLayout);
-
-		springLayout.putConstraint(SpringLayout.NORTH, scrollPane, 10, SpringLayout.NORTH, this);
-		springLayout.putConstraint(SpringLayout.WEST, scrollPane, 23, SpringLayout.WEST, this);
-		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane, -10, SpringLayout.SOUTH, this);
-		add(scrollPane);
+		JScrollPane scrollPane = new JScrollPane(waypointList);
+		waypointList.setFillsViewportHeight(true);
+		setLayout(new BorderLayout(0, 0));
 		
-	}
-
-	public JTable getWayPointList() {
-		return wayPointList;
-	}
-
-	public static class MyListCellRenderer extends JLabel implements ListCellRenderer {
-
+		JSplitPane splitPane = new JSplitPane();
+		splitPane.setResizeWeight(0.5);
+		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		add(splitPane);
 		
-		public MyListCellRenderer() {
-			setOpaque(true);
-			setHorizontalAlignment(LEFT);
-			setVerticalAlignment(CENTER);
-		}
-
-		/*
-		 * This method finds the image and text corresponding to the selected
-		 * value and returns the label, set up to display the text and image.
-		 */
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-				boolean cellHasFocus) {
-//			// Get the selected index. (The index param isn't
-//			// always valid, so just use the value.)
-//			int selectedIndex = ((Integer) value).intValue();
-//
-//			if (isSelected) {
-//				setBackground(list.getSelectionBackground());
-//				setForeground(list.getSelectionForeground());
-//			} else {
-//				setBackground(list.getBackground());
-//				setForeground(list.getForeground());
-//			}
-//
-			this.setSize((int)list.getSize().getWidth(), 40 );
-			setText(String.format("<html>%s</html>", (String) value));
-			setFont(list.getFont());
-
-			return this;
-		}
+		JSplitPane splitPane_1 = new JSplitPane();
+		splitPane_1.setResizeWeight(0.8);
+		splitPane.setLeftComponent(splitPane_1);
+		
+		JPanel upperLeftPanel = new JPanel();
+		splitPane_1.setRightComponent(upperLeftPanel);
+		upperLeftPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		JButton btnNewButton = new JButton("New button");
+		upperLeftPanel.add(btnNewButton);
+		
+		JPanel upperRightPanel = new JPanel();
+		splitPane_1.setLeftComponent(upperRightPanel);
+		upperRightPanel.setLayout(new BorderLayout(0, 0));
+		
+		upperRightPanel.add(scrollPane, BorderLayout.NORTH);
+		
+		JPanel lowerPanel = new JPanel();
+		splitPane.setRightComponent(lowerPanel);
+		lowerPanel.setLayout(new BorderLayout(0, 0));
+		
+		htmlPane = new JTextPane();
+		JScrollPane scrollPane_1 = new JScrollPane(htmlPane);
+		lowerPanel.add(scrollPane_1, BorderLayout.NORTH);
 
 	}
+
+	
+	public JTable getRouteTable() {
+		return waypointList;
+	}
+
+	public JTextPane getHtmlPane() {
+		return htmlPane;
+	}
+
 }
