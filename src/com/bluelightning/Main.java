@@ -39,7 +39,7 @@ public class Main {
 	protected List<ButtonWaypoint> waypoints;
 	protected Map         map;
 	protected JXMapViewer mapViewer;
-	protected RoutePanel  routePanel;
+	protected RoutePanel1  routePanel;
 	protected ControlPanel controlPanel;
 	protected Route route;
 	protected EnumMap<ControlPanel.MarkerKinds, POISet> poiMap = new EnumMap<>(ControlPanel.MarkerKinds.class);
@@ -105,7 +105,7 @@ public class Main {
 		JFrame frame = new JFrame("RobAuto RV Trip Planner");
 		mainPanel = new MainPanel();
 		mainPanel.getLeftPanel().setLayout(new BorderLayout() );
-		routePanel = new RoutePanel();
+		routePanel = new RoutePanel1();
 		mainPanel.getRightTabbedPane().addTab("Route", null, routePanel, null);
 		map = new Map();
 		mapViewer = map.getMapViewer();
