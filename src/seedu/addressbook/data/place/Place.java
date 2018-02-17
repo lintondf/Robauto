@@ -1,7 +1,11 @@
 package seedu.addressbook.data.place;
 
+import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
+import seedu.addressbook.data.tag.UniqueTagList.DuplicateTagException;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -11,18 +15,42 @@ import java.util.Objects;
 public class Place implements ReadOnlyPlace {
 
     private Name name;
-    private Phone phone;
-    private Email email;
+    private Double latitude;
+    private Double longitude;
     private Address address;
 
     private final UniqueTagList tags;
+    
+    public static Double UNKNOWN = new Double(0);
+    
+    public static Place factory( String name, String address, UniqueTagList tags ) {
+    	try {
+			return new Place(new Name(name), UNKNOWN, UNKNOWN, new Address(address), tags);
+		} catch (IllegalValueException e) {
+			return null;
+		}
+    }
+
+    
+    public static Place factory( String name, String address, List<Tag> tags ) {
+    	try {
+			return factory( name, address, new UniqueTagList(tags) );
+		} catch (DuplicateTagException e) {
+			return null;
+		}
+    }
+    
+    
+    public static Place factory( String name, String address ) {
+    	return factory( name, address, new UniqueTagList());
+    }
     /**
      * Assumption: Every field must be present and not null.
      */
-    public Place(Name name, Phone phone, Email email, Address address, UniqueTagList tags) {
+    public Place(Name name, Double latitude, Double longitude, Address address, UniqueTagList tags) {
         this.name = name;
-        this.phone = phone;
-        this.email = email;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.address = address;
         this.tags = new UniqueTagList(tags); // protect internal tags from changes in the arg list
     }
@@ -31,7 +59,7 @@ public class Place implements ReadOnlyPlace {
      * Copy constructor.
      */
     public Place(ReadOnlyPlace source) {
-        this(source.getName(), source.getPhone(), source.getEmail(), source.getAddress(), source.getTags());
+        this(source.getName(), source.getLatitude(), source.getLongitude(), source.getAddress(), source.getTags());
     }
 
     @Override
@@ -40,13 +68,13 @@ public class Place implements ReadOnlyPlace {
     }
 
     @Override
-    public Phone getPhone() {
-        return phone;
+    public Double getLatitude() {
+        return latitude;
     }
 
     @Override
-    public Email getEmail() {
-        return email;
+    public Double getLongitude() {
+        return longitude;
     }
 
     @Override
@@ -76,7 +104,7 @@ public class Place implements ReadOnlyPlace {
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, phone, email, address, tags);
+        return Objects.hash(name, latitude, longitude, address, tags);
     }
 
     @Override

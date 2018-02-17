@@ -20,8 +20,8 @@ public class Address {
      *
      * @throws IllegalValueException if given address string is invalid.
      */
-    public Address(String address, boolean isPrivate) throws IllegalValueException {
-        this.isPrivate = isPrivate;
+    public Address(String address) throws IllegalValueException {
+        this.isPrivate = false;
         if (!isValidAddress(address)) {
             throw new IllegalValueException(MESSAGE_ADDRESS_CONSTRAINTS);
         }

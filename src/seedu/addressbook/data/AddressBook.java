@@ -12,13 +12,13 @@ import java.util.*;
  * Represents the entire address book. Contains the data of the address book.
  *
  * Guarantees:
- *  - Every tag found in every person will also be found in the tag list.
- *  - The tags in each person point to tag objects in the master list. (== equality)
+ *  - Every tag found in every place will also be found in the tag list.
+ *  - The tags in each place point to tag objects in the master list. (== equality)
  */
 public class AddressBook {
 
-    private final UniquePlaceList allPersons;
-    private final UniqueTagList allTags; // can contain tags not attached to any person
+    private final UniquePlaceList allPlaces;
+    private final UniqueTagList allTags; // can contain tags not attached to any place
 
     public static AddressBook empty() {
         return new AddressBook();
@@ -28,33 +28,33 @@ public class AddressBook {
      * Creates an empty address book.
      */
     public AddressBook() {
-        allPersons = new UniquePlaceList();
+        allPlaces = new UniquePlaceList();
         allTags = new UniqueTagList();
     }
 
     /**
      * Constructs an address book with the given data.
-     * Also updates the tag list with any missing tags found in any person.
+     * Also updates the tag list with any missing tags found in any place.
      *
-     * @param persons external changes to this will not affect this address book
+     * @param places external changes to this will not affect this address book
      * @param tags external changes to this will not affect this address book
      */
-    public AddressBook(UniquePlaceList persons, UniqueTagList tags) {
-        this.allPersons = new UniquePlaceList(persons);
+    public AddressBook(UniquePlaceList places, UniqueTagList tags) {
+        this.allPlaces = new UniquePlaceList(places);
         this.allTags = new UniqueTagList(tags);
-        for (Place p : allPersons) {
+        for (Place p : allPlaces) {
             syncTagsWithMasterList(p);
         }
     }
 
     /**
-     * Ensures that every tag in this person:
+     * Ensures that every tag in this place:
      *  - exists in the master list {@link #allTags}
      *  - points to a Tag object in the master list
      */
-    private void syncTagsWithMasterList(Place person) {
-        final UniqueTagList personTags = person.getTags();
-        allTags.mergeFrom(personTags);
+    private void syncTagsWithMasterList(Place place) {
+        final UniqueTagList placeTags = place.getTags();
+        allTags.mergeFrom(placeTags);
 
         // Create map with values = tag object references in the master list
         final Map<Tag, Tag> masterTagObjects = new HashMap<>();
@@ -62,55 +62,60 @@ public class AddressBook {
             masterTagObjects.put(tag, tag);
         }
 
-        // Rebuild the list of person tags using references from the master list
+        // Rebuild the list of place tags using references from the master list
         final Set<Tag> commonTagReferences = new HashSet<>();
-        for (Tag tag : personTags) {
+        for (Tag tag : placeTags) {
             commonTagReferences.add(masterTagObjects.get(tag));
         }
-        person.setTags(new UniqueTagList(commonTagReferences));
+        place.setTags(new UniqueTagList(commonTagReferences));
     }
 
     /**
-     * Adds a person to the address book.
-     * Also checks the new person's tags and updates {@link #allTags} with any new tags found,
-     * and updates the Tag objects in the person to point to those in {@link #allTags}.
+     * Adds a place to the address book.
+     * Also checks the new place's tags and updates {@link #allTags} with any new tags found,
+     * and updates the Tag objects in the place to point to those in {@link #allTags}.
      *
-     * @throws DuplicatePlaceException if an equivalent person already exists.
+     * @throws DuplicatePlaceException if an equivalent place already exists.
      */
-    public void addPerson(Place toAdd) throws DuplicatePlaceException {
+    public void add(Place toAdd) throws DuplicatePlaceException {
         syncTagsWithMasterList(toAdd);
-        allPersons.add(toAdd);
+        allPlaces.add(toAdd);
+    }
+    
+    public void update( Place toUpdate )  throws PlaceNotFoundException {
+        allPlaces.update(toUpdate);
     }
 
+
     /**
-     * Checks if an equivalent person exists in the address book.
+     * Checks if an equivalent place exists in the address book.
      */
-    public boolean containsPerson(ReadOnlyPlace key) {
-        return allPersons.contains(key);
+    public boolean contains(ReadOnlyPlace key) {
+        return allPlaces.contains(key);
     }
 
     /**
-     * Removes the equivalent person from the address book.
+     * Removes the equivalent place from the address book.
      *
-     * @throws PlaceNotFoundException if no such Person could be found.
+     * @throws PlaceNotFoundException if no such place could be found.
      */
-    public void removePerson(ReadOnlyPlace toRemove) throws PlaceNotFoundException {
-        allPersons.remove(toRemove);
+    public void remove(ReadOnlyPlace toRemove) throws PlaceNotFoundException {
+        allPlaces.remove(toRemove);
     }
 
     /**
-     * Clears all persons and tags from the address book.
+     * Clears all places and tags from the address book.
      */
     public void clear() {
-        allPersons.clear();
+        allPlaces.clear();
         allTags.clear();
     }
 
     /**
-     * Defensively copied UniquePersonList of all persons in the address book at the time of the call.
+     * Defensively copied UniqueplaceList of all places in the address book at the time of the call.
      */
-    public UniquePlaceList getAllPersons() {
-        return new UniquePlaceList(allPersons);
+    public UniquePlaceList getAllPlaces() {
+        return new UniquePlaceList(allPlaces);
     }
 
     /**
@@ -124,13 +129,13 @@ public class AddressBook {
     public boolean equals(Object other) {
         return other == this // short circuit if same object
                 || (other instanceof AddressBook // instanceof handles nulls
-                && this.allPersons.equals(((AddressBook) other).allPersons)
+                && this.allPlaces.equals(((AddressBook) other).allPlaces)
                 && this.allTags.equals(((AddressBook) other).allTags));
     }
 
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(allPersons, allTags);
+        return Objects.hash(allPlaces, allTags);
     }
 }

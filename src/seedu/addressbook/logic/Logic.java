@@ -4,7 +4,7 @@ import seedu.addressbook.commands.Command;
 import seedu.addressbook.commands.CommandResult;
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.place.ReadOnlyPlace;
-import seedu.addressbook.parser.Parser;
+//import seedu.addressbook.parser.Parser;
 import seedu.addressbook.storage.StorageFile;
 
 import java.util.Collections;
@@ -20,7 +20,11 @@ public class Logic {
     private StorageFile storage;
     private AddressBook addressBook;
 
-    /** The list of person shown to the user most recently.  */
+    public AddressBook getAddressBook() {
+		return addressBook;
+	}
+
+	/** The list of person shown to the user most recently.  */
     private List<? extends ReadOnlyPlace> lastShownList = Collections.emptyList();
 
     public Logic() throws Exception{
@@ -68,12 +72,12 @@ public class Logic {
      * Parses the user command, executes it, and returns the result.
      * @throws Exception if there was any problem during command execution.
      */
-    public CommandResult execute(String userCommandText) throws Exception {
-        Command command = new Parser().parseCommand(userCommandText);
-        CommandResult result = execute(command);
-        recordResult(result);
-        return result;
-    }
+//    public CommandResult execute(String userCommandText) throws Exception {
+//        Command command = new Parser().parseCommand(userCommandText);
+//        CommandResult result = execute(command);
+//        recordResult(result);
+//        return result;
+//    }
 
     /**
      * Executes the command, updates storage, and returns the result.

@@ -15,7 +15,14 @@ import javax.swing.table.TableColumn;
 import seedu.addressbook.commands.AddCommand;
 import seedu.addressbook.commands.CommandResult;
 import seedu.addressbook.commands.ListCommand;
+import seedu.addressbook.commands.ViewCommand;
+import seedu.addressbook.data.AddressBook;
+import seedu.addressbook.data.place.Address;
+import seedu.addressbook.data.place.Name;
+import seedu.addressbook.data.place.Place;
 import seedu.addressbook.data.place.ReadOnlyPlace;
+import seedu.addressbook.data.place.UniquePlaceList;
+import seedu.addressbook.data.tag.UniqueTagList;
 import seedu.addressbook.logic.Logic;
 
 import javax.swing.JTable;
@@ -94,20 +101,36 @@ public class RoutePanel extends JPanel {
 
 	
 	public static void main(String[] args) {
+		CommandResult result;
 		try {
-			Logic addressBookController = new Logic();
+			Logic controller = new Logic();
+			AddressBook addressBook = controller.getAddressBook();
+			Place place = Place.factory("Maine Home", "7 Manor Lane, Sullivan, ME 40664");
+			addressBook.add(place);
+			UniquePlaceList placeList = addressBook.getAllPlaces();
+			for (ReadOnlyPlace p : placeList) {
+				System.out.println(p);
+			}
 //			AddCommand addCommand = new AddCommand("Home",
-//					"", false,
-//					"", false,
-//					"3533 Carambola Circle, Melbourne, FL 32940", false,
+//					0.0, 
+//					0.0, 
+//					"3533 Carambola Circle, Melbourne, FL 32940", 
 //					new TreeSet<String>() );
 //			System.out.println(addCommand);
-//			CommandResult result = addressBookController.execute(addCommand);
-			CommandResult result = addressBookController.execute(new ListCommand());
-			Optional<List<? extends ReadOnlyPlace>> allPersons = result.getRelevantPersons();
-			for (ReadOnlyPlace rop : allPersons.get()) {
-				System.out.println(rop);
-			}
+//			result = addressBookController.execute(addCommand);
+//			result = addressBookController.execute(new ListCommand());
+//			Optional<List<? extends ReadOnlyPlace>> allPersons = result.getRelevantPersons();
+//			System.out.println(result.feedbackToUser);
+//			for (ReadOnlyPlace rop : allPersons.get()) {
+//				System.out.println(rop);
+//			}
+//			result = addressBookController.execute( new ViewCommand(1) );
+//			System.out.println(result.feedbackToUser);
+//			allPersons = result.getRelevantPersons();
+//			for (ReadOnlyPlace rop : allPersons.get()) {
+//				System.out.println(rop);
+//			}
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();

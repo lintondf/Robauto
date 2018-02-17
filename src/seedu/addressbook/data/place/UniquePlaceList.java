@@ -106,6 +106,21 @@ public class UniquePlaceList implements Iterable<Place> {
         }
     }
 
+    
+    /**
+     * Replace a place in the list.
+     *
+     * @throws PlaceNotFoundException if no such place could be found in the list.
+     */
+    public void update( Place toReplace ) throws PlaceNotFoundException {
+        final boolean placeFoundAndDeleted = internalList.remove(toReplace);
+        if (!placeFoundAndDeleted) {
+            throw new PlaceNotFoundException();
+        }
+        internalList.add( toReplace );
+    }
+    
+    
     /**
      * Clears all places in list.
      */

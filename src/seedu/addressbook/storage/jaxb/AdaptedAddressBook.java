@@ -37,7 +37,7 @@ public class AdaptedAddressBook {
     public AdaptedAddressBook(AddressBook source) {
         persons = new ArrayList<>();
         tags = new ArrayList<>();
-        for (ReadOnlyPlace person : source.getAllPersons()) {
+        for (ReadOnlyPlace person : source.getAllPlaces()) {
             persons.add(new AdaptedPlace(person));
         }
         for (Tag tag : source.getAllTags()) {

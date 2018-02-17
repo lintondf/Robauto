@@ -20,18 +20,18 @@ public class AdaptedPlace {
     private static class AdaptedContactDetail {
         @XmlValue
         public String value;
-        @XmlAttribute(required = true)
-        public boolean isPrivate;
+//        @XmlAttribute(required = true)
+//        public boolean isPrivate;
     }
 
     @XmlElement(required = true)
     private String name;
     @XmlElement(required = true)
-    private AdaptedContactDetail phone;
-    @XmlElement(required = true)
-    private AdaptedContactDetail email;
-    @XmlElement(required = true)
     private AdaptedContactDetail address;
+    @XmlElement(required = true)
+    private AdaptedContactDetail latitude;
+    @XmlElement(required = true)
+    private AdaptedContactDetail longitude;
 
     @XmlElement
     private List<AdaptedTag> tagged = new ArrayList<>();
@@ -50,16 +50,13 @@ public class AdaptedPlace {
     public AdaptedPlace(ReadOnlyPlace source) {
         name = source.getName().fullName;
 
-        phone = new AdaptedContactDetail();
-        phone.isPrivate = source.getPhone().isPrivate();
-        phone.value = source.getPhone().value;
+        latitude = new AdaptedContactDetail();
+        latitude.value = source.getLatitude().toString();
 
-        email = new AdaptedContactDetail();
-        email.isPrivate = source.getEmail().isPrivate();
-        email.value = source.getEmail().value;
+        longitude = new AdaptedContactDetail();
+        longitude.value = source.getLongitude().toString();
 
         address = new AdaptedContactDetail();
-        address.isPrivate = source.getAddress().isPrivate();
         address.value = source.getAddress().value;
 
         tagged = new ArrayList<>();
@@ -83,8 +80,8 @@ public class AdaptedPlace {
             }
         }
         // second call only happens if phone/email/address are all not null
-        return Utils.isAnyNull(name, phone, email, address)
-                || Utils.isAnyNull(phone.value, email.value, address.value);
+        return Utils.isAnyNull(name, latitude, longitude, address)
+                || Utils.isAnyNull(latitude.value, longitude.value, address.value);
     }
 
     /**
@@ -98,10 +95,10 @@ public class AdaptedPlace {
             placeTags.add(tag.toModelType());
         }
         final Name name = new Name(this.name);
-        final Phone phone = new Phone(this.phone.value, this.phone.isPrivate);
-        final Email email = new Email(this.email.value, this.email.isPrivate);
-        final Address address = new Address(this.address.value, this.address.isPrivate);
+        final Double latitude = Double.parseDouble(this.latitude.value);
+        final Double longitude = Double.parseDouble(this.longitude.value);
+        final Address address = new Address(this.address.value);
         final UniqueTagList tags = new UniqueTagList(placeTags);
-        return new Place(name, phone, email, address, tags);
+        return new Place(name, latitude, longitude, address, tags);
     }
 }

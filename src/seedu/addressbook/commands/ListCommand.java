@@ -19,7 +19,7 @@ public class ListCommand extends Command {
 
     @Override
     public CommandResult execute() {
-        List<ReadOnlyPlace> allPersons = addressBook.getAllPersons().immutableListView();
+        List<ReadOnlyPlace> allPersons = addressBook.getAllPlaces().immutableListView();
         return new CommandResult(getMessageForPersonListShownSummary(allPersons), allPersons);
     }
 }

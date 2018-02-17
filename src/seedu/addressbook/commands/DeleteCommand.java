@@ -29,7 +29,7 @@ public class DeleteCommand extends Command {
     public CommandResult execute() {
         try {
             final ReadOnlyPlace target = getTargetPerson();
-            addressBook.removePerson(target);
+            addressBook.remove(target);
             return new CommandResult(String.format(MESSAGE_DELETE_PERSON_SUCCESS, target));
 
         } catch (IndexOutOfBoundsException ie) {

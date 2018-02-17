@@ -29,7 +29,7 @@ public class ViewCommand extends Command {
     public CommandResult execute() {
         try {
             final ReadOnlyPlace target = getTargetPerson();
-            if (!addressBook.containsPerson(target)) {
+            if (!addressBook.contains(target)) {
                 return new CommandResult(Messages.MESSAGE_PERSON_NOT_IN_ADDRESSBOOK);
             }
             return new CommandResult(String.format(MESSAGE_VIEW_PERSON_DETAILS, target.getAsTextHidePrivate()));
