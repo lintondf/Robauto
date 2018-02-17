@@ -5,8 +5,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.util.List;
+import java.util.Optional;
+import java.util.TreeSet;
+
 import javax.swing.JTextPane;
 import javax.swing.table.TableColumn;
+
+import seedu.addressbook.commands.AddCommand;
+import seedu.addressbook.commands.CommandResult;
+import seedu.addressbook.commands.ListCommand;
+import seedu.addressbook.data.person.ReadOnlyPerson;
+import seedu.addressbook.logic.Logic;
+
 import javax.swing.JTable;
 import javax.swing.JButton;
 import javax.swing.JTabbedPane;
@@ -81,4 +92,25 @@ public class RoutePanel extends JPanel {
 		return htmlPane;
 	}
 
+	
+	public static void main(String[] args) {
+		try {
+			Logic addressBookController = new Logic();
+//			AddCommand addCommand = new AddCommand("Home",
+//					"", false,
+//					"", false,
+//					"3533 Carambola Circle, Melbourne, FL 32940", false,
+//					new TreeSet<String>() );
+//			System.out.println(addCommand);
+//			CommandResult result = addressBookController.execute(addCommand);
+			CommandResult result = addressBookController.execute(new ListCommand());
+			Optional<List<? extends ReadOnlyPerson>> allPersons = result.getRelevantPersons();
+			for (ReadOnlyPerson rop : allPersons.get()) {
+				System.out.println(rop);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
