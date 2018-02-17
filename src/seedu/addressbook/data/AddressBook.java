@@ -1,7 +1,7 @@
 package seedu.addressbook.data;
 
-import seedu.addressbook.data.person.*;
-import seedu.addressbook.data.person.UniquePersonList.*;
+import seedu.addressbook.data.place.*;
+import seedu.addressbook.data.place.UniquePlaceList.*;
 import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
 import seedu.addressbook.data.tag.UniqueTagList.*;
@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class AddressBook {
 
-    private final UniquePersonList allPersons;
+    private final UniquePlaceList allPersons;
     private final UniqueTagList allTags; // can contain tags not attached to any person
 
     public static AddressBook empty() {
@@ -28,7 +28,7 @@ public class AddressBook {
      * Creates an empty address book.
      */
     public AddressBook() {
-        allPersons = new UniquePersonList();
+        allPersons = new UniquePlaceList();
         allTags = new UniqueTagList();
     }
 
@@ -39,10 +39,10 @@ public class AddressBook {
      * @param persons external changes to this will not affect this address book
      * @param tags external changes to this will not affect this address book
      */
-    public AddressBook(UniquePersonList persons, UniqueTagList tags) {
-        this.allPersons = new UniquePersonList(persons);
+    public AddressBook(UniquePlaceList persons, UniqueTagList tags) {
+        this.allPersons = new UniquePlaceList(persons);
         this.allTags = new UniqueTagList(tags);
-        for (Person p : allPersons) {
+        for (Place p : allPersons) {
             syncTagsWithMasterList(p);
         }
     }
@@ -52,7 +52,7 @@ public class AddressBook {
      *  - exists in the master list {@link #allTags}
      *  - points to a Tag object in the master list
      */
-    private void syncTagsWithMasterList(Person person) {
+    private void syncTagsWithMasterList(Place person) {
         final UniqueTagList personTags = person.getTags();
         allTags.mergeFrom(personTags);
 
@@ -75,9 +75,9 @@ public class AddressBook {
      * Also checks the new person's tags and updates {@link #allTags} with any new tags found,
      * and updates the Tag objects in the person to point to those in {@link #allTags}.
      *
-     * @throws DuplicatePersonException if an equivalent person already exists.
+     * @throws DuplicatePlaceException if an equivalent person already exists.
      */
-    public void addPerson(Person toAdd) throws DuplicatePersonException {
+    public void addPerson(Place toAdd) throws DuplicatePlaceException {
         syncTagsWithMasterList(toAdd);
         allPersons.add(toAdd);
     }
@@ -85,16 +85,16 @@ public class AddressBook {
     /**
      * Checks if an equivalent person exists in the address book.
      */
-    public boolean containsPerson(ReadOnlyPerson key) {
+    public boolean containsPerson(ReadOnlyPlace key) {
         return allPersons.contains(key);
     }
 
     /**
      * Removes the equivalent person from the address book.
      *
-     * @throws PersonNotFoundException if no such Person could be found.
+     * @throws PlaceNotFoundException if no such Person could be found.
      */
-    public void removePerson(ReadOnlyPerson toRemove) throws PersonNotFoundException {
+    public void removePerson(ReadOnlyPlace toRemove) throws PlaceNotFoundException {
         allPersons.remove(toRemove);
     }
 
@@ -109,8 +109,8 @@ public class AddressBook {
     /**
      * Defensively copied UniquePersonList of all persons in the address book at the time of the call.
      */
-    public UniquePersonList getAllPersons() {
-        return new UniquePersonList(allPersons);
+    public UniquePlaceList getAllPersons() {
+        return new UniquePlaceList(allPersons);
     }
 
     /**

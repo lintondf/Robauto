@@ -2,7 +2,7 @@ package seedu.addressbook.commands;
 
 import seedu.addressbook.common.Messages;
 import seedu.addressbook.data.AddressBook;
-import seedu.addressbook.data.person.ReadOnlyPerson;
+import seedu.addressbook.data.place.ReadOnlyPlace;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class Command {
 	public static final int DISPLAYED_INDEX_OFFSET = 1;
     protected AddressBook addressBook;
-    protected List<? extends ReadOnlyPerson> relevantPersons;
+    protected List<? extends ReadOnlyPlace> relevantPersons;
     private int targetIndex = -1;
 
     /**
@@ -33,7 +33,7 @@ public abstract class Command {
      * @param personsDisplayed used to generate summary
      * @return summary message for persons displayed
      */
-    public static String getMessageForPersonListShownSummary(List<? extends ReadOnlyPerson> personsDisplayed) {
+    public static String getMessageForPersonListShownSummary(List<? extends ReadOnlyPlace> personsDisplayed) {
         return String.format(Messages.MESSAGE_PERSONS_LISTED_OVERVIEW, personsDisplayed.size());
     }
 
@@ -50,7 +50,7 @@ public abstract class Command {
     /**
      * Supplies the data the command will operate on.
      */
-    public void setData(AddressBook addressBook, List<? extends ReadOnlyPerson> relevantPersons) {
+    public void setData(AddressBook addressBook, List<? extends ReadOnlyPlace> relevantPersons) {
         this.addressBook = addressBook;
         this.relevantPersons = relevantPersons;
     }
@@ -60,7 +60,7 @@ public abstract class Command {
      *
      * @throws IndexOutOfBoundsException if the target index is out of bounds of the last viewed listing
      */
-    protected ReadOnlyPerson getTargetPerson() throws IndexOutOfBoundsException {
+    protected ReadOnlyPlace getTargetPerson() throws IndexOutOfBoundsException {
         return relevantPersons.get(getTargetIndex() - DISPLAYED_INDEX_OFFSET);
     }
 

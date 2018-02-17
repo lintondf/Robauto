@@ -15,7 +15,7 @@ import javax.swing.table.TableColumn;
 import seedu.addressbook.commands.AddCommand;
 import seedu.addressbook.commands.CommandResult;
 import seedu.addressbook.commands.ListCommand;
-import seedu.addressbook.data.person.ReadOnlyPerson;
+import seedu.addressbook.data.place.ReadOnlyPlace;
 import seedu.addressbook.logic.Logic;
 
 import javax.swing.JTable;
@@ -104,8 +104,8 @@ public class RoutePanel extends JPanel {
 //			System.out.println(addCommand);
 //			CommandResult result = addressBookController.execute(addCommand);
 			CommandResult result = addressBookController.execute(new ListCommand());
-			Optional<List<? extends ReadOnlyPerson>> allPersons = result.getRelevantPersons();
-			for (ReadOnlyPerson rop : allPersons.get()) {
+			Optional<List<? extends ReadOnlyPlace>> allPersons = result.getRelevantPersons();
+			for (ReadOnlyPlace rop : allPersons.get()) {
 				System.out.println(rop);
 			}
 			

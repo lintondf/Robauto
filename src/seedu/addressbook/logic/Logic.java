@@ -3,7 +3,7 @@ package seedu.addressbook.logic;
 import seedu.addressbook.commands.Command;
 import seedu.addressbook.commands.CommandResult;
 import seedu.addressbook.data.AddressBook;
-import seedu.addressbook.data.person.ReadOnlyPerson;
+import seedu.addressbook.data.place.ReadOnlyPlace;
 import seedu.addressbook.parser.Parser;
 import seedu.addressbook.storage.StorageFile;
 
@@ -21,7 +21,7 @@ public class Logic {
     private AddressBook addressBook;
 
     /** The list of person shown to the user most recently.  */
-    private List<? extends ReadOnlyPerson> lastShownList = Collections.emptyList();
+    private List<? extends ReadOnlyPlace> lastShownList = Collections.emptyList();
 
     public Logic() throws Exception{
         setStorage(initializeStorage());
@@ -56,11 +56,11 @@ public class Logic {
     /**
      * Unmodifiable view of the current last shown list.
      */
-    public List<ReadOnlyPerson> getLastShownList() {
+    public List<ReadOnlyPlace> getLastShownList() {
         return Collections.unmodifiableList(lastShownList);
     }
 
-    protected void setLastShownList(List<? extends ReadOnlyPerson> newList) {
+    protected void setLastShownList(List<? extends ReadOnlyPlace> newList) {
         lastShownList = newList;
     }
 
@@ -91,7 +91,7 @@ public class Logic {
 
     /** Updates the {@link #lastShownList} if the result contains a list of Persons. */
     private void recordResult(CommandResult result) {
-        final Optional<List<? extends ReadOnlyPerson>> personList = result.getRelevantPersons();
+        final Optional<List<? extends ReadOnlyPlace>> personList = result.getRelevantPersons();
         if (personList.isPresent()) {
             lastShownList = personList.get();
         }
