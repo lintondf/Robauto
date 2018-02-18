@@ -57,7 +57,7 @@ public class OptimizeStops {
 //				if (restArea.totalProgress.trafficTime > totalTime)
 //					break;
 				//if (Math.abs( restArea.totalProgress.trafficTime - nextTime) < driveFuzz) {
-					System.out.println(restArea.maneuver.getRoadNumber() + " " + restArea.toReport() );
+					System.out.println(restArea.maneuver.getRoadNumber() + " : " + restArea.toReport() );
 				//}
 //				if (restArea.totalProgress.trafficTime > (nextTime+driveFuzz)) {
 //					nextTime += driveTimePerDriver;
