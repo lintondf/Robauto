@@ -122,15 +122,15 @@ public class Map {
 				}
 			}
 		});
-		mapViewer.addPropertyChangeListener("zoom", new PropertyChangeListener() {
-
-			@Override
-			public void propertyChange(PropertyChangeEvent event) {
-				Integer zoom = (Integer) event.getNewValue();
-				System.out.println(zoom + " " + zoomMetersPerPixel[zoom] *  mapViewer.getBounds().getWidth() );
-			}
-			
-		});
+//		mapViewer.addPropertyChangeListener("zoom", new PropertyChangeListener() {
+//
+//			@Override
+//			public void propertyChange(PropertyChangeEvent event) {
+//				Integer zoom = (Integer) event.getNewValue();
+//				System.out.println(zoom + " " + zoomMetersPerPixel[zoom] *  mapViewer.getBounds().getWidth() );
+//			}
+//			
+//		});
 		mapViewer.setCenterPosition( new GeoPosition(28, -81));
 		mapViewer.setZoom(10);
 	}

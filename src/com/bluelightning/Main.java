@@ -75,6 +75,12 @@ public class Main {
 						waypoints = map.showRoute(route);
 						int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 						mainPanel.getRightTabbedPane().setSelectedIndex(index);
+						long start = System.nanoTime();
+						insureNearbyMapLoaded( route, Main.MarkerKinds.RESTAREAS, poiMap.get(Main.MarkerKinds.RESTAREAS));
+						long finish = System.nanoTime();
+						double secs = 1.0e9 * (double) (finish - start);
+						System.out.println( secs + " seconds");
+						OptimizeStops optimizeStops = new OptimizeStops(route, nearbyMap);
 					}
 					break;
 					

@@ -342,6 +342,9 @@ public class Here2 {
 							linkDetails,
 							//angle2Direction(maneuver.getStartAngle()), // angle at start of maneuver
 							maneuver.getInstruction() );
+//					int i = maneuver.getInstruction().indexOf(" onto ");
+//					if (i >= 0)
+//						System.out.println(maneuver.getInstruction().substring(i));
 //					System.out.printf("    %s: %s\n", maneuver.getShapeQuality(), toString(maneuver.getShape()));
 //					if (maneuver.getId().equals("M40")) {
 //						routeShape = Route.parseShape(maneuver.getShape());

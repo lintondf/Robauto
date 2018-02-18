@@ -15,6 +15,8 @@ public interface POI {
 	public GlobalCoordinates getCoordinates();
 	public double distance( POIBase that );
 	public double distance(  GeoPosition point  );
+	public double roughDistance(  GeoPosition point  );
+	public double roughDistance( GeoPosition seg1, GeoPosition seg2);
 	public boolean isNearby( POIBase that, double cutoffMeters );
 	public double getLatitude();
 	public void setLatitude(double latitude);

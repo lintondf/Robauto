@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.bluelightning.PostProcessingEnabler;
+import com.bluelightning.json.Leg.CumulativeTravel;
 import com.bluelightning.poi.POISet.POIResult;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -267,6 +268,14 @@ public class Leg implements Serializable, PostProcessingEnabler.PostProcessable
     	public double  distance;
     	public double  travelTime;
     	public double  trafficTime;
+		public CumulativeTravel plus(CumulativeTravel legProgress) {
+			CumulativeTravel t = new CumulativeTravel();
+			t.heading = legProgress.heading;
+			t.distance = distance + legProgress.distance;
+			t.travelTime = travelTime + legProgress.travelTime;
+			t.trafficTime = trafficTime + legProgress.trafficTime;
+			return t;
+		}
     }
     
     protected Map<String, CumulativeTravel> progressMap = new HashMap<>();
