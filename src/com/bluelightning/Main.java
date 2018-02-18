@@ -20,11 +20,11 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.UiEvent;
+import com.bluelightning.Main.MarkerKinds;
 import com.bluelightning.WebBrowser.UiHandler;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.ControlPanel;
-import com.bluelightning.map.ControlPanel.MarkerKinds;
 import com.bluelightning.map.POIMarker;
 import com.bluelightning.poi.POISet;
 import com.bluelightning.poi.RestAreaPOI;
@@ -44,8 +44,8 @@ public class Main {
 	protected RoutePanel  routePanel;
 	protected ControlPanel controlPanel;
 	protected Route route;
-	protected EnumMap<ControlPanel.MarkerKinds, POISet> poiMap = new EnumMap<>(ControlPanel.MarkerKinds.class);
-	protected EnumMap<ControlPanel.MarkerKinds, ArrayList<POISet.POIResult>> nearbyMap = new EnumMap<>(ControlPanel.MarkerKinds.class);
+	protected EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
+	protected EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
 	protected ArrayList<ButtonWaypoint> nearby = new ArrayList<>();
 	protected MainPanel mainPanel;
 	protected WebBrowser browserCanvas;
@@ -58,6 +58,10 @@ public class Main {
 			int index = mainPanel.getRightTabbedPane().indexOfTab("AllStays");
 			mainPanel.getRightTabbedPane().setSelectedIndex(index);
 		}		
+	}
+	
+	public void insureNearbyMapLoaded( Route route, Main.MarkerKinds key, POISet pset ) {
+		nearbyMap.put(key, pset.getPointsOfInterestAlongRoute(route, controlPanel.getMarkerSearchRadius(key) ));
 	}
 	
 	public class UiHandler {
@@ -77,17 +81,17 @@ public class Main {
 				case "ControlPanel.Waypoints":
 					nearby.clear();
 					nearby.addAll(waypoints);  // always add stops along route
-					for (ControlPanel.MarkerKinds key : poiMap.keySet()) {
+					for (Main.MarkerKinds key : poiMap.keySet()) {
 						if (controlPanel.getMarkerStatus(key) && ! nearbyMap.containsKey(key)) {
 							POISet pset = poiMap.get(key);
 							if (pset != null) {
 								controlPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-								nearbyMap.put(key, pset.getPointsOfInterestAlongRoute(route, controlPanel.getMarkerSearchRadius(key) ));
+								insureNearbyMapLoaded( route, key, pset);
 								controlPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 							}
 						}						
 					}
-					for (Entry<MarkerKinds, ArrayList<POIResult>> entry : nearbyMap.entrySet()) {
+					for (Entry<Main.MarkerKinds, ArrayList<POIResult>> entry : nearbyMap.entrySet()) {
 						if (controlPanel.getMarkerStatus(entry.getKey())) {
 							System.out.println("Adding " + entry.getValue().size() + " " + entry.getKey().toString());
 							nearby.addAll( POIMarker.factory( entry.getValue() ));
@@ -101,6 +105,10 @@ public class Main {
 				}
 			}
 		}
+
+	public static enum MarkerKinds {
+		WALMARTS, SAMSCLUBS, COSTCOS, TRUCKSTOPS, RESTAREAS
+	}
 
 	public Main() {
 		// Display the viewer in a JFrame
@@ -125,13 +133,13 @@ public class Main {
 		// load base POI sets
 
 		POISet pset = WalmartPOI.factory(); 
-		poiMap.put(ControlPanel.MarkerKinds.WALMARTS, pset);
+		poiMap.put(Main.MarkerKinds.WALMARTS, pset);
 		pset = SamsClubPOI.factory();
-		poiMap.put(ControlPanel.MarkerKinds.SAMSCLUBS, pset);
+		poiMap.put(Main.MarkerKinds.SAMSCLUBS, pset);
 		pset = RestAreaPOI.factory();
-		poiMap.put(ControlPanel.MarkerKinds.RESTAREAS, pset);
+		poiMap.put(Main.MarkerKinds.RESTAREAS, pset);
 		pset = TruckStopPOI.factory(); 
-		poiMap.put(ControlPanel.MarkerKinds.TRUCKSTOPS, pset);
+		poiMap.put(Main.MarkerKinds.TRUCKSTOPS, pset);
 		//TODO Costco, Cabelas
 		
 		// Bind event handlers
@@ -142,6 +150,10 @@ public class Main {
 
 	public static void main(String[] args) {
 		Main main = new Main();
+	}
+
+	public EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> getNearbyMap() {
+		return nearbyMap;
 	}
 
 }

@@ -3,6 +3,7 @@ package com.bluelightning.map;
 import javax.swing.JPanel;
 
 import com.bluelightning.Events;
+import com.bluelightning.Main;
 
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
@@ -13,23 +14,20 @@ import java.awt.event.ActionEvent;
 
 public class ControlPanel extends JPanel {
 
-	public static enum MarkerKinds {
-		WALMARTS, SAMSCLUBS, COSTCOS, TRUCKSTOPS, RESTAREAS
-	};
 	protected JCheckBox chckbxWalmarts;
 	protected JCheckBox chckbxSamsClubs;
 	protected JCheckBox chckbxCostco;
 	protected JCheckBox chckbxTruckStops;
 	protected JCheckBox chckbxRestAreas;
 	
-	protected EnumMap<MarkerKinds, Boolean> markerStatus = new EnumMap<MarkerKinds, Boolean>(MarkerKinds.class);
+	protected EnumMap<Main.MarkerKinds, Boolean> markerStatus = new EnumMap<Main.MarkerKinds, Boolean>(Main.MarkerKinds.class);
 	
-	public boolean getMarkerStatus( MarkerKinds kind ) {
+	public boolean getMarkerStatus( Main.MarkerKinds kind ) {
 		Boolean tf = markerStatus.get(kind);
 		return (tf == null) ? false : tf;
 	}
 	
-	public double getMarkerSearchRadius( MarkerKinds kind ) { // meters
+	public double getMarkerSearchRadius( Main.MarkerKinds kind ) { // meters
 		return 5.0e3; // TODO from GUI
 	}
 
@@ -44,7 +42,7 @@ public class ControlPanel extends JPanel {
 		chckbxWalmarts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				boolean selected = ((JCheckBox) event.getSource()).isSelected();
-				markerStatus.put( MarkerKinds.WALMARTS, selected );
+				markerStatus.put( Main.MarkerKinds.WALMARTS, selected );
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.Waypoints", event));
 			}
 		});
@@ -55,7 +53,7 @@ public class ControlPanel extends JPanel {
 		chckbxSamsClubs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				boolean selected = ((JCheckBox) event.getSource()).isSelected();
-				markerStatus.put( MarkerKinds.SAMSCLUBS, selected);
+				markerStatus.put( Main.MarkerKinds.SAMSCLUBS, selected);
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.Waypoints", event));
 			}
 		});
@@ -66,7 +64,7 @@ public class ControlPanel extends JPanel {
 		chckbxCostco.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				boolean selected = ((JCheckBox) event.getSource()).isSelected();
-				markerStatus.put( MarkerKinds.COSTCOS, selected);
+				markerStatus.put( Main.MarkerKinds.COSTCOS, selected);
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.Waypoints", event));
 			}
 		});
@@ -77,7 +75,7 @@ public class ControlPanel extends JPanel {
 		chckbxTruckStops.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				boolean selected = ((JCheckBox) event.getSource()).isSelected();
-				markerStatus.put( MarkerKinds.TRUCKSTOPS, selected);
+				markerStatus.put( Main.MarkerKinds.TRUCKSTOPS, selected);
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.Waypoints", event));
 			}
 		});
@@ -88,7 +86,7 @@ public class ControlPanel extends JPanel {
 		chckbxRestAreas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				boolean selected = ((JCheckBox) event.getSource()).isSelected();
-				markerStatus.put( MarkerKinds.RESTAREAS, selected);
+				markerStatus.put( Main.MarkerKinds.RESTAREAS, selected);
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.Waypoints", event));
 			}
 		});
