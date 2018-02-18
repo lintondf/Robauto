@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import com.opencsv.CSVReader;
 
+import seedu.addressbook.data.tag.UniqueTagList;
+
 public class TruckStopPOI extends POIBase {
 	
 	protected String locationId;
@@ -64,6 +66,7 @@ public class TruckStopPOI extends POIBase {
 			default: break;
 			}
 		}
+		// TODO tagList
 	}
 
 	private void parseColumnC(String[] columnC) {
@@ -112,6 +115,16 @@ public class TruckStopPOI extends POIBase {
     	POISet pset = TruckStopPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Truck_Stops.csv");
     	for (int i = 0; i < pset.size(); i++)
     		System.out.println( pset.get(i).toString() );
+	}
+
+	@Override
+	public String getAddress() {
+		return address;
+	}
+
+	@Override
+	public UniqueTagList getTags() {
+		return tagList;
 	}
 
 }

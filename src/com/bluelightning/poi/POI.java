@@ -8,6 +8,9 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.map.SwingMarker;
 
+import seedu.addressbook.data.tag.Tag;
+import seedu.addressbook.data.tag.UniqueTagList;
+
 public interface POI {
 	public GlobalCoordinates getCoordinates();
 	public double distance( POIBase that );
@@ -20,7 +23,7 @@ public interface POI {
 	public String getName();
 	public void setName(String name);
 	public Image getImage();
-//	public SwingMarker getMarker();
-//	public SwingMarker getMarker(String report);
+	public String getAddress();
+	public UniqueTagList getTags();
 	
 }

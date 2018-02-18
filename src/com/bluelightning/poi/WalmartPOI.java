@@ -16,6 +16,10 @@ import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.SwingMarker;
 import com.opencsv.CSVReader;
 
+import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.tag.Tag;
+import seedu.addressbook.data.tag.UniqueTagList;
+
 
 public class WalmartPOI extends POIBase {
 	
@@ -29,6 +33,7 @@ public class WalmartPOI extends POIBase {
 	protected String  exit;
 	protected String  phone;
 	protected boolean isNoOvernight;
+	
 	
 	protected static  Image  imageOkToPark;
 	protected static  Image  imageNoParking;
@@ -59,6 +64,14 @@ public class WalmartPOI extends POIBase {
 						isNoOvernight = true;
 				}
 			}
+		}
+		try {
+			tagList.add( new Tag("Walmart") );
+			if (hasDiesel) tagList.add( new Tag("Diesel") );
+			if (hasGas) tagList.add( new Tag("Gas") );
+			if (!isNoOvernight) tagList.add( new Tag("Overnight") );
+		} catch (IllegalValueException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -187,6 +200,16 @@ public class WalmartPOI extends POIBase {
     	POISet pset = WalmartPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Walmart_United States & Canada.csv");
     	for (int i = 0; i < 15; i++)
     		System.out.println( pset.get(i).toString() );
+	}
+
+	@Override
+	public String getAddress() {
+		return address;
+	}
+
+	@Override
+	public UniqueTagList getTags() {
+		return tagList;
 	}
 
 }

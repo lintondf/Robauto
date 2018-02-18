@@ -5,8 +5,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.JTextPane;
@@ -22,6 +24,7 @@ import seedu.addressbook.data.place.Name;
 import seedu.addressbook.data.place.Place;
 import seedu.addressbook.data.place.ReadOnlyPlace;
 import seedu.addressbook.data.place.UniquePlaceList;
+import seedu.addressbook.data.place.VisitedPlace;
 import seedu.addressbook.data.tag.UniqueTagList;
 import seedu.addressbook.logic.Logic;
 
@@ -133,6 +136,7 @@ public class RoutePanel extends JPanel {
 			place.geocode();
 			addressBook.add(place);
 			controller.getStorage().save(addressBook);
+			SortedSet<VisitedPlace> visiting = Collections.synchronizedSortedSet(new TreeSet<VisitedPlace>());
 //			Place place = Place.factory("Maine Home", "7 Manor Lane, Sullivan, ME 40664");
 //			addressBook.add(place);
 //			UniquePlaceList placeList = addressBook.getAllPlaces();

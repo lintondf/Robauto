@@ -1,5 +1,10 @@
 package seedu.addressbook.data.place;
 
+import com.bluelightning.poi.POI;
+
+import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.tag.UniqueTagList;
+
 public class VisitedPlace extends Place implements Comparable<VisitedPlace> {
 	
 	Integer visitOrder;
@@ -11,6 +16,11 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace> {
 	public VisitedPlace(ReadOnlyPlace source) {
 		super(source);
 	}
+	
+	public VisitedPlace( POI poi ) throws IllegalValueException {
+		super(new Name(poi.getName()), poi.getLatitude(), poi.getLongitude(), new Address(poi.getAddress()), poi.getTags() );
+	}
+	
 
 	@Override
 	public int compareTo(VisitedPlace that) {

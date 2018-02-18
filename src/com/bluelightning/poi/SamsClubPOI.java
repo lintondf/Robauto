@@ -16,6 +16,10 @@ import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.SwingMarker;
 import com.opencsv.CSVReader;
 
+import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.tag.Tag;
+import seedu.addressbook.data.tag.UniqueTagList;
+
 
 public class SamsClubPOI extends POIBase {
 	
@@ -55,6 +59,13 @@ public class SamsClubPOI extends POIBase {
 			if (fields.length > 3) {
 				parseColumnD(fields[3]);
 			}
+		}
+		try {
+			tagList.add( new Tag("Walmart") );
+			if (hasDiesel) tagList.add( new Tag("Diesel") );
+			if (hasGas) tagList.add( new Tag("Gas") );
+		} catch (IllegalValueException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -191,6 +202,16 @@ public class SamsClubPOI extends POIBase {
     	POISet pset = SamsClubPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Walmart_United States & Canada.csv");
     	for (int i = 0; i < 15; i++)
     		System.out.println( pset.get(i).toString() );
+	}
+
+	@Override
+	public String getAddress() {
+		return address;
+	}
+
+	@Override
+	public UniqueTagList getTags() {
+		return tagList;
 	}
 
 }

@@ -19,7 +19,9 @@ import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.SwingMarker;
 import com.opencsv.CSVReader;
 
-public class POIBase implements POI {
+import seedu.addressbook.data.tag.UniqueTagList;
+
+public abstract class POIBase implements POI {
 	
 	protected double latitude;
 	protected double longitude;
@@ -28,6 +30,7 @@ public class POIBase implements POI {
 	protected static Image  image;
 	
 	protected String name;
+	protected UniqueTagList tagList = new UniqueTagList();
 	
 	public static GeodeticCalculator geoCalc = new GeodeticCalculator();
 	public static Ellipsoid wgs84 = Ellipsoid.WGS84;
@@ -41,21 +44,21 @@ public class POIBase implements POI {
 		}		
 	}
 	
-	public static POISet factory( String filePath ) {
-		POISet list = new POISet();
-		try {
-		     CSVReader reader = new CSVReader(new FileReader(filePath));
-		     String [] nextLine;
-		     while ((nextLine = reader.readNext()) != null) {
-		        POI poi = new POIBase( nextLine );
-		        list.add(poi);
-		     }
-			 reader.close();
-		} catch (Exception e) {
-			list.clear();;
-		}
-		 return list;
-	}
+//	public static POISet factory( String filePath ) {
+//		POISet list = new POISet();
+//		try {
+//		     CSVReader reader = new CSVReader(new FileReader(filePath));
+//		     String [] nextLine;
+//		     while ((nextLine = reader.readNext()) != null) {
+//		        POI poi = new POIBase( nextLine );
+//		        list.add(poi);
+//		     }
+//			 reader.close();
+//		} catch (Exception e) {
+//			list.clear();;
+//		}
+//		 return list;
+//	}
 	
 	public POIBase() {}
 	
