@@ -27,8 +27,10 @@ import com.bluelightning.map.ControlPanel;
 import com.bluelightning.map.ControlPanel.MarkerKinds;
 import com.bluelightning.map.POIMarker;
 import com.bluelightning.poi.POISet;
+import com.bluelightning.poi.RestAreaPOI;
 import com.bluelightning.poi.POISet.POIResult;
 import com.bluelightning.poi.SamsClubPOI;
+import com.bluelightning.poi.TruckStopPOI;
 import com.bluelightning.poi.WalmartPOI;
 import com.google.common.eventbus.Subscribe;
 
@@ -119,12 +121,20 @@ public class Main {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		browserCanvas.initialize(frame);
+		
+		// load base POI sets
 
 		POISet pset = WalmartPOI.factory(); 
 		poiMap.put(ControlPanel.MarkerKinds.WALMARTS, pset);
 		pset = SamsClubPOI.factory();
 		poiMap.put(ControlPanel.MarkerKinds.SAMSCLUBS, pset);
-		//TruckStopPOI.factory(); // POIBase.factory("POI/Costco_USA_Canada.csv");
+		pset = RestAreaPOI.factory();
+		poiMap.put(ControlPanel.MarkerKinds.RESTAREAS, pset);
+		pset = TruckStopPOI.factory(); 
+		poiMap.put(ControlPanel.MarkerKinds.TRUCKSTOPS, pset);
+		//TODO Costco, Cabelas
+		
+		// Bind event handlers
 
 		Events.eventBus.register(new UiHandler() );
 		Events.eventBus.register(new POIClickHandler() );

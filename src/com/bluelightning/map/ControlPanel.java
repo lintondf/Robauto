@@ -14,12 +14,14 @@ import java.awt.event.ActionEvent;
 public class ControlPanel extends JPanel {
 
 	public static enum MarkerKinds {
-		WALMARTS, SAMSCLUBS, COSTCOS, TRUCKSTOPS
+		WALMARTS, SAMSCLUBS, COSTCOS, TRUCKSTOPS, RESTAREAS
 	};
 	protected JCheckBox chckbxWalmarts;
 	protected JCheckBox chckbxSamsClubs;
 	protected JCheckBox chckbxCostco;
 	protected JCheckBox chckbxTruckStops;
+	protected JCheckBox chckbxRestAreas;
+	
 	protected EnumMap<MarkerKinds, Boolean> markerStatus = new EnumMap<MarkerKinds, Boolean>(MarkerKinds.class);
 	
 	public boolean getMarkerStatus( MarkerKinds kind ) {
@@ -80,6 +82,17 @@ public class ControlPanel extends JPanel {
 			}
 		});
 		add(chckbxTruckStops);
+		
+		chckbxRestAreas = new JCheckBox("Rest Areas");
+		chckbxRestAreas.setBounds(22, 129, 97, 23);
+		chckbxRestAreas.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				boolean selected = ((JCheckBox) event.getSource()).isSelected();
+				markerStatus.put( MarkerKinds.RESTAREAS, selected);
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.Waypoints", event));
+			}
+		});
+		add(chckbxRestAreas);
 		
 		JButton btnRoute = new JButton("Route");
 		btnRoute.addActionListener(new ActionListener() {

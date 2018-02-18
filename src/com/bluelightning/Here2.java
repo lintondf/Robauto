@@ -1,5 +1,6 @@
 package com.bluelightning;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -272,9 +273,10 @@ public class Here2 {
 	
 	public static Route computeRoute() {
 		HereRoute hereRoute = null;
+		//try { new File("route.json").delete(); } catch (Exception x) {}
 		String[] pointAddresses = {
 				"3533 Carambola Cir, Melbourne, FL",
-				"15 Mill Creek Circle, Pooler, GA",
+				"2110 Bells Hwy, Walterboro, SC 29488",
 				"125 Riverside Dr, Banner Elk, NC",
 				"2350 So Pleasant Valley Rd, Winchester, VA 22601",
 				"10654 Breezewood Dr, Woodstock, MD 21163-1317",
