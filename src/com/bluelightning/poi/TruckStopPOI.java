@@ -112,7 +112,7 @@ public class TruckStopPOI extends POIBase {
 	}
 	
 	public static void main(String[] args) {
-    	POISet pset = TruckStopPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Truck_Stops.csv");
+    	POISet pset = TruckStopPOI.factory("C:\\Users\\NOOK\\GIT\\default\\Robauto\\POI\\Truck_Stops.csv");
     	for (int i = 0; i < pset.size(); i++)
     		System.out.println( pset.get(i).toString() );
 	}

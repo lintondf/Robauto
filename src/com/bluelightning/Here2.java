@@ -142,14 +142,18 @@ public class Here2 {
 	
 	
 	public static LatLon geocodeLookup( String address ) {
+		return geocodeLookup(address, false);
+	}
+	
+	public static LatLon geocodeLookup( String address, boolean verbose ) {
 		List<BasicNameValuePair> nvps = getBasicValuePair();
 		nvps.add( new BasicNameValuePair("searchtext", address)); 
 		String response = getRestResponse( geocodeUrl, nvps );
 	    JsonElement jelement = new JsonParser().parse(response);
 	    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	    //System.out.println( gson.toJson(jelement).toString() );
+	    if (verbose) System.out.println( gson.toJson(jelement).toString() );
 	    JsonArray view = getNestedJsonArray(jelement, Arrays.asList("Response", "View"));
-	    if (view != null) {
+	    if (view != null && view.size() > 0) {
 	    	JsonArray result = getNestedJsonArray(view.get(0), Arrays.asList("Result"));
 	    	if (result != null) {
 	    		JsonArray navigationPosition = getNestedJsonArray(result.get(0), Arrays.asList("Location", "NavigationPosition"));
