@@ -8,6 +8,9 @@ import seedu.addressbook.data.tag.UniqueTagList.DuplicateTagException;
 import java.util.List;
 import java.util.Objects;
 
+import com.bluelightning.Here2;
+import com.bluelightning.LatLon;
+
 /**
  * Represents a Place in the address book.
  * Guarantees: details are present and not null, field values are validated.
@@ -60,6 +63,15 @@ public class Place implements ReadOnlyPlace {
      */
     public Place(ReadOnlyPlace source) {
         this(source.getName(), source.getLatitude(), source.getLongitude(), source.getAddress(), source.getTags());
+    }
+    
+    public LatLon geocode() {
+    	LatLon where = Here2.geocodeLookup(address.toString());
+    	if (where != null) {
+    		this.latitude = where.getLatitude();
+    		this.longitude = where.getLongitude();
+    	}
+    	return where;
     }
 
     @Override

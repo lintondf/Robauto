@@ -64,14 +64,14 @@ public class RoutePanel extends JPanel {
 		add(splitPane);
 		
 		JSplitPane splitPane_1 = new JSplitPane();
-		splitPane_1.setResizeWeight(0.8);
+		splitPane_1.setResizeWeight(0.9);
 		splitPane.setLeftComponent(splitPane_1);
 		
 		JPanel upperLeftPanel = new JPanel();
 		splitPane_1.setRightComponent(upperLeftPanel);
 		upperLeftPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		JButton btnNewButton = new JButton("New button");
+		JButton btnNewButton = new JButton("Address Book");
 		upperLeftPanel.add(btnNewButton);
 		
 		JPanel upperRightPanel = new JPanel();
@@ -105,12 +105,40 @@ public class RoutePanel extends JPanel {
 		try {
 			Logic controller = new Logic();
 			AddressBook addressBook = controller.getAddressBook();
-			Place place = Place.factory("Maine Home", "7 Manor Lane, Sullivan, ME 40664");
+			Place place = Place.factory("Sams Club", "15 Mill Creek Circle, Pooler, GA");
+			place.geocode();
 			addressBook.add(place);
-			UniquePlaceList placeList = addressBook.getAllPlaces();
-			for (ReadOnlyPlace p : placeList) {
-				System.out.println(p);
-			}
+			place = Place.factory("Grandfather Campground", "125 Riverside Dr, Banner Elk, NC");
+			place.geocode();
+			addressBook.add(place);
+			place = Place.factory("Walmart", "2350 So Pleasant Valley Rd, Winchester, VA 22601");
+			place.geocode();
+			addressBook.add(place);
+			place = Place.factory("Megan Mudge", "10654 Breezewood Dr, Woodstock, MD 21163-1317");
+			place.geocode();
+			addressBook.add(place);
+			place = Place.factory("Walmart", "1365 Boston Post Road, Milford, CT");
+			place.geocode();
+			addressBook.add(place);
+			place = Place.factory("Sippewissett Campground", "836 Palmer Avenue, Falmouth, MA");
+			place.geocode();
+			addressBook.add(place);
+			place = Place.factory("Cabelas", "100 Cabelas Blvd, Scarborough, ME");
+			place.geocode();
+			addressBook.add(place);
+			place = Place.factory("Home Maine", "7 Manor Lane, Sullivan, ME 40664");
+			place.geocode();
+			addressBook.add(place);
+			place = Place.factory("Home Florida", "3533 Carambola Cir, Melbourne, FL");
+			place.geocode();
+			addressBook.add(place);
+			controller.getStorage().save(addressBook);
+//			Place place = Place.factory("Maine Home", "7 Manor Lane, Sullivan, ME 40664");
+//			addressBook.add(place);
+//			UniquePlaceList placeList = addressBook.getAllPlaces();
+//			for (ReadOnlyPlace p : placeList) {
+//				System.out.println(p);
+//			}
 //			AddCommand addCommand = new AddCommand("Home",
 //					0.0, 
 //					0.0, 

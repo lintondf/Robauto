@@ -147,6 +147,7 @@ public class Here2 {
 		String response = getRestResponse( geocodeUrl, nvps );
 	    JsonElement jelement = new JsonParser().parse(response);
 	    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	    //System.out.println( gson.toJson(jelement).toString() );
 	    JsonArray view = getNestedJsonArray(jelement, Arrays.asList("Response", "View"));
 	    if (view != null) {
 	    	JsonArray result = getNestedJsonArray(view.get(0), Arrays.asList("Result"));
@@ -156,6 +157,7 @@ public class Here2 {
 	    		return location;
 	    	}
 	    }
+	    // TODO log response
 	    return null;
 	}
 	

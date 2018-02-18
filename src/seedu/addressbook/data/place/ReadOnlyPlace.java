@@ -35,18 +35,18 @@ public interface ReadOnlyPlace {
      */
     default String getAsTextShowAll() {
         final StringBuilder builder = new StringBuilder();
-        final String detailIsPrivate = "(private) ";
         builder.append(getName())
-                .append(" Latitude: ");
+                .append("; Latitude: ");
         builder.append(getLatitude())
-                .append(" Longitude: ");
+                .append("; Longitude: ");
         builder.append(getLongitude())
-                .append(" Address: ");
+                .append("; Address: ");
         builder.append(getAddress())
-                .append(" Tags: ");
+                .append("; Tags: [");
         for (Tag tag : getTags()) {
             builder.append(tag);
         }
+        builder.append(']');
         return builder.toString();
     }
 

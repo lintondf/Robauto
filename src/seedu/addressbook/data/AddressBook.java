@@ -7,6 +7,8 @@ import seedu.addressbook.data.tag.UniqueTagList;
 import seedu.addressbook.data.tag.UniqueTagList.*;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents the entire address book. Contains the data of the address book.
@@ -68,6 +70,35 @@ public class AddressBook {
             commonTagReferences.add(masterTagObjects.get(tag));
         }
         place.setTags(new UniqueTagList(commonTagReferences));
+    }
+    
+    /**
+     * Retrieve all persons in the address book whose names contain some of the specified keywords.
+     *
+     * @param keywords for searching
+     * @return list of persons found
+     */
+    public List<ReadOnlyPlace> getPlacesWithName(Set<String> keywords) {
+        final List<ReadOnlyPlace> matchedPlaces = new ArrayList<>();
+        for (ReadOnlyPlace place : getAllPlaces()) {
+            final Set<String> wordsInName = new HashSet<>(place.getName().getWordsInName());
+            if (!Collections.disjoint(wordsInName, keywords)) {
+            	matchedPlaces.add(place);
+            }
+        }
+        return matchedPlaces;
+    }
+    
+    public List<ReadOnlyPlace> getPlacesWithName(Pattern pattern) {
+        final List<ReadOnlyPlace> matchedPlaces = new ArrayList<>();
+        for (ReadOnlyPlace place : getAllPlaces()) {
+            String name = place.getName().toString();
+            Matcher matcher = pattern.matcher(name);
+            if (matcher.matches()) {
+            	matchedPlaces.add(place);
+            }
+        }
+        return matchedPlaces;
     }
 
     /**

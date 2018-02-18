@@ -18,7 +18,11 @@ public class Logic {
 
 
     private StorageFile storage;
-    private AddressBook addressBook;
+    public StorageFile getStorage() {
+		return storage;
+	}
+
+	private AddressBook addressBook;
 
     public AddressBook getAddressBook() {
 		return addressBook;
