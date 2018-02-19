@@ -3,6 +3,7 @@ package com.bluelightning;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.io.FileInputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -19,6 +20,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.io.IOUtils;
 
+import com.bluelightning.OptimizeStopsDialog.DriverAssignments.Assignment;
 import com.bluelightning.OptimizeStopsDialog.LegData;
 import com.bluelightning.OptimizeStopsDialog.RoadDirectionData;
 import com.bluelightning.OptimizeStopsDialog.StopData;
@@ -27,6 +29,11 @@ import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.poi.POISet;
 import com.bluelightning.poi.RestAreaPOI;
+import javax.swing.JTabbedPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
 
 public class OptimizeStopsDialog extends JDialog {
@@ -136,19 +143,14 @@ public class OptimizeStopsDialog extends JDialog {
 	}
 
 	private final JPanel contentPanel = new JPanel();
+	private JTable roadsTable;
+	private JTable legTable;
+	private JTable stopsTable;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		if (false) {
-			Permutations perm = new Permutations(new Integer[]{0,1,2,3,4,5});
-		    ArrayList<Integer[]> unique = perm.monotonic();
-		    for (Integer[] next : unique) {
-		    	System.out.println(Arrays.toString(next));
-		    }
-			return;
-		}
 		HereRoute hereRoute = null;
 		try {
 			String json = IOUtils.toString(new FileInputStream("route.json"), "UTF-8");
@@ -189,17 +191,54 @@ public class OptimizeStopsDialog extends JDialog {
 			driverAssignments.add( generateDriverAssignments(2, legDataList.get(0), stopDataList, elements) );
 		}
 		Iterator<DriverAssignments> it = driverAssignments.iterator();
-		for (int i = 0; it.hasNext() && i < 5; i++) {
-			System.out.println( it.next() );
+		
+		String html = toHtml(2, legDataList.get(0), it.next() );
+		try {
+			PrintWriter out = new PrintWriter("report.html");
+			out.println(html);
+			out.close();
+		} catch (Exception x) {
+			x.printStackTrace();
 		}
+		
 
-//		try {
-//			OptimizeStopsDialog dialog = new OptimizeStopsDialog();
-//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//			dialog.setVisible(true);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		try {
+			OptimizeStopsDialog dialog = new OptimizeStopsDialog(html);
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected static String toHtml( int nDrivers, LegData legData, DriverAssignments driverAssignments ) {
+		Report report = new Report();
+		report.depart("", legData.startLabel, 0.0);
+		
+		List<Iterator<Double>> driveTimes = new ArrayList<Iterator<Double>>( Arrays.asList(
+				driverAssignments.assignments[0].driveTimes.iterator(),
+				driverAssignments.assignments[1].driveTimes.iterator() ) );
+		List<Iterator<StopData>>  stops = new ArrayList<Iterator<StopData>>( Arrays.asList(
+				driverAssignments.assignments[0].stops.iterator(),
+				driverAssignments.assignments[1].stops.iterator() ) );
+		
+		int driver = 0;
+		double lastDistance = 0.0;
+		while (stops.get(driver).hasNext()) {
+			StopData stopData = stops.get(driver).next();
+			Double   driveTime = driveTimes.get(driver).next();
+			int hours = (int) (driveTime / 3600.0);
+			int minutes = ((int) (driveTime / 60.0)) % 60;
+			double stepDistance = stopData.distance - lastDistance;
+			lastDistance = stopData.distance;
+			report.drive(driver, hours, minutes, stepDistance*Here2.METERS_TO_MILES);
+			report.stop(stopData.name, stopData.road, 0);
+			driver = (driver + 1) % nDrivers;
+		}
+		
+		report.stop("",	legData.endLabel, 0.0);
+		report.arrive(0.0);
+		return report.toHtml();		
 	}
 	
 	protected static double scoreTime( double time ) {
@@ -249,12 +288,71 @@ public class OptimizeStopsDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public OptimizeStopsDialog() {
+	public OptimizeStopsDialog(String html) {
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
-		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		contentPanel.setLayout(new BorderLayout(0, 0));
+		{
+			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+			contentPanel.add(tabbedPane);
+			{
+				JSplitPane inputSplitPane = new JSplitPane();
+				tabbedPane.addTab("Input", null, inputSplitPane, null);
+				inputSplitPane.setResizeWeight(0.5);
+				inputSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+				{
+					JPanel upperPanel = new JPanel();
+					inputSplitPane.setLeftComponent(upperPanel);
+					upperPanel.setLayout(new BorderLayout(0, 0));
+					{
+						legTable = new JTable();
+						legTable.setFillsViewportHeight(true);
+						upperPanel.add(legTable);
+					}
+					{
+						roadsTable = new JTable();
+						roadsTable.setFillsViewportHeight(true);
+						upperPanel.add(roadsTable);
+					}
+				}
+				{
+					JPanel lowerPanel = new JPanel();
+					inputSplitPane.setRightComponent(lowerPanel);
+					lowerPanel.setLayout(new BorderLayout(0, 0));
+					{
+						JScrollPane scrollPane = new JScrollPane();
+						lowerPanel.add(scrollPane, BorderLayout.WEST);
+					}
+					{
+						stopsTable = new JTable();
+						lowerPanel.add(stopsTable, BorderLayout.CENTER);
+					}
+				}
+			}
+			{
+				JPanel outputPanel = new JPanel();
+				tabbedPane.addTab("Output", null, outputPanel, null);
+				outputPanel.setLayout(new BorderLayout(0, 0));
+				{
+					JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
+					outputPanel.add(tabbedPane_1, BorderLayout.NORTH);
+					{
+						JPanel panel = new JPanel();
+						tabbedPane_1.addTab("Case 1", null, panel, null);
+						tabbedPane_1.setEnabledAt(0, true);
+						panel.setLayout(new BorderLayout(0, 0));
+						{
+							JTextPane textPane = new JTextPane();
+							textPane.setContentType("text/html");
+							textPane.setText(html);
+							panel.add(textPane);
+						}
+					}
+				}
+			}
+		}
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
