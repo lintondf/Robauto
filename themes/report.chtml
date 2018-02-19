@@ -155,14 +155,15 @@
 			<tr>
 				<td></td>
 				<td></td>
-				<td colspan="2">Time (hr)</td>
+				<td colspan="3">Time (hr)</td>
 				<td colspan="2">Distance (mi)</td>
 				<td colspan="2">Fuel (gal)</td>
 			</tr>
 			<tr>
 				<td></td>
 				<td></td>
-				<td><small>Leg</small></td>
+				<td><small>Leg 1</small></td>
+				<td><small>Leg 2</small></td>
 				<td><small>Total</small></td>
 				<td><small>Leg</small></td>
 				<td><small>Total</small></td>
@@ -185,6 +186,7 @@
 				<td></td>
 				<td></td>
 				<td></td>
+				<td></td>
 				<td class="step-refuel">{$refuel}</td>
 			</tr>
 {#}
@@ -192,7 +194,8 @@
 			<tr class="step-detail">
 				<td></td>
 				<td class="step-drive">Drive</td>
-				<td class="step-field">{$legDuration}</td>
+				<td class="step-field">{$leg1Duration}</td>
+				<td class="step-field">{$leg2Duration}</td>
 				<td class="step-field">{$totalDuration}</td>
 				<td class="step-field">{$legDistance}</td>
 				<td class="step-field">{$totalDistance}</td>

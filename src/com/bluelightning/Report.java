@@ -59,7 +59,9 @@ public class Report implements Serializable {
 			int totalDistance = 0;
 			for (Step step : steps) {
 				if (step.drive != null) {
-					String[] duration = step.drive.legDuration.split(":");
+					String[] duration = (step.drive.leg1Duration!=null) ? 
+							step.drive.leg1Duration.split(":") :
+								step.drive.leg2Duration.split(":");
 					int hours = Integer.parseInt(duration[0]);
 					int minutes = Integer.parseInt(duration[1]);
 					totalMinutes += minutes;
@@ -120,7 +122,8 @@ public class Report implements Serializable {
 	}
 
 	public static class Drive {
-		String legDuration;
+		String leg1Duration;
+		String leg2Duration;
 		String totalDuration;
 		String legDistance;
 		String totalDistance;
@@ -129,7 +132,8 @@ public class Report implements Serializable {
 
 		public String toHtml() {
 			Chunk d = theme.makeChunk("report#detailRow");
-			d.set("legDuration", legDuration);
+			d.set("leg1Duration", leg1Duration);
+			d.set("leg2Duration", leg2Duration);
 			d.set("totalDuration", totalDuration);
 			d.set("legDistance", legDistance);
 			d.set("totalDistance", totalDistance);
@@ -186,10 +190,13 @@ public class Report implements Serializable {
 		lastDay.finish();
 	}
 
-	public void drive(int hours, int minutes, double distance) {
+	public void drive(int driver, int hours, int minutes, double distance) {
 		Drive d = new Drive();
 		d.legDistance = String.format("%.0f", distance);
-		d.legDuration = String.format("%d:%02d", hours, minutes);
+		if (driver == 0)
+			d.leg1Duration = String.format("%d:%02d", hours, minutes);
+		else
+			d.leg2Duration = String.format("%d:%02d", hours, minutes);
 		double fuelUsed = distance / mpg;
 		d.fuelUsed = String.format("%.0f", fuelUsed);
 		fuelLevel -= fuelUsed;
@@ -236,7 +243,7 @@ public class Report implements Serializable {
 		step.placeAddress = "491 St Marys Rd, St Marys, GA";
 
 		step.drive = new Drive();
-		step.drive.legDuration = "1:30";
+		step.drive.leg1Duration = "1:30";
 		step.drive.totalDuration = "1:30";
 		step.drive.legDistance = "95";
 		step.drive.totalDistance = "95";
@@ -353,7 +360,7 @@ public class Report implements Serializable {
 //		}
 //	}
 
-	public static void main(String[] args) {
+	public static void mainKml(String[] args) {
 		Theme theme = new Theme();
 		StringBuffer sb = new StringBuffer();
 		Chunk t = theme.makeChunk("report#kml");
@@ -363,61 +370,61 @@ public class Report implements Serializable {
 	}
 	
 	
-	public static void mainOld(String[] args) {
+	public static void main(String[] args) {
 		Report report = new Report();
 		report.depart("Home", "3533 Carambola Circle, Melbourne, FL", 0.0);
-		report.drive(2, 48, 195);
+		report.drive(0, 2, 48, 195);
 		report.stop("Pilot", "491 St Marys Rd, St Marys, GA", report.fillUp());
-		report.drive(0, 48, 45);
+		report.drive(1, 0, 48, 45);
 		report.stop("Jekyll Island SP",
 				"1199 Beach View Dr N, Jekyll Island, GA", 0.0);
 		report.arrive(0.0);
 
 		report.depart(0.0);
-		report.drive(4, 4, 281);
+		report.drive(0, 4, 4, 281);
 		report.stop("Pilot", "1504 SC-38, Latta, SC 29565, USA",
 				report.fillUp());
-		report.drive(1, 44, 116);
+		report.drive(1, 1, 44, 116);
 		report.stop("Walmart", "1299 N Brightleaf Blvd, Smithfield, NC", 0.0);
 		report.arrive(0.0);
 
 		report.depart(0.0);
-		report.drive(3, 39, 250);
+		report.drive(0, 3, 39, 250);
 		report.stop("Costco", "2708 Potomac Mills Cir, Woodbridge, VA",
 				report.fillUp());
-		report.drive(1, 18, 65);
+		report.drive(1, 1, 18, 65);
 		report.stop("Patapsco SP",
 				"8099 Park Dr, Ellicott City, MD 21043, USA", 0.0);
 		report.arrive(0.0);
 
 		report.depart(0.0);
-		report.drive(4, 46, 284);
+		report.drive(0, 4, 46, 284);
 		report.stop("Mills-Norie SP",
 				"84 Campground Hill, Staatsburg, NY 12580", 0.0);
 		report.arrive(0.0);
 
 		report.depart(0.0);
-		report.drive(1, 34, 87);
+		report.drive(0, 1, 34, 87);
 		report.stop("Lee Service Plaza", "I-90 Eastbound", report.fillUp());
-		report.drive(1, 17, 72);
+		report.drive(1, 1, 17, 72);
 		report.stop("Walmart",
 				"7 Dowling Village Boulevard, North Smithfield, RI�", 0.0);
 		report.arrive(0.0);
 
 		report.depart(0.0);
-		report.drive(2, 47, 173);
+		report.drive(0, 2, 47, 173);
 		report.stop("Freeport", "80 Depot St,Freeport, ME 04032", 0.0);
-		report.drive(0, 31, 32);
+		report.drive(1, 0, 31, 32);
 		report.stop("West Gardiner Service Plaza", "I-295/I-95 Junction", 0.0);
 		report.arrive(0.0);
 
 		report.depart(0.0);
-		report.drive(1, 31, 85);
+		report.drive(0, 1, 31, 85);
 		report.stop("Maple Lane Farm",
 				"251 Upper-Charleston Rd, Charleston, ME�", 0.0);
-		report.drive(1, 14, 57);
+		report.drive(1, 1, 14, 57);
 		report.stop("Irving Oil", "High Street Ellsworth, ME", report.fillUp());
-		report.drive(0, 17, 11);
+		report.drive(0, 0, 17, 11);
 		report.stop("Home", "7 Manor Lane, Sullivan, ME 04664", 0.0);
 		report.arrive(0.0);
 
