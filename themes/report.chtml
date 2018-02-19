@@ -203,6 +203,19 @@
 				<td class="step-field">{$fuelRemaining}</td>
 			</tr>
 {#}
+{#dayTotalRow}
+			<tr class="step-detail">
+				<td></td>
+				<td class="step-drive">Day Totals</td>
+				<td class="step-field">{$leg1Total}</td>
+				<td class="step-field">{$leg2Total}</td>
+				<td class="step-field"></td>
+				<td class="step-field"></td>
+				<td class="step-field"></td>
+				<td class="step-field"></td>
+				<td class="step-field"></td>
+			</tr>
+{#}
 {#kml}
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">

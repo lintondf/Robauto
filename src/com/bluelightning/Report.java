@@ -40,6 +40,9 @@ public class Report implements Serializable {
 
 		Step firstStep;
 		Step lastStep;
+		
+		String driver0Total;
+		String driver1Total;
 
 		public Day() {
 			this.steps = new ArrayList<Step>();
@@ -53,7 +56,9 @@ public class Report implements Serializable {
 			lastStep = step;
 		}
 
-		public void finish() {
+		public void finish(int driver0Minutes, int driver1Minutes) {
+			driver0Total = String.format("%d:%02d", driver0Minutes/60, driver0Minutes%60);
+			driver1Total = String.format("%d:%02d", driver1Minutes/60, driver1Minutes%60);
 			int totalHours = 0;
 			int totalMinutes = 0;
 			int totalDistance = 0;
@@ -91,6 +96,10 @@ public class Report implements Serializable {
 			for (Step step : steps) {
 				sb.append(step.toHtml());
 			}
+			Chunk t = theme.makeChunk("report#dayTotalRow");
+			t.set("leg1Total", driver0Total);
+			t.set("leg2Total", driver1Total);
+			sb.append( t.toString() );
 			c.set("rows", sb.toString());
 			return c.toString();
 		}
@@ -175,10 +184,16 @@ public class Report implements Serializable {
 			step.refuel = String.format("%.0f", refuel);
 		}
 	}
+	
+	protected int  driver0Minutes = 0;
+	protected int  driver1Minutes = 0;
+	
 
 	public void depart(double refuel) {
 		depart(lastDay.lastStep.placeName, lastDay.lastStep.placeAddress,
 				refuel);
+		driver0Minutes = 0;
+		driver1Minutes = 0;
 	}
 
 	public void arrive(double refuel) {
@@ -187,16 +202,19 @@ public class Report implements Serializable {
 			fuelLevel += refuel;
 			lastDay.lastStep.refuel = String.format("%.0f", refuel);
 		}
-		lastDay.finish();
+		lastDay.finish(driver0Minutes, driver1Minutes);
 	}
 
 	public void drive(int driver, int hours, int minutes, double distance) {
 		Drive d = new Drive();
 		d.legDistance = String.format("%.0f", distance);
-		if (driver == 0)
+		if (driver == 0) {
 			d.leg1Duration = String.format("%d:%02d", hours, minutes);
-		else
+			driver0Minutes += 60*hours + minutes;
+		} else {
 			d.leg2Duration = String.format("%d:%02d", hours, minutes);
+			driver1Minutes += 60*hours + minutes;
+		}
 		double fuelUsed = distance / mpg;
 		d.fuelUsed = String.format("%.0f", fuelUsed);
 		fuelLevel -= fuelUsed;
