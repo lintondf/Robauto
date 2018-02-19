@@ -1,0 +1,223 @@
+{#report}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Robauto Trip Plan</title>
+<style>
+            .bpTable {
+                margin: 0px;
+                padding: 0px;
+                width: 100%;
+                border: 1px solid #000000;
+                -moz-border-radius-bottomleft: 0px;
+                -webkit-border-bottom-left-radius: 0px;
+                border-bottom-left-radius: 0px;
+                -moz-border-radius-bottomright: 0px;
+                -webkit-border-bottom-right-radius: 0px;
+                border-bottom-right-radius: 0px;
+                -moz-border-radius-topright: 0px;
+                -webkit-border-top-right-radius: 0px;
+                border-top-right-radius: 0px;
+                -moz-border-radius-topleft: 0px;
+                -webkit-border-top-left-radius: 0px;
+                border-top-left-radius: 0px;
+            }
+            .bpTable table {
+                border-collapse: collapse;
+                border-spacing: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0px;
+                padding: 0px;
+            }
+            .bpTable tr:last-child td:last-child {
+                -moz-border-radius-bottomright: 0px;
+                -webkit-border-bottom-right-radius: 0px;
+                border-bottom-right-radius: 0px;
+            }
+            .bpTable table tr:first-child td:first-child {
+                -moz-border-radius-topleft: 0px;
+                -webkit-border-top-left-radius: 0px;
+                border-top-left-radius: 0px;
+            }
+            .bpTable table tr:first-child td:last-child {
+                -moz-border-radius-topright: 0px;
+                -webkit-border-top-right-radius: 0px;
+                border-top-right-radius: 0px;
+            }
+            .bpTable tr:last-child td:first-child {
+                -moz-border-radius-bottomleft: 0px;
+                -webkit-border-bottom-left-radius: 0px;
+                border-bottom-left-radius: 0px;
+            }
+            .bpTable tr:hover td {
+
+            }
+            .bpTable tr:nth-child(odd) {
+                background-color: #999999;
+            }
+            .bpTable tr:nth-child(even) {
+                background-color: #ffffff;
+            }
+            .bpTable td {
+                vertical-align: middle;
+                border: 1px solid #000000;
+                border-width: 0px 1px 1px 0px;
+                text-align: left;
+                padding: 3px;
+                font-size: 14px;
+                font-family: Courier;
+                font-weight: normal;
+                color: #000000;
+            }
+            .bpTable tr:last-child td {
+                border-width: 0px 1px 0px 0px;
+            }
+            .bpTable tr td:last-child {
+                border-width: 0px 0px 1px 0px;
+            }
+            .bpTable tr:last-child td:last-child {
+                border-width: 0px 0px 0px 0px;
+            }
+            .bpTable thead tr:first-child td {
+                background: -o-linear-gradient(bottom, #007fff 5%, #007fff 100%);
+                background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #007fff), color-stop(1, #007fff) );
+                background: -moz-linear-gradient( center top, #007fff 5%, #007fff 100% );
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#007fff", endColorstr="#007fff");
+                background: -o-linear-gradient(top,#007fff,007fff);
+                background-color: #007fff;
+                border: 0px solid #000000;
+                text-align: center;
+                border-width: 0px 0px 1px 1px;
+                font-size: 14px;
+                font-family: Arial;
+                font-weight: bold;
+                color: #ffffff;
+            }
+            .bpTable thead tr:first-child:hover td {
+                background: -o-linear-gradient(bottom, #007fff 5%, #007fff 100%);
+                background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #007fff), color-stop(1, #007fff) );
+                background: -moz-linear-gradient( center top, #007fff 5%, #007fff 100% );
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#007fff", endColorstr="#007fff");
+                background: -o-linear-gradient(top,#007fff,007fff);
+                background-color: #007fff;
+            }
+            .bpTable thead tr:last-child td {
+                font-size: 14px;
+                font-family: Arial;
+                font-weight: bold;
+            	text-align: center;
+            }
+            .bpTable tr:first-child td:first-child {
+                border-width: 0px 0px 1px 0px;
+            }
+            .bpTable tr:first-child td:last-child {
+                border-width: 0px 0px 1px 1px;
+            }
+            .bpCenter {
+            	text-align: center;
+            }
+            
+            .step-drive {
+            	text-align: right!important;
+            	font-weight: bold!important;
+            }
+            .step-field {
+            	text-align: center!important;
+            }
+            .step-ordinal {
+            	font-weight: bold!important;
+            	text-align: center!important;
+            }
+            .step-refuel {
+            	font-weight: bold!important;
+            	text-align: center!important;
+            }
+            .step-arrive {
+            	text-align: left!important;
+            }
+            .step-depart {
+            	text-align: left!important;
+            }
+        </style> 
+
+</head>
+<body>
+	{$body}
+</body>
+</html>
+{#}
+{#day}
+	<h1>{$dayName} - {$dayDuration} hours; Driving {$dayDistance} miles</h1>
+	<table class="bpTable">
+		<thead>
+			<tr>
+				<td></td>
+				<td></td>
+				<td colspan="2">Time (hr)</td>
+				<td colspan="2">Distance (mi)</td>
+				<td colspan="2">Fuel (gal)</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td><small>Leg</small></td>
+				<td><small>Total</small></td>
+				<td><small>Leg</small></td>
+				<td><small>Total</small></td>
+				<td><small>Used</small></td>
+				<td><small>Remaining</small></td>
+			</tr>
+		</thead>
+		<tbody>
+			{$rows}
+		</tbody>
+	</table>
+{#}
+{#titleRow}
+			<tr class="step-title">
+				<td class="step-ordinal step-depart">{$stepName}</td>
+				<td class="step-address">{$placeName}</br>
+				<small>{$placeAddress}</small></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td class="step-refuel">{$refuel}</td>
+			</tr>
+{#}
+{#detailRow}			
+			<tr class="step-detail">
+				<td></td>
+				<td class="step-drive">Drive</td>
+				<td class="step-field">{$legDuration}</td>
+				<td class="step-field">{$totalDuration}</td>
+				<td class="step-field">{$legDistance}</td>
+				<td class="step-field">{$totalDistance}</td>
+				<td class="step-field">{$fuelUsed}</td>
+				<td class="step-field">{$fuelRemaining}</td>
+			</tr>
+{#}
+{#kml}
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+<Style id="bendigo_line">
+    <LineStyle>
+        <width>3</width>
+        <color>ff33ccff</color>
+    </LineStyle>
+</Style>
+<Placemark>
+    <styleUrl>#bendigo_line</styleUrl>
+    <LineString>
+        <coordinates>
+{$coordinates}
+        </coordinates>
+    </LineString>
+</Placemark>
+</Document>
+</kml>
+{#}
