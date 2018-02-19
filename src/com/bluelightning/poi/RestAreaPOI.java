@@ -144,4 +144,54 @@ public class RestAreaPOI extends POIBase {
     		System.out.println( pset.get(i).toString() );
 	}
 
+
+	public String getState() {
+		return state;
+	}
+
+
+	public String getHighway() {
+		return highway;
+	}
+
+
+	public String getDirection() {
+		return direction;
+	}
+
+
+	public String getMileMarker() {
+		return mileMarker;
+	}
+
+
+	public boolean isHasRvDump() {
+		return hasRvDump;
+	}
+
+
+	public boolean isHasGas() {
+		return hasGas;
+	}
+
+
+	public boolean isHasDiesel() {
+		return hasDiesel;
+	}
+
+
+	public boolean isHasPetArea() {
+		return hasPetArea;
+	}
+
+
+	public boolean isHasRestrooms() {
+		return hasRestrooms;
+	}
+
+
+	public boolean isHasPicnicTables() {
+		return hasPicnicTables;
+	}
+
 }

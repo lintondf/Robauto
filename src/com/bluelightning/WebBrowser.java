@@ -128,14 +128,14 @@ public final class WebBrowser extends Canvas {
 
 				@Override
 				public void changing(LocationEvent event) {
-					System.out.println(Thread.currentThread() + " MOCK CHANGING: " + event);
+//					System.out.println(Thread.currentThread() + " MOCK CHANGING: " + event);
 					event.doit = false;
 					Events.eventBus.post(new Events.WebBrowserOpenEvent(browserCanvas, event.location));
 				}
 
 				@Override
 				public void changed(LocationEvent event) {
-					System.out.println(Thread.currentThread() + " MOCK CHANGED: " + event);
+//					System.out.println(Thread.currentThread() + " MOCK CHANGED: " + event);
 				}
 
 			});
@@ -149,12 +149,12 @@ public final class WebBrowser extends Canvas {
 
 				@Override
 				public void changing(LocationEvent event) {
-					System.out.println(Thread.currentThread() + " CHANGING: " + event);
+//					System.out.println(Thread.currentThread() + " CHANGING: " + event);
 				}
 
 				@Override
 				public void changed(LocationEvent event) {
-					System.out.println(Thread.currentThread() + " CHANGED: " + event);
+//					System.out.println(Thread.currentThread() + " CHANGED: " + event);
 					frame.setSize(1205, 805);
 				}
 
@@ -164,7 +164,7 @@ public final class WebBrowser extends Canvas {
 
 				@Override
 				public void open(org.eclipse.swt.browser.WindowEvent event) {
-					System.out.println(Thread.currentThread() + " OPEN: " + event);
+//					System.out.println(Thread.currentThread() + " OPEN: " + event);
 					event.required = true;
 					event.browser = mock.getBrowser();
 				}
@@ -251,7 +251,7 @@ public final class WebBrowser extends Canvas {
 			@Override
 			public void run() {
 				Object retval = getBrowser().evaluate(js);
-				System.out.println(retval);
+//				System.out.println(retval);
 			}
 		});
 	}
@@ -326,7 +326,7 @@ public final class WebBrowser extends Canvas {
 		@Override
 		public void run() {
 			// First prepare the SWT components...
-			System.out.println(Thread.currentThread() + " run()");
+//			System.out.println(Thread.currentThread() + " run()");
 			Display display;
 			Shell shell;
 			try {
@@ -377,7 +377,7 @@ public final class WebBrowser extends Canvas {
 	public static class WebBrowserOpenHandler {
 		@Subscribe
 		protected void handle(WebBrowserOpenEvent event) {
-			System.out.println("WB Open: " + event.href);
+//			System.out.println("WB Open: " + event.href);
 			String javascript = "var robauto_popups = document.getElementsByClassName('leaflet-popup-content');"
 					+ "return(robauto_popups.item(0).innerHTML);";
 			event.browserCanvas.evaluateJavascript(javascript);
@@ -392,7 +392,7 @@ public final class WebBrowser extends Canvas {
 	protected void loadGeoMock() {
 		try {
 			String geomock = IOUtils.toString( new FileReader("scripts/geomock.js") );
-			System.out.print("Loading geomock ");
+//			System.out.print("Loading geomock ");
 			evaluateJavascript(geomock);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -414,7 +414,7 @@ public final class WebBrowser extends Canvas {
 	public class UiHandler {
 		@Subscribe
 		protected void handle( UiEvent event ) {
-			System.out.println(event.source + " " + event.awtEvent );
+//			System.out.println(event.source + " " + event.awtEvent );
 			switch (event.source) {
 			case "ControlPanel.FireBug":
 				browserCanvas.setUrl("javascript:(function(F,i,r,e,b,u,g,L,I,T,E){if(F.getElementById(b))return;E=F[i+'NS']&&F.documentElement.namespaceURI;E=E?F[i+'NS'](E,'script'):F[i]('script');E[r]('id',b);E[r]('src',I+g+T);E[r](b,u);(F[e]('head')[0]||F[e]('body')[0]).appendChild(E);E=new%20Image;E[r]('src',I+L);})(document,'createElement','setAttribute','getElementsByTagName','FirebugLite','4','firebug-lite.js','releases/lite/latest/skin/xp/sprite.png','https://getfirebug.com/','#startOpened');");
@@ -519,14 +519,14 @@ public final class WebBrowser extends Canvas {
 
 				@Override
 				public void changing(LocationEvent event) {
-					System.out.println(Thread.currentThread() + " MOCK CHANGING: " + event);
+//					System.out.println(Thread.currentThread() + " MOCK CHANGING: " + event);
 					event.doit = false;
 					Events.eventBus.post(new Events.WebBrowserOpenEvent(browserCanvas, event.location));
 				}
 
 				@Override
 				public void changed(LocationEvent event) {
-					System.out.println(Thread.currentThread() + " MOCK CHANGED: " + event);
+//					System.out.println(Thread.currentThread() + " MOCK CHANGED: " + event);
 				}
 
 			});
@@ -540,12 +540,12 @@ public final class WebBrowser extends Canvas {
 
 				@Override
 				public void changing(LocationEvent event) {
-					System.out.println(Thread.currentThread() + " CHANGING: " + event);
+//					System.out.println(Thread.currentThread() + " CHANGING: " + event);
 				}
 
 				@Override
 				public void changed(LocationEvent event) {
-					System.out.println(Thread.currentThread() + " CHANGED: " + event);
+//					System.out.println(Thread.currentThread() + " CHANGED: " + event);
 					frame.setSize(1205, 805);
 				}
 
@@ -555,7 +555,7 @@ public final class WebBrowser extends Canvas {
 
 				@Override
 				public void open(org.eclipse.swt.browser.WindowEvent event) {
-					System.out.println(Thread.currentThread() + " OPEN: " + event);
+//					System.out.println(Thread.currentThread() + " OPEN: " + event);
 					event.required = true;
 					event.browser = mock.getBrowser();
 				}
