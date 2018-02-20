@@ -14,9 +14,13 @@ import java.util.TreeSet;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+
 import org.apache.commons.io.IOUtils;
 
 import com.bluelightning.json.HereRoute;
@@ -28,9 +32,18 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 
 public class OptimizeStopsDialog extends JDialog {
@@ -71,6 +84,8 @@ public class OptimizeStopsDialog extends JDialog {
 		public Double   distance;
 		public Double   trafficTime;
 		public String   road;
+		public String   state;
+		public String   mileMarker;
 		public String   direction;
 		public String   name;
 		public Double[] driveTimes;
@@ -81,7 +96,12 @@ public class OptimizeStopsDialog extends JDialog {
 				sb.append( use.toString() ); sb.append(",");
 			}
 			sb.append(String.format("%5.1f, %5s,", distance*Here2.METERS_TO_MILES, Here2.toPeriod(trafficTime)));
-			sb.append(road); sb.append(",");
+			sb.append(road);
+			sb.append('/');
+			sb.append(state);
+			sb.append(":");
+			sb.append(mileMarker);
+			sb.append(",");
 			sb.append(direction); sb.append(",");
 			sb.append(name); sb.append(",");
 			if (driveTimes != null) {
@@ -149,6 +169,7 @@ public class OptimizeStopsDialog extends JDialog {
 		
 	}
 
+	protected final OptimizeStops optimizeStops;
 	private final JPanel contentPanel = new JPanel();
 	private JTable roadsTable;
 	private JTable legTable;
@@ -157,6 +178,45 @@ public class OptimizeStopsDialog extends JDialog {
 	protected JTabbedPane outputTabbedPane;
 	protected LegTableModel legTableModel;
 	protected RoadTableModel roadTableModel;
+	protected StopsTableModel stopsTableModel;
+	protected JButton optimizeButton;
+	protected JButton chooseButton;
+	protected JButton cancelButton;
+	
+	protected class OptimizeActionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			System.out.println(event);
+			switch (event.getActionCommand()) {
+			case "Cancel":
+				OptimizeStopsDialog.this.dispose();
+				break;
+			default:
+				break;
+			}
+		}
+		
+	}
+	
+	protected class OptimizeLegSelectionListener implements ListSelectionListener {
+
+		@Override
+		public void valueChanged(ListSelectionEvent event) {
+			if (! event.getValueIsAdjusting()) {
+				System.out.println(event);
+				int which = event.getFirstIndex();
+				List<RoadDirectionData> roadDirectionDataList = optimizeStops.getUiRoadData(which);
+				roadDirectionDataList.forEach(System.out::println);
+				List<StopData> stopDataList = optimizeStops.getUiStopData(2, which, false, roadDirectionDataList);
+				stopDataList.forEach(System.out::println);
+				
+				setRoadDirectionTable(roadDirectionDataList);
+				setStopTable(stopDataList);				
+			}
+		}
+		
+	}
 
 	/**
 	 * Launch the application.
@@ -202,12 +262,18 @@ public class OptimizeStopsDialog extends JDialog {
 		Iterator<DriverAssignments> it = driverAssignments.iterator();
 			
 		try {
-			OptimizeStopsDialog dialog = new OptimizeStopsDialog();
+			OptimizeStopsDialog dialog = new OptimizeStopsDialog(optimizeStops);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 
 			dialog.setLegTable( legDataList );
 			dialog.setRoadDirectionTable(roadDirectionDataList);
+			dialog.setStopTable(stopDataList);
+			
+			dialog.addListeners(
+					dialog.new OptimizeActionListener(),
+					dialog.new OptimizeLegSelectionListener()
+					);
 			
 			for (int i = 0; it.hasNext() && i < 5; i++) {
 				String html = toHtml(2, legDataList.get(i), it.next() );
@@ -219,7 +285,7 @@ public class OptimizeStopsDialog extends JDialog {
 					x.printStackTrace();
 				}				
 				JPanel panel = new JPanel();
-				dialog.getOutputTabbedPane().addTab(String.format("Case %d", i), null, panel, null);
+				dialog.getOutputTabbedPane().addTab(String.format("Case %d", 1+i), null, panel, null);
 				dialog.getOutputTabbedPane().setEnabledAt(i, true);
 				panel.setLayout(new BorderLayout(0, 0));
 				{
@@ -228,16 +294,26 @@ public class OptimizeStopsDialog extends JDialog {
 					textPane.setText(html);
 					panel.add(textPane);
 				}
-			}
+			} // for i
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
+	private void addListeners(OptimizeActionListener optimizeActionListener,
+			OptimizeLegSelectionListener optimizeLegSelectionListener) {
+		
+		cancelButton.addActionListener(optimizeActionListener);
+		optimizeButton.addActionListener(optimizeActionListener);
+		chooseButton.addActionListener(optimizeActionListener);
+		
+		legTable.getSelectionModel().addListSelectionListener(optimizeLegSelectionListener);
+	}
+
 	protected static String toHtml( int nDrivers, LegData legData, DriverAssignments driverAssignments ) {
 		Report report = new Report();
-		report.depart("", legData.startLabel, 0.0);
+		report.depart(legData.startLabel, "", 0.0);
 		
 		List<Iterator<Double>> driveTimes = new ArrayList<Iterator<Double>>( Arrays.asList(
 				driverAssignments.assignments[0].driveTimes.iterator(),
@@ -259,9 +335,7 @@ public class OptimizeStopsDialog extends JDialog {
 			report.stop(stopData.name, stopData.road, 0);
 			driver = (driver + 1) % nDrivers;
 		}
-		
-		report.stop("",	legData.endLabel, 0.0);
-		report.arrive(0.0);
+		report.arrive(0.0, legData.endLabel, "");
 		return report.toHtml();		
 	}
 	
@@ -431,6 +505,96 @@ public class OptimizeStopsDialog extends JDialog {
 	}
 	
 	
+	protected static class StopsTableModel extends AbstractTableModel {
+		
+		private static final long serialVersionUID = 1L;
+		protected static final String[] names = {"Use", "Distance", "Time", "Road", "Direction", "Name"};
+		protected static final double[] widths = {0.05, 0.1, 0.1, 0.25, 0.10, 0.40};
+		protected static final boolean[] centered = {true, true, true, true, true, false};
+		
+		protected List<StopData> data = null;
+		
+		
+		public StopsTableModel() {
+		}
+
+		@Override
+		public int getColumnCount() {
+			return names.length;
+		}
+
+		@Override
+		public int getRowCount() {
+			if (data == null)
+				return 0;
+			return data.size();
+		}
+
+		@Override
+		public Object getValueAt(int iRow, int iCol) {
+			if (data == null || iRow >= data.size())
+				return null;
+			StopData stopData = data.get(iRow);
+			switch (iCol) {
+			case 0: 
+				return stopData.use;
+			case 1:
+				return String.format("%5.1f", stopData.distance*Here2.METERS_TO_MILES);
+			case 2:
+				return Here2.toPeriod(stopData.trafficTime);
+			case 3:
+				return String.format("%s %s %s", stopData.road, stopData.state, stopData.mileMarker); 
+			case 4:
+				return stopData.direction;
+			case 5:
+				return stopData.name;
+			}
+			return null;
+		}
+
+		@Override
+		public Class<?> getColumnClass(int iCol) {
+			if (iCol == 0)
+				return Boolean.class;
+			return String.class;
+		}
+
+		@Override
+		public String getColumnName(int iCol) {
+			return names[iCol];
+		}
+
+		public List<StopData> getData() {
+			return data;
+		}
+
+		public void setData(List<StopData> data) {
+			this.data = data;
+			fireTableStructureChanged();
+		}
+		
+		public void resizeColumns( JTable table, double totalWidth) {
+			TableColumn column = null;
+			for (int i = 0; i < getColumnCount(); i++) {
+			    column = table.getColumnModel().getColumn(i);
+			    int width = (int) (widths[i]*totalWidth);
+		        column.setPreferredWidth(width);
+			}			
+		}
+
+		public void layoutColumns(JTable stopsTable) {
+			// TODO make this work
+			DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+			centerRenderer.setHorizontalAlignment( SwingConstants.CENTER );
+			for (int i = 0; i < centered.length; i++) {
+				if (centered[i])
+					stopsTable.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );
+			}
+		}
+		
+	}
+	
+	
 	public void setLegTable( List<LegData> legDataList ) {
 		legTableModel.setData(legDataList);
 		if (! legDataList.isEmpty()) {
@@ -441,12 +605,19 @@ public class OptimizeStopsDialog extends JDialog {
 		roadTableModel.setData(roadDataList);
 	}
 
+	public void setStopTable( List<StopData> stopDataList ) {
+		stopsTableModel.setData(stopDataList);
+	}
+
 	/**
 	 * Create the dialog.
+	 * @param optimizeStops 
 	 */
-	public OptimizeStopsDialog() {
+	public OptimizeStopsDialog(OptimizeStops optimizeStops) {
+		this.optimizeStops = optimizeStops;
 		legTableModel = new LegTableModel();
 		roadTableModel = new RoadTableModel();
+		stopsTableModel = new StopsTableModel();
 		setBounds(100, 100, 900, 600);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -490,8 +661,12 @@ public class OptimizeStopsDialog extends JDialog {
 						lowerPanel.add(scrollPane, BorderLayout.WEST);
 					}
 					{
-						stopsTable = new JTable();
-						lowerPanel.add(stopsTable, BorderLayout.CENTER);
+						stopsTable = new JTable(stopsTableModel);
+						stopsTable.setBorder(new LineBorder(Color.BLACK, 1));
+						stopsTable.setFillsViewportHeight(true);
+						stopsTable.setVisible(true);
+						JScrollPane scrollPane = new JScrollPane(stopsTable);
+						lowerPanel.add(scrollPane, BorderLayout.CENTER);
 					}
 				}
 			}
@@ -502,19 +677,6 @@ public class OptimizeStopsDialog extends JDialog {
 				{
 					outputTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 					outputPanel.add(outputTabbedPane, BorderLayout.NORTH);
-//					{
-//						JPanel panel = new JPanel();
-//						outputTabbedPane.addTab("Case 1", null, panel, null);
-//						outputTabbedPane.setEnabledAt(0, true);
-//						panel.setLayout(new BorderLayout(0, 0));
-//						{
-//							textPane = new JTextPane();
-//							textPane.setContentType("text/html");
-//							//textPane.setText(html);
-//							// create a document, set it on the jeditorpane, then add the html
-//							panel.add(textPane);
-//						}
-//					}
 				}
 			}
 		}
@@ -523,17 +685,48 @@ public class OptimizeStopsDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("OK");
-				okButton.setActionCommand("OK");
-				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+				optimizeButton = new JButton("Optimize");
+				optimizeButton.setActionCommand("Optimize");
+				buttonPane.add(optimizeButton);
+//				getRootPane().setDefaultButton(okButton);
 			}
 			{
-				JButton cancelButton = new JButton("Cancel");
+				chooseButton = new JButton("Choose");
+				chooseButton.setActionCommand("Choose");
+				buttonPane.add(chooseButton);
+				getRootPane().setDefaultButton(chooseButton);
+			}
+			{
+				cancelButton = new JButton("Cancel");
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
 		}
+		
+		stopsTableModel.layoutColumns( stopsTable );
+		stopsTable.addComponentListener( new ComponentListener() {
+
+			@Override
+			public void componentHidden(ComponentEvent arg0) {
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent arg0) {
+			}
+
+			@Override
+			public void componentResized(ComponentEvent event) {
+				Dimension dim = event.getComponent().getSize();
+				stopsTableModel.resizeColumns(stopsTable, dim.getWidth());
+			}
+
+			@Override
+			public void componentShown(ComponentEvent event) {
+				componentResized(event);
+			}
+			
+		});
+		
 	}
 
 	public JTable getRoadsTable() {

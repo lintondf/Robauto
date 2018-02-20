@@ -198,8 +198,10 @@ public class Report implements Serializable {
 		driver1Minutes = 0;
 	}
 
-	public void arrive(double refuel) {
+	public void arrive(double refuel, String toPlace, String toAddress) {
 		lastDay.lastStep.stepName = "Arrive";
+		lastDay.lastStep.placeName = toPlace;
+		lastDay.lastStep.placeAddress = toAddress;
 		if (refuel > 0.0) {
 			fuelLevel += refuel;
 			lastDay.lastStep.refuel = String.format("%.0f", refuel);
@@ -400,57 +402,24 @@ public class Report implements Serializable {
 		report.drive(0, 2, 48, 195);
 		report.stop("Pilot", "491 St Marys Rd, St Marys, GA", report.fillUp());
 		report.drive(1, 0, 48, 45);
-		report.stop("Jekyll Island SP",
-				"1199 Beach View Dr N, Jekyll Island, GA", 0.0);
-		report.arrive(0.0);
+		report.arrive(0.0, "Jekyll Island SP",
+				"1199 Beach View Dr N, Jekyll Island, GA");
 
 		report.depart(0.0);
 		report.drive(0, 4, 4, 281);
 		report.stop("Pilot", "1504 SC-38, Latta, SC 29565, USA",
 				report.fillUp());
 		report.drive(1, 1, 44, 116);
-		report.stop("Walmart", "1299 N Brightleaf Blvd, Smithfield, NC", 0.0);
-		report.arrive(0.0);
+		report.arrive(0.0, "Walmart", "1299 N Brightleaf Blvd, Smithfield, NC");
 
 		report.depart(0.0);
 		report.drive(0, 3, 39, 250);
 		report.stop("Costco", "2708 Potomac Mills Cir, Woodbridge, VA",
 				report.fillUp());
 		report.drive(1, 1, 18, 65);
-		report.stop("Patapsco SP",
-				"8099 Park Dr, Ellicott City, MD 21043, USA", 0.0);
-		report.arrive(0.0);
+		report.arrive(0.0, "Patapsco SP",
+				"8099 Park Dr, Ellicott City, MD 21043, USA");
 
-		report.depart(0.0);
-		report.drive(0, 4, 46, 284);
-		report.stop("Mills-Norie SP",
-				"84 Campground Hill, Staatsburg, NY 12580", 0.0);
-		report.arrive(0.0);
-
-		report.depart(0.0);
-		report.drive(0, 1, 34, 87);
-		report.stop("Lee Service Plaza", "I-90 Eastbound", report.fillUp());
-		report.drive(1, 1, 17, 72);
-		report.stop("Walmart",
-				"7 Dowling Village Boulevard, North Smithfield, RI�", 0.0);
-		report.arrive(0.0);
-
-		report.depart(0.0);
-		report.drive(0, 2, 47, 173);
-		report.stop("Freeport", "80 Depot St,Freeport, ME 04032", 0.0);
-		report.drive(1, 0, 31, 32);
-		report.stop("West Gardiner Service Plaza", "I-295/I-95 Junction", 0.0);
-		report.arrive(0.0);
-
-		report.depart(0.0);
-		report.drive(0, 1, 31, 85);
-		report.stop("Maple Lane Farm",
-				"251 Upper-Charleston Rd, Charleston, ME�", 0.0);
-		report.drive(1, 1, 14, 57);
-		report.stop("Irving Oil", "High Street Ellsworth, ME", report.fillUp());
-		report.drive(0, 0, 17, 11);
-		report.stop("Home", "7 Manor Lane, Sullivan, ME 04664", 0.0);
-		report.arrive(0.0);
 
 		try {
 			PrintWriter out = new PrintWriter("report.html");

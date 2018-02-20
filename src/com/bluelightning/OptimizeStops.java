@@ -137,13 +137,6 @@ public class OptimizeStops {
 				dataList.add(data);
 			}
 		}
-//		for (POISet.POIResult r : summary.nearby) {
-//			RestAreaPOI restArea = (RestAreaPOI) r.poi;
-//			RoadDirectionData data = new RoadDirectionData();
-//			data.direction = restArea.getDirection();
-//			data.road = restArea.getHighway();
-//			dataList.add(data);
-//		}
 		return new ArrayList<>(dataList);
 	}
 	
@@ -170,6 +163,8 @@ public class OptimizeStops {
 			data.use = true;
 			data.direction = restArea.getDirection();
 			data.road = restArea.getHighway();
+			data.state = restArea.getState();
+			data.mileMarker = restArea.getMileMarker();
 			data.distance = r.totalProgress.distance;
 			data.trafficTime = r.totalProgress.trafficTime;
 			data.name = restArea.getName();
@@ -186,13 +181,10 @@ public class OptimizeStops {
 	public OptimizeStops(Route route, EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> nearbyMap) {
 		this.route = route;
 		legSummary = generateLegSummaries();
-		
-		
-		//legSummary.forEach(System.out::println);
-//		ArrayList<POISet.POIResult> restAreas = nearbyMap.get(Main.MarkerKinds.RESTAREAS);
-//		legSummary.forEach( ls-> {
-//			ls.setNearby(restAreas);
-//		});
+		ArrayList<POISet.POIResult> restAreas = nearbyMap.get(Main.MarkerKinds.RESTAREAS);
+		legSummary.forEach( ls-> {
+			ls.setNearby(restAreas);
+		});
 //		for (Leg leg : route.getLeg()) {
 //			System.out.println( leg.getSummary() );
 //			System.out.printf("%d Maneuvers\n", leg.getManeuver().size() );

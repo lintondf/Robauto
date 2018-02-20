@@ -175,13 +175,13 @@ public class POISet extends ArrayList<POI> {
 			}
 			Collections.sort(byManeuver);
 			for (POISet.POIResult r : byManeuver) {
-				double angle = r.maneuver.getShapeHeadings().get(r.index);
-				String heading = Here2.angle2Direction(angle);
-				String[] fields = r.poi.getName().split(",");
-				if (fields.length != 5 || fields[2].startsWith(heading.substring(0, 1))) {
+//				double angle = r.maneuver.getShapeHeadings().get(r.index);
+//				String heading = Here2.angle2Direction(angle);
+//				String[] fields = r.poi.getName().split(",");
+				//if (fields.length != 5 || fields[2].startsWith(heading.substring(0, 1))) {
 					output.add(r);
 					// System.out.println( r.toReport() );
-				}
+				//}
 			}
 			totalProgress.distance += leg.getLength();
 			totalProgress.trafficTime += leg.getTrafficTime();
