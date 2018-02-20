@@ -80,7 +80,7 @@ public class Main {
 //						long finish = System.nanoTime();
 //						double secs = 1.0e9 * (double) (finish - start);
 //						System.out.println( secs + " seconds");
-						OptimizeStops optimizeStops = new OptimizeStops(route, nearbyMap);
+						OptimizeStops optimizeStops = new OptimizeStops(route, poiMap, nearbyMap);
 					}
 					break;
 					
@@ -115,6 +115,19 @@ public class Main {
 	public static enum MarkerKinds {
 		WALMARTS, SAMSCLUBS, COSTCOS, TRUCKSTOPS, RESTAREAS
 	}
+	
+	// static support test use
+	public static void loadPOIMap(EnumMap<Main.MarkerKinds, POISet> poiMap) {
+		POISet pset = WalmartPOI.factory(); 
+		poiMap.put(Main.MarkerKinds.WALMARTS, pset);
+		pset = SamsClubPOI.factory();
+		poiMap.put(Main.MarkerKinds.SAMSCLUBS, pset);
+		pset = RestAreaPOI.factory();
+		poiMap.put(Main.MarkerKinds.RESTAREAS, pset);
+		pset = TruckStopPOI.factory(); 
+		poiMap.put(Main.MarkerKinds.TRUCKSTOPS, pset);
+		//TODO Costco, Cabelas		
+	}
 
 	public Main() {
 		// Display the viewer in a JFrame
@@ -137,16 +150,7 @@ public class Main {
 		browserCanvas.initialize(frame);
 		
 		// load base POI sets
-
-		POISet pset = WalmartPOI.factory(); 
-		poiMap.put(Main.MarkerKinds.WALMARTS, pset);
-		pset = SamsClubPOI.factory();
-		poiMap.put(Main.MarkerKinds.SAMSCLUBS, pset);
-		pset = RestAreaPOI.factory();
-		poiMap.put(Main.MarkerKinds.RESTAREAS, pset);
-		pset = TruckStopPOI.factory(); 
-		poiMap.put(Main.MarkerKinds.TRUCKSTOPS, pset);
-		//TODO Costco, Cabelas
+		loadPOIMap( poiMap );
 		
 		// Bind event handlers
 

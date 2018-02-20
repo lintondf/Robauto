@@ -22,10 +22,15 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import org.apache.commons.io.IOUtils;
+import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.Events.AddManualStopEvent;
+import com.bluelightning.Events.UiEvent;
 import com.bluelightning.json.HereRoute;
 import com.bluelightning.json.Route;
 import com.bluelightning.poi.POISet;
+import com.bluelightning.poi.POISet.POIResult;
+import com.google.common.eventbus.Subscribe;
 import com.bluelightning.poi.RestAreaPOI;
 import javax.swing.JTabbedPane;
 import javax.swing.JSplitPane;
@@ -83,6 +88,7 @@ public class OptimizeStopsDialog extends JDialog {
 		public Boolean  use;
 		public Double   distance;
 		public Double   trafficTime;
+		public Double   totalDistance;
 		public String   road;
 		public String   state;
 		public String   mileMarker;
@@ -182,6 +188,64 @@ public class OptimizeStopsDialog extends JDialog {
 	protected JButton optimizeButton;
 	protected JButton chooseButton;
 	protected JButton cancelButton;
+	protected JButton addBeforeButton;
+	protected JButton addAfterButton;
+	protected CallbackHandler handler;
+	
+	public class CallbackHandler {
+		
+		boolean addBefore;
+		int iRow;
+		
+		public CallbackHandler( boolean addBefore, int iRow ) {
+			this.addBefore = addBefore;
+			this.iRow = iRow;
+		}
+		
+		@Subscribe
+		protected void handle( AddManualStopEvent event ) {
+			System.out.println( addBefore + " " + iRow + " " + event.result.toReport() );
+			Events.eventBus.unregister(this); // one shot
+			handler = null;
+		}
+	}
+	
+	protected void addAfter() {
+		int selected = stopsTable.getSelectedRow();
+		if (selected < 0)
+			return;
+		if (selected < stopsTableModel.getRowCount()-1) { // cant add after last row
+			handler = new CallbackHandler( false, selected);
+			double distance0 = stopsTableModel.getData().get(selected).totalDistance;
+			double distance1 = stopsTableModel.getData().get(selected+1).totalDistance;
+			add( handler, distance0, distance1 );
+		}
+	}
+	
+	protected void addBefore() {
+		int selected = stopsTable.getSelectedRow();
+		if (selected < 0)
+			return;
+		double distance0 = 0;
+		double distance1 = stopsTableModel.getData().get(selected).totalDistance;
+		if (selected > 0) {
+			distance0 = stopsTableModel.getData().get(selected-1).totalDistance;
+		}
+		handler = new CallbackHandler( true, selected);
+		add( handler, distance0, distance1 );
+	}
+	
+	protected void add(CallbackHandler handler, double distance0, double distance1) {
+			ArrayList<POIResult> segmentPOI = optimizeStops.getRouteSegmentPOI(distance0, distance1);
+//			segmentPOI.forEach( r -> {
+//				System.out.println( r.toReport() );
+//			} );
+			AddManualStopDialog addDialog = new AddManualStopDialog();
+			addDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			addDialog.setData(segmentPOI);
+			addDialog.setVisible(true);
+			Events.eventBus.register( handler );
+	}
 	
 	protected class OptimizeActionListener implements ActionListener {
 
@@ -190,7 +254,15 @@ public class OptimizeStopsDialog extends JDialog {
 			System.out.println(event);
 			switch (event.getActionCommand()) {
 			case "Cancel":
+				Events.eventBus.unregister(handler);
+				handler = null;
 				OptimizeStopsDialog.this.dispose();
+				break;
+			case "Add Before":
+				addBefore();
+				break;
+			case "Add After":
+				addAfter();
 				break;
 			default:
 				break;
@@ -208,7 +280,7 @@ public class OptimizeStopsDialog extends JDialog {
 				int which = event.getLastIndex();
 				List<RoadDirectionData> roadDirectionDataList = optimizeStops.getUiRoadData(which);
 				roadDirectionDataList.forEach(System.out::println);
-				List<StopData> stopDataList = optimizeStops.getUiStopData(2, which, false, roadDirectionDataList);
+				ArrayList<StopData> stopDataList = optimizeStops.getUiStopData(2, which, false, roadDirectionDataList);
 				stopDataList.forEach(System.out::println);
 				
 				setRoadDirectionTable(roadDirectionDataList);
@@ -217,96 +289,27 @@ public class OptimizeStopsDialog extends JDialog {
 		}
 		
 	}
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		HereRoute hereRoute = null;
-		try {
-			String json = IOUtils.toString(new FileInputStream("route.json"), "UTF-8");
-			hereRoute = (HereRoute) Here2.gson.fromJson(json, HereRoute.class);
-			if (hereRoute == null || hereRoute.getResponse() == null)
-				throw new NullPointerException();
-		} catch (Exception x) {
-			x.printStackTrace();
-			return;
-		}
-		System.out.println(hereRoute.getResponse().getMetaInfo());
-		Set<Route> routes = hereRoute.getResponse().getRoute();
-		Route route = routes.iterator().next();
-
-		EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
-		EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
-		POISet pset = RestAreaPOI.factory();
-		poiMap.put(Main.MarkerKinds.RESTAREAS, pset);
-		nearbyMap.put(Main.MarkerKinds.RESTAREAS, pset.getPointsOfInterestAlongRoute(route, 5e3 ));
-		
-		OptimizeStops optimizeStops = new OptimizeStops( route, nearbyMap );
-		
-		List<LegData> legDataList = optimizeStops.getUiLegData();
-		legDataList.forEach(System.out::println);
-		
-		List<RoadDirectionData> roadDirectionDataList = optimizeStops.getUiRoadData(0);
-		roadDirectionDataList.forEach(System.out::println);
-		
-		List<StopData> stopDataList = optimizeStops.getUiStopData(2, 0, false, roadDirectionDataList);
-		stopDataList.forEach(System.out::println);
-		
-		Permutations perm = new Permutations( stopDataList.size() );
-		ArrayList<Integer[]> unique = perm.monotonic();
-		Set<DriverAssignments> driverAssignments = new TreeSet<>();
-		for (Integer[] elements : unique) {
-			driverAssignments.add( generateDriverAssignments(2, legDataList.get(0), stopDataList, elements) );
-		}
-		Iterator<DriverAssignments> it = driverAssignments.iterator();
-			
-		try {
-			OptimizeStopsDialog dialog = new OptimizeStopsDialog(optimizeStops);
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-
-			dialog.setLegTable( legDataList );
-			dialog.setRoadDirectionTable(roadDirectionDataList);
-			dialog.setStopTable(stopDataList);
-			
-			dialog.addListeners(
-					dialog.new OptimizeActionListener(),
-					dialog.new OptimizeLegSelectionListener()
-					);
-			
-			for (int i = 0; it.hasNext() && i < 5; i++) {
-				String html = toHtml(2, legDataList.get(i), it.next() );
-				if (i==0) try {
-					PrintWriter out = new PrintWriter("report.html");
-					out.println(html);
-					out.close();
-				} catch (Exception x) {
-					x.printStackTrace();
-				}				
-				JPanel panel = new JPanel();
-				dialog.getOutputTabbedPane().addTab(String.format("Case %d", 1+i), null, panel, null);
-				dialog.getOutputTabbedPane().setEnabledAt(i, true);
-				panel.setLayout(new BorderLayout(0, 0));
-				{
-					JTextPane textPane = new JTextPane();
-					textPane.setContentType("text/html");
-					textPane.setText(html);
-					panel.add(textPane);
-				}
-			} // for i
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 	
+	protected class OptimizeStopSelectionListener implements ListSelectionListener {
+
+		@Override
+		public void valueChanged(ListSelectionEvent event) {
+			if (! event.getValueIsAdjusting()) {
+				System.out.println(event);
+				int which = event.getLastIndex();
+			}
+		}
+		
+	}
+
 	private void addListeners(OptimizeActionListener optimizeActionListener,
 			OptimizeLegSelectionListener optimizeLegSelectionListener) {
 		
 		cancelButton.addActionListener(optimizeActionListener);
 		optimizeButton.addActionListener(optimizeActionListener);
 		chooseButton.addActionListener(optimizeActionListener);
+		addAfterButton.addActionListener(optimizeActionListener);
+		addBeforeButton.addActionListener(optimizeActionListener);
 		
 		legTable.getSelectionModel().addListSelectionListener(optimizeLegSelectionListener);
 	}
@@ -512,7 +515,7 @@ public class OptimizeStopsDialog extends JDialog {
 		protected static final double[] widths = {0.05, 0.1, 0.1, 0.25, 0.10, 0.40};
 		protected static final boolean[] centered = {true, true, true, true, true, false};
 		
-		protected List<StopData> data = null;
+		protected ArrayList<StopData> data = null;
 		
 		
 		public StopsTableModel() {
@@ -564,11 +567,11 @@ public class OptimizeStopsDialog extends JDialog {
 			return names[iCol];
 		}
 
-		public List<StopData> getData() {
+		public ArrayList<StopData> getData() {
 			return data;
 		}
 
-		public void setData(List<StopData> data) {
+		public void setData(ArrayList<StopData> data) {
 			this.data = data;
 			fireTableStructureChanged();
 		}
@@ -605,7 +608,7 @@ public class OptimizeStopsDialog extends JDialog {
 		roadTableModel.setData(roadDataList);
 	}
 
-	public void setStopTable( List<StopData> stopDataList ) {
+	public void setStopTable( ArrayList<StopData> stopDataList ) {
 		stopsTableModel.setData(stopDataList);
 	}
 
@@ -685,10 +688,19 @@ public class OptimizeStopsDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
+				addBeforeButton = new JButton("Add Before");
+				addBeforeButton.setActionCommand("Add Before");
+				buttonPane.add(addBeforeButton);
+			}
+			{
+				addAfterButton = new JButton("Add After");
+				addAfterButton.setActionCommand("Add After");
+				buttonPane.add(addAfterButton);
+			}
+			{
 				optimizeButton = new JButton("Optimize");
 				optimizeButton.setActionCommand("Optimize");
 				buttonPane.add(optimizeButton);
-//				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				chooseButton = new JButton("Choose");
@@ -741,4 +753,89 @@ public class OptimizeStopsDialog extends JDialog {
 		return outputTabbedPane;
 	}
 
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		HereRoute hereRoute = null;
+		try {
+			String json = IOUtils.toString(new FileInputStream("route.json"), "UTF-8");
+			hereRoute = (HereRoute) Here2.gson.fromJson(json, HereRoute.class);
+			if (hereRoute == null || hereRoute.getResponse() == null)
+				throw new NullPointerException();
+		} catch (Exception x) {
+			x.printStackTrace();
+			return;
+		}
+		System.out.println(hereRoute.getResponse().getMetaInfo());
+		Set<Route> routes = hereRoute.getResponse().getRoute();
+		Route route = routes.iterator().next();
+
+		EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
+		EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
+		Main.loadPOIMap( poiMap );
+		poiMap.forEach((kind, set) -> {
+			nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(route, 5e3 ));
+		} );
+		
+		
+		OptimizeStops optimizeStops = new OptimizeStops( route, poiMap, nearbyMap );
+		
+		List<LegData> legDataList = optimizeStops.getUiLegData();
+		legDataList.forEach(System.out::println);
+		
+		List<RoadDirectionData> roadDirectionDataList = optimizeStops.getUiRoadData(0);
+		roadDirectionDataList.forEach(System.out::println);
+		
+		ArrayList<StopData> stopDataList = optimizeStops.getUiStopData(2, 0, false, roadDirectionDataList);
+		stopDataList.forEach(System.out::println);
+		
+		Permutations perm = new Permutations( stopDataList.size() );
+		ArrayList<Integer[]> unique = perm.monotonic();
+		Set<DriverAssignments> driverAssignments = new TreeSet<>();
+		for (Integer[] elements : unique) {
+			driverAssignments.add( generateDriverAssignments(2, legDataList.get(0), stopDataList, elements) );
+		}
+		Iterator<DriverAssignments> it = driverAssignments.iterator();
+			
+		try {
+			OptimizeStopsDialog dialog = new OptimizeStopsDialog(optimizeStops);
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
+
+			dialog.setLegTable( legDataList );
+			dialog.setRoadDirectionTable(roadDirectionDataList);
+			dialog.setStopTable(stopDataList);
+			
+			dialog.addListeners(
+					dialog.new OptimizeActionListener(),
+					dialog.new OptimizeLegSelectionListener()
+					);
+			
+			for (int i = 0; it.hasNext() && i < 5; i++) {
+				String html = toHtml(2, legDataList.get(i), it.next() );
+				if (i==0) try {
+					PrintWriter out = new PrintWriter("report.html");
+					out.println(html);
+					out.close();
+				} catch (Exception x) {
+					x.printStackTrace();
+				}				
+				JPanel panel = new JPanel();
+				dialog.getOutputTabbedPane().addTab(String.format("Case %d", 1+i), null, panel, null);
+				dialog.getOutputTabbedPane().setEnabledAt(i, true);
+				panel.setLayout(new BorderLayout(0, 0));
+				{
+					JTextPane textPane = new JTextPane();
+					textPane.setContentType("text/html");
+					textPane.setText(html);
+					panel.add(textPane);
+				}
+			} // for i
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 }

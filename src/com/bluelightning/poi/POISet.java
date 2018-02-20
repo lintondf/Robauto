@@ -50,7 +50,7 @@ public class POISet extends ArrayList<POI> {
 
 		@Override
 		public int compareTo(POIResult that) {
-			return (int) (this.legProgress.distance - that.legProgress.distance);
+			return (int) (this.totalProgress.distance - that.totalProgress.distance);
 		}
 	}
 
@@ -102,20 +102,10 @@ public class POISet extends ArrayList<POI> {
 				neighbors.put(p, result);
 			}
 		}
-//		for (POIResult r : neighbors.values()) {
-//			r.distance = r.poi.distance(r.center);
-//		}
 		return neighbors;
 	}
 
-//	public Map<POI, POIResult> nearBy(List<GeoPosition> list, double rangeMeters) {
-//		HashMap<POI, POIResult> neighbors = new HashMap<POI, POIResult>();
-//		for (int i = 0; i < list.size(); i++) {
-//			GeoPosition p = list.get(i);
-//			neighbors.putAll(nearBy(p, i, rangeMeters));
-//		}
-//		return neighbors;
-//	}
+	
 	public Map<POI, POIResult> nearBy(List<GeoPosition> list, double rangeMeters) {
 		HashMap<POI, POIResult> neighbors = new HashMap<POI, POIResult>();
 		for (int i = 1; i < list.size(); i++) {

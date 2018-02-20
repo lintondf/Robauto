@@ -6,6 +6,7 @@ import java.util.concurrent.ForkJoinPool;
 import javax.swing.JFrame;
 
 import com.bluelightning.poi.POI;
+import com.bluelightning.poi.POISet;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 
@@ -13,6 +14,14 @@ public class Events {
 
 	// System-wide event bus
 	public static EventBus eventBus = new AsyncEventBus(new ForkJoinPool());
+	
+	public static class AddManualStopEvent {
+		POISet.POIResult   result;
+		
+		public AddManualStopEvent( POISet.POIResult result) {
+			this.result = result;
+		}
+	}
 	
 	public static class POIClickEvent {
 		POI   poi;
