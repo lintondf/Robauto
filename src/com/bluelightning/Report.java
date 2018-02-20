@@ -237,7 +237,7 @@ public class Report implements Serializable {
 		lastDay.add(step);
 	}
 
-	public String toHtml(String css) {
+	public String toHtml() {
 		if (theme == null) {
 			theme = new Theme();
 		}
@@ -247,7 +247,10 @@ public class Report implements Serializable {
 			sb.append(day.toHtml());
 		}
 		c.set("body", sb.toString());
-		c.set("styles", css);
+		try {
+			String css = IOUtils.toString(new FileInputStream("themes/style.css"));
+			c.set("styles", css);
+		} catch (Exception x) {}
 		return c.toString();
 	}
 
@@ -281,7 +284,7 @@ public class Report implements Serializable {
 
 		try {
 			PrintWriter out = new PrintWriter("report.html");
-			out.println(report.toHtml(""));
+			out.println(report.toHtml());
 			out.close();
 		} catch (Exception x) {
 			x.printStackTrace();
@@ -451,7 +454,7 @@ public class Report implements Serializable {
 
 		try {
 			PrintWriter out = new PrintWriter("report.html");
-			out.println(report.toHtml(""));
+			out.println(report.toHtml());
 			out.close();
 		} catch (Exception x) {
 			x.printStackTrace();

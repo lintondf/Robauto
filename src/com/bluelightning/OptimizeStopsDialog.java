@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -17,19 +16,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.Document;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
-
+import javax.swing.table.AbstractTableModel;
 import org.apache.commons.io.IOUtils;
 
-import com.bluelightning.OptimizeStopsDialog.DriverAssignments.Assignment;
-import com.bluelightning.OptimizeStopsDialog.LegData;
-import com.bluelightning.OptimizeStopsDialog.RoadDirectionData;
-import com.bluelightning.OptimizeStopsDialog.StopData;
 import com.bluelightning.json.HereRoute;
 import com.bluelightning.json.Route;
-import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.poi.POISet;
 import com.bluelightning.poi.RestAreaPOI;
 import javax.swing.JTabbedPane;
@@ -37,10 +28,18 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import java.awt.GridLayout;
 
 
 public class OptimizeStopsDialog extends JDialog {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static class LegData {
 		public String startLabel;
 		public String endLabel;
@@ -53,12 +52,17 @@ public class OptimizeStopsDialog extends JDialog {
 		}
 	}
 	
-	public static class RoadDirectionData {
+	public static class RoadDirectionData implements Comparable<RoadDirectionData> {
 		public String road;
 		public String direction;
 		
 		public String toString() {
 			return String.format("%s %s", road, direction );
+		}
+
+		@Override
+		public int compareTo(RoadDirectionData that) {
+			return road.compareTo(that.road);
 		}
 	}
 	
@@ -149,6 +153,10 @@ public class OptimizeStopsDialog extends JDialog {
 	private JTable roadsTable;
 	private JTable legTable;
 	private JTable stopsTable;
+	protected JTextPane textPane;
+	protected JTabbedPane outputTabbedPane;
+	protected LegTableModel legTableModel;
+	protected RoadTableModel roadTableModel;
 
 	/**
 	 * Launch the application.
@@ -170,8 +178,6 @@ public class OptimizeStopsDialog extends JDialog {
 
 		EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
 		EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
-		ArrayList<ButtonWaypoint> nearby = new ArrayList<>();
-		
 		POISet pset = RestAreaPOI.factory();
 		poiMap.put(Main.MarkerKinds.RESTAREAS, pset);
 		nearbyMap.put(Main.MarkerKinds.RESTAREAS, pset.getPointsOfInterestAlongRoute(route, 5e3 ));
@@ -194,31 +200,42 @@ public class OptimizeStopsDialog extends JDialog {
 			driverAssignments.add( generateDriverAssignments(2, legDataList.get(0), stopDataList, elements) );
 		}
 		Iterator<DriverAssignments> it = driverAssignments.iterator();
-		
-		String css = "";;
+			
 		try {
-			css = IOUtils.toString(new FileInputStream("themes/style.css"));
-		} catch (Exception x) {}
-
-		String html = toHtml(2, legDataList.get(0), it.next(), css );
-		try {
-			PrintWriter out = new PrintWriter("report.html");
-			out.println(html);
-			out.close();
-		} catch (Exception x) {
-			x.printStackTrace();
-		}
-		
-		try {
-			OptimizeStopsDialog dialog = new OptimizeStopsDialog(html );
+			OptimizeStopsDialog dialog = new OptimizeStopsDialog();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
+
+			dialog.setLegTable( legDataList );
+			dialog.setRoadDirectionTable(roadDirectionDataList);
+			
+			for (int i = 0; it.hasNext() && i < 5; i++) {
+				String html = toHtml(2, legDataList.get(i), it.next() );
+				if (i==0) try {
+					PrintWriter out = new PrintWriter("report.html");
+					out.println(html);
+					out.close();
+				} catch (Exception x) {
+					x.printStackTrace();
+				}				
+				JPanel panel = new JPanel();
+				dialog.getOutputTabbedPane().addTab(String.format("Case %d", i), null, panel, null);
+				dialog.getOutputTabbedPane().setEnabledAt(i, true);
+				panel.setLayout(new BorderLayout(0, 0));
+				{
+					JTextPane textPane = new JTextPane();
+					textPane.setContentType("text/html");
+					textPane.setText(html);
+					panel.add(textPane);
+				}
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	protected static String toHtml( int nDrivers, LegData legData, DriverAssignments driverAssignments, String css ) {
+	protected static String toHtml( int nDrivers, LegData legData, DriverAssignments driverAssignments ) {
 		Report report = new Report();
 		report.depart("", legData.startLabel, 0.0);
 		
@@ -245,7 +262,7 @@ public class OptimizeStopsDialog extends JDialog {
 		
 		report.stop("",	legData.endLabel, 0.0);
 		report.arrive(0.0);
-		return report.toHtml(css);		
+		return report.toHtml();		
 	}
 	
 	protected static double scoreTime( double time ) {
@@ -292,11 +309,145 @@ public class OptimizeStopsDialog extends JDialog {
 		return driverAssignments;
 	}
 
+	protected static class LegTableModel extends AbstractTableModel {
+		
+		private static final long serialVersionUID = 1L;
+		protected static final String[] names = {"Start", "End", "Length (mi)", "Time (hr:mm)"};
+		
+		protected List<LegData> data = null;
+		
+		
+		public LegTableModel() {
+		}
+
+		@Override
+		public int getColumnCount() {
+			return names.length;
+		}
+
+		@Override
+		public int getRowCount() {
+			if (data == null)
+				return 0;
+			return data.size();
+		}
+
+		@Override
+		public Object getValueAt(int iRow, int iCol) {
+			if (data == null || iRow >= data.size())
+				return null;
+			LegData legData = data.get(iRow);
+			switch (iCol) {
+			case 0: 
+				return legData.startLabel;
+			case 1:
+				return legData.endLabel;
+			case 2:
+				return String.format("%5.1f", legData.distance*Here2.METERS_TO_MILES);
+			case 3:
+				return Here2.toPeriod(legData.trafficTime);
+			}
+			return null;
+		}
+
+		@Override
+		public Class<?> getColumnClass(int iCol) {
+			return String.class;
+		}
+
+		@Override
+		public String getColumnName(int iCol) {
+			return names[iCol];
+		}
+
+		public List<LegData> getData() {
+			return data;
+		}
+
+		public void setData(List<LegData> data) {
+			this.data = data;
+			fireTableStructureChanged();
+		}
+		
+	}
+	
+	
+	protected static class RoadTableModel extends AbstractTableModel {
+		
+		private static final long serialVersionUID = 1L;
+		protected static final String[] names = {"Name", "Direction"};
+		
+		protected List<RoadDirectionData> data = null;
+		
+		
+		public RoadTableModel() {
+		}
+
+		@Override
+		public int getColumnCount() {
+			return names.length;
+		}
+
+		@Override
+		public int getRowCount() {
+			if (data == null)
+				return 0;
+			return data.size();
+		}
+
+		@Override
+		public Object getValueAt(int iRow, int iCol) {
+			if (data == null || iRow >= data.size())
+				return null;
+			RoadDirectionData roadData = data.get(iRow);
+			switch (iCol) {
+			case 0: 
+				return roadData.road;
+			case 1:
+				return roadData.direction;
+			}
+			return null;
+		}
+
+		@Override
+		public Class<?> getColumnClass(int iCol) {
+			return String.class;
+		}
+
+		@Override
+		public String getColumnName(int iCol) {
+			return names[iCol];
+		}
+
+		public List<RoadDirectionData> getData() {
+			return data;
+		}
+
+		public void setData(List<RoadDirectionData> data) {
+			this.data = data;
+			fireTableStructureChanged();
+		}
+		
+	}
+	
+	
+	public void setLegTable( List<LegData> legDataList ) {
+		legTableModel.setData(legDataList);
+		if (! legDataList.isEmpty()) {
+		}
+	}
+	
+	public void setRoadDirectionTable( List<RoadDirectionData> roadDataList ) {
+		roadTableModel.setData(roadDataList);
+	}
+
 	/**
 	 * Create the dialog.
 	 */
-	public OptimizeStopsDialog(String html) {
-		setBounds(100, 100, 450, 300);
+	public OptimizeStopsDialog() {
+		legTableModel = new LegTableModel();
+		roadTableModel = new RoadTableModel();
+		setBounds(100, 100, 900, 600);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -311,17 +462,23 @@ public class OptimizeStopsDialog extends JDialog {
 				inputSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 				{
 					JPanel upperPanel = new JPanel();
+					upperPanel.setLayout(new GridLayout(0, 2, 0, 0));
 					inputSplitPane.setLeftComponent(upperPanel);
-					upperPanel.setLayout(new BorderLayout(0, 0));
 					{
-						legTable = new JTable();
+						legTable = new JTable(legTableModel);
+						legTable.setBorder(new LineBorder(Color.BLACK, 1));
 						legTable.setFillsViewportHeight(true);
-						upperPanel.add(legTable);
+						legTable.setVisible(true);
+						JScrollPane scrollPane = new JScrollPane(legTable);
+						upperPanel.add(scrollPane);
 					}
 					{
-						roadsTable = new JTable();
+						roadsTable = new JTable(roadTableModel);
+						roadsTable.setBorder(new LineBorder(Color.BLACK, 1));
 						roadsTable.setFillsViewportHeight(true);
-						upperPanel.add(roadsTable);
+						roadsTable.setVisible(true);
+						JScrollPane scrollPane = new JScrollPane(roadsTable);
+						upperPanel.add(scrollPane);
 					}
 				}
 				{
@@ -343,21 +500,21 @@ public class OptimizeStopsDialog extends JDialog {
 				tabbedPane.addTab("Output", null, outputPanel, null);
 				outputPanel.setLayout(new BorderLayout(0, 0));
 				{
-					JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
-					outputPanel.add(tabbedPane_1, BorderLayout.NORTH);
-					{
-						JPanel panel = new JPanel();
-						tabbedPane_1.addTab("Case 1", null, panel, null);
-						tabbedPane_1.setEnabledAt(0, true);
-						panel.setLayout(new BorderLayout(0, 0));
-						{
-							JTextPane textPane = new JTextPane();
-							textPane.setContentType("text/html");
-							textPane.setText(html);
-							// create a document, set it on the jeditorpane, then add the html
-							panel.add(textPane);
-						}
-					}
+					outputTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+					outputPanel.add(outputTabbedPane, BorderLayout.NORTH);
+//					{
+//						JPanel panel = new JPanel();
+//						outputTabbedPane.addTab("Case 1", null, panel, null);
+//						outputTabbedPane.setEnabledAt(0, true);
+//						panel.setLayout(new BorderLayout(0, 0));
+//						{
+//							textPane = new JTextPane();
+//							textPane.setContentType("text/html");
+//							//textPane.setText(html);
+//							// create a document, set it on the jeditorpane, then add the html
+//							panel.add(textPane);
+//						}
+//					}
 				}
 			}
 		}
@@ -377,6 +534,18 @@ public class OptimizeStopsDialog extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 		}
+	}
+
+	public JTable getRoadsTable() {
+		return roadsTable;
+	}
+
+	public JTable getStopsTable() {
+		return stopsTable;
+	}
+
+	public JTabbedPane getOutputTabbedPane() {
+		return outputTabbedPane;
 	}
 
 }

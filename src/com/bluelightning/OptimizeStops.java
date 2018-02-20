@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.table.AbstractTableModel;
 
 import org.javatuples.Pair;
 
@@ -123,7 +126,7 @@ public class OptimizeStops {
 	
 	public List<RoadDirectionData> getUiRoadData( int iLeg ) {
 		LegSummary summary = legSummary.get(iLeg);
-		ArrayList<RoadDirectionData> dataList = new ArrayList<>();
+		TreeSet<RoadDirectionData> dataList = new TreeSet<>();
 		Pattern regex = Pattern.compile("onto\\s(\\w+)-(\\d+[\\w])\\s(\\w)");
 		for (Maneuver m : summary.leg.getManeuver()) {
 			Matcher matcher = regex.matcher(m.getInstruction());
@@ -141,7 +144,7 @@ public class OptimizeStops {
 //			data.road = restArea.getHighway();
 //			dataList.add(data);
 //		}
-		return dataList;
+		return new ArrayList<>(dataList);
 	}
 	
 	protected boolean filterDirections(StopData data, List<RoadDirectionData> roadDirections) {
@@ -180,41 +183,42 @@ public class OptimizeStops {
 		return dataList;
 	}
 	
-
 	public OptimizeStops(Route route, EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> nearbyMap) {
 		this.route = route;
 		legSummary = generateLegSummaries();
-		legSummary.forEach(System.out::println);
-		ArrayList<POISet.POIResult> restAreas = nearbyMap.get(Main.MarkerKinds.RESTAREAS);
-		legSummary.forEach( ls-> {
-			ls.setNearby(restAreas);
-		});
-		for (Leg leg : route.getLeg()) {
-			System.out.println( leg.getSummary() );
+		
+		
+		//legSummary.forEach(System.out::println);
+//		ArrayList<POISet.POIResult> restAreas = nearbyMap.get(Main.MarkerKinds.RESTAREAS);
+//		legSummary.forEach( ls-> {
+//			ls.setNearby(restAreas);
+//		});
+//		for (Leg leg : route.getLeg()) {
+//			System.out.println( leg.getSummary() );
 //			System.out.printf("%d Maneuvers\n", leg.getManeuver().size() );
 //			for (Maneuver m : leg.getManeuver()) {
 //				if (m.getId().equalsIgnoreCase("M91"))
 //					System.out.println(m.getId());
 //			}
-			double totalTime = leg.getTrafficTime();
-			double totalTimePerDriver = totalTime / nDrivers;
-			double nDrives = Math.floor( totalTimePerDriver / minDrive);
-			double mDrives = Math.ceil( totalTimePerDriver / maxDrive);
-			double driveTimePerDriver = totalTimePerDriver / mDrives;
-			if (totalTime <= minDrive) {
-				System.out.println("One drive of " + Here2.toPeriod(totalTime) );
-			}
-			if (totalTimePerDriver < maxDrive) {
-				System.out.println("Two drives of " + Here2.toPeriod(totalTimePerDriver) );				
-			} else {
-				System.out.println( Here2.toPeriod(totalTimePerDriver) + " per driver");
-				System.out.printf("%f %f drives\n", nDrives, mDrives );
-			}
-			
-			
-			double nextTime = driveTimePerDriver;
-			System.out.println( Here2.toPeriod(nextTime) );
-			
+//			double totalTime = leg.getTrafficTime();
+//			double totalTimePerDriver = totalTime / nDrivers;
+//			double nDrives = Math.floor( totalTimePerDriver / minDrive);
+//			double mDrives = Math.ceil( totalTimePerDriver / maxDrive);
+//			double driveTimePerDriver = totalTimePerDriver / mDrives;
+//			if (totalTime <= minDrive) {
+//				System.out.println("One drive of " + Here2.toPeriod(totalTime) );
+//			}
+//			if (totalTimePerDriver < maxDrive) {
+//				System.out.println("Two drives of " + Here2.toPeriod(totalTimePerDriver) );				
+//			} else {
+//				System.out.println( Here2.toPeriod(totalTimePerDriver) + " per driver");
+//				System.out.printf("%f %f drives\n", nDrives, mDrives );
+//			}
+//			
+//			
+//			double nextTime = driveTimePerDriver;
+//			System.out.println( Here2.toPeriod(nextTime) );
+//			
 //			for (POISet.POIResult restArea : restAreas) {
 ////				if (restArea.totalProgress.trafficTime > totalTime)
 ////					break;
@@ -229,7 +233,7 @@ public class OptimizeStops {
 ////				}
 //			}
 ////			break;
-		}
+//		}
 	}
 
 	/**
@@ -239,5 +243,6 @@ public class OptimizeStops {
 		// TODO Auto-generated method stub
 
 	}
+
 
 }
