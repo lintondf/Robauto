@@ -205,7 +205,7 @@ public class OptimizeStopsDialog extends JDialog {
 		public void valueChanged(ListSelectionEvent event) {
 			if (! event.getValueIsAdjusting()) {
 				System.out.println(event);
-				int which = event.getFirstIndex();
+				int which = event.getLastIndex();
 				List<RoadDirectionData> roadDirectionDataList = optimizeStops.getUiRoadData(which);
 				roadDirectionDataList.forEach(System.out::println);
 				List<StopData> stopDataList = optimizeStops.getUiStopData(2, which, false, roadDirectionDataList);

@@ -151,7 +151,7 @@ public class OptimizeStops {
 				return data.direction.startsWith( road.direction.substring(0, 1));
 			}
 		}
-		return false;
+		return true;
 	}
 
 	public List<StopData> getUiStopData( int nDrivers, int iLeg, boolean includeTruckAreas, List<RoadDirectionData> roadDirections ) {
@@ -165,8 +165,8 @@ public class OptimizeStops {
 			data.road = restArea.getHighway();
 			data.state = restArea.getState();
 			data.mileMarker = restArea.getMileMarker();
-			data.distance = r.totalProgress.distance;
-			data.trafficTime = r.totalProgress.trafficTime;
+			data.distance = r.legProgress.distance;
+			data.trafficTime = r.legProgress.trafficTime;
 			data.name = restArea.getName();
 			//data.driveTimes = new Double[nDrivers];
 			if (!includeTruckAreas && data.name.toUpperCase().contains("TRUCK"))
