@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -38,6 +39,7 @@ import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -191,13 +193,16 @@ public class OptimizeStopsDialog extends JDialog {
 	protected JButton addBeforeButton;
 	protected JButton addAfterButton;
 	protected CallbackHandler handler;
+	protected int currentLeg;
 	
 	public class CallbackHandler {
 		
+		int iLeg;
 		boolean addBefore;
 		int iRow;
 		
-		public CallbackHandler( boolean addBefore, int iRow ) {
+		public CallbackHandler( int iLeg, boolean addBefore, int iRow ) {
+			this.iLeg = iLeg;
 			this.addBefore = addBefore;
 			this.iRow = iRow;
 		}
@@ -207,6 +212,28 @@ public class OptimizeStopsDialog extends JDialog {
 			System.out.println( addBefore + " " + iRow + " " + event.result.toReport() );
 			Events.eventBus.unregister(this); // one shot
 			handler = null;
+			SwingUtilities.invokeLater( new Runnable() {
+				@Override
+				public void run() {
+					StopData data = new StopData();
+					data.use = true;
+					data.direction = "";
+					data.road = event.result.poi.getAddress();
+					data.state = "";
+					data.mileMarker = "";
+					data.distance = event.result.legProgress.distance;
+					data.trafficTime = event.result.legProgress.trafficTime;
+					data.totalDistance = event.result.totalProgress.distance;
+					data.name = event.result.poi.getName();
+					ArrayList<StopData> dataList = stopsTableModel.getData();
+					if (addBefore) {
+						dataList.add(iRow, data);
+					} else {
+						dataList.add(iRow+1, data);
+					}
+					stopsTableModel.setData(dataList);
+				}
+			});
 		}
 	}
 	
@@ -215,7 +242,7 @@ public class OptimizeStopsDialog extends JDialog {
 		if (selected < 0)
 			return;
 		if (selected < stopsTableModel.getRowCount()-1) { // cant add after last row
-			handler = new CallbackHandler( false, selected);
+			handler = new CallbackHandler( currentLeg, false, selected);
 			double distance0 = stopsTableModel.getData().get(selected).totalDistance;
 			double distance1 = stopsTableModel.getData().get(selected+1).totalDistance;
 			add( handler, distance0, distance1 );
@@ -231,7 +258,7 @@ public class OptimizeStopsDialog extends JDialog {
 		if (selected > 0) {
 			distance0 = stopsTableModel.getData().get(selected-1).totalDistance;
 		}
-		handler = new CallbackHandler( true, selected);
+		handler = new CallbackHandler( currentLeg, true, selected);
 		add( handler, distance0, distance1 );
 	}
 	
@@ -247,6 +274,35 @@ public class OptimizeStopsDialog extends JDialog {
 			Events.eventBus.register( handler );
 	}
 	
+	protected void optimizeStops() {
+		while (outputTabbedPane.getTabCount() > 0) {
+			outputTabbedPane.removeTabAt(0);
+		}
+		ArrayList<StopData> stopDataList = stopsTableModel.getData();
+		Permutations perm = new Permutations( stopDataList.size() );
+		ArrayList<Integer[]> unique = perm.monotonic();
+		Set<DriverAssignments> driverAssignments = new TreeSet<>();
+		LegData legData = legTableModel.getData().get(currentLeg);
+		for (Integer[] elements : unique) {
+			driverAssignments.add( generateDriverAssignments(2, legData, stopDataList, elements) );
+		}
+		Iterator<DriverAssignments> it = driverAssignments.iterator();
+		
+		for (int i = 0; it.hasNext() && i < 5; i++) {
+			String html = toHtml(2, legData, it.next() );
+			JPanel panel = new JPanel();
+			getOutputTabbedPane().addTab(String.format("Case %d", 1+i), null, panel, null);
+			getOutputTabbedPane().setEnabledAt(i, true);
+			panel.setLayout(new BorderLayout(0, 0));
+			{
+				JTextPane textPane = new JTextPane();
+				textPane.setContentType("text/html");
+				textPane.setText(html);
+				panel.add(textPane);
+			}
+		} // for i
+	}
+	
 	protected class OptimizeActionListener implements ActionListener {
 
 		@Override
@@ -254,8 +310,10 @@ public class OptimizeStopsDialog extends JDialog {
 			System.out.println(event);
 			switch (event.getActionCommand()) {
 			case "Cancel":
-				Events.eventBus.unregister(handler);
-				handler = null;
+				if (handler != null) {
+					Events.eventBus.unregister(handler);
+					handler = null;
+				}
 				OptimizeStopsDialog.this.dispose();
 				break;
 			case "Add Before":
@@ -263,6 +321,14 @@ public class OptimizeStopsDialog extends JDialog {
 				break;
 			case "Add After":
 				addAfter();
+				break;
+			case "Optimize":
+				SwingUtilities.invokeLater( new Runnable() {
+					@Override
+					public void run() {
+						optimizeStops();
+					}
+				});
 				break;
 			default:
 				break;
@@ -277,10 +343,10 @@ public class OptimizeStopsDialog extends JDialog {
 		public void valueChanged(ListSelectionEvent event) {
 			if (! event.getValueIsAdjusting()) {
 				System.out.println(event);
-				int which = event.getLastIndex();
-				List<RoadDirectionData> roadDirectionDataList = optimizeStops.getUiRoadData(which);
+				currentLeg = event.getLastIndex();
+				List<RoadDirectionData> roadDirectionDataList = optimizeStops.getUiRoadData(currentLeg);
 				roadDirectionDataList.forEach(System.out::println);
-				ArrayList<StopData> stopDataList = optimizeStops.getUiStopData(2, which, false, roadDirectionDataList);
+				ArrayList<StopData> stopDataList = optimizeStops.getUiStopData(2, currentLeg, false, roadDirectionDataList);
 				stopDataList.forEach(System.out::println);
 				
 				setRoadDirectionTable(roadDirectionDataList);
@@ -813,7 +879,7 @@ public class OptimizeStopsDialog extends JDialog {
 					);
 			
 			for (int i = 0; it.hasNext() && i < 5; i++) {
-				String html = toHtml(2, legDataList.get(i), it.next() );
+				String html = toHtml(2, legDataList.get(0), it.next() );
 				if (i==0) try {
 					PrintWriter out = new PrintWriter("report.html");
 					out.println(html);
