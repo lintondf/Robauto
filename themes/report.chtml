@@ -5,7 +5,11 @@
 <meta charset="ISO-8859-1">
 <title>Robauto Trip Plan</title>
 <style>
+{$styles}
             .bpTable {
+                font-size: 14px;
+                font-family: Arial;
+                font-weight: normal;
                 margin: 0px;
                 padding: 0px;
                 width: 100%;
@@ -67,7 +71,7 @@
                 text-align: left;
                 padding: 3px;
                 font-size: 14px;
-                font-family: Courier;
+                font-family: Arial;
                 font-weight: normal;
                 color: #000000;
             }

@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.apache.commons.io.IOUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.maps.model.LatLng;
@@ -235,7 +237,7 @@ public class Report implements Serializable {
 		lastDay.add(step);
 	}
 
-	public String toHtml() {
+	public String toHtml(String css) {
 		if (theme == null) {
 			theme = new Theme();
 		}
@@ -245,6 +247,7 @@ public class Report implements Serializable {
 			sb.append(day.toHtml());
 		}
 		c.set("body", sb.toString());
+		c.set("styles", css);
 		return c.toString();
 	}
 
@@ -278,7 +281,7 @@ public class Report implements Serializable {
 
 		try {
 			PrintWriter out = new PrintWriter("report.html");
-			out.println(report.toHtml());
+			out.println(report.toHtml(""));
 			out.close();
 		} catch (Exception x) {
 			x.printStackTrace();
@@ -448,7 +451,7 @@ public class Report implements Serializable {
 
 		try {
 			PrintWriter out = new PrintWriter("report.html");
-			out.println(report.toHtml());
+			out.println(report.toHtml(""));
 			out.close();
 		} catch (Exception x) {
 			x.printStackTrace();

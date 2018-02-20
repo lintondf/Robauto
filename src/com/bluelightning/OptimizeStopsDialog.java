@@ -17,6 +17,9 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 import org.apache.commons.io.IOUtils;
 
@@ -192,7 +195,12 @@ public class OptimizeStopsDialog extends JDialog {
 		}
 		Iterator<DriverAssignments> it = driverAssignments.iterator();
 		
-		String html = toHtml(2, legDataList.get(0), it.next() );
+		String css = "";;
+		try {
+			css = IOUtils.toString(new FileInputStream("themes/style.css"));
+		} catch (Exception x) {}
+
+		String html = toHtml(2, legDataList.get(0), it.next(), css );
 		try {
 			PrintWriter out = new PrintWriter("report.html");
 			out.println(html);
@@ -201,9 +209,8 @@ public class OptimizeStopsDialog extends JDialog {
 			x.printStackTrace();
 		}
 		
-
 		try {
-			OptimizeStopsDialog dialog = new OptimizeStopsDialog(html);
+			OptimizeStopsDialog dialog = new OptimizeStopsDialog(html );
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -211,7 +218,7 @@ public class OptimizeStopsDialog extends JDialog {
 		}
 	}
 	
-	protected static String toHtml( int nDrivers, LegData legData, DriverAssignments driverAssignments ) {
+	protected static String toHtml( int nDrivers, LegData legData, DriverAssignments driverAssignments, String css ) {
 		Report report = new Report();
 		report.depart("", legData.startLabel, 0.0);
 		
@@ -238,7 +245,7 @@ public class OptimizeStopsDialog extends JDialog {
 		
 		report.stop("",	legData.endLabel, 0.0);
 		report.arrive(0.0);
-		return report.toHtml();		
+		return report.toHtml(css);		
 	}
 	
 	protected static double scoreTime( double time ) {
@@ -347,6 +354,7 @@ public class OptimizeStopsDialog extends JDialog {
 							JTextPane textPane = new JTextPane();
 							textPane.setContentType("text/html");
 							textPane.setText(html);
+							// create a document, set it on the jeditorpane, then add the html
 							panel.add(textPane);
 						}
 					}
