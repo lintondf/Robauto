@@ -41,10 +41,13 @@ import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -183,7 +186,7 @@ public class OptimizeStopsDialog extends JDialog {
 	private JTable legTable;
 	private JTable stopsTable;
 	protected JTextPane textPane;
-	protected JTabbedPane outputTabbedPane;
+	protected JTabbedPane choicesTabbedPane;
 	protected LegTableModel legTableModel;
 	protected RoadTableModel roadTableModel;
 	protected StopsTableModel stopsTableModel;
@@ -193,7 +196,9 @@ public class OptimizeStopsDialog extends JDialog {
 	protected JButton addBeforeButton;
 	protected JButton addAfterButton;
 	protected CallbackHandler handler;
-	protected int currentLeg;
+	protected int currentLeg = -1;
+	protected ArrayList< ArrayList<StopData> > legStopData = new ArrayList<>();   // holds potentially modified leg stop data
+	protected JTabbedPane outputTabbedPane;
 	
 	public class CallbackHandler {
 		
@@ -275,8 +280,8 @@ public class OptimizeStopsDialog extends JDialog {
 	}
 	
 	protected void optimizeStops() {
-		while (outputTabbedPane.getTabCount() > 0) {
-			outputTabbedPane.removeTabAt(0);
+		while (choicesTabbedPane.getTabCount() > 0) {
+			choicesTabbedPane.removeTabAt(0);
 		}
 		ArrayList<StopData> stopDataList = stopsTableModel.getData();
 		Permutations perm = new Permutations( stopDataList.size() );
@@ -301,6 +306,24 @@ public class OptimizeStopsDialog extends JDialog {
 				panel.add(textPane);
 			}
 		} // for i
+	}
+	
+	protected void commitStops() {
+		for (ArrayList<StopData> stopList : legStopData ) {
+			stopList.forEach( System.out::println );
+		}
+	}
+	
+	protected void chooseCurrentTab() {
+		// TODO not this way; build output tab from saved data for all legs; need StopData constructors
+		int selected = choicesTabbedPane.getSelectedIndex();
+		if (selected >= 0) {
+			Component component = choicesTabbedPane.getTabComponentAt(selected);
+			System.out.println( component );
+			JTextPane pane = (JTextPane) component;
+			choicesTabbedPane.removeTabAt(selected);
+			outputTabbedPane.addTab(String.format("Leg %d", currentLeg), pane);
+		}
 	}
 	
 	protected class OptimizeActionListener implements ActionListener {
@@ -330,6 +353,15 @@ public class OptimizeStopsDialog extends JDialog {
 					}
 				});
 				break;
+			case "Choose":
+				SwingUtilities.invokeLater( new Runnable() {
+					@Override
+					public void run() {
+						chooseCurrentTab();
+						//commitStops();
+					}
+				});
+				break;
 			default:
 				break;
 			}
@@ -343,14 +375,20 @@ public class OptimizeStopsDialog extends JDialog {
 		public void valueChanged(ListSelectionEvent event) {
 			if (! event.getValueIsAdjusting()) {
 				System.out.println(event);
+				if (currentLeg >= 0) {
+					legStopData.set(currentLeg, getStopTable() );
+				}
 				currentLeg = event.getLastIndex();
 				List<RoadDirectionData> roadDirectionDataList = optimizeStops.getUiRoadData(currentLeg);
 				roadDirectionDataList.forEach(System.out::println);
-				ArrayList<StopData> stopDataList = optimizeStops.getUiStopData(2, currentLeg, false, roadDirectionDataList);
-				stopDataList.forEach(System.out::println);
-				
 				setRoadDirectionTable(roadDirectionDataList);
-				setStopTable(stopDataList);				
+				if (legStopData.get(currentLeg) == null) {
+					ArrayList<StopData> stopDataList = optimizeStops.getUiStopData(2, currentLeg, false, roadDirectionDataList);
+					stopDataList.forEach(System.out::println);
+					setStopTable(stopDataList);
+				} else {
+					setStopTable( legStopData.get(currentLeg) );
+				}
 			}
 		}
 		
@@ -663,10 +701,10 @@ public class OptimizeStopsDialog extends JDialog {
 		
 	}
 	
-	
 	public void setLegTable( List<LegData> legDataList ) {
 		legTableModel.setData(legDataList);
-		if (! legDataList.isEmpty()) {
+		for (int i = 0; i < legDataList.size(); i++) {
+			legStopData.add(null);
 		}
 	}
 	
@@ -676,6 +714,10 @@ public class OptimizeStopsDialog extends JDialog {
 
 	public void setStopTable( ArrayList<StopData> stopDataList ) {
 		stopsTableModel.setData(stopDataList);
+	}
+	
+	public ArrayList<StopData> getStopTable() {
+		return stopsTableModel.getData();
 	}
 
 	/**
@@ -740,6 +782,19 @@ public class OptimizeStopsDialog extends JDialog {
 				}
 			}
 			{
+				JPanel choicesPanel = new JPanel();
+				tabbedPane.addTab("Choices", null, choicesPanel, null);
+				choicesPanel.setLayout(new BorderLayout(0, 0));
+				{
+					choicesTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+					choicesPanel.add(choicesTabbedPane, BorderLayout.NORTH);
+					choicesTabbedPane.addChangeListener( new ChangeListener() {
+						@Override
+						public void stateChanged(ChangeEvent event) {
+							System.out.println(choicesTabbedPane.getSelectedIndex());
+						}
+					});
+				}
 				JPanel outputPanel = new JPanel();
 				tabbedPane.addTab("Output", null, outputPanel, null);
 				outputPanel.setLayout(new BorderLayout(0, 0));
@@ -816,7 +871,7 @@ public class OptimizeStopsDialog extends JDialog {
 	}
 
 	public JTabbedPane getOutputTabbedPane() {
-		return outputTabbedPane;
+		return choicesTabbedPane;
 	}
 
 	/**
