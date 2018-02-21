@@ -15,8 +15,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import com.bluelightning.OptimizeStopsDialog.StopData;
-import com.bluelightning.poi.POISet;
-import com.bluelightning.poi.POISet.POIResult;
+import com.bluelightning.poi.POIResult;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -35,7 +34,7 @@ public class AddManualStopDialog extends JDialog {
 		protected static final double[] widths = {0.10, 0.10, 0.40, 0.40};
 		protected static final boolean[] centered = {true, true, true, true};
 		
-		protected ArrayList<POISet.POIResult> data = null;
+		protected ArrayList<POIResult> data = null;
 		
 		
 		public ChoiceTableModel() {
@@ -57,7 +56,7 @@ public class AddManualStopDialog extends JDialog {
 		public Object getValueAt(int iRow, int iCol) {
 			if (data == null || iRow >= data.size())
 				return null;
-			POISet.POIResult result = data.get(iRow);
+			POIResult result = data.get(iRow);
 			switch (iCol) {
 			case 0: 
 				return String.format("%5.1f", result.legProgress.distance*Here2.METERS_TO_MILES);
@@ -81,11 +80,11 @@ public class AddManualStopDialog extends JDialog {
 			return names[iCol];
 		}
 
-		public ArrayList<POISet.POIResult> getData() {
+		public ArrayList<POIResult> getData() {
 			return data;
 		}
 
-		public void setData(ArrayList<POISet.POIResult> data) {
+		public void setData(ArrayList<POIResult> data) {
 			this.data = data;
 			fireTableStructureChanged();
 		}
@@ -111,7 +110,7 @@ public class AddManualStopDialog extends JDialog {
 		
 	}
 	
-	public void setData(ArrayList<POISet.POIResult> data) {
+	public void setData(ArrayList<POIResult> data) {
 		choiceTableModel.setData(data);
 	}
 	

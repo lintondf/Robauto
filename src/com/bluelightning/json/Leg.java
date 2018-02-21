@@ -11,7 +11,7 @@ import java.util.Set;
 
 import com.bluelightning.PostProcessingEnabler;
 import com.bluelightning.json.Leg.CumulativeTravel;
-import com.bluelightning.poi.POISet.POIResult;
+import com.bluelightning.poi.POIResult;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

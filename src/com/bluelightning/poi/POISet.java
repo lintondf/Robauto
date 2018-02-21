@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
-import com.bluelightning.Here2;
 import com.bluelightning.json.BoundingBox;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
@@ -26,33 +25,6 @@ public class POISet extends ArrayList<POI> {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	public static class POIResult implements Comparable<POIResult> {
-		public POI poi;
-		public GlobalCoordinates center;
-		public double distance;
-		public Maneuver maneuver;
-		public int index;
-		public CumulativeTravel legProgress;
-		public CumulativeTravel totalProgress;
-
-		public String toReport() {
-			return String.format("%6.1f mi %5s / %5.1f mi %5s: %4.1f mi: %s",
-					totalProgress.distance / (0.3048 * 5280.0), Here2.toPeriod(totalProgress.trafficTime),
-					legProgress.distance / (0.3048 * 5280.0), Here2.toPeriod(legProgress.trafficTime),
-					distance / (0.3048 * 5280.0), poi.toString());
-		}
-
-		public String toString() {
-			return String.format("POIResult: (%10.6f, %10.6f) away: %8.0f; %s; %s @ %d", center.getLatitude(),
-					center.getLongitude(), distance, "" + poi, "" + maneuver, index);
-		}
-
-		@Override
-		public int compareTo(POIResult that) {
-			return (int) (this.totalProgress.distance - that.totalProgress.distance);
-		}
-	}
 
 	public Map<POI, POIResult> nearBy(GeoPosition position, int i, double rangeMeters) {
 		HashMap<POI, POIResult> neighbors = new HashMap<POI, POIResult>();
@@ -153,18 +125,18 @@ public class POISet extends ArrayList<POI> {
 		return trim;
 	}
 
-	public ArrayList<POISet.POIResult> getPointsOfInterestAlongRoute(Route route, double radiusMeters) {
+	public ArrayList<POIResult> getPointsOfInterestAlongRoute(Route route, double radiusMeters) {
 		POISet pset = filter(route.getBoundingBox());
-		ArrayList<POISet.POIResult> output = new ArrayList<>();
+		ArrayList<POIResult> output = new ArrayList<>();
 		CumulativeTravel totalProgress = new CumulativeTravel();
 		for (Leg leg : route.getLeg()) {
-			Map<POI, POISet.POIResult> nearby = pset.nearBy(leg, totalProgress, radiusMeters);
-			ArrayList<POISet.POIResult> byManeuver = new ArrayList<POISet.POIResult>();
-			for (Entry<POI, POISet.POIResult> e : nearby.entrySet()) {
+			Map<POI, POIResult> nearby = pset.nearBy(leg, totalProgress, radiusMeters);
+			ArrayList<POIResult> byManeuver = new ArrayList<POIResult>();
+			for (Entry<POI, POIResult> e : nearby.entrySet()) {
 				byManeuver.add(e.getValue());
 			}
 			Collections.sort(byManeuver);
-			for (POISet.POIResult r : byManeuver) {
+			for (POIResult r : byManeuver) {
 //				double angle = r.maneuver.getShapeHeadings().get(r.index);
 //				String heading = Here2.angle2Direction(angle);
 //				String[] fields = r.poi.getName().split(",");

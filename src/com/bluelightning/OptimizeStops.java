@@ -24,8 +24,8 @@ import com.bluelightning.OptimizeStopsDialog.StopData;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.Route;
+import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
-import com.bluelightning.poi.POISet.POIResult;
 import com.bluelightning.poi.RestAreaPOI;
 
 /**
@@ -71,7 +71,7 @@ public class OptimizeStops {
 		public Leg   leg;
 		public LegPoint  start;
 		public LegPoint  finish;
-		public ArrayList<POISet.POIResult> nearby = new ArrayList<>();
+		public ArrayList<POIResult> nearby = new ArrayList<>();
 		
 		public LegSummary( Leg leg, LegPoint start, LegPoint finish) {
 			this.leg = leg;
@@ -79,8 +79,8 @@ public class OptimizeStops {
 			this.finish = finish;
 		}
 		
-		public void setNearby( ArrayList<POISet.POIResult> all ) {
-			for (POISet.POIResult r : all) {
+		public void setNearby( ArrayList<POIResult> all ) {
+			for (POIResult r : all) {
 				if (r.totalProgress.distance >= start.distance && r.totalProgress.distance < finish.distance) {
 					nearby.add(r);
 				}
@@ -160,47 +160,27 @@ public class OptimizeStops {
 	public ArrayList<StopData> getUiStopData( int nDrivers, int iLeg, boolean includeTruckAreas, List<RoadDirectionData> roadDirections ) {
 		LegSummary summary = legSummary.get(iLeg);
 		ArrayList<StopData> dataList = new ArrayList<>();
-		for (POISet.POIResult r : summary.nearby) {
-			RestAreaPOI restArea = (RestAreaPOI) r.poi;
-			StopData data = new StopData();
-			data.use = true;
-			data.direction = restArea.getDirection();
-			data.road = restArea.getHighway();
-			data.state = restArea.getState();
-			data.mileMarker = restArea.getMileMarker();
-			data.distance = r.legProgress.distance;
-			data.trafficTime = r.legProgress.trafficTime;
-			data.totalDistance = r.totalProgress.distance;
-			data.name = restArea.getName();
-			//data.driveTimes = new Double[nDrivers];
+		for (POIResult r : summary.nearby) {
+			StopData data = new StopData(r);
 			if (!includeTruckAreas && data.name.toUpperCase().contains("TRUCK"))
 				continue;
 			if (filterDirections(data, roadDirections)) {
 				dataList.add(data);
 			}
 		}
-		StopData data = new StopData();
-		data.use = null;
-		data.direction = "";
-		data.road = "ARRIVE";
-		data.state = "";
-		data.mileMarker = "";
-		data.distance = summary.leg.getLength();
-		data.trafficTime = summary.leg.getTrafficTime();
-		data.totalDistance = summary.finish.distance;
-		data.name = "";
+		StopData data = new StopData(summary);
 		dataList.add(data);
 		return dataList;
 	}
 	
-	public ArrayList<POISet.POIResult> getRouteSegmentPOI(Double start, Double finish) {
-		ArrayList<POISet.POIResult> resultList = new ArrayList<>();
+	public ArrayList<POIResult> getRouteSegmentPOI(Double start, Double finish) {
+		ArrayList<POIResult> resultList = new ArrayList<>();
 		poiMap.forEach( (kind, pset) -> {
 			resultList.addAll( pset.getPointsOfInterestAlongRoute( route, 5e3 ) );
 		});
-		Iterator<POISet.POIResult> it = resultList.iterator();
+		Iterator<POIResult> it = resultList.iterator();
 		while (it.hasNext()) {
-			POISet.POIResult result = it.next();
+			POIResult result = it.next();
 			if (result.totalProgress.distance < start || result.totalProgress.distance > finish) {
 				it.remove();
 			}
@@ -209,11 +189,11 @@ public class OptimizeStops {
 	}
 
 
-	public OptimizeStops(Route route, EnumMap<MarkerKinds, POISet> poiMap, EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> nearbyMap) {
+	public OptimizeStops(Route route, EnumMap<MarkerKinds, POISet> poiMap, EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap) {
 		this.route = route;
 		this.poiMap = poiMap;
 		legSummary = generateLegSummaries();
-		ArrayList<POISet.POIResult> restAreas = nearbyMap.get(Main.MarkerKinds.RESTAREAS);
+		ArrayList<POIResult> restAreas = nearbyMap.get(Main.MarkerKinds.RESTAREAS);
 		legSummary.forEach( ls-> {
 			ls.setNearby(restAreas);
 		});

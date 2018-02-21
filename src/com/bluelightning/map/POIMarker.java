@@ -19,7 +19,7 @@ import org.jxmapviewer.viewer.Waypoint;
 import com.bluelightning.Events;
 import com.bluelightning.LatLon;
 import com.bluelightning.poi.POI;
-import com.bluelightning.poi.POISet;
+import com.bluelightning.poi.POIResult;
 
 /**
  * @author NOOK
@@ -27,9 +27,9 @@ import com.bluelightning.poi.POISet;
  */
 public class POIMarker extends ButtonWaypoint {
 
-	POISet.POIResult result;
+	POIResult result;
 	
-	public POIMarker(POISet.POIResult result) {
+	public POIMarker(POIResult result) {
 		super( new ImageIcon(result.poi.getImage()), 
 				new GeoPosition(result.poi.getLatitude(), result.poi.getLongitude() ));
 		this.result = result;
@@ -44,11 +44,11 @@ public class POIMarker extends ButtonWaypoint {
 		return result.poi;
 	}
 	
-	public POISet.POIResult getPOIResult() {
+	public POIResult getPOIResult() {
 		return result;
 	}
 
-	public static List<POIMarker> factory( List<POISet.POIResult> in) {
+	public static List<POIMarker> factory( List<POIResult> in) {
 		ArrayList<POIMarker> out = new ArrayList<>();
 		in.forEach( r -> { 
 			out.add(new POIMarker(r)); 

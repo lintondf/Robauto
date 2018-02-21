@@ -26,9 +26,9 @@ import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.ControlPanel;
 import com.bluelightning.map.POIMarker;
+import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
 import com.bluelightning.poi.RestAreaPOI;
-import com.bluelightning.poi.POISet.POIResult;
 import com.bluelightning.poi.SamsClubPOI;
 import com.bluelightning.poi.TruckStopPOI;
 import com.bluelightning.poi.WalmartPOI;
@@ -45,7 +45,7 @@ public class Main {
 	protected ControlPanel controlPanel;
 	protected Route route;
 	protected EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
-	protected EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
+	protected EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
 	protected ArrayList<ButtonWaypoint> nearby = new ArrayList<>();
 	protected MainPanel mainPanel;
 	protected WebBrowser browserCanvas;
@@ -162,7 +162,7 @@ public class Main {
 		Main main = new Main();
 	}
 
-	public EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> getNearbyMap() {
+	public EnumMap<Main.MarkerKinds, ArrayList<POIResult>> getNearbyMap() {
 		return nearbyMap;
 	}
 

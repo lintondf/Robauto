@@ -45,7 +45,6 @@ import com.bluelightning.map.StopMarker.Kind;
 import com.bluelightning.map.SwingMarker;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.ButtonWaypointOverlayPainter;
-import com.bluelightning.poi.POISet.POIResult;
 
 
 /**

@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
@@ -27,10 +28,12 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.Events.AddManualStopEvent;
 import com.bluelightning.Events.UiEvent;
+import com.bluelightning.OptimizeStops.LegSummary;
+import com.bluelightning.OptimizeStopsDialog.StopData;
 import com.bluelightning.json.HereRoute;
 import com.bluelightning.json.Route;
+import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
-import com.bluelightning.poi.POISet.POIResult;
 import com.google.common.eventbus.Subscribe;
 import com.bluelightning.poi.RestAreaPOI;
 import javax.swing.JTabbedPane;
@@ -101,6 +104,54 @@ public class OptimizeStopsDialog extends JDialog {
 		public String   name;
 		public Double[] driveTimes;
 		
+//		public StopData() {
+//		}
+//
+		public StopData(LegData legData) {
+			this.use = null;
+			this.direction = "";
+			this.road = "";
+			this.state = "";
+			this.mileMarker = "";
+			this.distance = legData.distance;
+			this.trafficTime = legData.trafficTime;	
+			this.totalDistance = this.distance;
+		}
+
+		public StopData(POIResult result) {
+			this.use = true;
+			this.distance = result.legProgress.distance;
+			this.trafficTime = result.legProgress.trafficTime;
+			this.totalDistance = result.totalProgress.distance;
+			if (result.poi instanceof RestAreaPOI) {
+				RestAreaPOI restArea = (RestAreaPOI) result.poi;
+				this.direction = restArea.getDirection();
+				this.road = restArea.getHighway();
+				this.state = restArea.getState();
+				this.mileMarker = restArea.getMileMarker();
+				this.name = restArea.getName();
+			} else {
+				this.direction = "";
+				this.road = result.poi.getAddress();
+				this.state = "";
+				this.mileMarker = "";
+				this.name = result.poi.getName();
+			}
+		}
+
+
+		public StopData(LegSummary summary) {
+			this.use = null;
+			this.direction = "";
+			this.road = "ARRIVE";
+			this.state = "";
+			this.mileMarker = "";
+			this.distance = summary.leg.getLength();
+			this.trafficTime = summary.leg.getTrafficTime();
+			this.totalDistance = summary.finish.distance;
+			this.name = "";
+		}
+
 		public String toString() {
 			StringBuffer sb = new StringBuffer();
 			if (use != null) {
@@ -199,6 +250,7 @@ public class OptimizeStopsDialog extends JDialog {
 	protected int currentLeg = -1;
 	protected ArrayList< ArrayList<StopData> > legStopData = new ArrayList<>();   // holds potentially modified leg stop data
 	protected JTabbedPane outputTabbedPane;
+	protected ArrayList<DriverAssignments> driverAssignments;
 	
 	public class CallbackHandler {
 		
@@ -220,16 +272,7 @@ public class OptimizeStopsDialog extends JDialog {
 			SwingUtilities.invokeLater( new Runnable() {
 				@Override
 				public void run() {
-					StopData data = new StopData();
-					data.use = true;
-					data.direction = "";
-					data.road = event.result.poi.getAddress();
-					data.state = "";
-					data.mileMarker = "";
-					data.distance = event.result.legProgress.distance;
-					data.trafficTime = event.result.legProgress.trafficTime;
-					data.totalDistance = event.result.totalProgress.distance;
-					data.name = event.result.poi.getName();
+					StopData data = new StopData(event.result);
 					ArrayList<StopData> dataList = stopsTableModel.getData();
 					if (addBefore) {
 						dataList.add(iRow, data);
@@ -286,11 +329,12 @@ public class OptimizeStopsDialog extends JDialog {
 		ArrayList<StopData> stopDataList = stopsTableModel.getData();
 		Permutations perm = new Permutations( stopDataList.size() );
 		ArrayList<Integer[]> unique = perm.monotonic();
-		Set<DriverAssignments> driverAssignments = new TreeSet<>();
+		driverAssignments = new ArrayList<>();
 		LegData legData = legTableModel.getData().get(currentLeg);
 		for (Integer[] elements : unique) {
 			driverAssignments.add( generateDriverAssignments(2, legData, stopDataList, elements) );
 		}
+		Collections.sort(driverAssignments);
 		Iterator<DriverAssignments> it = driverAssignments.iterator();
 		
 		for (int i = 0; it.hasNext() && i < 5; i++) {
@@ -318,10 +362,8 @@ public class OptimizeStopsDialog extends JDialog {
 		// TODO not this way; build output tab from saved data for all legs; need StopData constructors
 		int selected = choicesTabbedPane.getSelectedIndex();
 		if (selected >= 0) {
-			Component component = choicesTabbedPane.getTabComponentAt(selected);
-			System.out.println( component );
-			JTextPane pane = (JTextPane) component;
-			choicesTabbedPane.removeTabAt(selected);
+			System.out.println( driverAssignments.get(selected) );
+			JPanel pane = new JPanel();
 			outputTabbedPane.addTab(String.format("Leg %d", currentLeg), pane);
 		}
 	}
@@ -460,17 +502,15 @@ public class OptimizeStopsDialog extends JDialog {
 		double lower = L / (1.0 + Math.exp(-k*(MIN_TIME - time))); 
 		return 1 + upper + lower;
 	}
-
+	
 	protected static DriverAssignments generateDriverAssignments(int nDrivers, LegData legData, List<StopData> stopDataList,
 			Integer[] elements) {
 		ArrayList<StopData> sublist = new ArrayList<>();
 		for (Integer i : elements) {
 			sublist.add( stopDataList.get(i.intValue()));
 		}
-		StopData legEnd = new StopData();
-		legEnd.distance = legData.distance;
-		legEnd.trafficTime = legData.trafficTime;
-		sublist.add(legEnd);
+		StopData legStop = new StopData(legData); 
+		sublist.add(legStop);
 		DriverAssignments driverAssignments = new DriverAssignments(nDrivers);
 		int driver = 0;
 		double lastTime = 0.0;
@@ -893,7 +933,7 @@ public class OptimizeStopsDialog extends JDialog {
 		Route route = routes.iterator().next();
 
 		EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
-		EnumMap<Main.MarkerKinds, ArrayList<POISet.POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
+		EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
 		Main.loadPOIMap( poiMap );
 		poiMap.forEach((kind, set) -> {
 			nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(route, 5e3 ));
