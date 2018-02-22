@@ -40,6 +40,7 @@ import com.bluelightning.poi.WalmartPOI;
 import com.google.common.eventbus.Subscribe;
 
 import seedu.addressbook.data.AddressBook;
+import seedu.addressbook.data.place.VisitedPlace;
 import seedu.addressbook.logic.Logic;
 
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
@@ -133,6 +134,7 @@ public class Main {
 		private CallbackHandler handler = null;
 		
 		private class CallbackHandler {
+			boolean addAfter = true;
 			@Subscribe
 			protected void handle( AddWaypointEvent event ) {
 				System.out.println( event + " " + event.place );
@@ -141,7 +143,18 @@ public class Main {
 				SwingUtilities.invokeLater( new Runnable() {
 					@Override
 					public void run() {
-						
+						VisitedPlace place = new VisitedPlace( event.place );
+						ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
+						if (places == null)
+							places = new ArrayList<>();
+						if (selectedWaypointRow < 0) {
+							places.add(place);
+						} else if (addAfter) {
+							places.add(selectedWaypointRow+1, place);
+						} else {
+							places.add(selectedWaypointRow, place);							
+						}
+						routePanel.getWaypointsModel().setData(places);
 					}
 				} );
 			}			
@@ -149,12 +162,10 @@ public class Main {
 
 		private void routeAddAfter() {
 			selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
-			if (selectedWaypointRow >= 0) {
-				Events.eventBus.register( new CallbackHandler() );
-				AddAddressDialog dialog = new AddAddressDialog(controller, addressBook);
-				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				dialog.setVisible(true);
-			}
+			Events.eventBus.register( new CallbackHandler() );
+			AddAddressDialog dialog = new AddAddressDialog(controller, addressBook);
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
 		}
 
 		private void routeAddBefore() {
