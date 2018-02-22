@@ -21,6 +21,12 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace> {
 		super(new Name(poi.getName()), poi.getLatitude(), poi.getLongitude(), new Address(poi.getAddress()), poi.getTags() );
 	}
 	
+	public String toGeo() {
+		//geo!37.7914050,-122.3987030;;My Home
+		String label = String.format("%s %s", getName().fullName, getAddress().value );
+		return String.format("geo!%f,%f;;%s", getLatitude(), getLongitude(), label);
+	}
+	
 
 	@Override
 	public int compareTo(VisitedPlace that) {

@@ -20,7 +20,7 @@ public class Permutations implements Iterator<Integer[]> {
 
 	public Integer[] output;// next() returns this array, make it public
 	
-	Permutations(int n) {
+	public Permutations(int n) {
 		Integer[] arr = new Integer[n];
 		for (int i = 0; i < n; i++) {
 			arr[i] = i;

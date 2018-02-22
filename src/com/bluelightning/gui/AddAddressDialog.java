@@ -1,4 +1,4 @@
-package com.bluelightning;
+package com.bluelightning.gui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -15,7 +15,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import com.bluelightning.OptimizeStopsDialog.StopData;
+import com.bluelightning.Events;
+import com.bluelightning.Events.AddWaypointEvent;
+import com.bluelightning.gui.OptimizeStopsDialog.StopData;
 
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.place.Place;

@@ -35,9 +35,11 @@ import org.jxmapviewer.viewer.LocalResponseCache;
 import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.jxmapviewer.viewer.WaypointPainter;
 
+import com.bluelightning.gui.ControlPanel;
+import com.bluelightning.gui.MainPanel;
+import com.bluelightning.gui.WebBrowser;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Route;
-import com.bluelightning.map.ControlPanel;
 import com.bluelightning.map.POIMarker;
 import com.bluelightning.map.RoutePainter;
 import com.bluelightning.map.StopMarker;

@@ -8,7 +8,7 @@
  * (C)2013 Caprica Software (http://www.capricasoftware.co.uk)
  */
 
-package com.bluelightning;
+package com.bluelightning.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -41,9 +41,9 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import com.bluelightning.Events;
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.Events.WebBrowserOpenEvent;
-import com.bluelightning.map.ControlPanel;
 import com.google.common.eventbus.Subscribe;
 
 /**

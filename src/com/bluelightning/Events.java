@@ -7,6 +7,7 @@ import java.util.concurrent.ForkJoinPool;
 
 import javax.swing.JFrame;
 
+import com.bluelightning.gui.WebBrowser;
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIResult;
 import com.google.common.eventbus.AsyncEventBus;
@@ -20,7 +21,7 @@ public class Events {
 	public static EventBus eventBus = new AsyncEventBus(new ForkJoinPool());
 	
 	public static class AddManualStopEvent {
-		POIResult   result;
+		public POIResult   result;
 		
 		public AddManualStopEvent( POIResult result) {
 			this.result = result;
@@ -28,7 +29,7 @@ public class Events {
 	}
 	
 	public static class AddWaypointEvent {
-		ReadOnlyPlace place;
+		public ReadOnlyPlace place;
 
 		public AddWaypointEvent( ReadOnlyPlace place) {
 			this.place = place;
@@ -36,7 +37,7 @@ public class Events {
 	}
 	
 	public static class POIClickEvent {
-		POI   poi;
+		public POI   poi;
 		
 		public POIClickEvent( POI poi) {
 			this.poi = poi;
@@ -44,8 +45,9 @@ public class Events {
 	}
 	
 	public static class UiEvent {
-		String source;
-		AWTEvent awtEvent;
+		public String source;
+		public AWTEvent awtEvent;
+		
 		public UiEvent( String source, AWTEvent awtEvent ) {
 			this.source = source;
 			this.awtEvent = awtEvent;
@@ -53,8 +55,9 @@ public class Events {
 	}
 	
 	public static class WebBrowserOpenEvent {
-		WebBrowser browserCanvas;
-		String href;
+		public WebBrowser browserCanvas;
+		public String href;
+		
 		public WebBrowserOpenEvent( WebBrowser browserCanvas, String href) {
 			this.browserCanvas = browserCanvas;
 			this.href = href;

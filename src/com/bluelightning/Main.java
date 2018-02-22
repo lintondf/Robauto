@@ -26,10 +26,15 @@ import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.Main.MarkerKinds;
-import com.bluelightning.WebBrowser.UiHandler;
+import com.bluelightning.gui.AddAddressDialog;
+import com.bluelightning.gui.ControlPanel;
+import com.bluelightning.gui.MainControlPanel;
+import com.bluelightning.gui.MainPanel;
+import com.bluelightning.gui.RoutePanel;
+import com.bluelightning.gui.WebBrowser;
+import com.bluelightning.gui.WebBrowser.UiHandler;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
-import com.bluelightning.map.ControlPanel;
 import com.bluelightning.map.POIMarker;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
@@ -51,7 +56,7 @@ public class Main {
 	protected Map map;
 	protected JXMapViewer mapViewer;
 	protected RoutePanel routePanel;
-	protected ControlPanel controlPanel;
+	protected MainControlPanel controlPanel;
 	protected Route route;
 	protected EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
 	protected EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
@@ -81,10 +86,10 @@ public class Main {
 			System.out.println(event.source + " " + event.awtEvent);
 			switch (event.source) {
 			case "RoutePanel.AddAfter":
-				routeAddAfter();
+				routeAdd(true);
 				break;
 			case "RoutePanel.AddBefore":
-				routeAddBefore();
+				routeAdd(false);
 				break;
 			case "RoutePanel.MoveDown":
 				routeMoveDown();
@@ -93,7 +98,7 @@ public class Main {
 				routeMoveUp();
 				break;
 			case "ControlPanel.Route":
-				route = Here2.computeRoute();
+				route = Here2.computeRoute( routePanel.getWaypointsModel().getData() );
 				if (route != null) {
 					waypoints = map.showRoute(route);
 					int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
@@ -130,11 +135,15 @@ public class Main {
 			}
 		}
 		
-		private int selectedWaypointRow = -1;
 		private CallbackHandler handler = null;
 		
 		private class CallbackHandler {
 			boolean addAfter = true;
+			
+			public CallbackHandler( boolean after ) {
+				addAfter = after;
+			}
+			
 			@Subscribe
 			protected void handle( AddWaypointEvent event ) {
 				System.out.println( event + " " + event.place );
@@ -143,6 +152,7 @@ public class Main {
 				SwingUtilities.invokeLater( new Runnable() {
 					@Override
 					public void run() {
+						int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
 						VisitedPlace place = new VisitedPlace( event.place );
 						ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
 						if (places == null)
@@ -160,21 +170,39 @@ public class Main {
 			}			
 		}
 
-		private void routeAddAfter() {
-			selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
-			Events.eventBus.register( new CallbackHandler() );
+		private void routeAdd( boolean after) {
+			Events.eventBus.register( new CallbackHandler(after) );
 			AddAddressDialog dialog = new AddAddressDialog(controller, addressBook);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		}
 
-		private void routeAddBefore() {
+		private void routeMoveDown() { // increase index position
+			ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
+			if (places == null)
+				places = new ArrayList<>();
+			int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
+			if (selectedWaypointRow < 0 || selectedWaypointRow >= places.size()-1)
+				return;  // nothing selected or selection already at end
+			// swap this and next
+			VisitedPlace place = places.get(selectedWaypointRow);
+			places.set(selectedWaypointRow, places.get(selectedWaypointRow+1));
+			places.set(selectedWaypointRow+1, place);
+			routePanel.getWaypointsModel().setData(places);
 		}
 
-		private void routeMoveDown() {
-		}
-
-		private void routeMoveUp() {
+		private void routeMoveUp() { // decrease index position
+			ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
+			if (places == null)
+				places = new ArrayList<>();
+			int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
+			if (selectedWaypointRow <= 0)
+				return;  // nothing selected or selection already first
+			// swap this and prior
+			VisitedPlace place = places.get(selectedWaypointRow);
+			places.set(selectedWaypointRow, places.get(selectedWaypointRow-1));
+			places.set(selectedWaypointRow-1, place);
+			routePanel.getWaypointsModel().setData(places);
 		}
 	}
 
@@ -206,7 +234,7 @@ public class Main {
 		mapViewer = map.getMapViewer();
 		mainPanel.getRightTabbedPane().addTab("Map", null, mapViewer, null);
 		browserCanvas = WebBrowser.factory(mainPanel);
-		controlPanel = new ControlPanel();
+		controlPanel = new MainControlPanel();
 		mainPanel.getLeftPanel().add(controlPanel);
 		frame.setContentPane(mainPanel);
 		// frame.setExtendedState(JFrame.MAXIMIZED_BOTH);

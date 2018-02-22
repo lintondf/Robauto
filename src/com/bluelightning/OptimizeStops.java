@@ -18,9 +18,9 @@ import org.javatuples.Pair;
 import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.Main.MarkerKinds;
-import com.bluelightning.OptimizeStopsDialog.LegData;
-import com.bluelightning.OptimizeStopsDialog.RoadDirectionData;
-import com.bluelightning.OptimizeStopsDialog.StopData;
+import com.bluelightning.gui.OptimizeStopsDialog.LegData;
+import com.bluelightning.gui.OptimizeStopsDialog.RoadDirectionData;
+import com.bluelightning.gui.OptimizeStopsDialog.StopData;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.Route;
@@ -44,7 +44,7 @@ public class OptimizeStops {
 	protected List<LegSummary> legSummary;
 	
 	public static class LegPoint {
-		double  distance;
+		public double  distance;
 		double  trafficTime;
 		double  travelTime;
 		

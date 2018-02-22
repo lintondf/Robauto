@@ -1,4 +1,4 @@
-package com.bluelightning.map;
+package com.bluelightning.gui;
 
 import javax.swing.JPanel;
 

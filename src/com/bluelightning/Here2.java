@@ -43,6 +43,8 @@ import com.google.gson.JsonParser;
 import com.x5.template.Chunk;
 import com.x5.template.Theme;
 
+import seedu.addressbook.data.place.VisitedPlace;
+
 public class Here2 {
 	
 	//https://developer.here.com/documentation
@@ -228,6 +230,16 @@ public class Here2 {
 	}
 
 	
+	public static HereRoute getRouteFromPlaces(List<VisitedPlace> places, String mode) {
+		List<BasicNameValuePair> nvps = getBasicValuePair();
+		int i = 0;
+		for (VisitedPlace place : places) {
+			nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), place.toGeo()));			
+		}
+		return getRouteBase( nvps, mode );
+	}
+
+	
 	public static HereRoute getRoute( LatLon from, LatLon to, String mode ) {
 		List<BasicNameValuePair> nvps = getBasicValuePair();
 		nvps.add(new BasicNameValuePair("waypoint0", from.toGeo()));
@@ -297,6 +309,20 @@ public class Here2 {
 			}
 			hereRoute = getRoute( points, "fastest;truck;traffic:disabled" );
 		}
+		return computeRouteBase( hereRoute, pointAddresses );
+	}
+	
+	
+	public static Route computeRoute( List<VisitedPlace> places ) {
+		String[] pointAddresses = new String[places.size()];
+		for (int i = 0; i < pointAddresses.length; i++) {
+			pointAddresses[i] = places.get(i).getAddress().value;
+		}
+		HereRoute hereRoute = getRouteFromPlaces( places, "fastest;truck;traffic:disabled"  );
+		return computeRouteBase( hereRoute, pointAddresses );
+	}
+	
+	protected static Route computeRouteBase( HereRoute hereRoute, String[] pointAddresses ) {
 		System.out.println(hereRoute.getResponse().getMetaInfo());
 		Set<Route> routes = hereRoute.getResponse().getRoute();
 		System.out.printf("%d routes\n", routes.size() );

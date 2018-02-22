@@ -1,4 +1,4 @@
-package com.bluelightning;
+package com.bluelightning.gui;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;

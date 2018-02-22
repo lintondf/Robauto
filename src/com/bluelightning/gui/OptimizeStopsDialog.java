@@ -1,4 +1,4 @@
-package com.bluelightning;
+package com.bluelightning.gui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -26,10 +26,17 @@ import javax.swing.table.TableColumn;
 import org.apache.commons.io.IOUtils;
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.Events;
+import com.bluelightning.Here2;
+import com.bluelightning.Main;
+import com.bluelightning.OptimizeStops;
+import com.bluelightning.Permutations;
+import com.bluelightning.Report;
 import com.bluelightning.Events.AddManualStopEvent;
 import com.bluelightning.Events.UiEvent;
+import com.bluelightning.Main.MarkerKinds;
 import com.bluelightning.OptimizeStops.LegSummary;
-import com.bluelightning.OptimizeStopsDialog.StopData;
+import com.bluelightning.gui.OptimizeStopsDialog.StopData;
 import com.bluelightning.json.HereRoute;
 import com.bluelightning.json.Route;
 import com.bluelightning.poi.POIResult;
