@@ -312,9 +312,6 @@ public class OptimizeStopsDialog extends JDialog {
 	
 	protected void add(CallbackHandler handler, double distance0, double distance1) {
 			ArrayList<POIResult> segmentPOI = optimizeStops.getRouteSegmentPOI(distance0, distance1);
-//			segmentPOI.forEach( r -> {
-//				System.out.println( r.toReport() );
-//			} );
 			AddManualStopDialog addDialog = new AddManualStopDialog();
 			addDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			addDialog.setData(segmentPOI);

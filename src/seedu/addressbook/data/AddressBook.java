@@ -72,6 +72,22 @@ public class AddressBook {
         place.setTags(new UniqueTagList(commonTagReferences));
     }
     
+    public List<ReadOnlyPlace> getPlacesWithAddress(String exact) {
+    	return getPlacesWithAddress( Pattern.compile(exact) );
+    }
+    
+    public List<ReadOnlyPlace> getPlacesWithAddress(Pattern pattern) {
+        final List<ReadOnlyPlace> matchedPlaces = new ArrayList<>();
+        for (ReadOnlyPlace place : getAllPlaces()) {
+            String address = place.getAddress().toString();
+            Matcher matcher = pattern.matcher(address);
+            if (matcher.matches()) {
+            	matchedPlaces.add(place);
+            }
+        }
+        return matchedPlaces;
+    }
+
     /**
      * Retrieve all persons in the address book whose names contain some of the specified keywords.
      *

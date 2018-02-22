@@ -1,6 +1,8 @@
 package com.bluelightning;
 
 import java.awt.AWTEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.concurrent.ForkJoinPool;
 
 import javax.swing.JFrame;
@@ -9,6 +11,8 @@ import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIResult;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
+
+import seedu.addressbook.data.place.ReadOnlyPlace;
 
 public class Events {
 
@@ -20,6 +24,14 @@ public class Events {
 		
 		public AddManualStopEvent( POIResult result) {
 			this.result = result;
+		}
+	}
+	
+	public static class AddWaypointEvent {
+		ReadOnlyPlace place;
+
+		public AddWaypointEvent( ReadOnlyPlace place) {
+			this.place = place;
 		}
 	}
 	
@@ -48,5 +60,17 @@ public class Events {
 			this.href = href;
 		}
 	}
+	
+	public static class EventActionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			if (event.getActionCommand() != null && !event.getActionCommand().isEmpty()) {
+				eventBus.post( new UiEvent(event.getActionCommand(), event) );
+			}
+		}
+		
+	}
+
 
 }

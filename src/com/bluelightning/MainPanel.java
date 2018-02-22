@@ -91,6 +91,7 @@ public class MainPanel extends JPanel {
 		lowerPanel.setLayout(new BorderLayout(0, 0));
 		
 		lowerTextArea = new JTextArea();
+		lowerTextArea.setText("Log Messages");
 		lowerPanel.add(lowerTextArea);
 
 	}

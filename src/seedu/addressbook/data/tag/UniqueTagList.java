@@ -69,6 +69,15 @@ public class UniqueTagList implements Iterable<Tag> {
     public UniqueTagList(UniqueTagList source) {
         internalList.addAll(source.internalList);
     }
+    
+    public String toString() {
+    	StringBuffer sb = new StringBuffer();
+    	for (Tag tag : internalList) {
+    		sb.append(tag.tagName);
+    		sb.append(",");
+    	}
+    	return sb.toString();
+    }
 
     /**
      * All tags in this list as a Set. This set is mutable and change-insulated against the internal list.

@@ -167,7 +167,7 @@ public class Here2 {
 	}
 	
 
-	public static HereRoute getRouteFinal(List<BasicNameValuePair> nvps, String mode) {
+	public static HereRoute getRouteBase(List<BasicNameValuePair> nvps, String mode) {
 		nvps.add(new BasicNameValuePair("metricSystem", "imperial"));
 		nvps.add(new BasicNameValuePair("instructionFormat", "text"));
 		nvps.add(new BasicNameValuePair("representation", "navigation"));
@@ -215,7 +215,7 @@ public class Here2 {
 			nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), via.toGeo()));			
 		}
 		nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), to.toGeo()));
-		return getRouteFinal( nvps, mode );
+		return getRouteBase( nvps, mode );
 	}
 
 	public static HereRoute getRoute(List<LatLon> points, String mode) {
@@ -224,7 +224,7 @@ public class Here2 {
 		for (LatLon via : points) {
 			nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), via.toGeo()));			
 		}
-		return getRouteFinal( nvps, mode );
+		return getRouteBase( nvps, mode );
 	}
 
 	
@@ -232,7 +232,7 @@ public class Here2 {
 		List<BasicNameValuePair> nvps = getBasicValuePair();
 		nvps.add(new BasicNameValuePair("waypoint0", from.toGeo()));
 		nvps.add(new BasicNameValuePair("waypoint1", to.toGeo()));
-		return getRouteFinal( nvps, mode );
+		return getRouteBase( nvps, mode );
 	}
 	
 	
