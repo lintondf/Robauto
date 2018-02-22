@@ -27,7 +27,6 @@ import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.Main.MarkerKinds;
 import com.bluelightning.gui.AddAddressDialog;
-import com.bluelightning.gui.ControlPanel;
 import com.bluelightning.gui.MainControlPanel;
 import com.bluelightning.gui.MainPanel;
 import com.bluelightning.gui.RoutePanel;
@@ -105,6 +104,12 @@ public class Main {
 					mainPanel.getRightTabbedPane().setSelectedIndex(index);
 					insureNearbyMapLoaded(route, Main.MarkerKinds.RESTAREAS, poiMap.get(Main.MarkerKinds.RESTAREAS));
 					OptimizeStops optimizeStops = new OptimizeStops(route, poiMap, nearbyMap);
+				}
+				break;
+				
+			case "ControlPanel.Optimize":
+				if (route != null) {
+					
 				}
 				break;
 

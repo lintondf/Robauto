@@ -103,6 +103,7 @@ public final class WebBrowser extends Canvas {
 		mainPanel.getRightTabbedPane().addTab("AllStays", null, browserCanvas, null);
 		
 		mock = new WebBrowser();
+		//mainPanel.getRightTabbedPane().addTab("Mock", null, mock, null);
 		mainPanel.getLeftPanel().add(mock);
 		mock.setVisible(false);
 		
@@ -184,7 +185,7 @@ public final class WebBrowser extends Canvas {
 				
 			});
 
-			browserCanvas.setUrl("https://www.allstays.com/pro/full"); // index.php
+			browserCanvas.setUrl("https://www.allstays.com/pro"); // index.php
 		} else {
 			System.out.println("Failed to initialise browser");
 		}
@@ -494,7 +495,7 @@ public final class WebBrowser extends Canvas {
 		final WebBrowser mock = new WebBrowser();
 		JPanel contentPane1 = new JPanel();
 		contentPane1.setLayout(new BorderLayout());
-		final ControlPanel cpanel = new ControlPanel();
+		final MainControlPanel cpanel = new MainControlPanel();
 		contentPane1.add(mock, BorderLayout.CENTER);
 		contentPane1.add(cpanel, BorderLayout.CENTER);
 		frame1.setBounds(10, 10, 120, 180);

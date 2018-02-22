@@ -77,7 +77,7 @@ public class MainPanel extends JPanel {
 		add(upperLowerPane);
 		
 		leftRightPane = new JSplitPane();
-		leftRightPane.setResizeWeight(0.25);
+		//leftRightPane.setResizeWeight(0.20);
 		upperLowerPane.setLeftComponent(leftRightPane);
 		
 		leftPanel = new JPanel();

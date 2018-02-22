@@ -35,7 +35,7 @@ import org.jxmapviewer.viewer.LocalResponseCache;
 import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.jxmapviewer.viewer.WaypointPainter;
 
-import com.bluelightning.gui.ControlPanel;
+import com.bluelightning.gui.MainControlPanel;
 import com.bluelightning.gui.MainPanel;
 import com.bluelightning.gui.WebBrowser;
 import com.bluelightning.json.Leg;
@@ -202,7 +202,7 @@ public class Map {
 		mainPanel.getLeftPanel().setLayout(new BorderLayout() );
 		mainPanel.getRightTabbedPane().addTab("Planner", null, mapViewer, null);
 		WebBrowser browserCanvas = WebBrowser.factory(mainPanel);
-		mainPanel.getLeftPanel().add( new ControlPanel() );
+		mainPanel.getLeftPanel().add( new MainControlPanel() );
 		frame.setContentPane(mainPanel);
 		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		frame.setSize(800, 600);

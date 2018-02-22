@@ -206,8 +206,8 @@ public class RoutePanel extends JPanel {
 		JPanel buttonPanel = new JPanel();
 		splitPane.setRightComponent(buttonPanel);
 		GridBagLayout gbl_buttonPanel = new GridBagLayout();
-		gbl_buttonPanel.columnWidths = new int[] {75, 0, 0};
-		gbl_buttonPanel.rowHeights = new int[] {30, 30, 0, 0, 0};
+		gbl_buttonPanel.columnWidths = new int[] {40, 0, 0};
+		gbl_buttonPanel.rowHeights = new int[] {20, 20, 0, 0, 0};
 		gbl_buttonPanel.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
 		gbl_buttonPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		buttonPanel.setLayout(gbl_buttonPanel);
