@@ -2,6 +2,7 @@ package seedu.addressbook.data.place;
 
 import seedu.addressbook.data.exception.IllegalValueException;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * Represents a Person's name in the address book.
  * Guarantees: immutable; is valid as declared in {@link #isValidName(String)}
  */
-public class Name {
+public class Name implements Serializable {
 
     public static final String EXAMPLE = "John Doe";
     public static final String MESSAGE_NAME_CONSTRAINTS = "Person names should be spaces or alphanumeric characters";
@@ -30,7 +31,11 @@ public class Name {
         this.fullName = name;
     }
 
-    /**
+    public Name() {
+    	fullName = "";
+	}
+
+	/**
      * Returns true if a given string is a valid person name.
      */
     public static boolean isValidName(String test) {

@@ -3,6 +3,7 @@ package seedu.addressbook.data.tag;
 import seedu.addressbook.common.Utils;
 import seedu.addressbook.data.exception.DuplicateDataException;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -11,7 +12,7 @@ import java.util.*;
  * @see Tag#equals(Object)
  * @see Utils#elementsAreUnique(Collection)
  */
-public class UniqueTagList implements Iterable<Tag> {
+public class UniqueTagList implements Iterable<Tag>, Serializable {
 
     /**
      * Signals that an operation would have violated the 'no duplicates' property of the list.

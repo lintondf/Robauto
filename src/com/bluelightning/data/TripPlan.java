@@ -80,8 +80,8 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			in.close();
 			return tripPlan;
 		} catch (Exception x) {
-			x.printStackTrace();
-			return null;
+			
+			return new TripPlan();
 		}
 	}
 	public static void main(String[] args) {
@@ -91,6 +91,38 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		tripPlan.save( file );
 		TripPlan out = TripPlan.load( file );
 		System.out.println(out);
+	}
+
+	public Date getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(Date lastModified) {
+		this.lastModified = lastModified;
+	}
+
+	public ArrayList<VisitedPlace> getPlaces() {
+		return places;
+	}
+
+	public void setPlaces(ArrayList<VisitedPlace> places) {
+		this.places = places;
+	}
+
+	public String getRouteJson() {
+		return routeJson;
+	}
+
+	public void setRouteJson(String routeJson) {
+		this.routeJson = routeJson;
+	}
+
+	public ArrayList<TripLeg> getTripLegs() {
+		return tripLegs;
+	}
+
+	public void setTripLegs(ArrayList<TripLeg> tripLegs) {
+		this.tripLegs = tripLegs;
 	}
 
 }

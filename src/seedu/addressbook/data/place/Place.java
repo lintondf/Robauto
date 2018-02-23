@@ -5,6 +5,7 @@ import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
 import seedu.addressbook.data.tag.UniqueTagList.DuplicateTagException;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,7 +16,7 @@ import com.bluelightning.LatLon;
  * Represents a Place in the address book.
  * Guarantees: details are present and not null, field values are validated.
  */
-public class Place implements ReadOnlyPlace {
+public class Place implements ReadOnlyPlace, Serializable {
 
     private Name name;
     private Double latitude;
@@ -47,9 +48,17 @@ public class Place implements ReadOnlyPlace {
     public static Place factory( String name, String address ) {
     	return factory( name, address, new UniqueTagList());
     }
-    /**
-     * Assumption: Every field must be present and not null.
-     */
+    
+    
+    public Place() {
+        this.name = new Name();
+        this.latitude = new Double(0);
+        this.longitude = new Double(0);
+        this.address = new Address();
+        this.tags = new UniqueTagList();   	
+    }
+
+    
     public Place(Name name, Double latitude, Double longitude, Address address, UniqueTagList tags) {
         this.name = name;
         this.latitude = latitude;
@@ -123,5 +132,25 @@ public class Place implements ReadOnlyPlace {
     public String toString() {
         return getAsTextShowAll();
     }
+
+
+	public void setName(Name name) {
+		this.name = name;
+	}
+
+
+	public void setLatitude(Double latitude) {
+		this.latitude = latitude;
+	}
+
+
+	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
 
 }

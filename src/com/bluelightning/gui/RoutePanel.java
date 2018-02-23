@@ -206,10 +206,10 @@ public class RoutePanel extends JPanel {
 		JPanel buttonPanel = new JPanel();
 		splitPane.setRightComponent(buttonPanel);
 		GridBagLayout gbl_buttonPanel = new GridBagLayout();
-		gbl_buttonPanel.columnWidths = new int[] {40, 0, 0};
-		gbl_buttonPanel.rowHeights = new int[] {20, 20, 0, 0, 0};
-		gbl_buttonPanel.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		gbl_buttonPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_buttonPanel.columnWidths = new int[] {25};
+		gbl_buttonPanel.rowHeights = new int[] {20, 20, 0, 0, 0, 0};
+		gbl_buttonPanel.columnWeights = new double[]{0.0};
+		gbl_buttonPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		buttonPanel.setLayout(gbl_buttonPanel);
 		
 		JButton btnMoveUp = new JButton("Move Up");
@@ -247,10 +247,20 @@ public class RoutePanel extends JPanel {
 		btnAddAfter.setActionCommand("RoutePanel.AddAfter");
 		GridBagConstraints gbc_btnAddAfter = new GridBagConstraints();
 		gbc_btnAddAfter.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnAddAfter.insets = new Insets(0, 0, 0, 5);
+		gbc_btnAddAfter.insets = new Insets(0, 0, 5, 5);
 		gbc_btnAddAfter.gridx = 0;
 		gbc_btnAddAfter.gridy = 3;
 		buttonPanel.add(btnAddAfter, gbc_btnAddAfter);
+		
+		JButton btnRemove = new JButton("Remove");
+		btnRemove.addActionListener(listener);
+		btnRemove.setActionCommand("RoutePanel.Remove");
+		GridBagConstraints gbc_btnRemove = new GridBagConstraints();
+		gbc_btnRemove.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnRemove.insets = new Insets(0, 0, 0, 5);
+		gbc_btnRemove.gridx = 0;
+		gbc_btnRemove.gridy = 4;
+		buttonPanel.add(btnRemove, gbc_btnRemove);
 		
 		JPanel tablePanel = new JPanel();
 		splitPane.setLeftComponent(tablePanel);

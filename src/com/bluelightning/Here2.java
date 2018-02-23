@@ -26,6 +26,7 @@ import org.apache.http.util.EntityUtils;
 import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.data.TripPlan;
 import com.bluelightning.json.*;
 import com.bluelightning.json.Leg.CumulativeTravel;
 import com.bluelightning.map.POIMarker;
@@ -168,8 +169,18 @@ public class Here2 {
 	    return null;
 	}
 	
+	
+	protected static class HereRoutePlus {
+		HereRoute route;
+		String json;
+		public HereRoutePlus( HereRoute route, String json) {
+			this.route = route;
+			this.json = json;
+		}
+	}
+	
 
-	public static HereRoute getRouteBase(List<BasicNameValuePair> nvps, String mode) {
+	protected static HereRoutePlus getRouteBase(List<BasicNameValuePair> nvps, String mode) {
 		nvps.add(new BasicNameValuePair("metricSystem", "imperial"));
 		nvps.add(new BasicNameValuePair("instructionFormat", "text"));
 		nvps.add(new BasicNameValuePair("representation", "navigation"));
@@ -192,7 +203,8 @@ public class Here2 {
 	    	out.close();
 	    } catch (Exception x) {}
 	    HereRoute hereRoute = (HereRoute) Here2.gson.fromJson(jelement, HereRoute.class);
-	    return hereRoute;
+	    HereRoutePlus plus = new HereRoutePlus( hereRoute, json );
+	    return plus;
 //	    System.out.println( hereRoute );
 //	    JsonArray routes = Here.getNestedJsonArray(jelement, Arrays.asList("response", "route"));
 //	    if (routes != null && routes.size() > 0) {
@@ -209,7 +221,7 @@ public class Here2 {
 //	    return null;
 	}
 	
-	public static HereRoute getRoute(LatLon from, List<LatLon> vias, LatLon to, String mode) {
+	protected static HereRoutePlus getRoute(LatLon from, List<LatLon> vias, LatLon to, String mode) {
 		List<BasicNameValuePair> nvps = getBasicValuePair();
 		int i = 0;
 		nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), from.toGeo()));
@@ -220,7 +232,7 @@ public class Here2 {
 		return getRouteBase( nvps, mode );
 	}
 
-	public static HereRoute getRoute(List<LatLon> points, String mode) {
+	protected static HereRoutePlus getRoute(List<LatLon> points, String mode) {
 		List<BasicNameValuePair> nvps = getBasicValuePair();
 		int i = 0;
 		for (LatLon via : points) {
@@ -230,7 +242,7 @@ public class Here2 {
 	}
 
 	
-	public static HereRoute getRouteFromPlaces(List<VisitedPlace> places, String mode) {
+	protected static HereRoutePlus getRouteFromPlaces(List<VisitedPlace> places, String mode) {
 		List<BasicNameValuePair> nvps = getBasicValuePair();
 		int i = 0;
 		for (VisitedPlace place : places) {
@@ -240,7 +252,7 @@ public class Here2 {
 	}
 
 	
-	public static HereRoute getRoute( LatLon from, LatLon to, String mode ) {
+	protected static HereRoutePlus getRoute( LatLon from, LatLon to, String mode ) {
 		List<BasicNameValuePair> nvps = getBasicValuePair();
 		nvps.add(new BasicNameValuePair("waypoint0", from.toGeo()));
 		nvps.add(new BasicNameValuePair("waypoint1", to.toGeo()));
@@ -284,7 +296,7 @@ public class Here2 {
 //		System.out.println( lee  );
 	
 	public static Route computeRoute() {
-		HereRoute hereRoute = null;
+		HereRoutePlus plus = null;
 		//try { new File("route.json").delete(); } catch (Exception x) {}
 		String[] pointAddresses = {
 				"3533 Carambola Cir, Melbourne, FL",
@@ -299,30 +311,54 @@ public class Here2 {
 		};
 		try {
 			String json = IOUtils.toString(new FileInputStream("route.json"), "UTF-8");
-			hereRoute = (HereRoute) Here2.gson.fromJson(json, HereRoute.class);
+			HereRoute hereRoute = (HereRoute) Here2.gson.fromJson(json, HereRoute.class);
 			if (hereRoute == null || hereRoute.getResponse() == null)
 				throw new NullPointerException();
+			plus.route = hereRoute;
+			plus.json = json;
 		} catch (Exception x) {
 			ArrayList<LatLon> points = new ArrayList<>();
 			for (String address : pointAddresses) {
 				points.add(geocodeLookup(address));
 			}
-			hereRoute = getRoute( points, "fastest;truck;traffic:disabled" );
+			plus = getRoute( points, "fastest;truck;traffic:disabled" );
 		}
-		return computeRouteBase( hereRoute, pointAddresses );
+		return computeRouteBase( plus, pointAddresses );
 	}
 	
 	
+	public static Route computeRoute(TripPlan tripPlan) {
+		String[] pointAddresses = new String[tripPlan.getPlaces().size()];
+		for (int i = 0; i < pointAddresses.length; i++) {
+			pointAddresses[i] = tripPlan.getPlaces().get(i).getAddress().value;
+		}
+		if (tripPlan.getRouteJson().isEmpty()) {
+			HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces(), "fastest;truck;traffic:disabled"  );
+			tripPlan.setRouteJson( hereRoute.json );
+			return computeRouteBase( hereRoute, pointAddresses );
+		} else {
+			try {
+				HereRoute hereRoute = (HereRoute) Here2.gson.fromJson(tripPlan.getRouteJson(), HereRoute.class);
+				HereRoutePlus plus = new HereRoutePlus( hereRoute, tripPlan.getRouteJson());
+				return computeRouteBase( plus, pointAddresses );				
+			} catch (Exception x) {
+				return null;
+			}
+		}
+	}
+
+
 	public static Route computeRoute( List<VisitedPlace> places ) {
 		String[] pointAddresses = new String[places.size()];
 		for (int i = 0; i < pointAddresses.length; i++) {
 			pointAddresses[i] = places.get(i).getAddress().value;
 		}
-		HereRoute hereRoute = getRouteFromPlaces( places, "fastest;truck;traffic:disabled"  );
+		HereRoutePlus hereRoute = getRouteFromPlaces( places, "fastest;truck;traffic:disabled"  );
 		return computeRouteBase( hereRoute, pointAddresses );
 	}
 	
-	protected static Route computeRouteBase( HereRoute hereRoute, String[] pointAddresses ) {
+	protected static Route computeRouteBase( HereRoutePlus plus, String[] pointAddresses ) {
+		HereRoute hereRoute = plus.route;
 		System.out.println(hereRoute.getResponse().getMetaInfo());
 		Set<Route> routes = hereRoute.getResponse().getRoute();
 		System.out.printf("%d routes\n", routes.size() );
@@ -396,6 +432,5 @@ public class Here2 {
 		} // for route
 		return null;
 	}
-
 
 }

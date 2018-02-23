@@ -5,6 +5,9 @@ import java.awt.Cursor;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -26,6 +29,7 @@ import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.Main.MarkerKinds;
+import com.bluelightning.data.TripPlan;
 import com.bluelightning.gui.AddAddressDialog;
 import com.bluelightning.gui.MainControlPanel;
 import com.bluelightning.gui.MainPanel;
@@ -51,6 +55,8 @@ import seedu.addressbook.logic.Logic;
 
 public class Main {
 
+	protected File tripPlanFile = new File("RobautoTripPlan.obj");
+	protected TripPlan tripPlan;
 	protected List<ButtonWaypoint> waypoints;
 	protected Map map;
 	protected JXMapViewer mapViewer;
@@ -96,8 +102,13 @@ public class Main {
 			case "RoutePanel.MoveUp":
 				routeMoveUp();
 				break;
+			case "RoutePanel.Remove":
+				routeRemove();
+				break;
 			case "ControlPanel.Route":
-				route = Here2.computeRoute( routePanel.getWaypointsModel().getData() );
+				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
+				tripPlan.save(tripPlanFile);
+				route = Here2.computeRoute( tripPlan );
 				if (route != null) {
 					waypoints = map.showRoute(route);
 					int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
@@ -134,6 +145,12 @@ public class Main {
 				}
 				System.out.println(nearby.size() + " total markers");
 				map.updateWaypoints(nearby);
+				break;
+				
+			case "Window.Closing":
+				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
+				tripPlan.save(tripPlanFile);
+//				System.out.println("Saved: " + tripPlan.toString() );
 				break;
 			default:
 				break;
@@ -209,6 +226,19 @@ public class Main {
 			places.set(selectedWaypointRow-1, place);
 			routePanel.getWaypointsModel().setData(places);
 		}
+		
+		private void routeRemove() {
+			ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
+			if (places == null)
+				return;
+			int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
+			if (selectedWaypointRow < 0)
+				return;  // nothing selected
+			// swap this and prior
+			VisitedPlace place = places.get(selectedWaypointRow);
+			places.remove(selectedWaypointRow);
+			routePanel.getWaypointsModel().setData(places);
+		}
 	}
 
 	public static enum MarkerKinds {
@@ -248,6 +278,10 @@ public class Main {
 		frame.setVisible(true);
 		browserCanvas.initialize(frame);
 
+		tripPlan = TripPlan.load( tripPlanFile );
+		System.out.println("Loaded: " + tripPlan.toString() );
+		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
+		
 		// load base POI sets
 		loadPOIMap(poiMap);
 
@@ -263,6 +297,13 @@ public class Main {
 		} catch (Exception x) {		
 			x.printStackTrace();
 		}
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+            	Events.eventBus.post( new Events.UiEvent("Window.Closing", e));
+            }
+        });
+
 	}
 
 	public EnumMap<Main.MarkerKinds, ArrayList<POIResult>> getNearbyMap() {

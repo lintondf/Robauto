@@ -1,12 +1,14 @@
 package seedu.addressbook.data.tag;
 
+import java.io.Serializable;
+
 import seedu.addressbook.data.exception.IllegalValueException;
 
 /**
  * Represents a Tag in the address book.
  * Guarantees: immutable; name is valid as declared in {@link #isValidTagName(String)}
  */
-public class Tag {
+public class Tag implements Serializable {
 
     public static final String MESSAGE_TAG_CONSTRAINTS = "Tags names should be alphanumeric";
     public static final String TAG_VALIDATION_REGEX = "\\p{Alnum}+";

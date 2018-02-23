@@ -1,17 +1,25 @@
 package seedu.addressbook.data.place;
 
+import java.io.Serializable;
+
 import com.bluelightning.poi.POI;
 
 import seedu.addressbook.data.exception.IllegalValueException;
 import seedu.addressbook.data.tag.UniqueTagList;
 
-public class VisitedPlace extends Place implements Comparable<VisitedPlace> {
+public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	Integer visitOrder;
 	boolean passThru;
 	boolean overnight;
 	boolean driverSwitch;
 	double  fuel;            // amount to purchase in gallons; zero if none
+	
+	public VisitedPlace() {
+		
+	}
 
 	public VisitedPlace(ReadOnlyPlace source) {
 		super(source);
@@ -63,6 +71,14 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace> {
 
 	public void setFuel(double fuel) {
 		this.fuel = fuel;
+	}
+
+	public Integer getVisitOrder() {
+		return visitOrder;
+	}
+
+	public void setVisitOrder(Integer visitOrder) {
+		this.visitOrder = visitOrder;
 	}
 
 }
