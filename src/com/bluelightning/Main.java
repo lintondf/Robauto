@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -23,7 +24,6 @@ import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
 
@@ -51,6 +51,14 @@ import com.bluelightning.poi.WalmartPOI;
 import com.google.common.eventbus.Subscribe;
 
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.PatternLayout;
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.html.HTMLLayout;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.Layout;
+import ch.qos.logback.core.LayoutBase;
+import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
 import ch.qos.logback.core.status.OnConsoleStatusListener;
 import ch.qos.logback.core.status.Status;
 import ch.qos.logback.core.status.StatusListener;
@@ -312,6 +320,44 @@ public class Main {
 		// TODO Costco, Cabelas
 	}
 
+	public class TextAreaAppender extends AppenderBase<ILoggingEvent> {
+
+		Layout<ILoggingEvent> layout;
+
+		public Layout<ILoggingEvent> getLayout() {
+			return layout;
+		}
+
+		public void setLayout(Layout<ILoggingEvent> layout) {
+			this.layout = layout;
+		}
+
+		@Override
+		public void start() {
+			if (this.layout == null) {
+				addError("No layout set for the appender named [" + name + "].");
+				return;
+			}
+			super.start();
+		}
+
+		@Override
+		protected void append(ILoggingEvent event) {
+			System.out.println("TAE: " + event.toString() + " " + layout);
+			final String message = layout.doLayout(event);
+			SwingUtilities.invokeLater( new Runnable(){
+				@Override
+				public void run() {
+					StringBuffer sb = new StringBuffer(mainPanel.getLowerTextArea().getText());
+					sb.append(message);
+					sb.append('\n');
+					mainPanel.getLowerTextArea().setText(sb.toString());
+				}
+			});
+		}
+
+	}
+	
 	public Main() {
 		// Display the viewer in a JFrame
 		JFrame frame = new JFrame("RobAuto RV Trip Planner");
@@ -330,12 +376,47 @@ public class Main {
 		frame.setSize(800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		browserCanvas.initialize(frame);
+			browserCanvas.initialize(frame);
 
+			// load base POI sets
+			loadPOIMap(poiMap);
+
+		// Bind event handlers
+
+		Events.eventBus.register(new UiHandler());
+		Events.eventBus.register(new POIClickHandler());
+		try {
+			controller = new Logic();
+			controller.getStorage().load();
+			addressBook = controller.getAddressBook();
+		} catch (Exception x) {
+			x.printStackTrace();
+		}
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				Events.eventBus.post(new Events.UiEvent("Window.Closing", e));
+			}
+		});
+
+		tripPlan = TripPlan.load(tripPlanFile);
+		System.out.println("Loaded: " + tripPlan.toString());
+		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
+		if (!tripPlan.getRouteJson().isEmpty()) {
+			Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
+		}
+	}
+
+	public EnumMap<Main.MarkerKinds, ArrayList<POIResult>> getNearbyMap() {
+		return nearbyMap;
+	}
+
+	public static void main(String[] args) {
+		logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
 		// assume SLF4J is bound to logback in the current environment
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		// print logback's internal status
-		StatusPrinter.print(lc);
+//		StatusPrinter.print(lc);
 //		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 //		StatusManager statusManager = lc.getStatusManager();
 		// OnConsoleStatusListener onConsoleListener = new
@@ -357,47 +438,21 @@ public class Main {
 		// });
 		// }
 		// });
-		logger.debug("Hello world.");
-
-		// load base POI sets
-		loadPOIMap(poiMap);
-
-		// Bind event handlers
-
-		Events.eventBus.register(new UiHandler());
-		Events.eventBus.register(new POIClickHandler());
-
-		try {
-			controller = new Logic();
-			controller.getStorage().load();
-			addressBook = controller.getAddressBook();
-		} catch (Exception x) {
-			x.printStackTrace();
-		}
-		frame.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				Events.eventBus.post(new Events.UiEvent("Window.Closing", e));
-			}
-		});
-
-		tripPlan = TripPlan.load(tripPlanFile);
-		System.out.println("Loaded: " + tripPlan.toString());
-		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
-		if (!tripPlan.getRouteJson().isEmpty()) {
-			Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
-		}
-
-	}
-
-	public EnumMap<Main.MarkerKinds, ArrayList<POIResult>> getNearbyMap() {
-		return nearbyMap;
-	}
-
-	public static void main(String[] args) {
-		logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
 
 		Main main = new Main();
+		ch.qos.logback.classic.Logger rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
+		TextAreaAppender a = main.new TextAreaAppender();
+		a.setContext(lc);
+		a.setName("robauto");
+		PatternLayout layout = new PatternLayout();
+		layout.setPattern("%d{HH:mm:ss.SSS} [%thread] %-5level: %msg%n");
+		layout.setContext(lc);
+		layout.start();
+		a.setLayout(layout);
+		a.start();
+		rootLogger.addAppender( a );
+		logger.debug("Hello world.");
+
 	}
 
 }
