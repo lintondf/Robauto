@@ -1,0 +1,96 @@
+package com.bluelightning.data;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+
+import com.bluelightning.Report;
+import com.bluelightning.gui.OptimizeStopsDialog.DriverAssignments;
+import com.bluelightning.gui.OptimizeStopsDialog.LegData;
+import com.bluelightning.gui.OptimizeStopsDialog.RoadDirectionData;
+import com.bluelightning.gui.OptimizeStopsDialog.StopData;
+
+import seedu.addressbook.data.place.VisitedPlace;
+
+public class TripPlan implements Comparable<TripPlan>, Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	protected Date   lastModified;
+	
+	protected ArrayList<VisitedPlace> places;
+	
+	protected String  routeJson;
+	
+	public static class TripLeg {
+		LegData   legData;
+		RoadDirectionData roadDirectionData;
+		ArrayList<StopData> stopDataList;
+		ArrayList<DriverAssignments> driverAssignmentsList;
+	}
+	
+	protected ArrayList<TripLeg>  tripLegs;
+	
+	
+	public TripPlan() {
+		lastModified = new Date();
+		places = new ArrayList<>();
+		routeJson = "";
+		tripLegs = new ArrayList<>();
+	}
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("Robauto TripPlan: ");
+		sb.append(lastModified.toString());
+		sb.append('\n');
+		sb.append( String.format("  RouteJson: %d\n", routeJson.length()));
+		sb.append( String.format("  Places: %d\n", places.size()));
+		sb.append( String.format("  Legs: %d\n", tripLegs.size()));
+		return sb.toString();
+	}
+
+	@Override
+	public int compareTo(TripPlan o) {
+		return lastModified.compareTo(o.lastModified);
+	}
+
+	public void save(File file) {
+		lastModified = new Date();
+		try {
+			FileOutputStream fos = new FileOutputStream(file);
+			ObjectOutputStream out = new ObjectOutputStream(fos);
+			out.writeObject(this);
+			out.close();
+		} catch (Exception x) {
+			x.printStackTrace();
+		}
+	}
+
+	public static TripPlan load(File file) {
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			ObjectInputStream in = new ObjectInputStream(fis);
+			TripPlan tripPlan = (TripPlan) in.readObject();
+			in.close();
+			return tripPlan;
+		} catch (Exception x) {
+			x.printStackTrace();
+			return null;
+		}
+	}
+	public static void main(String[] args) {
+		TripPlan tripPlan = new TripPlan();
+		System.out.println(tripPlan);
+		File file = new File("robautoTripPlan.obj");
+		tripPlan.save( file );
+		TripPlan out = TripPlan.load( file );
+		System.out.println(out);
+	}
+
+}
