@@ -21,6 +21,9 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
 
@@ -47,6 +50,12 @@ import com.bluelightning.poi.TruckStopPOI;
 import com.bluelightning.poi.WalmartPOI;
 import com.google.common.eventbus.Subscribe;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.status.OnConsoleStatusListener;
+import ch.qos.logback.core.status.Status;
+import ch.qos.logback.core.status.StatusListener;
+import ch.qos.logback.core.status.StatusManager;
+import ch.qos.logback.core.util.StatusPrinter;
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.place.VisitedPlace;
 import seedu.addressbook.logic.Logic;
@@ -70,6 +79,7 @@ public class Main {
 	protected WebBrowser browserCanvas;
 	protected Logic controller;
 	protected AddressBook addressBook;
+	public static Logger logger;
 
 	public class POIClickHandler {
 		@Subscribe
@@ -92,7 +102,7 @@ public class Main {
 			switch (event.source) {
 			case "RoutePanel.AddAfter":
 				tripPlan.setPlacesChanged(true);
-				SwingUtilities.invokeLater( new Runnable() {
+				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						routeAdd(true);
@@ -101,7 +111,7 @@ public class Main {
 				break;
 			case "RoutePanel.AddBefore":
 				tripPlan.setPlacesChanged(true);
-				SwingUtilities.invokeLater( new Runnable() {
+				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						routeAdd(false);
@@ -110,7 +120,7 @@ public class Main {
 				break;
 			case "RoutePanel.MoveDown":
 				tripPlan.setPlacesChanged(true);
-				SwingUtilities.invokeLater( new Runnable() {
+				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						routeMoveDown();
@@ -119,7 +129,7 @@ public class Main {
 				break;
 			case "RoutePanel.MoveUp":
 				tripPlan.setPlacesChanged(true);
-				SwingUtilities.invokeLater( new Runnable() {
+				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						routeMoveUp();
@@ -128,7 +138,7 @@ public class Main {
 				break;
 			case "RoutePanel.Remove":
 				tripPlan.setPlacesChanged(true);
-				SwingUtilities.invokeLater( new Runnable() {
+				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						routeRemove();
@@ -136,17 +146,17 @@ public class Main {
 				});
 				break;
 			case "ControlPanel.Route":
-				SwingUtilities.invokeLater( new Runnable() {
+				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						route();
 					}
 				});
 				break;
-				
+
 			case "ControlPanel.Optimize":
 				if (route != null) {
-					
+
 				}
 				break;
 
@@ -172,70 +182,72 @@ public class Main {
 				System.out.println(nearby.size() + " total markers");
 				map.updateWaypoints(nearby);
 				break;
-				
+
 			case "Window.Closing":
 				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
 				tripPlan.save(tripPlanFile);
-//				System.out.println("Saved: " + tripPlan.toString() );
+				// System.out.println("Saved: " + tripPlan.toString() );
 				break;
 			default:
 				break;
 			}
 		}
-		
+
 		private void route() {
 			if (tripPlan.getPlacesChanged()) {
 				tripPlan.setRouteJson("");
 				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
 			}
-			route = Here2.computeRoute( tripPlan );
+			route = Here2.computeRoute(tripPlan);
 			if (route != null) {
 				waypoints = map.showRoute(route);
 				int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 				mainPanel.getRightTabbedPane().setSelectedIndex(index);
-//				insureNearbyMapLoaded(route, Main.MarkerKinds.RESTAREAS, poiMap.get(Main.MarkerKinds.RESTAREAS));
-//				OptimizeStops optimizeStops = new OptimizeStops(route, poiMap, nearbyMap);
+				// insureNearbyMapLoaded(route, Main.MarkerKinds.RESTAREAS,
+				// poiMap.get(Main.MarkerKinds.RESTAREAS));
+				// OptimizeStops optimizeStops = new OptimizeStops(route,
+				// poiMap, nearbyMap);
 			}
 			tripPlan.save(tripPlanFile);
 		}
 
 		private CallbackHandler handler = null;
-		
+
 		private class CallbackHandler {
 			boolean addAfter = true;
-			
-			public CallbackHandler( boolean after ) {
+
+			public CallbackHandler(boolean after) {
 				addAfter = after;
 			}
-			
+
 			@Subscribe
-			protected void handle( AddWaypointEvent event ) {
-				System.out.println( event + " " + event.place );
+			protected void handle(AddWaypointEvent event) {
+				System.out.println(event + " " + event.place);
 				Events.eventBus.unregister(this); // one shot
 				handler = null;
-				SwingUtilities.invokeLater( new Runnable() {
+				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
-						VisitedPlace place = new VisitedPlace( event.place );
+						VisitedPlace place = new VisitedPlace(event.place);
 						ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
 						if (places == null)
 							places = new ArrayList<>();
 						if (selectedWaypointRow < 0) {
 							places.add(place);
 						} else if (addAfter) {
-							places.add(selectedWaypointRow+1, place);
+							places.add(selectedWaypointRow + 1, place);
 						} else {
-							places.add(selectedWaypointRow, place);							
+							places.add(selectedWaypointRow, place);
 						}
 						routePanel.getWaypointsModel().setData(places);
 					}
-				} );
-			}			
+				});
+			}
 		}
 
-		private void routeAdd( boolean after) {
-			Events.eventBus.register( new CallbackHandler(after) );
+		private void routeAdd(boolean after) {
+			Events.eventBus.register(new CallbackHandler(after));
 			AddAddressDialog dialog = new AddAddressDialog(controller, addressBook);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
@@ -246,12 +258,12 @@ public class Main {
 			if (places == null)
 				places = new ArrayList<>();
 			int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
-			if (selectedWaypointRow < 0 || selectedWaypointRow >= places.size()-1)
-				return;  // nothing selected or selection already at end
+			if (selectedWaypointRow < 0 || selectedWaypointRow >= places.size() - 1)
+				return; // nothing selected or selection already at end
 			// swap this and next
 			VisitedPlace place = places.get(selectedWaypointRow);
-			places.set(selectedWaypointRow, places.get(selectedWaypointRow+1));
-			places.set(selectedWaypointRow+1, place);
+			places.set(selectedWaypointRow, places.get(selectedWaypointRow + 1));
+			places.set(selectedWaypointRow + 1, place);
 			routePanel.getWaypointsModel().setData(places);
 		}
 
@@ -261,21 +273,21 @@ public class Main {
 				places = new ArrayList<>();
 			int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
 			if (selectedWaypointRow <= 0)
-				return;  // nothing selected or selection already first
+				return; // nothing selected or selection already first
 			// swap this and prior
 			VisitedPlace place = places.get(selectedWaypointRow);
-			places.set(selectedWaypointRow, places.get(selectedWaypointRow-1));
-			places.set(selectedWaypointRow-1, place);
+			places.set(selectedWaypointRow, places.get(selectedWaypointRow - 1));
+			places.set(selectedWaypointRow - 1, place);
 			routePanel.getWaypointsModel().setData(places);
 		}
-		
+
 		private void routeRemove() {
 			ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
 			if (places == null)
 				return;
 			int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
 			if (selectedWaypointRow < 0)
-				return;  // nothing selected
+				return; // nothing selected
 			// swap this and prior
 			VisitedPlace place = places.get(selectedWaypointRow);
 			places.remove(selectedWaypointRow);
@@ -320,6 +332,33 @@ public class Main {
 		frame.setVisible(true);
 		browserCanvas.initialize(frame);
 
+		// assume SLF4J is bound to logback in the current environment
+		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+		// print logback's internal status
+		StatusPrinter.print(lc);
+//		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+//		StatusManager statusManager = lc.getStatusManager();
+		// OnConsoleStatusListener onConsoleListener = new
+		// OnConsoleStatusListener();
+		// statusManager.add(onConsoleListener);
+		// statusManager.add( new StatusListener() {
+		// @Override
+		// public void addStatusEvent(Status status) {
+		// final String message = status.toString();
+		// SwingUtilities.invokeLater( new Runnable() {
+		// @Override
+		// public void run() {
+		// StringBuffer sb = new StringBuffer();
+		// sb.append( mainPanel.getLowerTextArea().getText() );
+		// sb.append('\n');
+		// sb.append( message );
+		// mainPanel.getLowerTextArea().setText( sb.toString() );
+		// }
+		// });
+		// }
+		// });
+		logger.debug("Hello world.");
+
 		// load base POI sets
 		loadPOIMap(poiMap);
 
@@ -327,28 +366,28 @@ public class Main {
 
 		Events.eventBus.register(new UiHandler());
 		Events.eventBus.register(new POIClickHandler());
-		
+
 		try {
 			controller = new Logic();
 			controller.getStorage().load();
 			addressBook = controller.getAddressBook();
-		} catch (Exception x) {		
+		} catch (Exception x) {
 			x.printStackTrace();
 		}
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-            	Events.eventBus.post( new Events.UiEvent("Window.Closing", e));
-            }
-        });
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				Events.eventBus.post(new Events.UiEvent("Window.Closing", e));
+			}
+		});
 
-		tripPlan = TripPlan.load( tripPlanFile );
-		System.out.println("Loaded: " + tripPlan.toString() );
+		tripPlan = TripPlan.load(tripPlanFile);
+		System.out.println("Loaded: " + tripPlan.toString());
 		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
 		if (!tripPlan.getRouteJson().isEmpty()) {
-			Events.eventBus.post( new Events.UiEvent("ControlPanel.Route", null));
+			Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
 		}
-		
+
 	}
 
 	public EnumMap<Main.MarkerKinds, ArrayList<POIResult>> getNearbyMap() {
@@ -356,6 +395,8 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
+		logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
+
 		Main main = new Main();
 	}
 
