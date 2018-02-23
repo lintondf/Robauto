@@ -123,7 +123,7 @@ public class RoutePanel extends JPanel {
 		
 		public void resizeColumns( JTable table, double totalWidth) {
 			TableColumn column = null;
-			for (int i = 0; i < getColumnCount(); i++) {
+			for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) { 
 			    column = table.getColumnModel().getColumn(i);
 			    int width = (int) (widths[i]*totalWidth);
 		        column.setPreferredWidth(width);

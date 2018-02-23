@@ -91,31 +91,57 @@ public class Main {
 			System.out.println(event.source + " " + event.awtEvent);
 			switch (event.source) {
 			case "RoutePanel.AddAfter":
-				routeAdd(true);
+				tripPlan.setPlacesChanged(true);
+				SwingUtilities.invokeLater( new Runnable() {
+					@Override
+					public void run() {
+						routeAdd(true);
+					}
+				});
 				break;
 			case "RoutePanel.AddBefore":
-				routeAdd(false);
+				tripPlan.setPlacesChanged(true);
+				SwingUtilities.invokeLater( new Runnable() {
+					@Override
+					public void run() {
+						routeAdd(false);
+					}
+				});
 				break;
 			case "RoutePanel.MoveDown":
-				routeMoveDown();
+				tripPlan.setPlacesChanged(true);
+				SwingUtilities.invokeLater( new Runnable() {
+					@Override
+					public void run() {
+						routeMoveDown();
+					}
+				});
 				break;
 			case "RoutePanel.MoveUp":
-				routeMoveUp();
+				tripPlan.setPlacesChanged(true);
+				SwingUtilities.invokeLater( new Runnable() {
+					@Override
+					public void run() {
+						routeMoveUp();
+					}
+				});
 				break;
 			case "RoutePanel.Remove":
-				routeRemove();
+				tripPlan.setPlacesChanged(true);
+				SwingUtilities.invokeLater( new Runnable() {
+					@Override
+					public void run() {
+						routeRemove();
+					}
+				});
 				break;
 			case "ControlPanel.Route":
-				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
-				tripPlan.save(tripPlanFile);
-				route = Here2.computeRoute( tripPlan );
-				if (route != null) {
-					waypoints = map.showRoute(route);
-					int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
-					mainPanel.getRightTabbedPane().setSelectedIndex(index);
-					insureNearbyMapLoaded(route, Main.MarkerKinds.RESTAREAS, poiMap.get(Main.MarkerKinds.RESTAREAS));
-					OptimizeStops optimizeStops = new OptimizeStops(route, poiMap, nearbyMap);
-				}
+				SwingUtilities.invokeLater( new Runnable() {
+					@Override
+					public void run() {
+						route();
+					}
+				});
 				break;
 				
 			case "ControlPanel.Optimize":
@@ -157,6 +183,22 @@ public class Main {
 			}
 		}
 		
+		private void route() {
+			if (tripPlan.getPlacesChanged()) {
+				tripPlan.setRouteJson("");
+				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
+			}
+			route = Here2.computeRoute( tripPlan );
+			if (route != null) {
+				waypoints = map.showRoute(route);
+				int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
+				mainPanel.getRightTabbedPane().setSelectedIndex(index);
+//				insureNearbyMapLoaded(route, Main.MarkerKinds.RESTAREAS, poiMap.get(Main.MarkerKinds.RESTAREAS));
+//				OptimizeStops optimizeStops = new OptimizeStops(route, poiMap, nearbyMap);
+			}
+			tripPlan.save(tripPlanFile);
+		}
+
 		private CallbackHandler handler = null;
 		
 		private class CallbackHandler {
@@ -278,10 +320,6 @@ public class Main {
 		frame.setVisible(true);
 		browserCanvas.initialize(frame);
 
-		tripPlan = TripPlan.load( tripPlanFile );
-		System.out.println("Loaded: " + tripPlan.toString() );
-		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
-		
 		// load base POI sets
 		loadPOIMap(poiMap);
 
@@ -304,6 +342,13 @@ public class Main {
             }
         });
 
+		tripPlan = TripPlan.load( tripPlanFile );
+		System.out.println("Loaded: " + tripPlan.toString() );
+		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
+		if (!tripPlan.getRouteJson().isEmpty()) {
+			Events.eventBus.post( new Events.UiEvent("ControlPanel.Route", null));
+		}
+		
 	}
 
 	public EnumMap<Main.MarkerKinds, ArrayList<POIResult>> getNearbyMap() {

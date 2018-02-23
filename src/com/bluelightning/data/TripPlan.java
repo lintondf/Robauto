@@ -23,6 +23,8 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	
 	protected Date   lastModified;
 	
+	protected boolean  placesChanged;
+	
 	protected ArrayList<VisitedPlace> places;
 	
 	protected String  routeJson;
@@ -42,6 +44,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		places = new ArrayList<>();
 		routeJson = "";
 		tripLegs = new ArrayList<>();
+		placesChanged = false;
 	}
 	
 	public String toString() {
@@ -107,6 +110,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	public void setPlaces(ArrayList<VisitedPlace> places) {
 		this.places = places;
+		this.placesChanged = false;
 	}
 
 	public String getRouteJson() {
@@ -123,6 +127,14 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	public void setTripLegs(ArrayList<TripLeg> tripLegs) {
 		this.tripLegs = tripLegs;
+	}
+
+	public boolean getPlacesChanged() {
+		return placesChanged;
+	}
+
+	public void setPlacesChanged(boolean placesChanged) {
+		this.placesChanged = placesChanged;
 	}
 
 }
