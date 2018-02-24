@@ -165,13 +165,11 @@ public class OptimizeStopsDialog extends JDialog {
 	
 	
 	protected void commitSelectedChoice() {
-//		for (ArrayList<OptimizeStops.StopData> stopList : legStopData ) {
-//			stopList.forEach( System.out::println );
-//		}
+		String html = updateTripData();
+		Events.eventBus.post( new Events.StopsCommitEvent( html ) );
 	}
 	
 	protected void chooseCurrentTab() {
-		// TODO not this way; build output tab from saved data for all legs; need StopData constructors
 		int selected = choicesTabbedPane.getSelectedIndex();
 		if (selected >= 0) {
 			optimizeStops.getTripPlan().getTripLegs().get(currentLeg).driverAssignments = presentedChoices.get(selected);
@@ -474,7 +472,7 @@ public class OptimizeStopsDialog extends JDialog {
 	}
 	
 	
-	public void updateTripData() {
+	public String updateTripData() {
 		ArrayList<TripLeg> tripLegs = optimizeStops.getTripPlan().getTripLegs();
 		ArrayList<OptimizeStops.LegData> legDataList = new ArrayList<>();
 		Report report = new Report();
@@ -484,8 +482,9 @@ public class OptimizeStopsDialog extends JDialog {
 		}
 		legTableModel.setData(legDataList);
 		outputTextPane.setContentType("text/html");
-		outputTextPane.setText(report.toHtml());
-
+		String html = report.toHtml();
+		outputTextPane.setText(html);
+		return html;
 	}
 	
 	public void setCurrentLeg( TripLeg legData ) {
@@ -620,7 +619,7 @@ public class OptimizeStopsDialog extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 			{
-				commitButton = new JButton("Commit");
+				commitButton = new JButton("OK");
 				commitButton.setActionCommand("Commit");
 				buttonPane.add(commitButton);
 			}

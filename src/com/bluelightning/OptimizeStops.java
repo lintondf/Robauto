@@ -396,7 +396,7 @@ public class OptimizeStops {
 			tripLeg.roadDirectionDataList = getUiRoadData(iLeg);
 			tripLeg.stopDataList = getUiStopData(TripPlan.N_DRIVERS, iLeg, false, tripLeg.roadDirectionDataList);
 			ArrayList<StopData> endPoints = new ArrayList<>();
-			endPoints.add( tripLeg.stopDataList.get(0) );
+//			endPoints.add( tripLeg.stopDataList.get(0) );
 			endPoints.add( tripLeg.stopDataList.get(tripLeg.stopDataList.size()-1) );
 			tripLeg.driverAssignments = generateDriverAssignments(TripPlan.N_DRIVERS, tripLeg.legData, endPoints );
 //					tripLeg.stopDataList);

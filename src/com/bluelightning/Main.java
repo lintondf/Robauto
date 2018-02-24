@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.jxmapviewer.JXMapViewer;
 import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
+import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.OptimizeStops.DriverAssignments;
 import com.bluelightning.OptimizeStops.LegData;
@@ -78,6 +80,7 @@ public class Main {
 	protected Logic controller;
 	protected AddressBook addressBook;
 	public static Logger logger;
+	protected JTextPane resultsPane;
 
 	public class POIClickHandler {
 		@Subscribe
@@ -94,6 +97,11 @@ public class Main {
 	}
 
 	public class UiHandler {
+		@Subscribe
+		protected void handle(StopsCommitEvent event) {
+			resultsPane.setText(event.html);
+		}
+		
 		@Subscribe
 		protected void handle(UiEvent event) {
 			System.out.println(event.source + " " + event.awtEvent);
@@ -412,6 +420,13 @@ public class Main {
 		controlPanel = new MainControlPanel();
 		mainPanel.getLeftPanel().add(controlPanel);
 		frame.setContentPane(mainPanel);
+		
+		resultsPane = new JTextPane();
+		resultsPane.setVisible(true);
+		resultsPane.setContentType("text/html");
+		resultsPane.setEditable(false);
+		JScrollPane scroll = new JScrollPane(resultsPane);
+		mainPanel.getRightTabbedPane().addTab("Results", null, scroll, null);
 		// frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		frame.setSize(800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -458,6 +473,14 @@ public class Main {
 
 	public static void main(String[] args) {
 		Main main = new Main();
+	}
+
+	public JTextPane getResultsPane() {
+		return resultsPane;
+	}
+
+	public void setResultsPane(JTextPane resultsPane) {
+		this.resultsPane = resultsPane;
 	}
 
 }

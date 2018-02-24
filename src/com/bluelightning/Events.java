@@ -44,6 +44,14 @@ public class Events {
 		}
 	}
 	
+	public static class StopsCommitEvent {
+		public String html;
+		
+		public StopsCommitEvent( String html ) {
+			this.html = html;
+		}
+	}
+	
 	public static class UiEvent {
 		public String source;
 		public AWTEvent awtEvent;
