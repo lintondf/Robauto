@@ -64,6 +64,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import javax.swing.ScrollPaneConstants;
 
 
 public class OptimizeStopsDialog extends JDialog {
@@ -136,7 +137,7 @@ public class OptimizeStopsDialog extends JDialog {
 			handler = new CallbackHandler( currentLeg, false, selected);
 			double distance0 = stopsTableModel.getData().get(selected).totalDistance;
 			double distance1 = stopsTableModel.getData().get(selected+1).totalDistance;
-			this.add( handler, distance0, distance1 );
+			startAddDialog( handler, distance0, distance1 );
 		}
 	}
 	
@@ -150,10 +151,10 @@ public class OptimizeStopsDialog extends JDialog {
 			distance0 = stopsTableModel.getData().get(selected-1).totalDistance;
 		}
 		handler = new CallbackHandler( currentLeg, true, selected);
-		this.add( handler, distance0, distance1 );
+		startAddDialog( handler, distance0, distance1 );
 	}
 	
-	protected void add(CallbackHandler handler, double distance0, double distance1) {
+	protected void startAddDialog(CallbackHandler handler, double distance0, double distance1) {
 			ArrayList<POIResult> segmentPOI = optimizeStops.getRouteSegmentPOI(distance0, distance1);
 			AddManualStopDialog addDialog = new AddManualStopDialog();
 			addDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -571,7 +572,7 @@ public class OptimizeStopsDialog extends JDialog {
 				choicesPanel.setLayout(new BorderLayout(0, 0));
 				{
 					choicesTabbedPane = new JTabbedPane(JTabbedPane.TOP);
-					choicesPanel.add(choicesTabbedPane, BorderLayout.NORTH);
+					choicesPanel.add(choicesTabbedPane); //, BorderLayout.NORTH);
 					choicesTabbedPane.addChangeListener( new ChangeListener() {
 						@Override
 						public void stateChanged(ChangeEvent event) {
@@ -584,8 +585,12 @@ public class OptimizeStopsDialog extends JDialog {
 				outputPanel.setLayout(new BorderLayout(0, 0));
 				{
 					outputTextPane = new JTextPane();
+					outputTextPane.setContentType("text/html");
+					outputTextPane.setEditable(false);
 					JScrollPane scroll = new JScrollPane(outputTextPane);
-					outputPanel.add(scroll, BorderLayout.NORTH);
+					scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+					scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+					outputPanel.add(scroll);//, BorderLayout.NORTH);
 				}
 			}
 		}
