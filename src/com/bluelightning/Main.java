@@ -2,43 +2,42 @@ package com.bluelightning;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Label;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map.Entry;
-import java.util.TreeMap;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.viewer.GeoPosition;
-
-import com.bluelightning.Events.AddManualStopEvent;
 import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.UiEvent;
-import com.bluelightning.Main.MarkerKinds;
+import com.bluelightning.OptimizeStops.DriverAssignments;
+import com.bluelightning.OptimizeStops.LegData;
+import com.bluelightning.OptimizeStops.RoadDirectionData;
+import com.bluelightning.OptimizeStops.StopData;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.gui.AddAddressDialog;
 import com.bluelightning.gui.MainControlPanel;
 import com.bluelightning.gui.MainPanel;
+import com.bluelightning.gui.OptimizeStopsDialog;
 import com.bluelightning.gui.RoutePanel;
 import com.bluelightning.gui.WebBrowser;
-import com.bluelightning.gui.WebBrowser.UiHandler;
+import com.bluelightning.gui.OptimizeStopsDialog.OptimizeActionListener;
+import com.bluelightning.gui.OptimizeStopsDialog.OptimizeLegSelectionListener;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.POIMarker;
@@ -52,18 +51,9 @@ import com.google.common.eventbus.Subscribe;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.PatternLayout;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.classic.html.HTMLLayout;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
-import ch.qos.logback.core.LayoutBase;
-import ch.qos.logback.core.encoder.LayoutWrappingEncoder;
-import ch.qos.logback.core.status.OnConsoleStatusListener;
-import ch.qos.logback.core.status.Status;
-import ch.qos.logback.core.status.StatusListener;
-import ch.qos.logback.core.status.StatusManager;
-import ch.qos.logback.core.util.StatusPrinter;
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.place.VisitedPlace;
 import seedu.addressbook.logic.Logic;
@@ -163,9 +153,14 @@ public class Main {
 				break;
 
 			case "ControlPanel.Optimize":
-				if (route != null) {
-
-				}
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						if (route != null) {
+							optimizeStops();
+						}
+					}
+				});
 				break;
 
 			case "ControlPanel.Waypoints":
@@ -202,23 +197,96 @@ public class Main {
 		}
 
 		private void route() {
+			logger.info("Planning route...");
 			if (tripPlan.getPlacesChanged()) {
 				tripPlan.setRouteJson("");
 				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
+				logger.info("  Route points saved");
 			}
 			route = Here2.computeRoute(tripPlan);
+			logger.info("  Route planned");
 			if (route != null) {
 				waypoints = map.showRoute(route);
 				int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 				mainPanel.getRightTabbedPane().setSelectedIndex(index);
+				logger.info("  Route shown on map");
 				// insureNearbyMapLoaded(route, Main.MarkerKinds.RESTAREAS,
 				// poiMap.get(Main.MarkerKinds.RESTAREAS));
 				// OptimizeStops optimizeStops = new OptimizeStops(route,
 				// poiMap, nearbyMap);
 			}
 			tripPlan.save(tripPlanFile);
+			logger.info("  Trip plan saved");
 		}
 
+		private void optimizeStops() {
+			EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
+			EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
+			Main.loadPOIMap( poiMap );
+			poiMap.forEach((kind, set) -> {
+				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(route, 5e3 ));
+			} );
+			
+			
+			OptimizeStops optimizeStops = new OptimizeStops( route, poiMap, nearbyMap );
+			optimizeStops.updateTripPlan( tripPlan );
+			
+			int iLeg = 0;  // start with first leg
+			
+			// generate all possible permutations of driver assignments
+			//  do not permute stopping at the arrival point (last in stopDataList)
+			Permutations perm = new Permutations( tripPlan.getTripLegs().get(iLeg).stopDataList.size()-1 );
+			ArrayList<Integer[]> unique = perm.monotonic();
+			Set<OptimizeStops.DriverAssignments> driverAssignments = new TreeSet<>();
+			for (Integer[] elements : unique) {
+				driverAssignments.add( OptimizeStops.generateDriverAssignments(TripPlan.N_DRIVERS, 
+						tripPlan.getTripLegs().get(iLeg).legData, 
+						tripPlan.getTripLegs().get(iLeg).stopDataList, 
+						elements) );
+				
+			}
+			Iterator<OptimizeStops.DriverAssignments> it = driverAssignments.iterator();
+				
+			try {
+				OptimizeStopsDialog dialog = new OptimizeStopsDialog(optimizeStops);
+				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setVisible(true);
+
+				dialog.setTripData( tripPlan.getTripLegs() );
+				dialog.setLegData(tripPlan.getTripLegs().get(iLeg));
+				
+				dialog.addListeners(
+						dialog.new OptimizeActionListener(),
+						dialog.new OptimizeLegSelectionListener()
+						);
+				
+				for (int i = 0; it.hasNext() && i < 5; i++) {
+					String html = OptimizeStops.toHtml(2, tripPlan.getTripLegs().get(0).legData, it.next() );
+					if (i==0) try {
+						PrintWriter out = new PrintWriter("report.html");
+						out.println(html);
+						out.close();
+					} catch (Exception x) {
+						x.printStackTrace();
+					}				
+					JPanel panel = new JPanel();
+					dialog.getOutputTabbedPane().addTab(String.format("Case %d", 1+i), null, panel, null);
+					dialog.getOutputTabbedPane().setEnabledAt(i, true);
+					panel.setLayout(new BorderLayout(0, 0));
+					{
+						JTextPane textPane = new JTextPane();
+						textPane.setContentType("text/html");
+						textPane.setText(html);
+						panel.add(textPane);
+					}
+				} // for i
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
 		private CallbackHandler handler = null;
 
 		private class CallbackHandler {
@@ -324,6 +392,16 @@ public class Main {
 
 		Layout<ILoggingEvent> layout;
 
+		public TextAreaAppender(LoggerContext lc) {
+			setContext(lc);
+			setName("robauto");
+			PatternLayout layout = new PatternLayout();
+			layout.setPattern("%d{HH:mm:ss.SSS} [%thread] %-5level: %msg%n");
+			layout.setContext(lc);
+			layout.start();
+			setLayout(layout);
+		}
+
 		public Layout<ILoggingEvent> getLayout() {
 			return layout;
 		}
@@ -343,22 +421,26 @@ public class Main {
 
 		@Override
 		protected void append(ILoggingEvent event) {
-			System.out.println("TAE: " + event.toString() + " " + layout);
+			//System.out.println("TAE: " + event.toString() + " " + layout);
 			final String message = layout.doLayout(event);
-			SwingUtilities.invokeLater( new Runnable(){
+			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					StringBuffer sb = new StringBuffer(mainPanel.getLowerTextArea().getText());
 					sb.append(message);
-					sb.append('\n');
 					mainPanel.getLowerTextArea().setText(sb.toString());
 				}
 			});
 		}
 
 	}
-	
+
 	public Main() {
+		logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
+		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+		ch.qos.logback.classic.Logger rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
+		TextAreaAppender a = new TextAreaAppender(lc);
+		a.start();
 		// Display the viewer in a JFrame
 		JFrame frame = new JFrame("RobAuto RV Trip Planner");
 		mainPanel = new MainPanel();
@@ -376,10 +458,13 @@ public class Main {
 		frame.setSize(800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-			browserCanvas.initialize(frame);
+		browserCanvas.initialize(frame);
+		rootLogger.addAppender(a);  // logging to text area can start once frame is visible
+		logger.info("Robauto Planner starting");
 
-			// load base POI sets
-			loadPOIMap(poiMap);
+		// load base POI sets
+		logger.info("Loading points of interest");
+		loadPOIMap(poiMap);
 
 		// Bind event handlers
 
@@ -399,6 +484,7 @@ public class Main {
 			}
 		});
 
+		logger.info("Loading previous trip plan");		
 		tripPlan = TripPlan.load(tripPlanFile);
 		System.out.println("Loaded: " + tripPlan.toString());
 		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
@@ -412,47 +498,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
-		// assume SLF4J is bound to logback in the current environment
-		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-		// print logback's internal status
-//		StatusPrinter.print(lc);
-//		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-//		StatusManager statusManager = lc.getStatusManager();
-		// OnConsoleStatusListener onConsoleListener = new
-		// OnConsoleStatusListener();
-		// statusManager.add(onConsoleListener);
-		// statusManager.add( new StatusListener() {
-		// @Override
-		// public void addStatusEvent(Status status) {
-		// final String message = status.toString();
-		// SwingUtilities.invokeLater( new Runnable() {
-		// @Override
-		// public void run() {
-		// StringBuffer sb = new StringBuffer();
-		// sb.append( mainPanel.getLowerTextArea().getText() );
-		// sb.append('\n');
-		// sb.append( message );
-		// mainPanel.getLowerTextArea().setText( sb.toString() );
-		// }
-		// });
-		// }
-		// });
-
 		Main main = new Main();
-		ch.qos.logback.classic.Logger rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
-		TextAreaAppender a = main.new TextAreaAppender();
-		a.setContext(lc);
-		a.setName("robauto");
-		PatternLayout layout = new PatternLayout();
-		layout.setPattern("%d{HH:mm:ss.SSS} [%thread] %-5level: %msg%n");
-		layout.setContext(lc);
-		layout.start();
-		a.setLayout(layout);
-		a.start();
-		rootLogger.addAppender( a );
-		logger.debug("Hello world.");
-
 	}
 
 }

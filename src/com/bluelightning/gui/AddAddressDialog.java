@@ -17,7 +17,7 @@ import javax.swing.table.TableColumn;
 
 import com.bluelightning.Events;
 import com.bluelightning.Events.AddWaypointEvent;
-import com.bluelightning.gui.OptimizeStopsDialog.StopData;
+import com.bluelightning.OptimizeStops.StopData;
 
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.place.Place;

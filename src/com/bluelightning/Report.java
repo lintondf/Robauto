@@ -101,6 +101,7 @@ public class Report implements Serializable {
 			Chunk t = theme.makeChunk("report#dayTotalRow");
 			t.set("leg1Total", driver0Total);
 			t.set("leg2Total", driver1Total);
+			t.set("totalDuration", duration);
 			sb.append( t.toString() );
 			c.set("rows", sb.toString());
 			return c.toString();

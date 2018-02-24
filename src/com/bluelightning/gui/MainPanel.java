@@ -1,6 +1,7 @@
 package com.bluelightning.gui;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
@@ -93,7 +94,9 @@ public class MainPanel extends JPanel {
 		
 		lowerTextArea = new JTextArea();
 		lowerTextArea.setText("Log Messages");
-		lowerPanel.add(lowerTextArea);
+		lowerTextArea.setAutoscrolls(true);
+		JScrollPane scroll = new JScrollPane(lowerTextArea);
+		lowerPanel.add(scroll);
 
 	}
 

@@ -9,34 +9,37 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.bluelightning.OptimizeStops;
+import com.bluelightning.OptimizeStops.DriverAssignments;
+import com.bluelightning.OptimizeStops.LegData;
+import com.bluelightning.OptimizeStops.RoadDirectionData;
+import com.bluelightning.OptimizeStops.StopData;
 import com.bluelightning.Report;
-import com.bluelightning.gui.OptimizeStopsDialog.DriverAssignments;
-import com.bluelightning.gui.OptimizeStopsDialog.LegData;
-import com.bluelightning.gui.OptimizeStopsDialog.RoadDirectionData;
-import com.bluelightning.gui.OptimizeStopsDialog.StopData;
 
 import seedu.addressbook.data.place.VisitedPlace;
 
 public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	public static final int N_DRIVERS = 2;
 	
-	protected Date   lastModified;
+	protected Date                    lastModified;
 	
-	protected boolean  placesChanged;
+	protected boolean                 placesChanged;
 	
 	protected ArrayList<VisitedPlace> places;
 	
-	protected String  routeJson;
+	protected String                  routeJson;
 	
-	public static class TripLeg {
-		LegData   legData;
-		RoadDirectionData roadDirectionData;
-		ArrayList<StopData> stopDataList;
-		ArrayList<DriverAssignments> driverAssignmentsList;
+	public static class TripLeg implements Serializable {
+		public OptimizeStops.LegData                      legData;
+		public ArrayList<OptimizeStops.RoadDirectionData> roadDirectionDataList;
+		public ArrayList<OptimizeStops.StopData>          stopDataList;
+		public OptimizeStops.DriverAssignments            driverAssignments;
 	}
 	
-	protected ArrayList<TripLeg>  tripLegs;
+	protected ArrayList<TripLeg>      tripLegs;
 	
 	
 	public TripPlan() {

@@ -1,7 +1,7 @@
 {
   "response": {
     "metaInfo": {
-      "timestamp": "2018-02-23T14:48:26Z",
+      "timestamp": "2018-02-24T14:32:30Z",
       "mapVersion": "8.30.80.153",
       "moduleVersion": "7.2.201807-12514",
       "interfaceVersion": "2.6.34",
@@ -2344,7 +2344,7 @@
                 "nextRoadName": "N Wickham Rd",
                 "roadNumber": "",
                 "nextRoadNumber": "",
-                "trafficTime": 283,
+                "trafficTime": 285,
                 "baseTime": 283,
                 "startAngle": 180,
                 "id": "M3",
@@ -3644,7 +3644,7 @@
                 "nextRoadName": "I-295 East Bltwy",
                 "roadNumber": "SR-9B",
                 "nextRoadNumber": "I-295",
-                "trafficTime": 1691,
+                "trafficTime": 1576,
                 "baseTime": 1576,
                 "roadShield": {
                   "region": "USA",
@@ -3864,7 +3864,7 @@
                 "roadNumber": "I-295",
                 "nextRoadNumber": "I-95",
                 "freewayExit": "35B",
-                "trafficTime": 1287,
+                "trafficTime": 1361,
                 "baseTime": 1287,
                 "roadShield": {
                   "region": "USA",
@@ -4618,7 +4618,7 @@
                 "nextRoadName": "Howard Gilman Hwy",
                 "roadNumber": "I-95",
                 "nextRoadNumber": "I-95",
-                "trafficTime": 6313,
+                "trafficTime": 6317,
                 "baseTime": 6313,
                 "roadShield": {
                   "region": "USA",
@@ -5464,11 +5464,11 @@
                 "maneuver": "M3",
                 "speedLimit": 20.0,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 11.3888893,
-                  "trafficTime": 30,
+                  "trafficSpeed": 11.1111107,
+                  "trafficTime": 31,
                   "baseSpeed": 11.3888893,
                   "baseTime": 30,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.3000011
                 },
                 "flags": [
                   "builtUpArea"
@@ -5495,11 +5495,11 @@
                 "maneuver": "M3",
                 "speedLimit": 20.0,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 11.3888893,
-                  "trafficTime": 5,
+                  "trafficSpeed": 11.1111107,
+                  "trafficTime": 6,
                   "baseSpeed": 12.7777777,
                   "baseTime": 5,
-                  "jamFactor": 1.4634147
+                  "jamFactor": 1.7999997
                 },
                 "flags": [
                   "builtUpArea"
@@ -21073,11 +21073,11 @@
                 "maneuver": "M7",
                 "speedLimit": 26.9444447,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 9.166667,
-                  "trafficTime": 52,
+                  "trafficSpeed": 21.666666,
+                  "trafficTime": 22,
                   "baseSpeed": 21.6666679,
                   "baseTime": 22,
-                  "jamFactor": 7.3636365
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway"
@@ -21104,11 +21104,11 @@
                 "maneuver": "M7",
                 "speedLimit": 26.9444447,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 9.166667,
-                  "trafficTime": 4,
+                  "trafficSpeed": 20.0,
+                  "trafficTime": 2,
                   "baseSpeed": 20.0,
                   "baseTime": 2,
-                  "jamFactor": 7.181818
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway"
@@ -21135,11 +21135,11 @@
                 "maneuver": "M7",
                 "speedLimit": 26.9444447,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 9.166667,
-                  "trafficTime": 3,
+                  "trafficSpeed": 20.0,
+                  "trafficTime": 1,
                   "baseSpeed": 20.0,
                   "baseTime": 1,
-                  "jamFactor": 7.181818
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway"
@@ -21169,11 +21169,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 9.166667,
-                  "trafficTime": 87,
+                  "trafficSpeed": 24.166666,
+                  "trafficTime": 33,
                   "baseSpeed": 24.1666679,
                   "baseTime": 33,
-                  "jamFactor": 7.636364
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway"
@@ -21201,11 +21201,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 18.8888893,
-                  "trafficTime": 74,
+                  "trafficSpeed": 24.4444447,
+                  "trafficTime": 58,
                   "baseSpeed": 24.4444447,
                   "baseTime": 58,
-                  "jamFactor": 3.3529406
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway"
@@ -21233,11 +21233,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 23.0555553,
-                  "trafficTime": 24,
+                  "trafficSpeed": 25.2777786,
+                  "trafficTime": 22,
                   "baseSpeed": 25.2777786,
                   "baseTime": 22,
-                  "jamFactor": 1.1566272
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway",
@@ -21266,11 +21266,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 23.0555553,
-                  "trafficTime": 32,
+                  "trafficSpeed": 25.2777786,
+                  "trafficTime": 30,
                   "baseSpeed": 25.2777786,
                   "baseTime": 30,
-                  "jamFactor": 1.1566272
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway",
@@ -21500,11 +21500,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 24.166666,
+                  "trafficSpeed": 25.0,
                   "trafficTime": 3,
                   "baseSpeed": 25.0,
                   "baseTime": 3,
-                  "jamFactor": 0.413794
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway",
@@ -21536,11 +21536,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 24.166666,
+                  "trafficSpeed": 25.2777786,
                   "trafficTime": 12,
                   "baseSpeed": 25.2777786,
                   "baseTime": 12,
-                  "jamFactor": 0.5517254
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway",
@@ -21568,11 +21568,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 24.166666,
+                  "trafficSpeed": 25.2777786,
                   "trafficTime": 2,
                   "baseSpeed": 25.2777786,
                   "baseTime": 2,
-                  "jamFactor": 0.5517254
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway",
@@ -21600,11 +21600,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 24.166666,
-                  "trafficTime": 7,
+                  "trafficSpeed": 25.2777786,
+                  "trafficTime": 6,
                   "baseSpeed": 25.2777786,
                   "baseTime": 6,
-                  "jamFactor": 0.5517254
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway",
@@ -21632,11 +21632,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 24.166666,
+                  "trafficSpeed": 25.2777786,
                   "trafficTime": 4,
                   "baseSpeed": 25.2777786,
                   "baseTime": 4,
-                  "jamFactor": 0.5517254
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway",
@@ -21667,11 +21667,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 24.166666,
+                  "trafficSpeed": 25.2777786,
                   "trafficTime": 9,
                   "baseSpeed": 25.2777786,
                   "baseTime": 9,
-                  "jamFactor": 0.5517254
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway",
@@ -21700,11 +21700,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 19.166666,
-                  "trafficTime": 7,
+                  "trafficSpeed": 25.2777786,
+                  "trafficTime": 5,
                   "baseSpeed": 25.2777786,
                   "baseTime": 5,
-                  "jamFactor": 3.550725
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway",
@@ -21735,11 +21735,11 @@
                 "maneuver": "M7",
                 "speedLimit": 29.1666679,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 18.8888893,
-                  "trafficTime": 15,
+                  "trafficSpeed": 25.2777786,
+                  "trafficTime": 11,
                   "baseSpeed": 25.2777786,
                   "baseTime": 11,
-                  "jamFactor": 3.7058821
+                  "jamFactor": 0.0
                 },
                 "flags": [
                   "motorway",
@@ -27920,11 +27920,11 @@
                 "maneuver": "M8",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.666666,
-                  "trafficTime": 32,
+                  "trafficSpeed": 15.2777777,
+                  "trafficTime": 56,
                   "baseSpeed": 26.6666679,
                   "baseTime": 32,
-                  "jamFactor": 0.0
+                  "jamFactor": 5.9818187
                 },
                 "flags": [
                   "motorway"
@@ -27951,11 +27951,11 @@
                 "maneuver": "M8",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
-                  "trafficTime": 3,
+                  "trafficSpeed": 15.2777777,
+                  "trafficTime": 5,
                   "baseSpeed": 26.9444447,
                   "baseTime": 3,
-                  "jamFactor": 0.0
+                  "jamFactor": 6.0545454
                 },
                 "flags": [
                   "motorway"
@@ -27983,11 +27983,11 @@
                 "maneuver": "M8",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.666666,
-                  "trafficTime": 2,
+                  "trafficSpeed": 15.2777777,
+                  "trafficTime": 4,
                   "baseSpeed": 26.6666679,
                   "baseTime": 2,
-                  "jamFactor": 0.0
+                  "jamFactor": 5.9818187
                 },
                 "flags": [
                   "motorway"
@@ -28016,11 +28016,11 @@
                 "maneuver": "M8",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
-                  "trafficTime": 6,
+                  "trafficSpeed": 15.2777777,
+                  "trafficTime": 11,
                   "baseSpeed": 26.9444447,
                   "baseTime": 6,
-                  "jamFactor": 0.0
+                  "jamFactor": 6.0545454
                 },
                 "flags": [
                   "motorway"
@@ -28049,11 +28049,11 @@
                 "maneuver": "M8",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
-                  "trafficTime": 30,
+                  "trafficSpeed": 15.2777777,
+                  "trafficTime": 53,
                   "baseSpeed": 26.9444447,
                   "baseTime": 30,
-                  "jamFactor": 0.0
+                  "jamFactor": 6.0545454
                 },
                 "flags": [
                   "motorway"
@@ -28085,11 +28085,11 @@
                 "maneuver": "M8",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
-                  "trafficTime": 21,
+                  "trafficSpeed": 15.2777777,
+                  "trafficTime": 37,
                   "baseSpeed": 26.9444447,
                   "baseTime": 21,
-                  "jamFactor": 0.0
+                  "jamFactor": 6.0545454
                 },
                 "flags": [
                   "motorway"
@@ -28116,11 +28116,11 @@
                 "maneuver": "M8",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
-                  "trafficTime": 3,
+                  "trafficSpeed": 15.2777777,
+                  "trafficTime": 5,
                   "baseSpeed": 26.9444447,
                   "baseTime": 3,
-                  "jamFactor": 0.0
+                  "jamFactor": 6.0545454
                 },
                 "flags": [
                   "motorway"
@@ -28147,11 +28147,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
-                  "trafficTime": 4,
+                  "trafficSpeed": 17.2222214,
+                  "trafficTime": 6,
                   "baseSpeed": 26.9444447,
                   "baseTime": 4,
-                  "jamFactor": 0.0
+                  "jamFactor": 5.2580647
                 },
                 "flags": [
                   "motorway"
@@ -28179,11 +28179,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 2,
                   "baseSpeed": 26.9444447,
                   "baseTime": 2,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.125001
                 },
                 "flags": [
                   "motorway"
@@ -28214,11 +28214,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 12,
                   "baseSpeed": 26.9444447,
                   "baseTime": 12,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.125001
                 },
                 "flags": [
                   "motorway"
@@ -28248,11 +28248,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 4,
                   "baseSpeed": 26.9444447,
                   "baseTime": 4,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.125001
                 },
                 "flags": [
                   "motorway"
@@ -28286,11 +28286,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 10,
                   "baseSpeed": 26.9444447,
                   "baseTime": 10,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.125001
                 },
                 "flags": [
                   "motorway"
@@ -28320,11 +28320,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 27.2222214,
-                  "trafficTime": 7,
+                  "trafficSpeed": 26.666666,
+                  "trafficTime": 8,
                   "baseSpeed": 27.2222233,
                   "baseTime": 7,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.2500005
                 },
                 "flags": [
                   "motorway"
@@ -28351,11 +28351,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 1,
                   "baseSpeed": 26.9444447,
                   "baseTime": 1,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.125001
                 },
                 "flags": [
                   "motorway"
@@ -28383,11 +28383,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 7,
                   "baseSpeed": 26.9444447,
                   "baseTime": 7,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.125001
                 },
                 "flags": [
                   "motorway"
@@ -28418,11 +28418,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
-                  "trafficTime": 20,
+                  "trafficSpeed": 26.666666,
+                  "trafficTime": 21,
                   "baseSpeed": 26.9444447,
                   "baseTime": 20,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.125001
                 },
                 "flags": [
                   "motorway"
@@ -28449,11 +28449,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 27.2222214,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 6,
                   "baseSpeed": 27.2222233,
                   "baseTime": 6,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.2500005
                 },
                 "flags": [
                   "motorway"
@@ -28480,11 +28480,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 1,
                   "baseSpeed": 26.9444447,
                   "baseTime": 1,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.125001
                 },
                 "flags": [
                   "motorway"
@@ -28512,11 +28512,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 3,
                   "baseSpeed": 26.9444447,
                   "baseTime": 3,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.125001
                 },
                 "flags": [
                   "motorway"
@@ -28546,11 +28546,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 27.2222214,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 13,
                   "baseSpeed": 27.2222233,
                   "baseTime": 13,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.2500005
                 },
                 "flags": [
                   "motorway"
@@ -28577,11 +28577,11 @@
                 "maneuver": "M9",
                 "speedLimit": 31.3888893,
                 "dynamicSpeedInfo": {
-                  "trafficSpeed": 26.9444447,
+                  "trafficSpeed": 26.666666,
                   "trafficTime": 16,
                   "baseSpeed": 26.9444447,
                   "baseTime": 16,
-                  "jamFactor": 0.0
+                  "jamFactor": 0.125001
                 },
                 "flags": [
                   "motorway"
@@ -41501,11 +41501,11 @@
             ],
             "firstPoint": 0,
             "lastPoint": 2069,
-            "trafficTime": 19446,
+            "trafficTime": 19411,
             "baseTime": 19331,
             "summary": {
               "distance": 477452,
-              "trafficTime": 19446,
+              "trafficTime": 19411,
               "baseTime": 19331,
               "text": "The trip takes 297 mi and 5:22 h.",
               "travelTime": 19331,
