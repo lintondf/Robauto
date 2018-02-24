@@ -31,7 +31,7 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 	
 	public String toGeo() {
 		//geo!37.7914050,-122.3987030;;My Home
-		String label = String.format("%s %s", getName().fullName, getAddress().value );
+		String label = String.format("%s/%s", getName().fullName, getAddress().value );
 		return String.format("geo!%f,%f;;%s", getLatitude(), getLongitude(), label);
 	}
 	

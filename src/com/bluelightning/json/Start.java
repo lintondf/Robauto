@@ -78,6 +78,14 @@ public class Start implements Serializable
      * (Required)
      * 
      */
+    @SerializedName("userLabel")
+    @Expose
+    private String userLabel;
+   /**
+     * 
+     * (Required)
+     * 
+     */
     @SerializedName("shapeIndex")
     @Expose
     private Double shapeIndex;
@@ -249,5 +257,13 @@ public class Start implements Serializable
     public String toString() {
         return new ToStringBuilder(this).append("linkId", linkId).append("mappedPosition", mappedPosition).append("originalPosition", originalPosition).append("type", type).append("spot", spot).append("sideOfStreet", sideOfStreet).append("mappedRoadName", mappedRoadName).append("label", label).append("shapeIndex", shapeIndex).toString();
     }
+
+	public String getUserLabel() {
+		return userLabel;
+	}
+
+	public void setUserLabel(String userLabel) {
+		this.userLabel = userLabel;
+	}
 
 }

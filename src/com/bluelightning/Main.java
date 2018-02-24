@@ -243,7 +243,6 @@ public class Main {
 						tripPlan.getTripLegs().get(iLeg).legData, 
 						tripPlan.getTripLegs().get(iLeg).stopDataList, 
 						elements) );
-				
 			}
 			Iterator<OptimizeStops.DriverAssignments> it = driverAssignments.iterator();
 				

@@ -191,15 +191,16 @@ public class OptimizeStops {
 		}
 
 		public StopData(LegSummary summary) {
-			this.use = null;
+			this.use = true;
 			this.direction = "ARRIVE";
-			this.road = "";
+			String[] fields = summary.leg.getEnd().getUserLabel().split("/");
+			this.road = (fields.length > 0) ? fields[1] : "";
 			this.state = "";
 			this.mileMarker = "";
 			this.distance = summary.leg.getLength();
 			this.trafficTime = summary.leg.getTrafficTime();
 			this.totalDistance = summary.finish.distance;
-			this.name = "";
+			this.name = fields[0];
 		}
 
 		public String toString() {
@@ -228,6 +229,16 @@ public class OptimizeStops {
 				}
 				sb.append(']');
 			}
+			return sb.toString();
+		}
+
+		public String getAddress() {
+			StringBuffer sb = new StringBuffer();
+			sb.append(state);
+			sb.append(' ');
+			sb.append(road);
+			sb.append(" @ ");
+			sb.append(mileMarker);
 			return sb.toString();
 		}
 	}
@@ -289,7 +300,7 @@ public class OptimizeStops {
 			OptimizeStops.LegData data = new OptimizeStops.LegData();
 			data.distance = summary.leg.getLength();
 			data.startLabel = summary.leg.getStart().getLabel();
-			data.endLabel = summary.leg.getEnd().getLabel();
+			data.endLabel = summary.leg.getEnd().getUserLabel();
 			data.trafficTime = summary.leg.getTrafficTime();
 			dataList.add(data);
 		}
@@ -473,7 +484,7 @@ public class OptimizeStops {
 			double stepDistance = stopData.distance - lastDistance;
 			lastDistance = stopData.distance;
 			report.drive(driver, hours, minutes, stepDistance * Here2.METERS_TO_MILES);
-			report.stop(stopData.name, stopData.road, 0);
+			report.stop(stopData.name, stopData.getAddress(), 0);
 			driver = (driver + 1) % nDrivers;
 		}
 		report.arrive(0.0, legData.endLabel, "");
