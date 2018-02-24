@@ -211,6 +211,11 @@ public class OptimizeStopsDialog extends JDialog {
 						commitSelectedChoice();
 					}
 				});
+				if (handler != null) {
+					Events.eventBus.unregister(handler);
+					handler = null;
+				}
+				OptimizeStopsDialog.this.dispose();
 				break;
 			default:
 				break;
@@ -701,89 +706,5 @@ public class OptimizeStopsDialog extends JDialog {
 	}
 	
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-//		HereRoute hereRoute = null;
-//		try {
-//			String json = IOUtils.toString(new FileInputStream("route.json"), "UTF-8");
-//			hereRoute = (HereRoute) Here2.gson.fromJson(json, HereRoute.class);
-//			if (hereRoute == null || hereRoute.getResponse() == null)
-//				throw new NullPointerException();
-//		} catch (Exception x) {
-//			x.printStackTrace();
-//			return;
-//		}
-//		System.out.println(hereRoute.getResponse().getMetaInfo());
-//		Set<Route> routes = hereRoute.getResponse().getRoute();
-//		Route route = routes.iterator().next();
-//
-//		EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
-//		EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
-//		Main.loadPOIMap( poiMap );
-//		poiMap.forEach((kind, set) -> {
-//			nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(route, 5e3 ));
-//		} );
-//		
-//		
-//		OptimizeStops optimizeStops = new OptimizeStops( route, poiMap, nearbyMap );
-//		
-//		List<LegData> legDataList = optimizeStops.getUiLegData();
-//		legDataList.forEach(System.out::println);
-//		
-//		List<RoadDirectionData> roadDirectionDataList = optimizeStops.getUiRoadData(0);
-//		roadDirectionDataList.forEach(System.out::println);
-//		
-//		ArrayList<StopData> stopDataList = optimizeStops.getUiStopData(2, 0, false, roadDirectionDataList);
-//		stopDataList.forEach(System.out::println);
-//		
-//		Permutations perm = new Permutations( stopDataList.size() );
-//		ArrayList<Integer[]> unique = perm.monotonic();
-//		Set<DriverAssignments> driverAssignments = new TreeSet<>();
-//		for (Integer[] elements : unique) {
-//			driverAssignments.add( OptimizeStops.generateDriverAssignments(2, legDataList.get(0), stopDataList, elements) );
-//		}
-//		Iterator<DriverAssignments> it = driverAssignments.iterator();
-//			
-//		try {
-//			OptimizeStopsDialog dialog = new OptimizeStopsDialog(optimizeStops);
-//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//			dialog.setVisible(true);
-//
-//			dialog.setLegData( legDataList );
-//			dialog.setRoadDirectionTable(roadDirectionDataList);
-//			dialog.setStopTable(stopDataList);
-//			
-//			dialog.addListeners(
-//					dialog.new OptimizeActionListener(),
-//					dialog.new OptimizeLegSelectionListener()
-//					);
-//			
-//			for (int i = 0; it.hasNext() && i < 5; i++) {
-//				String html = toHtml(2, legDataList.get(0), it.next() );
-//				if (i==0) try {
-//					PrintWriter out = new PrintWriter("report.html");
-//					out.println(html);
-//					out.close();
-//				} catch (Exception x) {
-//					x.printStackTrace();
-//				}				
-//				JPanel panel = new JPanel();
-//				dialog.getOutputTabbedPane().addTab(String.format("Case %d", 1+i), null, panel, null);
-//				dialog.getOutputTabbedPane().setEnabledAt(i, true);
-//				panel.setLayout(new BorderLayout(0, 0));
-//				{
-//					JTextPane textPane = new JTextPane();
-//					textPane.setContentType("text/html");
-//					textPane.setText(html);
-//					panel.add(textPane);
-//				}
-//			} // for i
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-	}
 
 }

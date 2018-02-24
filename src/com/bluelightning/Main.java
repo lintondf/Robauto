@@ -243,12 +243,19 @@ public class Main {
 			dialog.setVisible(true);
 
 			int iLeg = 0; // start with first leg
-			dialog.updateTripData();
+			final String html = dialog.updateTripData();
 			dialog.setCurrentLeg(tripPlan.getTripLegs().get(iLeg));
 
 			dialog.addListeners(dialog.new OptimizeActionListener(), dialog.new OptimizeLegSelectionListener());
 
 			dialog.generateLegStopChoices( iLeg );
+			
+			SwingUtilities.invokeLater( new Runnable() {
+				@Override
+				public void run() {
+					resultsPane.setText(html);
+				}
+			});
 		}
 
 
