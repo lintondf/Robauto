@@ -165,7 +165,7 @@ public class Here2 {
 	    		return location;
 	    	}
 	    }
-	    // TODO log response
+	    Main.logger.debug(response);
 	    return null;
 	}
 	

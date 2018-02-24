@@ -395,8 +395,11 @@ public class OptimizeStops {
 			tripLeg.legData = leg;
 			tripLeg.roadDirectionDataList = getUiRoadData(iLeg);
 			tripLeg.stopDataList = getUiStopData(TripPlan.N_DRIVERS, iLeg, false, tripLeg.roadDirectionDataList);
-			tripLeg.driverAssignments = generateDriverAssignments(TripPlan.N_DRIVERS, tripLeg.legData,
-					tripLeg.stopDataList);
+			ArrayList<StopData> endPoints = new ArrayList<>();
+			endPoints.add( tripLeg.stopDataList.get(0) );
+			endPoints.add( tripLeg.stopDataList.get(tripLeg.stopDataList.size()-1) );
+			tripLeg.driverAssignments = generateDriverAssignments(TripPlan.N_DRIVERS, tripLeg.legData, endPoints );
+//					tripLeg.stopDataList);
 			tripPlan.getTripLegs().add(tripLeg);
 		}
 	}
@@ -466,28 +469,7 @@ public class OptimizeStops {
 	public static String toHtml(int nDrivers, OptimizeStops.LegData legData,
 			OptimizeStops.DriverAssignments driverAssignments) {
 		Report report = new Report();
-		report.depart(legData.startLabel, "", 0.0);
-
-		List<Iterator<Double>> driveTimes = new ArrayList<Iterator<Double>>(
-				Arrays.asList(driverAssignments.assignments[0].driveTimes.iterator(),
-						driverAssignments.assignments[1].driveTimes.iterator()));
-		List<Iterator<OptimizeStops.StopData>> stops = new ArrayList<Iterator<OptimizeStops.StopData>>(Arrays.asList(
-				driverAssignments.assignments[0].stops.iterator(), driverAssignments.assignments[1].stops.iterator()));
-
-		int driver = 0;
-		double lastDistance = 0.0;
-		while (stops.get(driver).hasNext()) {
-			OptimizeStops.StopData stopData = stops.get(driver).next();
-			Double driveTime = driveTimes.get(driver).next();
-			int hours = (int) (driveTime / 3600.0);
-			int minutes = ((int) (driveTime / 60.0)) % 60;
-			double stepDistance = stopData.distance - lastDistance;
-			lastDistance = stopData.distance;
-			report.drive(driver, hours, minutes, stepDistance * Here2.METERS_TO_MILES);
-			report.stop(stopData.name, stopData.getAddress(), 0);
-			driver = (driver + 1) % nDrivers;
-		}
-		report.arrive(0.0, legData.endLabel, "");
+		report.add( nDrivers, legData, driverAssignments );
 		return report.toHtml();
 	}
 

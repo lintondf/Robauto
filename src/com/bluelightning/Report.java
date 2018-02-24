@@ -10,6 +10,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -239,6 +241,33 @@ public class Report implements Serializable {
 		}
 		lastDay.add(step);
 	}
+	
+	public void add(int nDrivers, OptimizeStops.LegData legData,
+			OptimizeStops.DriverAssignments driverAssignments) {
+		this.depart(legData.startLabel, "", 0.0);
+
+		List<Iterator<Double>> driveTimes = new ArrayList<Iterator<Double>>(
+				Arrays.asList(driverAssignments.assignments[0].driveTimes.iterator(),
+						driverAssignments.assignments[1].driveTimes.iterator()));
+		List<Iterator<OptimizeStops.StopData>> stops = new ArrayList<Iterator<OptimizeStops.StopData>>(Arrays.asList(
+				driverAssignments.assignments[0].stops.iterator(), driverAssignments.assignments[1].stops.iterator()));
+
+		int driver = 0;
+		double lastDistance = 0.0;
+		while (stops.get(driver).hasNext()) {
+			OptimizeStops.StopData stopData = stops.get(driver).next();
+			Double driveTime = driveTimes.get(driver).next();
+			int hours = (int) (driveTime / 3600.0);
+			int minutes = ((int) (driveTime / 60.0)) % 60;
+			double stepDistance = stopData.distance - lastDistance;
+			lastDistance = stopData.distance;
+			this.drive(driver, hours, minutes, stepDistance * Here2.METERS_TO_MILES);
+			this.stop(stopData.name, stopData.getAddress(), 0);
+			driver = (driver + 1) % nDrivers;
+		}
+		this.arrive(0.0, legData.endLabel, "");
+	}
+	
 
 	public String toHtml() {
 		if (theme == null) {

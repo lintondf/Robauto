@@ -16,10 +16,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import com.bluelightning.Events;
+import com.bluelightning.Here2;
+import com.bluelightning.LatLon;
 import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.OptimizeStops.StopData;
 
 import seedu.addressbook.data.AddressBook;
+import seedu.addressbook.data.place.Address;
+import seedu.addressbook.data.place.Name;
 import seedu.addressbook.data.place.Place;
 import seedu.addressbook.data.place.ReadOnlyPlace;
 import seedu.addressbook.data.place.UniquePlaceList;
@@ -145,6 +149,19 @@ public class AddAddressDialog extends JDialog {
 				AddAddressDialog.this.dispose();
 				break;
 			case "Create":
+				try {
+					Place p = new Place();
+					p.setName( new Name( nameField.getText()) );
+					p.setAddress( new Address( addressField.getText() ) );
+					LatLon where = Here2.geocodeLookup(p.getAddress().value );
+					if (where != null) {
+						p.setLatitude( where.getLatitude() );
+						p.setLongitude( where.getLongitude() );
+						addressBook.add(p);
+						controller.getStorage().save(addressBook);
+						addressesModel.setData( addressBook.getAllPlaces() );
+					}
+				} catch (Exception x) {}
 				break;
 			}
 		}

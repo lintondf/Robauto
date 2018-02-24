@@ -222,70 +222,28 @@ public class Main {
 		private void optimizeStops() {
 			EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
 			EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
-			Main.loadPOIMap( poiMap );
+			Main.loadPOIMap(poiMap);
 			poiMap.forEach((kind, set) -> {
-				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(route, 5e3 ));
-			} );
-			
-			
-			OptimizeStops optimizeStops = new OptimizeStops( route, poiMap, nearbyMap );
-			optimizeStops.updateTripPlan( tripPlan );
-			
-			int iLeg = 0;  // start with first leg
-			
-			// generate all possible permutations of driver assignments
-			//  do not permute stopping at the arrival point (last in stopDataList)
-			Permutations perm = new Permutations( tripPlan.getTripLegs().get(iLeg).stopDataList.size()-1 );
-			ArrayList<Integer[]> unique = perm.monotonic();
-			Set<OptimizeStops.DriverAssignments> driverAssignments = new TreeSet<>();
-			for (Integer[] elements : unique) {
-				driverAssignments.add( OptimizeStops.generateDriverAssignments(TripPlan.N_DRIVERS, 
-						tripPlan.getTripLegs().get(iLeg).legData, 
-						tripPlan.getTripLegs().get(iLeg).stopDataList, 
-						elements) );
-			}
-			Iterator<OptimizeStops.DriverAssignments> it = driverAssignments.iterator();
-				
-			try {
-				OptimizeStopsDialog dialog = new OptimizeStopsDialog(optimizeStops);
-				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				dialog.setVisible(true);
+				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(route, 5e3));
+			});
 
-				dialog.setTripData( tripPlan.getTripLegs() );
-				dialog.setLegData(tripPlan.getTripLegs().get(iLeg));
-				
-				dialog.addListeners(
-						dialog.new OptimizeActionListener(),
-						dialog.new OptimizeLegSelectionListener()
-						);
-				
-				for (int i = 0; it.hasNext() && i < 5; i++) {
-					String html = OptimizeStops.toHtml(2, tripPlan.getTripLegs().get(0).legData, it.next() );
-					if (i==0) try {
-						PrintWriter out = new PrintWriter("report.html");
-						out.println(html);
-						out.close();
-					} catch (Exception x) {
-						x.printStackTrace();
-					}				
-					JPanel panel = new JPanel();
-					dialog.getOutputTabbedPane().addTab(String.format("Case %d", 1+i), null, panel, null);
-					dialog.getOutputTabbedPane().setEnabledAt(i, true);
-					panel.setLayout(new BorderLayout(0, 0));
-					{
-						JTextPane textPane = new JTextPane();
-						textPane.setContentType("text/html");
-						textPane.setText(html);
-						panel.add(textPane);
-					}
-				} // for i
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			OptimizeStops optimizeStops = new OptimizeStops(route, poiMap, nearbyMap);
+			optimizeStops.updateTripPlan(tripPlan);
+
+			OptimizeStopsDialog dialog = new OptimizeStopsDialog(optimizeStops);
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
+
+			int iLeg = 0; // start with first leg
+			dialog.updateTripData();
+			dialog.setCurrentLeg(tripPlan.getTripLegs().get(iLeg));
+
+			dialog.addListeners(dialog.new OptimizeActionListener(), dialog.new OptimizeLegSelectionListener());
+
+			dialog.generateLegStopChoices( iLeg );
 		}
-		
-		
+
+
 		private CallbackHandler handler = null;
 
 		private class CallbackHandler {
@@ -420,7 +378,7 @@ public class Main {
 
 		@Override
 		protected void append(ILoggingEvent event) {
-			//System.out.println("TAE: " + event.toString() + " " + layout);
+			// System.out.println("TAE: " + event.toString() + " " + layout);
 			final String message = layout.doLayout(event);
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -438,8 +396,9 @@ public class Main {
 		logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		ch.qos.logback.classic.Logger rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
-		TextAreaAppender a = new TextAreaAppender(lc);
-		a.start();
+		TextAreaAppender textAreaAppender = new TextAreaAppender(lc);
+		textAreaAppender.start();
+
 		// Display the viewer in a JFrame
 		JFrame frame = new JFrame("RobAuto RV Trip Planner");
 		mainPanel = new MainPanel();
@@ -458,7 +417,9 @@ public class Main {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		browserCanvas.initialize(frame);
-		rootLogger.addAppender(a);  // logging to text area can start once frame is visible
+
+		// logging to text area can start once frame is visible
+		rootLogger.addAppender(textAreaAppender);
 		logger.info("Robauto Planner starting");
 
 		// load base POI sets
@@ -466,7 +427,6 @@ public class Main {
 		loadPOIMap(poiMap);
 
 		// Bind event handlers
-
 		Events.eventBus.register(new UiHandler());
 		Events.eventBus.register(new POIClickHandler());
 		try {
@@ -483,7 +443,7 @@ public class Main {
 			}
 		});
 
-		logger.info("Loading previous trip plan");		
+		logger.info("Loading previous trip plan");
 		tripPlan = TripPlan.load(tripPlanFile);
 		System.out.println("Loaded: " + tripPlan.toString());
 		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
