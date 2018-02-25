@@ -14,6 +14,7 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.SwingMarker;
+import com.bluelightning.poi.POI.FuelAvailable;
 import com.opencsv.CSVReader;
 
 import seedu.addressbook.data.exception.IllegalValueException;
@@ -196,12 +197,6 @@ public class WalmartPOI extends POIBase {
 	}
 	
 	
-	public static void main(String[] args) {
-    	POISet pset = WalmartPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Walmart_United States & Canada.csv");
-    	for (int i = 0; i < 15; i++)
-    		System.out.println( pset.get(i).toString() );
-	}
-
 	@Override
 	public String getAddress() {
 		return address;
@@ -210,6 +205,23 @@ public class WalmartPOI extends POIBase {
 	@Override
 	public UniqueTagList getTags() {
 		return tagList;
+	}
+
+	@Override
+	public FuelAvailable getFuelAvailable() {
+		if (hasGas && hasDiesel) 
+			return FuelAvailable.HAS_BOTH;
+		else if (hasDiesel)
+			return FuelAvailable.HAS_DIESEL;
+		else if (hasGas)
+			return FuelAvailable.HAS_GAS;
+		return FuelAvailable.NO_FUEL;
+	}
+	
+	public static void main(String[] args) {
+    	POISet pset = WalmartPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Walmart_United States & Canada.csv");
+    	for (int i = 0; i < 15; i++)
+    		System.out.println( pset.get(i).toString() );
 	}
 
 }

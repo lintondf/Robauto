@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import javax.imageio.ImageIO;
 
 import com.bluelightning.map.ButtonWaypoint;
+import com.bluelightning.poi.POI.FuelAvailable;
 import com.opencsv.CSVReader;
 
 import seedu.addressbook.data.tag.UniqueTagList;
@@ -148,6 +149,11 @@ public class TruckStopPOI extends POIBase {
 		return image;
 	}
 
+	@Override
+	public FuelAvailable getFuelAvailable() {
+		return FuelAvailable.HAS_BOTH;
+	}
+	
 	public static POISet factory(String filePath) {
 		POISet list = new POISet();
 		try {

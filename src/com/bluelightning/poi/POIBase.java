@@ -18,6 +18,7 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.SwingMarker;
+import com.bluelightning.poi.POI.FuelAvailable;
 import com.opencsv.CSVReader;
 
 import seedu.addressbook.data.tag.UniqueTagList;
@@ -209,38 +210,8 @@ public abstract class POIBase implements POI {
 		return image;
 	}
 
-//	@Override
-//	public SwingMarker getMarker() {
-//		return getMarker( toString() );
-//	}
-//	
-//	@Override
-//	public SwingMarker getMarker(String report) {
-//		return new SwingMarker( new GeoPosition(latitude, longitude), getName(), report );
-//	}
-//	public static void main(String[] args) {
-//		List<POI> list = factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\RestAreasCombined_USA.csv");
-////		POI p1 = list.get(0);
-////		POI p2 = list.get(1);
-////		System.out.println(p1);
-////		System.out.println(p2);
-////		double d = p1.distance(p2);
-////		System.out.println( d );
-////		System.out.println( p1.isNearby(p2, d ));
-//		long startTime = System.nanoTime();
-//		double sumd = 0;
-//		for (POI p1 : list) {
-//			for (POI p2 : list) {
-//				if (!p1.equals(p2)) {
-//					sumd += p1.distance(p2);
-//				}
-//			}
-//		}
-//		long endTime = System.nanoTime();
-//		long duration = (endTime - startTime)/1000000L;  //divide to get milliseconds.
-//		System.out.println( list.size() + " " + sumd );
-//		System.out.println(duration);
-//		System.out.println((double) duration / (double)(list.size()*list.size() - list.size()) );
-//	}
-
+	@Override
+	public FuelAvailable getFuelAvailable() {
+		return FuelAvailable.NO_FUEL;
+	}
 }

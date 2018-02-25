@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.bluelightning.Main;
 import com.bluelightning.OptimizeStops;
 import com.bluelightning.OptimizeStops.DriverAssignments;
 import com.bluelightning.OptimizeStops.LegData;
@@ -84,6 +85,9 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			ObjectInputStream in = new ObjectInputStream(fis);
 			TripPlan tripPlan = (TripPlan) in.readObject();
 			in.close();
+			String[] report = tripPlan.toString().split("\n");
+			for (String line : report)
+				Main.logger.info(line);
 			return tripPlan;
 		} catch (Exception x) {
 			

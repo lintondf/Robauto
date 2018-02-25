@@ -83,6 +83,16 @@ public class MainControlPanel extends JPanel {
 		});
 		panel.add(chckbxCostcos);
 		
+		JCheckBox chckbxMurphy = new JCheckBox("Murphy");
+		chckbxMurphy.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				boolean selected = ((JCheckBox) event.getSource()).isSelected();
+				markerStatus.put( Main.MarkerKinds.MURPHY, selected);
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.Waypoints", event));
+			}
+		});
+		panel.add(chckbxMurphy);
+		
 		JCheckBox chckbxTruckStops = new JCheckBox("Truck Stops");
 		chckbxTruckStops.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {

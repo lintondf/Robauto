@@ -28,4 +28,7 @@ public interface POI {
 	public String getAddress();
 	public UniqueTagList getTags();
 	
+	public enum  FuelAvailable {NO_FUEL, HAS_GAS, HAS_DIESEL, HAS_BOTH};
+	public FuelAvailable getFuelAvailable();
+	
 }

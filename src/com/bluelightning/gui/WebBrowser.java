@@ -130,7 +130,7 @@ public final class WebBrowser extends Canvas {
 				@Override
 				public void changing(LocationEvent event) {
 //					System.out.println(Thread.currentThread() + " MOCK CHANGING: " + event);
-					event.doit = false;
+					//event.doit = false;  TODO
 					Events.eventBus.post(new Events.WebBrowserOpenEvent(browserCanvas, event.location));
 				}
 

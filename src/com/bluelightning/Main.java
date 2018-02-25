@@ -43,6 +43,7 @@ import com.bluelightning.gui.OptimizeStopsDialog.OptimizeLegSelectionListener;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.POIMarker;
+import com.bluelightning.poi.MurphyPOI;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
 import com.bluelightning.poi.RestAreaPOI;
@@ -63,6 +64,8 @@ import seedu.addressbook.logic.Logic;
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
 
 public class Main {
+	
+	protected static final String INITIAL_RESULTS_TEXT = "<html><center>Run Optimize Stops to populate this panel</center></html>";
 
 	protected File tripPlanFile = new File("RobautoTripPlan.obj");
 	protected TripPlan tripPlan;
@@ -344,7 +347,7 @@ public class Main {
 	}
 
 	public static enum MarkerKinds {
-		WALMARTS, SAMSCLUBS, COSTCOS, TRUCKSTOPS, RESTAREAS
+		WALMARTS, SAMSCLUBS, COSTCOS, TRUCKSTOPS, RESTAREAS, MURPHY
 	}
 
 	// static support test use
@@ -357,6 +360,8 @@ public class Main {
 		poiMap.put(Main.MarkerKinds.RESTAREAS, pset);
 		pset = TruckStopPOI.factory();
 		poiMap.put(Main.MarkerKinds.TRUCKSTOPS, pset);
+		pset = MurphyPOI.factory();
+		poiMap.put(Main.MarkerKinds.MURPHY, pset);
 		// TODO Costco, Cabelas
 	}
 
@@ -432,6 +437,7 @@ public class Main {
 		resultsPane.setVisible(true);
 		resultsPane.setContentType("text/html");
 		resultsPane.setEditable(false);
+		resultsPane.setText( INITIAL_RESULTS_TEXT );
 		JScrollPane scroll = new JScrollPane(resultsPane);
 		mainPanel.getRightTabbedPane().addTab("Results", null, scroll, null);
 		// frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -456,7 +462,7 @@ public class Main {
 			controller.getStorage().load();
 			addressBook = controller.getAddressBook();
 		} catch (Exception x) {
-			x.printStackTrace();
+			logger.trace( x.getMessage() );
 		}
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -467,7 +473,6 @@ public class Main {
 
 		logger.info("Loading previous trip plan");
 		tripPlan = TripPlan.load(tripPlanFile);
-		System.out.println("Loaded: " + tripPlan.toString());
 		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
 		if (!tripPlan.getRouteJson().isEmpty()) {
 			Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
@@ -478,16 +483,18 @@ public class Main {
 		return nearbyMap;
 	}
 
-	public static void main(String[] args) {
-		Main main = new Main();
-	}
-
 	public JTextPane getResultsPane() {
 		return resultsPane;
 	}
 
 	public void setResultsPane(JTextPane resultsPane) {
 		this.resultsPane = resultsPane;
+	}
+
+	
+	
+	public static void main(String[] args) {
+		Main main = new Main();
 	}
 
 }

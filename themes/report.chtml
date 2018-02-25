@@ -15,12 +15,11 @@
 </html>
 {#}
 {#day}
-	<h1>{$dayName} - {$dayDuration} hours; Driving {$dayDistance} miles</h1>
 	<table class="bpTable">
 		<thead>
 			<tr>
-				<td></td>
-				<td></td>
+				<td><h1>{$dayName}</h1></td>
+				<td><h1>{$dayDuration} hours; Driving {$dayDistance} miles</h1></td>
 				<td colspan="3">Time (hr)</td>
 				<td colspan="2">Distance (mi)</td>
 				<td colspan="2">Fuel (gal)</td>
