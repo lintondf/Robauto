@@ -18,9 +18,12 @@ import com.bluelightning.data.TripPlan;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.Route;
+import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
 import com.bluelightning.poi.RestAreaPOI;
+
+import seedu.addressbook.data.place.VisitedPlace;
 
 /**
  * @author NOOK
@@ -42,6 +45,7 @@ public class OptimizeStops {
 		public double distance;
 		double trafficTime;
 		double travelTime;
+		public String fuelAvailability;
 
 		public LegPoint() {
 		}
@@ -154,26 +158,28 @@ public class OptimizeStops {
 		public String state;
 		public String mileMarker;
 		public String direction;
+		public String fuelAvailable;
 		public String name;
 		public Double[] driveTimes;
 
-		public StopData(OptimizeStops.LegData legData) {
-			this.use = null;
-			this.direction = "ARRIVE";
-			this.road = "";
-			this.state = "";
-			this.mileMarker = "";
-			this.distance = legData.distance;
-			this.trafficTime = legData.trafficTime;
-			this.totalDistance = this.distance;
-			this.name = legData.endLabel;
-		}
+//		public StopData(OptimizeStops.LegData legData) {
+//			this.use = null;
+//			this.direction = "ARRIVE";
+//			this.road = "";
+//			this.state = "";
+//			this.mileMarker = "";
+//			this.distance = legData.distance;
+//			this.trafficTime = legData.trafficTime;
+//			this.totalDistance = this.distance;
+//			this.name = legData.endLabel;
+//		}
 
 		public StopData(POIResult result) {
 			this.use = true;
 			this.distance = result.legProgress.distance;
 			this.trafficTime = result.legProgress.trafficTime;
 			this.totalDistance = result.totalProgress.distance;
+			this.fuelAvailable = POIBase.toFuelString( result.poi.getFuelAvailable() );
 			if (result.poi instanceof RestAreaPOI) {
 				RestAreaPOI restArea = (RestAreaPOI) result.poi;
 				this.direction = restArea.getDirection();
@@ -201,6 +207,7 @@ public class OptimizeStops {
 			this.trafficTime = summary.leg.getTrafficTime();
 			this.totalDistance = summary.finish.distance;
 			this.name = fields[0];
+			this.fuelAvailable = summary.finish.fuelAvailability;
 		}
 
 		public String toString() {
@@ -276,7 +283,9 @@ public class OptimizeStops {
 	protected List<LegSummary> generateLegSummaries() {
 		ArrayList<LegSummary> starts = new ArrayList<>();
 		LegPoint current = new LegPoint();
+		Iterator<VisitedPlace> it = tripPlan.getPlaces().iterator();
 		for (Leg leg : route.getLeg()) {
+			current.fuelAvailability = POIBase.toFuelString( it.next().getFuelAvailable() );
 			LegPoint next = new LegPoint(current);
 			next.plus(leg);
 			starts.add(new LegSummary(leg, current, next));
@@ -374,8 +383,9 @@ public class OptimizeStops {
 		return resultList;
 	}
 
-	public OptimizeStops(Route route, EnumMap<MarkerKinds, POISet> poiMap,
+	public OptimizeStops(TripPlan tripPlan, Route route, EnumMap<MarkerKinds, POISet> poiMap,
 			EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap) {
+		this.tripPlan = tripPlan;
 		this.route = route;
 		this.poiMap = poiMap;
 		legSummary = generateLegSummaries();
@@ -383,10 +393,10 @@ public class OptimizeStops {
 		legSummary.forEach(ls -> {
 			ls.setNearby(restAreas);
 		});
+		updateTripPlan();
 	}
 
-	public void updateTripPlan(TripPlan tripPlan) {
-		this.tripPlan = tripPlan;
+	protected void updateTripPlan() {
 		tripPlan.getTripLegs().clear();
 		List<OptimizeStops.LegData> legDataList = getUiLegData();
 		for (int iLeg = 0; iLeg < legDataList.size(); iLeg++) {

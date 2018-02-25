@@ -18,6 +18,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import com.bluelightning.poi.POI;
+import com.bluelightning.poi.POIBase;
+
 import seedu.addressbook.commands.AddCommand;
 import seedu.addressbook.commands.CommandResult;
 import seedu.addressbook.commands.ListCommand;
@@ -57,9 +60,9 @@ public class RoutePanel extends JPanel {
 	public static class WaypointsModel extends AbstractTableModel {
 		
 		private static final long serialVersionUID = 1L;
-		protected static final String[] names = {"Via","Address","Name","Latitude","Longitude"};
-		protected static final double[] widths = {0.10, 0.30,     0.40,   0.10,     0.10};
-		protected static final boolean[] centered = {true, false, false, false, false};
+		protected static final String[] names = {"Via","Name","Address","Latitude","Longitude","Fuel"};
+		protected static final double[] widths = {0.05, 0.30,    0.40,   0.10,     0.10,        0.05};
+		protected static final boolean[] centered = {true, false, false, false, false, true};
 		
 		AddAddressDialog dialog;
 		protected ArrayList<VisitedPlace> placesList;
@@ -79,7 +82,7 @@ public class RoutePanel extends JPanel {
 				return 0;
 			return placesList.size();
 		}
-
+		
 		@Override
 		public Object getValueAt(int iRow, int iCol) {
 			if (placesList == null || iRow >= getRowCount())
@@ -96,6 +99,8 @@ public class RoutePanel extends JPanel {
 				return String.format("%12.6f", place.getLatitude() );
 			case 4:
 				return String.format("%12.6f", place.getLongitude() );
+			case 5:
+				return POIBase.toFuelString( place.getFuelAvailable());
 			}
 			return null;
 		}

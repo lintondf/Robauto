@@ -71,7 +71,7 @@
 {#dayTotalRow}
 			<tr class="step-detail">
 				<td></td>
-				<td class="step-drive">Day Totals</td>
+				<td class="step-drive">Day Totals ({$imbalance})</td>
 				<td class="step-field">{$leg1Total}</td>
 				<td class="step-field">{$leg2Total}</td>
 				<td class="step-field">{$totalDuration}</td>

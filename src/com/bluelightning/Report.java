@@ -47,6 +47,7 @@ public class Report implements Serializable {
 		
 		String driver0Total;
 		String driver1Total;
+		String imbalance;
 
 		public Day() {
 			this.steps = new ArrayList<Step>();
@@ -61,8 +62,11 @@ public class Report implements Serializable {
 		}
 
 		public void finish(int driver0Minutes, int driver1Minutes) {
+			int imbalanceMinutes = driver0Minutes - driver1Minutes;
 			driver0Total = String.format("%d:%02d", driver0Minutes/60, driver0Minutes%60);
 			driver1Total = String.format("%d:%02d", driver1Minutes/60, driver1Minutes%60);
+			imbalance = String.format("%s%d:%02d", (imbalanceMinutes >= 0) ? "+" : "-", 
+					Math.abs(imbalanceMinutes)/60, Math.abs(imbalanceMinutes)%60);
 			int totalHours = 0;
 			int totalMinutes = 0;
 			int totalDistance = 0;
@@ -101,6 +105,7 @@ public class Report implements Serializable {
 				sb.append(step.toHtml());
 			}
 			Chunk t = theme.makeChunk("report#dayTotalRow");
+			t.set("imbalance", imbalance);
 			t.set("leg1Total", driver0Total);
 			t.set("leg2Total", driver1Total);
 			t.set("totalDuration", duration);

@@ -15,10 +15,10 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 	boolean passThru;
 	boolean overnight;
 	boolean driverSwitch;
+	POI.FuelAvailable fuelAvailable;
 	double  fuel;            // amount to purchase in gallons; zero if none
 	
 	public VisitedPlace() {
-		
 	}
 
 	public VisitedPlace(ReadOnlyPlace source) {
@@ -27,6 +27,7 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 	
 	public VisitedPlace( POI poi ) throws IllegalValueException {
 		super(new Name(poi.getName()), poi.getLatitude(), poi.getLongitude(), new Address(poi.getAddress()), poi.getTags() );
+		fuelAvailable = poi.getFuelAvailable();
 	}
 	
 	public String toGeo() {
@@ -79,6 +80,14 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 
 	public void setVisitOrder(Integer visitOrder) {
 		this.visitOrder = visitOrder;
+	}
+
+	public POI.FuelAvailable getFuelAvailable() {
+		return fuelAvailable;
+	}
+
+	public void setFuelAvailable(POI.FuelAvailable fuelAvailable) {
+		this.fuelAvailable = fuelAvailable;
 	}
 
 }

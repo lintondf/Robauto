@@ -39,6 +39,7 @@ import com.bluelightning.Events.UiEvent;
 import com.bluelightning.Main.MarkerKinds;
 import com.bluelightning.json.HereRoute;
 import com.bluelightning.json.Route;
+import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
 import com.google.common.eventbus.Subscribe;
@@ -124,6 +125,7 @@ public class OptimizeStopsDialog extends JDialog {
 						dataList.add(iRow+1, data);
 					}
 					stopsTableModel.setData(dataList);
+					generateLegStopChoices();
 				}
 			});
 		}
@@ -390,9 +392,9 @@ public class OptimizeStopsDialog extends JDialog {
 	protected static class StopsTableModel extends AbstractTableModel {
 		
 		private static final long serialVersionUID = 1L;
-		protected static final String[] names = {"Use", "Distance", "Time", "Road", "Direction", "Name"};
-		protected static final double[] widths = {0.05, 0.1, 0.1, 0.25, 0.10, 0.40};
-		protected static final boolean[] centered = {true, true, true, true, true, false};
+		protected static final String[] names = {"Use", "Distance", "Time", "Road", "Dir.", "Fuel", "Name"};
+		protected static final double[] widths = {0.05, 0.1, 0.1, 0.25, 0.10, 0.05, 0.34};
+		protected static final boolean[] centered = {true, true, true, true, true, true, false};
 		
 		protected ArrayList<OptimizeStops.StopData> data = null;
 		
@@ -429,6 +431,8 @@ public class OptimizeStopsDialog extends JDialog {
 			case 4:
 				return stopData.direction;
 			case 5:
+				return stopData.fuelAvailable;
+			case 6:
 				return stopData.name;
 			}
 			return null;
@@ -514,6 +518,7 @@ public class OptimizeStopsDialog extends JDialog {
 	 * @param optimizeStops 
 	 */
 	public OptimizeStopsDialog(OptimizeStops optimizeStops) {
+		this.setTitle("Robauto - Optimize Stops");
 		this.optimizeStops = optimizeStops;
 		legTableModel = new LegTableModel();
 		roadTableModel = new RoadTableModel();
@@ -668,7 +673,13 @@ public class OptimizeStopsDialog extends JDialog {
 		return choicesTabbedPane;
 	}
 	
+	public void generateLegStopChoices() {
+		generateLegStopChoices( currentLeg );
+	}
+	
+	
 	public void generateLegStopChoices(int iLeg) {
+		Main.logger.info("Generating leg stop choices...");
 		while (getChoicesTabbedPane().getComponentCount() > 0) {
 			getChoicesTabbedPane().removeTabAt(0);
 		}

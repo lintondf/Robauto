@@ -46,21 +46,16 @@ public abstract class POIBase implements POI {
 		}		
 	}
 	
-//	public static POISet factory( String filePath ) {
-//		POISet list = new POISet();
-//		try {
-//		     CSVReader reader = new CSVReader(new FileReader(filePath));
-//		     String [] nextLine;
-//		     while ((nextLine = reader.readNext()) != null) {
-//		        POI poi = new POIBase( nextLine );
-//		        list.add(poi);
-//		     }
-//			 reader.close();
-//		} catch (Exception e) {
-//			list.clear();;
-//		}
-//		 return list;
-//	}
+	public static String toFuelString( POI.FuelAvailable fa ) {
+		if (fa != null) switch (fa) {
+		case NO_FUEL: return "None";
+		case HAS_BOTH: return "Both";
+		case HAS_GAS: return "Gas";
+		case HAS_DIESEL: return "Diesel";
+		}
+		return "None";
+	}
+
 	
 	public POIBase() {}
 	

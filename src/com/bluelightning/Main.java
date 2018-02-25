@@ -23,6 +23,8 @@ import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.viewer.GeoPosition;
+
 import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.StopsCommitEvent;
@@ -44,6 +46,7 @@ import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.POIMarker;
 import com.bluelightning.poi.MurphyPOI;
+import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
 import com.bluelightning.poi.RestAreaPOI;
@@ -238,10 +241,9 @@ public class Main {
 				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(route, 5e3));
 			});
 
-			OptimizeStops optimizeStops = new OptimizeStops(route, poiMap, nearbyMap);
-			optimizeStops.updateTripPlan(tripPlan);
+			OptimizeStops optimizeStops = new OptimizeStops(tripPlan, route, poiMap, nearbyMap);
 
-			OptimizeStopsDialog dialog = new OptimizeStopsDialog(optimizeStops);
+			dialog = new OptimizeStopsDialog(optimizeStops);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 
@@ -263,6 +265,7 @@ public class Main {
 
 
 		private CallbackHandler handler = null;
+		protected OptimizeStopsDialog dialog = null;
 
 		private class CallbackHandler {
 			boolean addAfter = true;
@@ -281,6 +284,7 @@ public class Main {
 					public void run() {
 						int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
 						VisitedPlace place = new VisitedPlace(event.place);
+						place.setFuelAvailable( getNearByFuel(place.getLatitude(), place.getLongitude(), 1e3) );
 						ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
 						if (places == null)
 							places = new ArrayList<>();
@@ -364,7 +368,31 @@ public class Main {
 		poiMap.put(Main.MarkerKinds.MURPHY, pset);
 		// TODO Costco, Cabelas
 	}
-
+	
+	
+	public POI.FuelAvailable getNearByFuel(double latitude, double longitude, double radius ) {
+		GeoPosition position = new GeoPosition( latitude, longitude );
+		for (POISet pset : poiMap.values()) {
+			java.util.Map<POI, POIResult> map = pset.nearBy( position, 0, radius );
+			if (! map.isEmpty()) {
+				POIResult closest = null;
+				for (POIResult r : map.values()) {
+					if (closest == null) {
+						closest = r;
+					} else {
+						if (r.distance < closest.distance) {
+							closest = r;
+						}
+					}
+				}
+				if (closest != null) {
+					return closest.poi.getFuelAvailable();
+				}
+			}
+		}
+		return POI.FuelAvailable.NO_FUEL;
+	}
+ 
 	public class TextAreaAppender extends AppenderBase<ILoggingEvent> {
 
 		Layout<ILoggingEvent> layout;
@@ -425,7 +453,7 @@ public class Main {
 		mainPanel.getLeftPanel().setLayout(new BorderLayout());
 		routePanel = new RoutePanel(new Events.EventActionListener());
 		mainPanel.getRightTabbedPane().addTab("Route", null, routePanel, null);
-		map = new Map();
+		map = new com.bluelightning.Map();
 		mapViewer = map.getMapViewer();
 		mainPanel.getRightTabbedPane().addTab("Map", null, mapViewer, null);
 		browserCanvas = WebBrowser.factory(mainPanel);
