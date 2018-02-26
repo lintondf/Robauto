@@ -18,6 +18,7 @@ import com.bluelightning.data.TripPlan;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.Route;
+import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
@@ -151,6 +152,7 @@ public class OptimizeStops {
 		private static final long serialVersionUID = 1L;
 
 		public Boolean use;
+		public Boolean refuel;
 		public Double distance;
 		public Double trafficTime;
 		public Double totalDistance;
@@ -180,6 +182,7 @@ public class OptimizeStops {
 			this.trafficTime = result.legProgress.trafficTime;
 			this.totalDistance = result.totalProgress.distance;
 			this.fuelAvailable = POIBase.toFuelString( result.poi.getFuelAvailable() );
+			this.refuel = result.poi.getFuelAvailable() == POI.FuelAvailable.HAS_GAS || result.poi.getFuelAvailable() == POI.FuelAvailable.HAS_BOTH;
 			if (result.poi instanceof RestAreaPOI) {
 				RestAreaPOI restArea = (RestAreaPOI) result.poi;
 				this.direction = restArea.getDirection();
@@ -208,6 +211,7 @@ public class OptimizeStops {
 			this.totalDistance = summary.finish.distance;
 			this.name = fields[0];
 			this.fuelAvailable = summary.finish.fuelAvailability;
+			this.refuel = fuelAvailable.equalsIgnoreCase("Gas") || fuelAvailable.equalsIgnoreCase("Both");
 		}
 
 		public String toString() {
@@ -284,9 +288,10 @@ public class OptimizeStops {
 		ArrayList<LegSummary> starts = new ArrayList<>();
 		LegPoint current = new LegPoint();
 		Iterator<VisitedPlace> it = tripPlan.getPlaces().iterator();
+		current.fuelAvailability = POIBase.toFuelString( it.next().getFuelAvailable() );
 		for (Leg leg : route.getLeg()) {
-			current.fuelAvailability = POIBase.toFuelString( it.next().getFuelAvailable() );
 			LegPoint next = new LegPoint(current);
+			next.fuelAvailability = POIBase.toFuelString( it.next().getFuelAvailable() );
 			next.plus(leg);
 			starts.add(new LegSummary(leg, current, next));
 			current = next;

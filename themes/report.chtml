@@ -40,6 +40,7 @@
 			{$rows}
 		</tbody>
 	</table>
+<br/>	
 {#}
 {#titleRow}
 			<tr class="step-title">
@@ -52,7 +53,7 @@
 				<td></td>
 				<td></td>
 				<td></td>
-				<td class="step-refuel">{$refuel}</td>
+				<td class="step-refuel"><b>{$refuel}</b></td>
 			</tr>
 {#}
 {#detailRow}			

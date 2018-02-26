@@ -189,6 +189,8 @@ public class Report implements Serializable {
 		step.placeName = place;
 		step.placeAddress = address;
 		step.stepName = "Depart";
+		driver0Minutes = 0;
+		driver1Minutes = 0;
 		if (refuel > 0.0) {
 			fuelLevel += refuel;
 			step.refuel = String.format("%.0f", refuel);
@@ -212,7 +214,8 @@ public class Report implements Serializable {
 		lastDay.lastStep.placeAddress = toAddress;
 		if (refuel > 0.0) {
 			fuelLevel += refuel;
-			lastDay.lastStep.refuel = String.format("%.0f", refuel);
+			lastDay.lastStep.refuel = String.format("+%.0f", refuel);
+			lastDay.lastStep.stepName = "Arrive/Fuel";
 		}
 		lastDay.finish(driver0Minutes, driver1Minutes);
 	}
@@ -239,10 +242,12 @@ public class Report implements Serializable {
 		int n = lastDay.steps.size();
 		step.placeName = toPlace;
 		step.placeAddress = toAddress;
-		step.stepName = String.format("%d. Stop", n);
 		if (refuel > 0.0) {
 			fuelLevel += refuel;
-			step.refuel = String.format("%.0f", refuel);
+			step.refuel = String.format("+%.0f", refuel);
+			step.stepName = String.format("%d. Fuel", n);
+		} else {
+			step.stepName = String.format("%d. Stop", n);			
 		}
 		lastDay.add(step);
 	}
@@ -267,7 +272,8 @@ public class Report implements Serializable {
 			double stepDistance = stopData.distance - lastDistance;
 			lastDistance = stopData.distance;
 			this.drive(driver, hours, minutes, stepDistance * Here2.METERS_TO_MILES);
-			this.stop(stopData.name, stopData.getAddress(), 0);
+			double refuel = (stopData.refuel) ? this.fillUp() : 0.0;
+			this.stop(stopData.name, stopData.getAddress(), refuel );
 			driver = (driver + 1) % nDrivers;
 		}
 		this.arrive(0.0, legData.endLabel, "");

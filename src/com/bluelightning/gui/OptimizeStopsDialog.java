@@ -29,6 +29,7 @@ import com.bluelightning.Events;
 import com.bluelightning.Here2;
 import com.bluelightning.Main;
 import com.bluelightning.OptimizeStops;
+import com.bluelightning.OptimizeStops.LegData;
 import com.bluelightning.OptimizeStops.StopData;
 import com.bluelightning.Permutations;
 import com.bluelightning.Report;
@@ -126,6 +127,7 @@ public class OptimizeStopsDialog extends JDialog {
 					}
 					stopsTableModel.setData(dataList);
 					generateLegStopChoices();
+					OptimizeStopsDialog.this.optimizeStops.getTripPlan().getTripLegs().get(currentLeg).stopDataList = dataList;
 				}
 			});
 		}
@@ -167,7 +169,15 @@ public class OptimizeStopsDialog extends JDialog {
 	
 	
 	protected void commitSelectedChoice() {
-		String html = updateTripData();
+		//String html = updateTripData();
+		ArrayList<TripLeg> tripLegs = optimizeStops.getTripPlan().getTripLegs();
+		Iterator<LegData> it = legTableModel.getData().iterator();
+		Report report = new Report();
+		for (TripLeg leg : tripLegs) {
+			leg.legData = it.next();
+			report.add( TripPlan.N_DRIVERS, leg.legData, leg.driverAssignments );
+		}
+		String html = report.toHtml();
 		Events.eventBus.post( new Events.StopsCommitEvent( html ) );
 	}
 	
@@ -392,9 +402,9 @@ public class OptimizeStopsDialog extends JDialog {
 	protected static class StopsTableModel extends AbstractTableModel {
 		
 		private static final long serialVersionUID = 1L;
-		protected static final String[] names = {"Use", "Distance", "Time", "Road", "Dir.", "Fuel", "Name"};
-		protected static final double[] widths = {0.05, 0.1, 0.1, 0.25, 0.10, 0.05, 0.34};
-		protected static final boolean[] centered = {true, true, true, true, true, true, false};
+		protected static final String[] names = {"Use", "Refuel", "Fuel?", "Distance", "Time", "Road", "Dir.", "Name"};
+		protected static final double[] widths = {0.05, 0.05, 0.05, 0.05, 0.08, 0.07, 0.20, 0.10, 0.35};
+		protected static final boolean[] centered = {true, true, true, true, true, true, true, false};
 		
 		protected ArrayList<OptimizeStops.StopData> data = null;
 		
@@ -423,16 +433,18 @@ public class OptimizeStopsDialog extends JDialog {
 			case 0: 
 				return stopData.use;
 			case 1:
-				return String.format("%5.1f", stopData.distance*Here2.METERS_TO_MILES);
+				return stopData.refuel;
 			case 2:
-				return Here2.toPeriod(stopData.trafficTime);
-			case 3:
-				return String.format("%s %s %s", stopData.road, stopData.state, stopData.mileMarker); 
-			case 4:
-				return stopData.direction;
-			case 5:
 				return stopData.fuelAvailable;
+			case 3:
+				return String.format("%5.1f", stopData.distance*Here2.METERS_TO_MILES);
+			case 4:
+				return Here2.toPeriod(stopData.trafficTime);
+			case 5:
+				return String.format("%s %s %s", stopData.road, stopData.state, stopData.mileMarker); 
 			case 6:
+				return stopData.direction;
+			case 7:
 				return stopData.name;
 			}
 			return null;
@@ -440,7 +452,7 @@ public class OptimizeStopsDialog extends JDialog {
 
 		@Override
 		public Class<?> getColumnClass(int iCol) {
-			if (iCol == 0)
+			if (iCol <= 1)
 				return Boolean.class;
 			return String.class;
 		}
@@ -500,14 +512,6 @@ public class OptimizeStopsDialog extends JDialog {
 		roadTableModel.setData(legData.roadDirectionDataList);
 		stopsTableModel.setData(legData.stopDataList);
 	}
-	
-//	private void setRoadDirectionTable( List<RoadDirectionData> roadDataList ) {
-//		roadTableModel.setData(roadDataList);
-//	}
-//
-//	private void setStopTable( ArrayList<StopData> stopDataList ) {
-//		stopsTableModel.setData(stopDataList);
-//	}
 	
 	public ArrayList<OptimizeStops.StopData> getStopTable() {
 		return stopsTableModel.getData();
