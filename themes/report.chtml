@@ -20,9 +20,9 @@
 			<tr>
 				<td><h1>{$dayName}</h1></td>
 				<td><h1>{$dayDuration} hours; Driving {$dayDistance} miles</h1></td>
-				<td colspan="3">Time (hr)</td>
-				<td colspan="2">Distance (mi)</td>
-				<td colspan="2">Fuel (gal)</td>
+				<td colspan="3"><h1>Time (hr)</h1></td>
+				<td colspan="2"><h1>Distance (mi)</h1></td>
+				<td colspan="2"><h1>Fuel (gal)</h1></td>
 			</tr>
 			<tr>
 				<td></td>

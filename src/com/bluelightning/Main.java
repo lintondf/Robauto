@@ -217,17 +217,14 @@ public class Main {
 				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
 				logger.info("  Route points saved");
 			}
-			route = Here2.computeRoute(tripPlan);
+			route = Here2.computeRoute(tripPlan);  // will reload from routeJson if not empty
 			logger.info("  Route planned");
 			if (route != null) {
 				waypoints = map.showRoute(route);
 				int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 				mainPanel.getRightTabbedPane().setSelectedIndex(index);
 				logger.info("  Route shown on map");
-				// insureNearbyMapLoaded(route, Main.MarkerKinds.RESTAREAS,
-				// poiMap.get(Main.MarkerKinds.RESTAREAS));
-				// OptimizeStops optimizeStops = new OptimizeStops(route,
-				// poiMap, nearbyMap);
+				tripPlan.update( route );
 			}
 			tripPlan.save(tripPlanFile);
 			logger.info("  Trip plan saved");
@@ -504,6 +501,11 @@ public class Main {
 		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
 		if (!tripPlan.getRouteJson().isEmpty()) {
 			Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
+			Report report = tripPlan.getTripReport();
+			if (report != null) {
+				String html = report.toHtml();
+				resultsPane.setText(html);
+			}
 		}
 	}
 

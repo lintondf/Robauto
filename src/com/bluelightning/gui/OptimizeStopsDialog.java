@@ -169,14 +169,14 @@ public class OptimizeStopsDialog extends JDialog {
 	
 	
 	protected void commitSelectedChoice() {
-		//String html = updateTripData();
-		ArrayList<TripLeg> tripLegs = optimizeStops.getTripPlan().getTripLegs();
-		Iterator<LegData> it = legTableModel.getData().iterator();
-		Report report = new Report();
-		for (TripLeg leg : tripLegs) {
-			leg.legData = it.next();
-			report.add( TripPlan.N_DRIVERS, leg.legData, leg.driverAssignments );
-		}
+//		ArrayList<TripLeg> tripLegs = optimizeStops.getTripPlan().getTripLegs();
+//		Iterator<LegData> it = legTableModel.getData().iterator();
+//		Report report = new Report();
+//		for (TripLeg leg : tripLegs) {
+//			leg.legData = it.next();
+//			report.add( TripPlan.N_DRIVERS, leg.legData, leg.driverAssignments );
+//		}
+		Report report = optimizeStops.getTripPlan().getTripReport();
 		String html = report.toHtml();
 		Events.eventBus.post( new Events.StopsCommitEvent( html ) );
 	}
@@ -491,7 +491,6 @@ public class OptimizeStopsDialog extends JDialog {
 		}
 		
 	}
-	
 	
 	public String updateTripData() {
 		ArrayList<TripLeg> tripLegs = optimizeStops.getTripPlan().getTripLegs();

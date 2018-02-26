@@ -8,6 +8,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import com.bluelightning.Main;
 import com.bluelightning.OptimizeStops;
@@ -15,6 +17,8 @@ import com.bluelightning.OptimizeStops.DriverAssignments;
 import com.bluelightning.OptimizeStops.LegData;
 import com.bluelightning.OptimizeStops.RoadDirectionData;
 import com.bluelightning.OptimizeStops.StopData;
+import com.bluelightning.data.TripPlan.TripLeg;
+import com.bluelightning.json.Route;
 import com.bluelightning.Report;
 
 import seedu.addressbook.data.place.VisitedPlace;
@@ -51,6 +55,9 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		placesChanged = false;
 	}
 	
+	public void update(Route route) {
+	}
+
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("Robauto TripPlan: ");
@@ -66,8 +73,32 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	public int compareTo(TripPlan o) {
 		return lastModified.compareTo(o.lastModified);
 	}
+	
+	public Report getTripReport() {
+		List<LegData> legDataList = getTripLegData();
+		ArrayList<TripLeg> tripLegs = getTripLegs();
+		Iterator<LegData> it = legDataList.iterator();
+		Report report = new Report();
+		for (TripLeg leg : tripLegs) {
+			leg.legData = it.next();
+			report.add( TripPlan.N_DRIVERS, leg.legData, leg.driverAssignments );
+		}
+		return report;
+	}
+	
+	public ArrayList<LegData> getTripLegData() {
+		ArrayList<TripLeg> tripLegs = getTripLegs();
+		ArrayList<OptimizeStops.LegData> legDataList = new ArrayList<>();
+		for (TripLeg leg : tripLegs) {
+			legDataList.add( leg.legData );
+		}
+		return legDataList;
+	}
+	
+
 
 	public void save(File file) {
+		placesChanged = false;
 		lastModified = new Date();
 		try {
 			FileOutputStream fos = new FileOutputStream(file);
@@ -88,6 +119,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			String[] report = tripPlan.toString().split("\n");
 			for (String line : report)
 				Main.logger.info(line);
+			tripPlan.placesChanged = false;
 			return tripPlan;
 		} catch (Exception x) {
 			

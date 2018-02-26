@@ -402,7 +402,8 @@ public class OptimizeStops {
 	}
 
 	protected void updateTripPlan() {
-		tripPlan.getTripLegs().clear();
+		if (! tripPlan.getTripLegs().isEmpty())
+			return;
 		List<OptimizeStops.LegData> legDataList = getUiLegData();
 		for (int iLeg = 0; iLeg < legDataList.size(); iLeg++) {
 			OptimizeStops.LegData leg = legDataList.get(iLeg);
