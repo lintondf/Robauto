@@ -88,7 +88,6 @@ public class OptimizeStopsDialog extends JDialog {
 	protected StopsTableModel stopsTableModel;
 	protected JButton commitButton;
 	protected JButton chooseButton;
-	protected JButton cancelButton;
 	protected JButton addBeforeButton;
 	protected JButton addAfterButton;
 	protected CallbackHandler handler;
@@ -127,7 +126,7 @@ public class OptimizeStopsDialog extends JDialog {
 					}
 					stopsTableModel.setData(dataList);
 					generateLegStopChoices();
-					OptimizeStopsDialog.this.optimizeStops.getTripPlan().getTripLegs().get(currentLeg).stopDataList = dataList;
+					OptimizeStopsDialog.this.optimizeStops.getTripPlan().getTripLeg(currentLeg).stopDataList = dataList;
 				}
 			});
 		}
@@ -184,7 +183,7 @@ public class OptimizeStopsDialog extends JDialog {
 	protected void chooseCurrentTab() {
 		int selected = choicesTabbedPane.getSelectedIndex();
 		if (selected >= 0) {
-			optimizeStops.getTripPlan().getTripLegs().get(currentLeg).driverAssignments = presentedChoices.get(selected);
+			optimizeStops.getTripPlan().getTripLeg(currentLeg).driverAssignments = presentedChoices.get(selected);
 			updateTripData();
 		}
 	}
@@ -243,10 +242,10 @@ public class OptimizeStopsDialog extends JDialog {
 			if (! event.getValueIsAdjusting()) {
 				System.out.println(event);
 				if (currentLeg >= 0) {
-					optimizeStops.getTripPlan().getTripLegs().get(currentLeg).stopDataList = getStopTable();
+					optimizeStops.getTripPlan().getTripLeg(currentLeg).stopDataList = getStopTable();
 				}
 				currentLeg = event.getLastIndex();
-				setCurrentLeg( optimizeStops.getTripPlan().getTripLegs().get(currentLeg) );
+				setCurrentLeg( optimizeStops.getTripPlan().getTripLeg(currentLeg) );
 				generateLegStopChoices(currentLeg);
 			}
 		}
@@ -268,7 +267,6 @@ public class OptimizeStopsDialog extends JDialog {
 	public void addListeners(OptimizeActionListener optimizeActionListener,
 			OptimizeLegSelectionListener optimizeLegSelectionListener) {
 		
-		cancelButton.addActionListener(optimizeActionListener);
 		commitButton.addActionListener(optimizeActionListener);
 		chooseButton.addActionListener(optimizeActionListener);
 		addAfterButton.addActionListener(optimizeActionListener);
@@ -493,14 +491,8 @@ public class OptimizeStopsDialog extends JDialog {
 	}
 	
 	public String updateTripData() {
-		ArrayList<TripLeg> tripLegs = optimizeStops.getTripPlan().getTripLegs();
-		ArrayList<TripPlan.LegData> legDataList = new ArrayList<>();
-		Report report = new Report();
-		for (TripLeg leg : tripLegs) {
-			legDataList.add( leg.legData );
-			report.add( TripPlan.N_DRIVERS, leg.legData, leg.driverAssignments );
-		}
-		legTableModel.setData(legDataList);
+		legTableModel.setData(optimizeStops.getTripPlan().getTripLegData());
+		Report report = optimizeStops.getTripPlan().getTripReport();
 		outputTextPane.setContentType("text/html");
 		String html = report.toHtml();
 		outputTextPane.setText(html);
@@ -627,12 +619,7 @@ public class OptimizeStopsDialog extends JDialog {
 				getRootPane().setDefaultButton(chooseButton);
 			}
 			{
-				cancelButton = new JButton("Cancel");
-				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
-			}
-			{
-				commitButton = new JButton("OK");
+				commitButton = new JButton("Done");
 				commitButton.setActionCommand("Commit");
 				buttonPane.add(commitButton);
 			}
@@ -689,13 +676,13 @@ public class OptimizeStopsDialog extends JDialog {
 		// generate all possible permutations of driver assignments
 		// do not permute stopping at the arrival point (last in
 		// stopDataList)
-		Permutations perm = new Permutations(optimizeStops.getTripPlan().getTripLegs().get(iLeg).stopDataList.size() - 1);
+		Permutations perm = new Permutations(optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList.size() - 1);
 		ArrayList<Integer[]> unique = perm.monotonic();
 		Set<TripPlan.DriverAssignments> driverAssignmentsSet = new TreeSet<>();
 		for (Integer[] elements : unique) {
-			driverAssignmentsSet.add(OptimizeStops.generateDriverAssignments(TripPlan.N_DRIVERS,
-					optimizeStops.getTripPlan().getTripLegs().get(iLeg).legData, 
-					optimizeStops.getTripPlan().getTripLegs().get(iLeg).stopDataList,
+			driverAssignmentsSet.add(TripPlan.generateDriverAssignments(TripPlan.N_DRIVERS,
+					optimizeStops.getTripPlan().getTripLeg(iLeg).legData, 
+					optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList,
 					elements));
 		}
 		Iterator<TripPlan.DriverAssignments> it = driverAssignmentsSet.iterator();
@@ -705,7 +692,7 @@ public class OptimizeStopsDialog extends JDialog {
 		for (int i = 0; it.hasNext() && i < 5; i++) {
 			TripPlan.DriverAssignments choiceDriverAssignments = it.next();
 			presentedChoices.add(choiceDriverAssignments);
-			String html = OptimizeStops.toHtml(2, optimizeStops.getTripPlan().getTripLegs().get(iLeg).legData, choiceDriverAssignments);
+			String html = OptimizeStops.toHtml(2, optimizeStops.getTripPlan().getTripLeg(iLeg).legData, choiceDriverAssignments);
 			JPanel panel = new JPanel();
 			getChoicesTabbedPane().addTab(String.format("Case %d", 1 + i), null, panel, null);
 			getChoicesTabbedPane().setEnabledAt(i, true);

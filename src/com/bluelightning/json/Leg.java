@@ -263,8 +263,8 @@ public class Leg implements Serializable, PostProcessingEnabler.PostProcessable
         return new ToStringBuilder(this).append("start", start).append("end", end).append("length", length).append("travelTime", travelTime).append("maneuver", maneuver).append("link", link).append("boundingBox", boundingBox).append("shape", shape).append("firstPoint", firstPoint).append("lastPoint", lastPoint).append("trafficTime", trafficTime).append("baseTime", baseTime).append("summary", summary).toString();
     }
     
-    public static class CumulativeTravel {
-    	public double  heading;
+    public static class CumulativeTravel implements Serializable {
+		public double  heading;
     	public double  distance;
     	public double  travelTime;
     	public double  trafficTime;

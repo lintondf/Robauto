@@ -1,5 +1,7 @@
 package com.bluelightning;
 
+import java.io.Serializable;
+
 import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.json.MappedPosition;
@@ -7,12 +9,14 @@ import com.google.gson.JsonElement;
 
 // 28.23469, -80.7532
 	// 44.5228246, -68.2088976
-	public class LatLon extends GeoPosition {
+	public class LatLon extends GeoPosition implements Serializable {
 //		@SerializedName(value="latitude", alternate={"Latitude"})
 //		protected double latitude;
 //		@SerializedName(value="longitude", alternate={"Longitude"})
 //		protected double longitude;
 		
+		private static final long serialVersionUID = 1L;
+
 		public LatLon() {  }
 		
 		public LatLon( String parse ) {

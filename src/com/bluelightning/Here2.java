@@ -323,7 +323,7 @@ public class Here2 {
 			}
 			plus = getRoute( points, "fastest;truck;traffic:disabled" );
 		}
-		return computeRouteBase( plus, pointAddresses );
+		return computeRouteBase( plus.route, pointAddresses );
 	}
 	
 	
@@ -332,18 +332,11 @@ public class Here2 {
 		for (int i = 0; i < pointAddresses.length; i++) {
 			pointAddresses[i] = tripPlan.getPlaces().get(i).getAddress().value;
 		}
-		if (tripPlan.getRouteJson().isEmpty()) {
+		if (tripPlan.getRoute() == null) {
 			HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces(), "fastest;truck;traffic:disabled"  );
-			tripPlan.setRouteJson( hereRoute.json );
-			return computeRouteBase( hereRoute, pointAddresses );
+			return computeRouteBase( hereRoute.route, pointAddresses );
 		} else {
-			try {
-				HereRoute hereRoute = (HereRoute) Here2.gson.fromJson(tripPlan.getRouteJson(), HereRoute.class);
-				HereRoutePlus plus = new HereRoutePlus( hereRoute, tripPlan.getRouteJson());
-				return computeRouteBase( plus, pointAddresses );				
-			} catch (Exception x) {
-				return null;
-			}
+			return tripPlan.getRoute();
 		}
 	}
 
@@ -354,11 +347,11 @@ public class Here2 {
 			pointAddresses[i] = places.get(i).getAddress().value;
 		}
 		HereRoutePlus hereRoute = getRouteFromPlaces( places, "fastest;truck;traffic:disabled"  );
-		return computeRouteBase( hereRoute, pointAddresses );
+		return computeRouteBase( hereRoute.route, pointAddresses );
 	}
 	
-	protected static Route computeRouteBase( HereRoutePlus plus, String[] pointAddresses ) {
-		HereRoute hereRoute = plus.route;
+	protected static Route computeRouteBase( HereRoute hereRoute, String[] pointAddresses ) {
+		//HereRoute hereRoute = plus.route;
 		System.out.println(hereRoute.getResponse().getMetaInfo());
 		Set<Route> routes = hereRoute.getResponse().getRoute();
 		System.out.printf("%d routes\n", routes.size() );

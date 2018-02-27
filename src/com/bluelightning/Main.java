@@ -213,7 +213,7 @@ public class Main {
 		private void route() {
 			logger.info("Planning route...");
 			if (tripPlan.getPlacesChanged()) {
-				tripPlan.setRouteJson("");
+				tripPlan.setRoute(null);
 				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
 				logger.info("  Route points saved");
 			}
@@ -224,7 +224,7 @@ public class Main {
 				int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 				mainPanel.getRightTabbedPane().setSelectedIndex(index);
 				logger.info("  Route shown on map");
-				tripPlan.update( route );
+				tripPlan.setRoute( route );
 			}
 			tripPlan.save(tripPlanFile);
 			logger.info("  Trip plan saved");
@@ -238,6 +238,7 @@ public class Main {
 				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(route, 5e3));
 			});
 
+			tripPlan.setRoute(route);
 			OptimizeStops optimizeStops = new OptimizeStops(tripPlan, route, poiMap, nearbyMap);
 
 			dialog = new OptimizeStopsDialog(optimizeStops);
@@ -246,7 +247,7 @@ public class Main {
 
 			int iLeg = 0; // start with first leg
 			final String html = dialog.updateTripData();
-			dialog.setCurrentLeg(tripPlan.getTripLegs().get(iLeg));
+			dialog.setCurrentLeg(tripPlan.getTripLeg(iLeg));
 
 			dialog.addListeners(dialog.new OptimizeActionListener(), dialog.new OptimizeLegSelectionListener());
 
@@ -441,6 +442,20 @@ public class Main {
 
 	}
 
+	public EnumMap<Main.MarkerKinds, ArrayList<POIResult>> getNearbyMap() {
+		return nearbyMap;
+	}
+
+	public JTextPane getResultsPane() {
+		return resultsPane;
+	}
+
+	public void setResultsPane(JTextPane resultsPane) {
+		this.resultsPane = resultsPane;
+	}
+
+	
+	
 	public Main() {
 		logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -503,7 +518,7 @@ public class Main {
 		logger.info("Loading previous trip plan");
 		tripPlan = TripPlan.load(tripPlanFile);
 		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
-		if (!tripPlan.getRouteJson().isEmpty()) {
+		if (tripPlan.getRoute() != null) {
 			Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
 			Report report = tripPlan.getTripReport();
 			if (report != null) {
@@ -513,20 +528,6 @@ public class Main {
 		}
 	}
 
-	public EnumMap<Main.MarkerKinds, ArrayList<POIResult>> getNearbyMap() {
-		return nearbyMap;
-	}
-
-	public JTextPane getResultsPane() {
-		return resultsPane;
-	}
-
-	public void setResultsPane(JTextPane resultsPane) {
-		this.resultsPane = resultsPane;
-	}
-
-	
-	
 	public static void main(String[] args) {
 		Main main = new Main();
 	}

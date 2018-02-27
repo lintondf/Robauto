@@ -10,15 +10,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.bluelightning.Here2;
 import com.bluelightning.Main;
 import com.bluelightning.OptimizeStops;
-import com.bluelightning.data.TripPlan.DriverAssignments;
 import com.bluelightning.json.Leg;
+import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.Route;
 import com.bluelightning.poi.POI;
-import com.bluelightning.poi.POI.FuelAvailable;
 import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.RestAreaPOI;
@@ -34,16 +36,22 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	
 	protected Date                    lastModified;
 	
-	protected boolean                 placesChanged;
+	protected Boolean                 placesChanged;
 	
 	protected ArrayList<VisitedPlace> places;
 	
-	protected String                  routeJson;
+	protected Route                   route;
 	
 	protected ArrayList<TripLeg>      tripLegs;
 	
+	protected ArrayList<LegData>      legDataList;
+	
+	protected List<TripPlan.LegSummary> legSummary;
+	
 
 	public static class TripLeg implements Serializable {
+		private static final long serialVersionUID = 1L;
+
 		public TripPlan.LegData                      legData;
 		public ArrayList<TripPlan.RoadDirectionData> roadDirectionDataList;
 		public ArrayList<TripPlan.StopData>          stopDataList;
@@ -284,12 +292,12 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	public TripPlan() {
 		lastModified = new Date();
 		places = new ArrayList<>();
-		routeJson = "";
+		route = null;
 		tripLegs = new ArrayList<>();
 		placesChanged = false;
 	}
 	
-	public void update(Route route) {
+	public void update( Route route ) {
 		//TODO
 	}
 
@@ -298,7 +306,6 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		sb.append("Robauto TripPlan: ");
 		sb.append(lastModified.toString());
 		sb.append('\n');
-		sb.append( String.format("  RouteJson: %d\n", routeJson.length()));
 		sb.append( String.format("  Places: %d\n", places.size()));
 		sb.append( String.format("  Legs: %d\n", tripLegs.size()));
 		return sb.toString();
@@ -311,7 +318,6 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	
 	public Report getTripReport() {
 		List<TripPlan.LegData> legDataList = getTripLegData();
-		ArrayList<TripLeg> tripLegs = getTripLegs();
 		Iterator<TripPlan.LegData> it = legDataList.iterator();
 		Report report = new Report();
 		for (TripLeg leg : tripLegs) {
@@ -322,7 +328,6 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	}
 	
 	public ArrayList<TripPlan.LegData> getTripLegData() {
-		ArrayList<TripLeg> tripLegs = getTripLegs();
 		ArrayList<TripPlan.LegData> legDataList = new ArrayList<>();
 		for (TripLeg leg : tripLegs) {
 			legDataList.add( leg.legData );
@@ -335,10 +340,17 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	public void save(File file) {
 		placesChanged = false;
 		lastModified = new Date();
+		legDataList = null;  // clear transient data
+		legSummary = null;
+		
 		try {
 			FileOutputStream fos = new FileOutputStream(file);
 			ObjectOutputStream out = new ObjectOutputStream(fos);
-			out.writeObject(this);
+			out.writeObject(this.lastModified);
+			out.writeObject(this.placesChanged);
+			out.writeObject(this.places);
+			out.writeObject(Here2.gson.toJson(this.route));
+			out.writeObject(this.tripLegs);
 			out.close();
 		} catch (Exception x) {
 			x.printStackTrace();
@@ -349,26 +361,33 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		try {
 			FileInputStream fis = new FileInputStream(file);
 			ObjectInputStream in = new ObjectInputStream(fis);
-			TripPlan tripPlan = (TripPlan) in.readObject();
+			TripPlan tripPlan = new TripPlan();
+			tripPlan.lastModified = (Date) in.readObject();
+			tripPlan.placesChanged = (Boolean) in.readObject();
+			tripPlan.places = (ArrayList<VisitedPlace>) in.readObject();
+			String json = (String) in.readObject();
+			tripPlan.route = (Route) Here2.gson.fromJson(json, Route.class);
+			tripPlan.tripLegs = (ArrayList<TripLeg>) in.readObject();
 			in.close();
 			String[] report = tripPlan.toString().split("\n");
 			for (String line : report)
 				Main.logger.info(line);
 			tripPlan.placesChanged = false;
+			tripPlan.setRoute( tripPlan.getRoute() );
 			return tripPlan;
 		} catch (Exception x) {
 			
 			return new TripPlan();
 		}
 	}
-	public static void main(String[] args) {
-		TripPlan tripPlan = new TripPlan();
-		System.out.println(tripPlan);
-		File file = new File("robautoTripPlan.obj");
-		tripPlan.save( file );
-		TripPlan out = TripPlan.load( file );
-		System.out.println(out);
-	}
+//	public static void main(String[] args) {
+//		TripPlan tripPlan = new TripPlan();
+//		System.out.println(tripPlan);
+//		File file = new File("robautoTripPlan.obj");
+//		tripPlan.save( file );
+//		TripPlan out = TripPlan.load( file );
+//		System.out.println(out);
+//	}
 
 	public Date getLastModified() {
 		return lastModified;
@@ -387,17 +406,17 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		this.placesChanged = false;
 	}
 
-	public String getRouteJson() {
-		return routeJson;
+	public boolean isLegsEmpty() {
+		return tripLegs.isEmpty();
+	}
+	
+	public TripLeg getTripLeg(int i) {
+		return tripLegs.get(i);
 	}
 
-	public void setRouteJson(String routeJson) {
-		this.routeJson = routeJson;
-	}
-
-	public ArrayList<TripLeg> getTripLegs() {
-		return tripLegs;
-	}
+//	public ArrayList<TripLeg> getTripLegs() {
+//		return tripLegs;
+//	}
 
 //	public void setTripLegs(ArrayList<TripLeg> tripLegs) {
 //		this.tripLegs = tripLegs;
@@ -409,6 +428,150 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	public void setPlacesChanged(boolean placesChanged) {
 		this.placesChanged = placesChanged;
+	}
+
+	protected boolean filterDirections(TripPlan.StopData data,
+			List<TripPlan.RoadDirectionData> roadDirections) {
+		for (TripPlan.RoadDirectionData road : roadDirections) {
+			if (road.road.equalsIgnoreCase(data.road)) {
+				// RestAreas: NB, EB, SB, WB, NB/SB, EB/WB
+				if (road.direction.equalsIgnoreCase("ANY"))
+					return true;
+				if (data.direction.contains("/"))
+					return true;
+				return data.direction.startsWith(road.direction.substring(0, 1));
+			}
+		}
+		return true;
+	}
+
+	public ArrayList<TripPlan.StopData> getStopData(int nDrivers, int iLeg, boolean includeTruckAreas,
+			List<TripPlan.RoadDirectionData> roadDirections) {
+		TripPlan.LegSummary summary = legSummary.get(iLeg);
+		ArrayList<TripPlan.StopData> dataList = new ArrayList<>();
+		for (POIResult r : summary.nearby) {
+			TripPlan.StopData data = new TripPlan.StopData(r);
+			if (!includeTruckAreas && data.name.toUpperCase().contains("TRUCK"))
+				continue;
+			if (filterDirections(data, roadDirections)) {
+				dataList.add(data);
+			}
+		}
+		TripPlan.StopData data = new TripPlan.StopData(summary);
+		dataList.add(data);
+		return dataList;
+	}
+
+	public void update(Route route, ArrayList<POIResult> restAreas) {
+		setRoute(route);
+		legSummary.forEach(ls -> {
+			ls.setNearby(restAreas);
+		});
+		//TODO handle stops add/remove/reorder?
+		if (! isLegsEmpty())
+			return;
+		List<TripPlan.LegData> legDataList = getTripLegData();
+		for (int iLeg = 0; iLeg < legDataList.size(); iLeg++) {
+			TripPlan.LegData leg = legDataList.get(iLeg);
+			TripPlan.TripLeg tripLeg = new TripPlan.TripLeg();
+			tripLeg.legData = leg;
+			tripLeg.roadDirectionDataList = getRoadDirectionData(iLeg);
+			tripLeg.stopDataList = getStopData(TripPlan.N_DRIVERS, iLeg, false, tripLeg.roadDirectionDataList);
+			ArrayList<TripPlan.StopData> endPoints = new ArrayList<>();
+			endPoints.add( tripLeg.stopDataList.get(tripLeg.stopDataList.size()-1) );
+			tripLeg.driverAssignments = generateDriverAssignments(TripPlan.N_DRIVERS, tripLeg.legData, endPoints );
+			tripLegs.add(tripLeg);
+		}
+	}
+
+	public static TripPlan.DriverAssignments generateDriverAssignments(int nDrivers, TripPlan.LegData legData,
+			ArrayList<TripPlan.StopData> stopDataList, Integer[] elements) {
+		ArrayList<TripPlan.StopData> sublist = new ArrayList<>();
+		for (Integer i : elements) {
+			sublist.add(stopDataList.get(i.intValue()));
+		}
+		sublist.add( stopDataList.get(stopDataList.size()-1) );  // always stop at arrival point
+		return generateDriverAssignments(nDrivers, legData, stopDataList, sublist);
+	}
+
+	public static TripPlan.DriverAssignments generateDriverAssignments(int nDrivers, TripPlan.LegData legData,
+			ArrayList<TripPlan.StopData> stopDataList) {
+		return generateDriverAssignments(nDrivers, legData, stopDataList, stopDataList);
+	}
+
+	public static TripPlan.DriverAssignments generateDriverAssignments(int nDrivers, TripPlan.LegData legData,
+			ArrayList<TripPlan.StopData> stopDataList, ArrayList<TripPlan.StopData> sublist) {
+
+		TripPlan.DriverAssignments driverAssignments = new TripPlan.DriverAssignments(nDrivers);
+		int driver = 0;
+		double lastTime = 0.0;
+		double score = 0.0;
+		for (TripPlan.StopData stopData : sublist) {
+			//System.out.printf("%10.0f %10.0f %s\n", legData.trafficTime, stopData.trafficTime, stopData.toString());
+			driverAssignments.assignments[driver].stops.add(stopData);
+			double dTime = stopData.trafficTime - lastTime;
+			driverAssignments.assignments[driver].driveTimes.add(dTime);
+			driverAssignments.totalDriveTimes[driver] += dTime;
+			score += OptimizeStops.scoreTime(dTime);
+			lastTime = stopData.trafficTime;
+			driver = (driver + 1) % nDrivers;
+		}
+		driverAssignments.driveImbalance = Math
+				.abs(driverAssignments.totalDriveTimes[1] - driverAssignments.totalDriveTimes[0]);
+		driverAssignments.score = score + driverAssignments.driveImbalance;
+		// System.out.println(driverAssignments);
+		return driverAssignments;
+	}
+	
+	public Route getRoute() {
+		return route;
+	}
+
+	public void setRoute(Route route) {
+		this.route = route;
+		legSummary = new ArrayList<>();
+		legDataList = new ArrayList<>();
+		LegPoint current = new LegPoint();
+		Iterator<VisitedPlace> it = this.getPlaces().iterator();
+		current.fuelAvailability = POIBase.toFuelString( it.next().getFuelAvailable() );
+		for (Leg leg : route.getLeg()) {
+			LegPoint next = new LegPoint(current);
+			next.fuelAvailability = POIBase.toFuelString( it.next().getFuelAvailable() );
+			next.plus(leg);
+			LegSummary summary = new LegSummary(leg, current, next);
+			legSummary.add(summary);
+			LegData data = new LegData();
+			data.distance = summary.leg.getLength();
+			data.startLabel = summary.leg.getStart().getUserLabel();
+			data.endLabel = summary.leg.getEnd().getUserLabel();
+			data.trafficTime = summary.leg.getTrafficTime();
+			legDataList.add(data);
+			current = next;
+		}
+	}
+
+	public List<TripPlan.LegSummary> getLegSummary() {
+		return legSummary;
+	}
+
+	public ArrayList<RoadDirectionData> getRoadDirectionData(int iLeg) {
+		LegSummary summary = legSummary.get(iLeg);
+		return getRoadDirectionData(summary);
+	}
+
+	public ArrayList<RoadDirectionData> getRoadDirectionData(LegSummary summary) {
+		TreeSet<RoadDirectionData> dataList = new TreeSet<>();
+		Pattern regex = Pattern.compile("onto\\s(\\w+)-(\\d+[\\w])\\s(\\w)");
+		for (Maneuver m : summary.leg.getManeuver()) {
+			Matcher matcher = regex.matcher(m.getInstruction());
+			if (matcher.find()) {
+				RoadDirectionData data = new RoadDirectionData();
+				data.direction = matcher.group(3);
+				data.road = matcher.group(1) + "-" + matcher.group(2);
+				dataList.add(data);
+			}
+		}
+		return new ArrayList<>(dataList);
 	}
 
 }
