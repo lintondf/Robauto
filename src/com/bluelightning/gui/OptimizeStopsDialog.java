@@ -29,11 +29,11 @@ import com.bluelightning.Events;
 import com.bluelightning.Here2;
 import com.bluelightning.Main;
 import com.bluelightning.OptimizeStops;
-import com.bluelightning.OptimizeStops.LegData;
-import com.bluelightning.OptimizeStops.StopData;
 import com.bluelightning.Permutations;
 import com.bluelightning.Report;
 import com.bluelightning.data.TripPlan;
+import com.bluelightning.data.TripPlan.LegData;
+import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.data.TripPlan.TripLeg;
 import com.bluelightning.Events.AddManualStopEvent;
 import com.bluelightning.Events.UiEvent;
@@ -96,7 +96,7 @@ public class OptimizeStopsDialog extends JDialog {
 
 	protected JTextPane outputTextPane;
 
-	protected ArrayList<OptimizeStops.DriverAssignments> presentedChoices;
+	protected ArrayList<TripPlan.DriverAssignments> presentedChoices;
 	
 	public class CallbackHandler {
 		
@@ -118,8 +118,8 @@ public class OptimizeStopsDialog extends JDialog {
 			SwingUtilities.invokeLater( new Runnable() {
 				@Override
 				public void run() {
-					OptimizeStops.StopData data = new OptimizeStops.StopData(event.result);
-					ArrayList<OptimizeStops.StopData> dataList = stopsTableModel.getData();
+					TripPlan.StopData data = new TripPlan.StopData(event.result);
+					ArrayList<TripPlan.StopData> dataList = stopsTableModel.getData();
 					if (addBefore) {
 						dataList.add(iRow, data);
 					} else {
@@ -282,7 +282,7 @@ public class OptimizeStopsDialog extends JDialog {
 		private static final long serialVersionUID = 1L;
 		protected static final String[] names = {"Start", "End", "Length (mi)", "Time (hr:mm)"};
 		
-		protected List<OptimizeStops.LegData> data = null;
+		protected List<TripPlan.LegData> data = null;
 		
 		
 		public LegTableModel() {
@@ -304,7 +304,7 @@ public class OptimizeStopsDialog extends JDialog {
 		public Object getValueAt(int iRow, int iCol) {
 			if (data == null || iRow >= data.size())
 				return null;
-			OptimizeStops.LegData legData = data.get(iRow);
+			TripPlan.LegData legData = data.get(iRow);
 			switch (iCol) {
 			case 0: 
 				return legData.startLabel;
@@ -328,11 +328,11 @@ public class OptimizeStopsDialog extends JDialog {
 			return names[iCol];
 		}
 
-		public List<OptimizeStops.LegData> getData() {
+		public List<TripPlan.LegData> getData() {
 			return data;
 		}
 
-		public void setData(List<OptimizeStops.LegData> data) {
+		public void setData(List<TripPlan.LegData> data) {
 			this.data = data;
 			fireTableStructureChanged();
 		}
@@ -345,7 +345,7 @@ public class OptimizeStopsDialog extends JDialog {
 		private static final long serialVersionUID = 1L;
 		protected static final String[] names = {"Name", "Direction"};
 		
-		protected List<OptimizeStops.RoadDirectionData> data = null;
+		protected List<TripPlan.RoadDirectionData> data = null;
 		
 		
 		public RoadTableModel() {
@@ -367,7 +367,7 @@ public class OptimizeStopsDialog extends JDialog {
 		public Object getValueAt(int iRow, int iCol) {
 			if (data == null || iRow >= data.size())
 				return null;
-			OptimizeStops.RoadDirectionData roadData = data.get(iRow);
+			TripPlan.RoadDirectionData roadData = data.get(iRow);
 			switch (iCol) {
 			case 0: 
 				return roadData.road;
@@ -387,11 +387,11 @@ public class OptimizeStopsDialog extends JDialog {
 			return names[iCol];
 		}
 
-		public List<OptimizeStops.RoadDirectionData> getData() {
+		public List<TripPlan.RoadDirectionData> getData() {
 			return data;
 		}
 
-		public void setData(List<OptimizeStops.RoadDirectionData> data) {
+		public void setData(List<TripPlan.RoadDirectionData> data) {
 			this.data = data;
 			fireTableStructureChanged();
 		}
@@ -406,7 +406,7 @@ public class OptimizeStopsDialog extends JDialog {
 		protected static final double[] widths = {0.05, 0.05, 0.05, 0.05, 0.08, 0.07, 0.20, 0.10, 0.35};
 		protected static final boolean[] centered = {true, true, true, true, true, true, true, false};
 		
-		protected ArrayList<OptimizeStops.StopData> data = null;
+		protected ArrayList<TripPlan.StopData> data = null;
 		
 		
 		public StopsTableModel() {
@@ -428,7 +428,7 @@ public class OptimizeStopsDialog extends JDialog {
 		public Object getValueAt(int iRow, int iCol) {
 			if (data == null || iRow >= data.size())
 				return null;
-			OptimizeStops.StopData stopData = data.get(iRow);
+			TripPlan.StopData stopData = data.get(iRow);
 			switch (iCol) {
 			case 0: 
 				return stopData.use;
@@ -462,11 +462,11 @@ public class OptimizeStopsDialog extends JDialog {
 			return names[iCol];
 		}
 
-		public ArrayList<OptimizeStops.StopData> getData() {
+		public ArrayList<TripPlan.StopData> getData() {
 			return data;
 		}
 
-		public void setData(ArrayList<OptimizeStops.StopData> data) {
+		public void setData(ArrayList<TripPlan.StopData> data) {
 			this.data = data;
 			fireTableStructureChanged();
 		}
@@ -494,7 +494,7 @@ public class OptimizeStopsDialog extends JDialog {
 	
 	public String updateTripData() {
 		ArrayList<TripLeg> tripLegs = optimizeStops.getTripPlan().getTripLegs();
-		ArrayList<OptimizeStops.LegData> legDataList = new ArrayList<>();
+		ArrayList<TripPlan.LegData> legDataList = new ArrayList<>();
 		Report report = new Report();
 		for (TripLeg leg : tripLegs) {
 			legDataList.add( leg.legData );
@@ -512,7 +512,7 @@ public class OptimizeStopsDialog extends JDialog {
 		stopsTableModel.setData(legData.stopDataList);
 	}
 	
-	public ArrayList<OptimizeStops.StopData> getStopTable() {
+	public ArrayList<TripPlan.StopData> getStopTable() {
 		return stopsTableModel.getData();
 	}
 
@@ -691,19 +691,19 @@ public class OptimizeStopsDialog extends JDialog {
 		// stopDataList)
 		Permutations perm = new Permutations(optimizeStops.getTripPlan().getTripLegs().get(iLeg).stopDataList.size() - 1);
 		ArrayList<Integer[]> unique = perm.monotonic();
-		Set<OptimizeStops.DriverAssignments> driverAssignmentsSet = new TreeSet<>();
+		Set<TripPlan.DriverAssignments> driverAssignmentsSet = new TreeSet<>();
 		for (Integer[] elements : unique) {
 			driverAssignmentsSet.add(OptimizeStops.generateDriverAssignments(TripPlan.N_DRIVERS,
 					optimizeStops.getTripPlan().getTripLegs().get(iLeg).legData, 
 					optimizeStops.getTripPlan().getTripLegs().get(iLeg).stopDataList,
 					elements));
 		}
-		Iterator<OptimizeStops.DriverAssignments> it = driverAssignmentsSet.iterator();
+		Iterator<TripPlan.DriverAssignments> it = driverAssignmentsSet.iterator();
 		
 		presentedChoices = new ArrayList<>();
 
 		for (int i = 0; it.hasNext() && i < 5; i++) {
-			OptimizeStops.DriverAssignments choiceDriverAssignments = it.next();
+			TripPlan.DriverAssignments choiceDriverAssignments = it.next();
 			presentedChoices.add(choiceDriverAssignments);
 			String html = OptimizeStops.toHtml(2, optimizeStops.getTripPlan().getTripLegs().get(iLeg).legData, choiceDriverAssignments);
 			JPanel panel = new JPanel();

@@ -16,7 +16,7 @@ import javax.swing.table.TableColumn;
 
 import com.bluelightning.Events;
 import com.bluelightning.Here2;
-import com.bluelightning.OptimizeStops.StopData;
+import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.Events.AddManualStopEvent;
 import com.bluelightning.poi.POIResult;
 

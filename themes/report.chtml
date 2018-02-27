@@ -20,20 +20,20 @@
 			<tr>
 				<td><h1>{$dayName}</h1></td>
 				<td><h1>{$dayDuration} hours; Driving {$dayDistance} miles</h1></td>
-				<td colspan="3"><h1>Time (hr)</h1></td>
-				<td colspan="2"><h1>Distance (mi)</h1></td>
-				<td colspan="2"><h1>Fuel (gal)</h1></td>
+				<td colspan="3" style="text-align:center"><h1>Time (hr)</h1></td>
+				<td colspan="2" style="text-align:center"><h1>Distance (mi)</h1></td>
+				<td colspan="2" style="text-align:center"><h1>Fuel (gal)</h1></td>
 			</tr>
 			<tr>
 				<td></td>
 				<td></td>
-				<td><small>Leg 1</small></td>
-				<td><small>Leg 2</small></td>
-				<td><small>Total</small></td>
-				<td><small>Leg</small></td>
-				<td><small>Total</small></td>
-				<td><small>Used</small></td>
-				<td><small>Remaining</small></td>
+				<td style="text-align:center"><h2>Leg 1</h2></td>
+				<td style="text-align:center"><h2>Leg 2</h2></td>
+				<td style="text-align:center"><h2>Total</h2></td>
+				<td style="text-align:center"><h2>Leg</h2></td>
+				<td style="text-align:center"><h2>Total</h2></td>
+				<td style="text-align:center"><h2>Used</h2></td>
+				<td style="text-align:center"><h2>Remaining</h2></td>
 			</tr>
 		</thead>
 		<tbody>
@@ -45,7 +45,7 @@
 {#titleRow}
 			<tr class="step-title">
 				<td class="step-ordinal step-depart">{$stepName}</td>
-				<td class="step-address">{$placeName}</br>
+				<td class="step-address">{$placeName}<br/>
 				<small>{$placeAddress}</small></td>
 				<td></td>
 				<td></td>
@@ -53,33 +53,33 @@
 				<td></td>
 				<td></td>
 				<td></td>
-				<td class="step-refuel"><b>{$refuel}</b></td>
+				<td class="step-refuel" style="text-align:center"><b>{$refuel}</b></td>
 			</tr>
 {#}
 {#detailRow}			
 			<tr class="step-detail">
 				<td></td>
 				<td class="step-drive">Drive</td>
-				<td class="step-field">{$leg1Duration}</td>
-				<td class="step-field">{$leg2Duration}</td>
-				<td class="step-field">{$totalDuration}</td>
-				<td class="step-field">{$legDistance}</td>
-				<td class="step-field">{$totalDistance}</td>
-				<td class="step-field">{$fuelUsed}</td>
-				<td class="step-field">{$fuelRemaining}</td>
+				<td class="step-field" style="text-align:center">{$leg1Duration}</td>
+				<td class="step-field" style="text-align:center">{$leg2Duration}</td>
+				<td class="step-field" style="text-align:center">{$totalDuration}</td>
+				<td class="step-field" style="text-align:center">{$legDistance}</td>
+				<td class="step-field" style="text-align:center">{$totalDistance}</td>
+				<td class="step-field" style="text-align:center">{$fuelUsed}</td>
+				<td class="step-field" style="text-align:center">{$fuelRemaining}</td>
 			</tr>
 {#}
 {#dayTotalRow}
 			<tr class="step-detail">
 				<td></td>
 				<td class="step-drive">Day Totals ({$imbalance})</td>
-				<td class="step-field">{$leg1Total}</td>
-				<td class="step-field">{$leg2Total}</td>
-				<td class="step-field">{$totalDuration}</td>
-				<td class="step-field"></td>
-				<td class="step-field"></td>
-				<td class="step-field"></td>
-				<td class="step-field"></td>
+				<td class="step-field" style="text-align:center">{$leg1Total}</td>
+				<td class="step-field" style="text-align:center">{$leg2Total}</td>
+				<td class="step-field" style="text-align:center">{$totalDuration}</td>
+				<td class="step-field" style="text-align:center"></td>
+				<td class="step-field" style="text-align:center"></td>
+				<td class="step-field" style="text-align:center"></td>
+				<td class="step-field" style="text-align:center"></td>
 			</tr>
 {#}
 {#kml}

@@ -18,8 +18,8 @@ import javax.swing.table.TableColumn;
 import com.bluelightning.Events;
 import com.bluelightning.Here2;
 import com.bluelightning.LatLon;
+import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.Events.AddWaypointEvent;
-import com.bluelightning.OptimizeStops.StopData;
 
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.place.Address;

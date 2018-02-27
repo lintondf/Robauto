@@ -17,6 +17,7 @@ import java.util.logging.Level;
 
 import org.apache.commons.io.IOUtils;
 
+import com.bluelightning.data.TripPlan;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.maps.model.LatLng;
@@ -252,20 +253,28 @@ public class Report implements Serializable {
 		lastDay.add(step);
 	}
 	
-	public void add(int nDrivers, OptimizeStops.LegData legData,
-			OptimizeStops.DriverAssignments driverAssignments) {
-		this.depart(legData.startLabel, "", 0.0);
+	protected String formatUserLabel(String userLabel) {
+		String[] fields = userLabel.split("/");
+		if (fields.length < 2)
+			return fields[0];
+		return String.format("%s<br/><small>%s</small>", fields[0], fields[1] );
+	}
+
+	
+	public void add(int nDrivers, TripPlan.LegData legData,
+			TripPlan.DriverAssignments driverAssignments) {
+		this.depart(formatUserLabel(legData.startLabel), "", 0.0);
 
 		List<Iterator<Double>> driveTimes = new ArrayList<Iterator<Double>>(
 				Arrays.asList(driverAssignments.assignments[0].driveTimes.iterator(),
 						driverAssignments.assignments[1].driveTimes.iterator()));
-		List<Iterator<OptimizeStops.StopData>> stops = new ArrayList<Iterator<OptimizeStops.StopData>>(Arrays.asList(
+		List<Iterator<TripPlan.StopData>> stops = new ArrayList<Iterator<TripPlan.StopData>>(Arrays.asList(
 				driverAssignments.assignments[0].stops.iterator(), driverAssignments.assignments[1].stops.iterator()));
 
 		int driver = 0;
 		double lastDistance = 0.0;
 		while (stops.get(driver).hasNext()) {
-			OptimizeStops.StopData stopData = stops.get(driver).next();
+			TripPlan.StopData stopData = stops.get(driver).next();
 			Double driveTime = driveTimes.get(driver).next();
 			int hours = (int) (driveTime / 3600.0);
 			int minutes = ((int) (driveTime / 60.0)) % 60;
@@ -276,7 +285,7 @@ public class Report implements Serializable {
 			this.stop(stopData.name, stopData.getAddress(), refuel );
 			driver = (driver + 1) % nDrivers;
 		}
-		this.arrive(0.0, legData.endLabel, "");
+		this.arrive(0.0, formatUserLabel(legData.endLabel), "");
 	}
 	
 

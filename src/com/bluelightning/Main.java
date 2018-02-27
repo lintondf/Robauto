@@ -29,11 +29,11 @@ import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
-import com.bluelightning.OptimizeStops.DriverAssignments;
-import com.bluelightning.OptimizeStops.LegData;
-import com.bluelightning.OptimizeStops.RoadDirectionData;
-import com.bluelightning.OptimizeStops.StopData;
 import com.bluelightning.data.TripPlan;
+import com.bluelightning.data.TripPlan.DriverAssignments;
+import com.bluelightning.data.TripPlan.LegData;
+import com.bluelightning.data.TripPlan.RoadDirectionData;
+import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.gui.AddAddressDialog;
 import com.bluelightning.gui.MainControlPanel;
 import com.bluelightning.gui.MainPanel;
@@ -293,6 +293,7 @@ public class Main {
 							places.add(selectedWaypointRow, place);
 						}
 						routePanel.getWaypointsModel().setData(places);
+						tripPlan.setPlaces(places);
 					}
 				});
 			}
@@ -317,6 +318,7 @@ public class Main {
 			places.set(selectedWaypointRow, places.get(selectedWaypointRow + 1));
 			places.set(selectedWaypointRow + 1, place);
 			routePanel.getWaypointsModel().setData(places);
+			tripPlan.setPlaces(places);
 		}
 
 		private void routeMoveUp() { // decrease index position
@@ -331,6 +333,7 @@ public class Main {
 			places.set(selectedWaypointRow, places.get(selectedWaypointRow - 1));
 			places.set(selectedWaypointRow - 1, place);
 			routePanel.getWaypointsModel().setData(places);
+			tripPlan.setPlaces(places);
 		}
 
 		private void routeRemove() {
@@ -344,6 +347,7 @@ public class Main {
 			VisitedPlace place = places.get(selectedWaypointRow);
 			places.remove(selectedWaypointRow);
 			routePanel.getWaypointsModel().setData(places);
+			tripPlan.setPlaces(places);
 		}
 	}
 
