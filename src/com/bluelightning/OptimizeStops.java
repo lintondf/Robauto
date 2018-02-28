@@ -60,14 +60,13 @@ public class OptimizeStops {
 		return resultList;
 	}
 
-	public OptimizeStops(TripPlan tripPlan, Route route, EnumMap<MarkerKinds, POISet> poiMap,
+	public OptimizeStops(TripPlan tripPlan, EnumMap<MarkerKinds, POISet> poiMap,
 			EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap) {
 		this.tripPlan = tripPlan;
-		this.route = route;
+		this.route = tripPlan.getRoute();
 		this.poiMap = poiMap;
-		tripPlan.setRoute(route);
 		ArrayList<POIResult> restAreas = nearbyMap.get(Main.MarkerKinds.RESTAREAS);
-		tripPlan.update(route, restAreas);
+		tripPlan.setRoute(route, restAreas);
 	}
 
 	public TripPlan getTripPlan() {

@@ -200,11 +200,6 @@ public class Main {
 				map.updateWaypoints(nearby);
 				break;
 
-			case "Window.Closing":
-				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
-				tripPlan.save(tripPlanFile);
-				// System.out.println("Saved: " + tripPlan.toString() );
-				break;
 			default:
 				break;
 			}
@@ -238,8 +233,7 @@ public class Main {
 				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(route, 5e3));
 			});
 
-			tripPlan.setRoute(route);
-			OptimizeStops optimizeStops = new OptimizeStops(tripPlan, route, poiMap, nearbyMap);
+			OptimizeStops optimizeStops = new OptimizeStops(tripPlan, poiMap, nearbyMap);
 
 			dialog = new OptimizeStopsDialog(optimizeStops);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -511,7 +505,8 @@ public class Main {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				Events.eventBus.post(new Events.UiEvent("Window.Closing", e));
+				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
+				tripPlan.save(tripPlanFile);
 			}
 		});
 

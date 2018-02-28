@@ -5,6 +5,7 @@ import java.awt.Image;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileReader;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,10 @@ import com.opencsv.CSVReader;
 
 import seedu.addressbook.data.tag.UniqueTagList;
 
-public abstract class POIBase implements POI {
+public abstract class POIBase implements POI, Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	protected double latitude;
 	protected double longitude;
 	protected double tanLatitude;
