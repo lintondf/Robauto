@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
@@ -331,6 +333,31 @@ public class Here2 {
 	
 	
 	public static Route computeRoute(TripPlan tripPlan) {
+		if (tripPlan.getRoute() == null) {
+			Route route = new Route();
+			HashSet<Leg> legs = new HashSet<>();
+			ArrayList<Object> shape = new ArrayList<>();
+			String[] pointAddresses = new String[2];
+			for (int i = 1; i < tripPlan.getPlaces().size(); i++) {
+				pointAddresses[0] = tripPlan.getPlaces().get(i-1).getAddress().value;
+				pointAddresses[1] = tripPlan.getPlaces().get(i).getAddress().value;
+				HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces().subList(i-1, i+1), "fastest;truck;traffic:disabled"  );
+				Route r = computeRouteBase( hereRoute.route, pointAddresses );
+				Leg leg = r.getLeg().iterator().next(); 
+				legs.add(leg);
+				shape.addAll( leg.getShape() );
+			}
+			route.setLeg(legs);
+			route.setShape(shape);
+			route.postProcess();
+			return route;
+		} else {
+			return tripPlan.getRoute();
+		}
+	}
+
+
+	public static Route computeRoute0(TripPlan tripPlan) {
 		String[] pointAddresses = new String[tripPlan.getPlaces().size()];
 		for (int i = 0; i < pointAddresses.length; i++) {
 			pointAddresses[i] = tripPlan.getPlaces().get(i).getAddress().value;
@@ -342,7 +369,6 @@ public class Here2 {
 			return tripPlan.getRoute();
 		}
 	}
-
 
 	public static Route computeRoute( List<VisitedPlace> places ) {
 		String[] pointAddresses = new String[places.size()];
