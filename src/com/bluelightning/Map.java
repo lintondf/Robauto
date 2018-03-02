@@ -136,6 +136,25 @@ public class Map {
 		mapViewer.setZoom(10);
 	}
 	
+	public void clearRoute() {
+		// remove the old swing markers
+		for (ButtonWaypoint w : currentMarkers) {
+			mapViewer.remove(w);
+		}
+		currentMarkers.clear();
+		markerPainter = new ButtonWaypointOverlayPainter();
+		markerPainter.setWaypoints( new HashSet<ButtonWaypoint>());
+		
+        painters = new ArrayList<Painter<JXMapViewer>>();
+		painters.add(markerPainter);
+
+		CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
+		mapViewer.setOverlayPainter(painter);
+		
+		mapViewer.setCenterPosition( new GeoPosition(28, -81));
+		mapViewer.setZoom(10);
+	}
+	
 	public List<ButtonWaypoint> showRoute( Route route) {
 		List<GeoPosition> track = route.getShape();
 		routePainter = new RoutePainter(track);

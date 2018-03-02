@@ -271,6 +271,7 @@ public class Main {
 				System.out.println(event + " " + event.place);
 				Events.eventBus.unregister(this); // one shot
 				handler = null;
+				map.clearRoute();
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -314,6 +315,7 @@ public class Main {
 			places.set(selectedWaypointRow + 1, place);
 			routePanel.getWaypointsModel().setData(places);
 			tripPlan.setPlaces(places);
+			map.clearRoute();
 		}
 
 		private void routeMoveUp() { // decrease index position
@@ -329,6 +331,7 @@ public class Main {
 			places.set(selectedWaypointRow - 1, place);
 			routePanel.getWaypointsModel().setData(places);
 			tripPlan.setPlaces(places);
+			map.clearRoute();
 		}
 
 		private void routeRemove() {
@@ -343,6 +346,7 @@ public class Main {
 			places.remove(selectedWaypointRow);
 			routePanel.getWaypointsModel().setData(places);
 			tripPlan.setPlaces(places);
+			map.clearRoute();
 		}
 	}
 

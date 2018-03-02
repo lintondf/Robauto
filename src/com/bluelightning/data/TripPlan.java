@@ -120,6 +120,10 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 				}
 			}
 		}
+		
+		public String getId() {
+			return String.format("[%s][%s]", this.startUserLabel, this.endUserLabel);
+		}
 	
 		public String toString() {
 			return String.format("%s, %s, %s to %s", start.toString(), finish.toString(), this.startUserLabel, this.endUserLabel);
@@ -458,9 +462,10 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	public void setPlacesChanged(boolean placesChanged) {
 		this.placesChanged = placesChanged;
+		this.route = null;
 	}
 
-	protected boolean filterDirections(TripPlan.StopData data,
+	protected static boolean filterDirections(TripPlan.StopData data,
 			List<TripPlan.RoadDirectionData> roadDirections) {
 		for (TripPlan.RoadDirectionData road : roadDirections) {
 			if (road.road.equalsIgnoreCase(data.road)) {
@@ -475,7 +480,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		return true;
 	}
 
-	public ArrayList<TripPlan.StopData> getStopData(int nDrivers, int iLeg, boolean includeTruckAreas,
+	public static ArrayList<TripPlan.StopData> getStopData(List<TripPlan.LegSummary> legSummary, int nDrivers, int iLeg, boolean includeTruckAreas,
 			List<TripPlan.RoadDirectionData> roadDirections) {
 		TripPlan.LegSummary summary = legSummary.get(iLeg);
 		ArrayList<TripPlan.StopData> dataList = new ArrayList<>();
@@ -542,42 +547,53 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	public void setRoute(Route route, ArrayList<POIResult> restAreas) {
 		this.route = route;
-		legSummary = new ArrayList<>();
-		legDataList = new ArrayList<>();
-		tripLegs = new ArrayList<>();
-		if (route == null)
-			return;
-
-		Iterator<VisitedPlace> it = this.getPlaces().iterator();
-		LegPoint current = new LegPoint();
-		if (it.hasNext())
-			current.fuelAvailability = POIBase.toFuelString( it.next().getFuelAvailable() );
-		for (Leg leg : route.getLeg()) {
-			LegPoint next = new LegPoint(current);
-			next.fuelAvailability = POIBase.toFuelString( it.next().getFuelAvailable() );
-			next.plus(leg);
-			LegSummary summary = new LegSummary(leg, current, next);
-			summary.setNearby(restAreas);
-			legSummary.add(summary);
-			LegData data = new LegData();
-			data.distance = summary.length;
-			data.startLabel = summary.startUserLabel;
-			data.endLabel = summary.endUserLabel;
-			data.trafficTime = summary.trafficTime;
-			legDataList.add(data);
-			current = next;
+		ArrayList<LegSummary> legSummary = new ArrayList<>();
+		ArrayList<LegData> legDataList = new ArrayList<>();
+		ArrayList<TripLeg> tripLegs = new ArrayList<>();
+		if (route != null) {
+			Iterator<VisitedPlace> it = this.getPlaces().iterator();
+			LegPoint current = new LegPoint();
+			if (it.hasNext())
+				current.fuelAvailability = POIBase.toFuelString( it.next().getFuelAvailable() );
+			Iterator<Leg> itLeg = route.getLeg().iterator();
+			for (int iLeg = 0; iLeg < route.getLeg().size(); iLeg++) {
+				Leg leg = itLeg.next();
+				LegPoint next = new LegPoint(current);
+				next.fuelAvailability = POIBase.toFuelString( it.next().getFuelAvailable() );
+				next.plus(leg);
+				LegSummary summary = new LegSummary(leg, current, next);
+				legSummary.add(summary);
+				summary.setNearby(restAreas);
+				LegData data = new LegData();
+				legDataList.add(data);
+				data.distance = summary.length;
+				data.startLabel = summary.startUserLabel;
+				data.endLabel = summary.endUserLabel;
+				data.trafficTime = summary.trafficTime;
+				current = next;
+				TripPlan.TripLeg tripLeg = new TripPlan.TripLeg();
+				tripLeg.legData = data;
+				tripLegs.add(tripLeg);
+				tripLeg.roadDirectionDataList = getRoadDirectionData(summary);
+				tripLeg.stopDataList = getStopData(legSummary, TripPlan.N_DRIVERS, iLeg, false, tripLeg.roadDirectionDataList);
+				tripLeg.driverAssignments = generateDriverAssignments(TripPlan.N_DRIVERS, tripLeg.legData, tripLeg.stopDataList );
+			}
+			for (int iPrevious = 0; iPrevious < this.legSummary.size(); iPrevious++) {
+				for (int jNew = 0; jNew < legSummary.size(); jNew++) {
+					boolean match = this.legSummary.get(iPrevious).getId().equalsIgnoreCase(legSummary.get(jNew).getId());
+					//System.out.println( match + ": " + this.legSummary.get(iPrevious).getId() + " vs " + legSummary.get(jNew).getId());
+					if (match) {
+						legSummary.set(jNew, this.legSummary.get(iPrevious));
+						legDataList.set(jNew, this.legDataList.get(iPrevious));
+						tripLegs.set(jNew, this.tripLegs.get(iPrevious));
+					}
+				}
+				
+			}
 		}
-		for (int iLeg = 0; iLeg < legDataList.size(); iLeg++) {
-			TripPlan.LegData leg = legDataList.get(iLeg);
-			TripPlan.TripLeg tripLeg = new TripPlan.TripLeg();
-			tripLeg.legData = leg;
-			tripLeg.roadDirectionDataList = getRoadDirectionData(iLeg);
-			tripLeg.stopDataList = getStopData(TripPlan.N_DRIVERS, iLeg, false, tripLeg.roadDirectionDataList);
-//			ArrayList<TripPlan.StopData> endPoints = new ArrayList<>();
-//			endPoints.add( tripLeg.stopDataList.get(tripLeg.stopDataList.size()-1) );
-			tripLeg.driverAssignments = generateDriverAssignments(TripPlan.N_DRIVERS, tripLeg.legData, tripLeg.stopDataList );
-			tripLegs.add(tripLeg);
-		}
+		this.legSummary = legSummary;
+		this.legDataList = legDataList;
+		this.tripLegs = tripLegs;
 	}
 
 	public ArrayList<RoadDirectionData> getRoadDirectionData(int iLeg) {
