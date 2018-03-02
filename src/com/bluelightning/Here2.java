@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -181,9 +182,11 @@ public class Here2 {
 	
 
 	protected static HereRoutePlus getRouteBase(List<BasicNameValuePair> nvps, String mode) {
+		nvps.add(new BasicNameValuePair("alternatives", "3"));
 		nvps.add(new BasicNameValuePair("metricSystem", "imperial"));
 		nvps.add(new BasicNameValuePair("instructionFormat", "text"));
 		nvps.add(new BasicNameValuePair("representation", "navigation"));
+		nvps.add(new BasicNameValuePair("RouteAttributes", "waypoints,summary,legs"));
 		nvps.add(new BasicNameValuePair("legAttributes", "maneuvers,waypoint,length,travelTime,links"));
 		nvps.add(new BasicNameValuePair("linkAttributes", "speedLimit,truckRestrictions,roadName"));
 		nvps.add(new BasicNameValuePair("maneuverAttributes", 
@@ -355,7 +358,20 @@ public class Here2 {
 		System.out.println(hereRoute.getResponse().getMetaInfo());
 		Set<Route> routes = hereRoute.getResponse().getRoute();
 		System.out.printf("%d routes\n", routes.size() );
-		for (Route route : routes) {
+		Iterator<Route> it = routes.iterator();
+		Route route = null;
+		// find shortest after adjusting speeds
+		while (it.hasNext()) {
+			Route r = it.next();
+			if (route == null) {
+				route = r;
+			} else {
+				if (r.getSummary().getTrafficTime() < route.getSummary().getTrafficTime()) {
+					route = r;
+				}
+			}
+		}
+		if (route != null) {
 			System.out.printf("%d indicents\n", route.getIncident().size() );
 			for (Incident incident : route.getIncident() ) {
 				System.out.println(incident);

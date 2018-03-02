@@ -77,7 +77,7 @@ public class Main {
 	protected JXMapViewer mapViewer;
 	protected RoutePanel routePanel;
 	protected MainControlPanel controlPanel;
-	protected Route route;
+//	protected Route route;
 	protected EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
 	protected EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
 	protected ArrayList<ButtonWaypoint> nearby = new ArrayList<>();
@@ -170,7 +170,7 @@ public class Main {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						if (route != null) {
+						if (tripPlan.getRoute() != null) {
 							optimizeStops();
 						}
 					}
@@ -185,7 +185,7 @@ public class Main {
 						POISet pset = poiMap.get(key);
 						if (pset != null) {
 							controlPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-							insureNearbyMapLoaded(route, key, pset);
+							insureNearbyMapLoaded(tripPlan.getRoute(), key, pset);
 							controlPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 					}
@@ -212,7 +212,7 @@ public class Main {
 				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
 				logger.info("  Route points saved");
 			}
-			route = Here2.computeRoute(tripPlan);  // will reload from routeJson if not empty
+			Route route = Here2.computeRoute(tripPlan);  // will reload from routeJson if not empty
 			logger.info("  Route planned");
 			if (route != null) {
 				waypoints = map.showRoute(route);
@@ -229,8 +229,9 @@ public class Main {
 			EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
 			EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
 			Main.loadPOIMap(poiMap);
+			nearbyMap.clear();
 			poiMap.forEach((kind, set) -> {
-				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(route, 5e3));
+				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(tripPlan.getRoute(), 5e3));
 			});
 
 			OptimizeStops optimizeStops = new OptimizeStops(tripPlan, poiMap, nearbyMap);

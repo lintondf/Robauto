@@ -57,6 +57,23 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		public ArrayList<TripPlan.RoadDirectionData> roadDirectionDataList;
 		public ArrayList<TripPlan.StopData>          stopDataList;
 		public DriverAssignments                     driverAssignments;
+		
+		public String toString() {
+			StringBuffer sb = new StringBuffer();
+			sb.append(" TripLeg\n");
+			sb.append("    legData: " + legData.toString() ); sb.append('\n');
+			sb.append(String.format("   roadDirectionDataList (%d)\n", roadDirectionDataList.size() ) );
+			for (RoadDirectionData data : this.roadDirectionDataList) {
+				sb.append("     " + data.toString() );
+			}
+			sb.append(String.format("   stopDataList (%d)\n", stopDataList.size() ) );
+			for (StopData stopData : this.stopDataList ) {
+				sb.append("      " + stopData.toString() );
+			}
+			
+			sb.append("    driverAssignments: " + this.driverAssignments.toString() );
+			return sb.toString();
+		}
 	}
 	
 	private static class LegPoint implements Serializable {
@@ -348,8 +365,12 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	}
 	
 
+	public void log() {
+		Main.logger.info(this.toString());
+	}
 
 	public void save(File file) {
+		log();
 		placesChanged = false;
 		lastModified = new Date();
 		
@@ -405,6 +426,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			tripPlan.placesChanged = false;
 			tripPlan.setRoute( tripPlan.getRoute() );
 			Main.logger.info("Load complete");
+			tripPlan.log();
 			return tripPlan;
 		} catch (FileNotFoundException e) {
 			Main.logger.error( "Prior Trip Plan file not found on load ", e);
@@ -414,14 +436,6 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			return new TripPlan();
 		}
 	}
-//	public static void main(String[] args) {
-//		TripPlan tripPlan = new TripPlan();
-//		System.out.println(tripPlan);
-//		File file = new File("robautoTripPlan.obj");
-//		tripPlan.save( file );
-//		TripPlan out = TripPlan.load( file );
-//		System.out.println(out);
-//	}
 
 	public Date getLastModified() {
 		return lastModified;
@@ -447,14 +461,6 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	public TripLeg getTripLeg(int i) {
 		return tripLegs.get(i);
 	}
-
-//	public ArrayList<TripLeg> getTripLegs() {
-//		return tripLegs;
-//	}
-
-//	public void setTripLegs(ArrayList<TripLeg> tripLegs) {
-//		this.tripLegs = tripLegs;
-//	}
 
 	public boolean getPlacesChanged() {
 		return placesChanged;
@@ -582,7 +588,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 				for (int jNew = 0; jNew < legSummary.size(); jNew++) {
 					boolean match = this.legSummary.get(iPrevious).getId().equalsIgnoreCase(legSummary.get(jNew).getId());
 					//System.out.println( match + ": " + this.legSummary.get(iPrevious).getId() + " vs " + legSummary.get(jNew).getId());
-					if (match) {
+					if (match && this.tripLegs.get(iPrevious).stopDataList.size() > 1) {
 						legSummary.set(jNew, this.legSummary.get(iPrevious));
 						legDataList.set(jNew, this.legDataList.get(iPrevious));
 						tripLegs.set(jNew, this.tripLegs.get(iPrevious));

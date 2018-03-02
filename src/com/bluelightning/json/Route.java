@@ -49,6 +49,11 @@ public class Route implements Serializable, PostProcessingEnabler.PostProcessabl
     @SerializedName("zone")
     @Expose
     private List<Object> zone = new ArrayList<Object>();
+    @SerializedName("summary")
+    @Expose
+    private Summary summary = new Summary();
+    
+    
     private final static long serialVersionUID = 7863514656284411359L;
     
     private List<GeoPosition> shapePoints;
@@ -159,6 +164,23 @@ public class Route implements Serializable, PostProcessingEnabler.PostProcessabl
 				shapePoints.add( new LatLon( (String) point ) );
 			}
 		}
+		Summary summary = getSummary();
+		summary.setBaseTime(0.0);
+		summary.setTrafficTime(0.0);
+		summary.setTravelTime(0.0);
+		for (Leg leg : getLeg()) {
+			summary.setBaseTime( summary.getBaseTime() + leg.getBaseTime() );
+			summary.setTrafficTime( summary.getTrafficTime() + leg.getTrafficTime() );
+			summary.setTravelTime( summary.getTravelTime() + leg.getTravelTime() );
+		}
+	}
+
+	public Summary getSummary() {
+		return summary;
+	}
+
+	public void setSummary(Summary summary) {
+		this.summary = summary;
 	}
 
 }
