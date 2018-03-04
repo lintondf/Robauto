@@ -335,15 +335,19 @@ public class Here2 {
 	public static Route computeRoute(TripPlan tripPlan) {
 		if (tripPlan.getRoute() == null) {
 			Route route = new Route();
-			HashSet<Leg> legs = new HashSet<>();
+			TreeSet<Leg> legs = new TreeSet<>();
 			ArrayList<Object> shape = new ArrayList<>();
 			String[] pointAddresses = new String[2];
+			double lastPoint = 0;
 			for (int i = 1; i < tripPlan.getPlaces().size(); i++) {
 				pointAddresses[0] = tripPlan.getPlaces().get(i-1).getAddress().value;
 				pointAddresses[1] = tripPlan.getPlaces().get(i).getAddress().value;
 				HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces().subList(i-1, i+1), "fastest;truck;traffic:disabled"  );
 				Route r = computeRouteBase( hereRoute.route, pointAddresses );
 				Leg leg = r.getLeg().iterator().next(); 
+				leg.setFirstPoint( leg.getFirstPoint() + lastPoint );
+				leg.setLastPoint( leg.getLastPoint() + lastPoint);
+				lastPoint = leg.getLastPoint();
 				legs.add(leg);
 				shape.addAll( leg.getShape() );
 			}

@@ -77,7 +77,6 @@ public class Main {
 	protected JXMapViewer mapViewer;
 	protected RoutePanel routePanel;
 	protected MainControlPanel controlPanel;
-//	protected Route route;
 	protected EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
 	protected EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
 	protected ArrayList<ButtonWaypoint> nearby = new ArrayList<>();
@@ -207,6 +206,7 @@ public class Main {
 
 		private void route() {
 			logger.info("Planning route...");
+			tripPlan.debugClear();
 			if (tripPlan.getPlacesChanged()) {
 				tripPlan.setRoute(null);
 				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());

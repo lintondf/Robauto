@@ -17,7 +17,7 @@ import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class Leg implements Serializable, PostProcessingEnabler.PostProcessable
+public class Leg implements Serializable, PostProcessingEnabler.PostProcessable, Comparable<Leg>
 {
 
     @SerializedName("start")
@@ -328,6 +328,12 @@ public class Leg implements Serializable, PostProcessingEnabler.PostProcessable
 
 	public HashMap<String, Link> getLinkMap() {
 		return linkMap;
+	}
+
+	@Override
+	public int compareTo(Leg o) {
+		// TODO Auto-generated method stub
+		return (int) (this.firstPoint - o.firstPoint);
 	}
 
 }

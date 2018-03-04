@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.bluelightning.PostProcessingEnabler;
 import com.google.gson.annotations.Expose;
@@ -33,7 +34,7 @@ public class Route implements Serializable, PostProcessingEnabler.PostProcessabl
     private BoundingBox boundingBox;
     @SerializedName("leg")
     @Expose
-    private Set<Leg> leg = new LinkedHashSet<Leg>();
+    private Set<Leg> leg = new TreeSet<Leg>();
     @SerializedName("note")
     @Expose
     private Set<Note> note = new LinkedHashSet<Note>();
@@ -168,11 +169,31 @@ public class Route implements Serializable, PostProcessingEnabler.PostProcessabl
 		summary.setBaseTime(0.0);
 		summary.setTrafficTime(0.0);
 		summary.setTravelTime(0.0);
+		BoundingBox box = null;
 		for (Leg leg : getLeg()) {
 			summary.setBaseTime( summary.getBaseTime() + leg.getBaseTime() );
 			summary.setTrafficTime( summary.getTrafficTime() + leg.getTrafficTime() );
 			summary.setTravelTime( summary.getTravelTime() + leg.getTravelTime() );
+			if (box == null) {
+				box = leg.getBoundingBox();
+			} else {
+				TopLeft boxTL = box.getTopLeft();
+				TopLeft legTL = leg.getBoundingBox().getTopLeft();
+				if (legTL.getLatitude() > boxTL.getLatitude()) 
+					boxTL.setLatitude( legTL.getLatitude() );
+				if (legTL.getLongitude() < boxTL.getLongitude())
+					boxTL.setLongitude( legTL.getLongitude() );
+				box.setTopLeft(boxTL);
+				BottomRight boxBR = box.getBottomRight();
+				BottomRight legBR = leg.getBoundingBox().getBottomRight();
+				if (legBR.getLatitude() < boxBR.getLatitude()) 
+					boxBR.setLatitude( legBR.getLatitude() );
+				if (legBR.getLongitude() > boxBR.getLongitude())
+					boxBR.setLongitude( legBR.getLongitude() );
+				box.setBottomRight(boxBR);
+			}
 		}
+		setBoundingBox(box);
 	}
 
 	public Summary getSummary() {

@@ -268,13 +268,13 @@ public class Report implements Serializable {
 		List<Iterator<Double>> driveTimes = new ArrayList<Iterator<Double>>(
 				Arrays.asList(driverAssignments.assignments[0].driveTimes.iterator(),
 						driverAssignments.assignments[1].driveTimes.iterator()));
-		List<Iterator<TripPlan.StopData>> stops = new ArrayList<Iterator<TripPlan.StopData>>(Arrays.asList(
+		List<Iterator<TripPlan.StopData>> stopsIteratorsByDriver = new ArrayList<Iterator<TripPlan.StopData>>(Arrays.asList(
 				driverAssignments.assignments[0].stops.iterator(), driverAssignments.assignments[1].stops.iterator()));
 
 		int driver = 0;
 		double lastDistance = 0.0;
-		while (stops.get(driver).hasNext()) {
-			TripPlan.StopData stopData = stops.get(driver).next();
+		while (stopsIteratorsByDriver.get(driver).hasNext()) {
+			TripPlan.StopData stopData = stopsIteratorsByDriver.get(driver).next();
 			Double driveTime = driveTimes.get(driver).next();
 			int hours = (int) (driveTime / 3600.0);
 			int minutes = ((int) (driveTime / 60.0)) % 60;

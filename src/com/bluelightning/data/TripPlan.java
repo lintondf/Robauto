@@ -49,6 +49,14 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	
 	protected List<TripPlan.LegSummary> legSummary;
 	
+	public void debugClear() {
+		Main.logger.error("DEBUG CLEAR");
+		route = null;
+		tripLegs = new ArrayList<>();
+		legDataList = new ArrayList<>();
+		legSummary = new ArrayList<>();
+	}
+	
 
 	public static class TripLeg implements Serializable {
 		private static final long serialVersionUID = 1L;

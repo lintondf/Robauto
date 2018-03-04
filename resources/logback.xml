@@ -1,10 +1,8 @@
 <configuration>
-
+  <!-- <statusListener class="ch.qos.logback.core.status.NopStatusListener" /> -->
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>robauto.log</file>
     <append>true</append>
-    <!-- set immediateFlush to false for much higher logging throughput -->
-    <immediateFlush>true</immediateFlush>
     <!-- encoders are assigned the type
          ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
     <encoder>
@@ -16,15 +14,4 @@
     <appender-ref ref="FILE" />
   </root>
   
-  <!-- 
-  <appender name="STDOUT" class="com.bluelightning.Main.TextAreaAppender">
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level: %msg%n</pattern>
-    </encoder>
-  </appender>
-
-  <root level="debug">
-    <appender-ref ref="STDOUT" />
-  </root>
-   --> 
 </configuration>
