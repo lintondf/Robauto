@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AddressBook>
+    <persons>
+        <name>Sams Club</name>
+        <address>15 Mill Creek Circle, Pooler, GA</address>
+        <latitude>32.13932</latitude>
+        <longitude>-81.24487</longitude>
+    </persons>
+    <persons>
+        <name>Grandfather Campground</name>
+        <address>125 Riverside Dr, Banner Elk, NC</address>
+        <latitude>36.1440102</latitude>
+        <longitude>-81.7976193</longitude>
+    </persons>
+    <persons>
+        <name>Walmart</name>
+        <address>2350 So Pleasant Valley Rd, Winchester, VA 22601</address>
+        <latitude>39.1574</latitude>
+        <longitude>-78.17323</longitude>
+    </persons>
+    <persons>
+        <name>Megan Mudge</name>
+        <address>10654 Breezewood Dr, Woodstock, MD 21163-1317</address>
+        <latitude>39.32632</latitude>
+        <longitude>-76.88196</longitude>
+    </persons>
+    <persons>
+        <name>Walmart</name>
+        <address>1365 Boston Post Road, Milford, CT</address>
+        <latitude>41.23982</latitude>
+        <longitude>-73.0345233</longitude>
+    </persons>
+    <persons>
+        <name>Sippewissett Campground</name>
+        <address>836 Palmer Avenue, Falmouth, MA</address>
+        <latitude>41.57739</latitude>
+        <longitude>-70.62898</longitude>
+    </persons>
+    <persons>
+        <name>Cabelas</name>
+        <address>100 Cabelas Blvd, Scarborough, ME</address>
+        <latitude>43.60265</latitude>
+        <longitude>-70.37061</longitude>
+    </persons>
+    <persons>
+        <name>Home Maine</name>
+        <address>7 Manor Lane, Sullivan, ME 40664</address>
+        <latitude>44.5228246</latitude>
+        <longitude>-68.2088976</longitude>
+    </persons>
+    <persons>
+        <name>Home Florida</name>
+        <address>3533 Carambola Cir, Melbourne, FL</address>
+        <latitude>28.23469</latitude>
+        <longitude>-80.7532</longitude>
+    </persons>
+    <persons>
+        <name>Walmart</name>
+        <address>2110 Bells Hwy, Walterboro, SC 29488</address>
+        <latitude>32.9324299</latitude>
+        <longitude>-80.6945099</longitude>
+    </persons>
+    <persons>
+        <name>Shell Point</name>
+        <address>15101 Shell Point Blvd, Fort Myers, FL 33908</address>
+        <latitude>26.5173122</latitude>
+        <longitude>-81.9967957</longitude>
+    </persons>
+    <persons>
+        <name>Maple Lane Farms</name>
+        <address>224 Upper-Charleston Rd. Charleston, ME 04422</address>
+        <latitude>45.08825</latitude>
+        <longitude>-69.01912</longitude>
+    </persons>
+</AddressBook>
