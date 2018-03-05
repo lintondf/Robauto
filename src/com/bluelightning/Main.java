@@ -206,7 +206,7 @@ public class Main {
 
 		private void route() {
 			logger.info("Planning route...");
-			tripPlan.debugClear();
+			//tripPlan.debugClear();
 			if (tripPlan.getPlacesChanged()) {
 				tripPlan.setRoute(null);
 				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
