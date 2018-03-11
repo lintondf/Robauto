@@ -199,6 +199,7 @@ public class OptimizeStopsDialog extends JDialog {
 					Events.eventBus.unregister(handler);
 					handler = null;
 				}
+				Main.logger.info("dispose() on OSD Cancel");
 				OptimizeStopsDialog.this.dispose();
 				break;
 			case "Add Before":
@@ -226,6 +227,7 @@ public class OptimizeStopsDialog extends JDialog {
 					Events.eventBus.unregister(handler);
 					handler = null;
 				}
+				Main.logger.info("dispose() on OSD Commit");
 				OptimizeStopsDialog.this.dispose();
 				break;
 			default:
@@ -240,13 +242,15 @@ public class OptimizeStopsDialog extends JDialog {
 		@Override
 		public void valueChanged(ListSelectionEvent event) {
 			if (! event.getValueIsAdjusting()) {
-				System.out.println(event);
+				Main.logger.info("OSD/OLSL VC " + currentLeg);
 				if (currentLeg >= 0) {
 					optimizeStops.getTripPlan().getTripLeg(currentLeg).stopDataList = getStopTable();
 				}
 				currentLeg = event.getLastIndex();
 				setCurrentLeg( optimizeStops.getTripPlan().getTripLeg(currentLeg) );
+				Main.logger.info("OSD/OLSL VC A");
 				generateLegStopChoices(currentLeg);
+				Main.logger.info("OSD/OLSL VC exiting");
 			}
 		}
 		
@@ -678,6 +682,7 @@ public class OptimizeStopsDialog extends JDialog {
 		// stopDataList)
 		Permutations perm = new Permutations(optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList.size() - 1);
 		ArrayList<Integer[]> unique = perm.monotonic();
+		Main.logger.info(String.format("  %d unique", unique.size()));
 		Set<TripPlan.DriverAssignments> driverAssignmentsSet = new TreeSet<>();
 		for (Integer[] elements : unique) {
 			driverAssignmentsSet.add(TripPlan.generateDriverAssignments(TripPlan.N_DRIVERS,
@@ -685,6 +690,7 @@ public class OptimizeStopsDialog extends JDialog {
 					optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList,
 					elements));
 		}
+		Main.logger.info(String.format("  %d assignments", driverAssignmentsSet.size()));
 		Iterator<TripPlan.DriverAssignments> it = driverAssignmentsSet.iterator();
 		
 		presentedChoices = new ArrayList<>();
@@ -704,6 +710,7 @@ public class OptimizeStopsDialog extends JDialog {
 				panel.add(textPane);
 			}
 		} // for i
+		Main.logger.info("  reported");
 	}
 	
 

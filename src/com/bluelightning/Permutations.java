@@ -1,38 +1,42 @@
 package com.bluelightning;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 
 // https://stackoverflow.com/questions/2920315/permutation-of-array
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.TreeMap;
+
+import com.bluelightning.data.TripPlan;
 
 public class Permutations implements Iterator<Integer[]> {
 
+	private Integer number;
 	private Integer[] arr;
 	private int[] ind;
 	private boolean has_next;
 
 	public Integer[] output;// next() returns this array, make it public
 	
-	public Permutations(int n) {
-		Integer[] arr = new Integer[n];
-		for (int i = 0; i < n; i++) {
+	public Permutations(int number) {
+		this.number = number;
+//		Main.logger.info("Permutations " + number );
+		Integer[] arr = new Integer[number];
+		for (int i = 0; i < number; i++) {
 			arr[i] = i;
 		}
-		initialize(arr);
-	}
-
-	Permutations(Integer[] arr) {
-		initialize(arr);
-	}
-	
-	protected void initialize(Integer[] arr) {
 		this.arr = arr.clone();
 		ind = new int[arr.length];
 		// convert an array of any elements into array of integers - first
@@ -50,7 +54,8 @@ public class Permutations implements Iterator<Integer[]> {
 
 		// output = new E[arr.length]; <-- cannot do in Java with generics, so
 		// use reflection
-		output = (Integer[]) Array.newInstance(arr.getClass().getComponentType(), arr.length);
+		//output = (Integer[]) Array.newInstance(arr.getClass().getComponentType(), arr.length);
+		output = new Integer[ arr.length ];
 		has_next = true;
 	}
 
@@ -124,8 +129,26 @@ public class Permutations implements Iterator<Integer[]> {
 	}
 
 	public ArrayList<Integer[]> monotonic() {
+		//Main.logger.info("monotonic");
+		if (uniques == null) {
+			try {
+				FileInputStream fis = new FileInputStream(uniquesFile);
+				ObjectInputStream in = new ObjectInputStream(fis);
+				uniques = (TreeMap< Integer, ArrayList<Integer[]> >) in.readObject();
+				in.close();
+			} catch (Exception x) {
+				uniques = new TreeMap<>();
+			}
+		}
 		ArrayList<Integer[]> unique = new ArrayList<>();
+		if (uniques.containsKey(number)) {
+			unique = uniques.get(number);
+			//Main.logger.info(String.format("  fetched %d", unique.size()) );
+			return unique;
+		}
+		int count = 0;
 		while (this.hasNext()) {
+			count++;
 			Integer[] next = this.next().clone();
 			for (int i = 1; i < next.length; i++) {
 				if (next[i] < next[i - 1]) {
@@ -138,7 +161,38 @@ public class Permutations implements Iterator<Integer[]> {
 				unique.add(next);
 			}
 		}
+		//Main.logger.info(String.format("  exiting %d -> %d", count, unique.size()) );
+		uniques.put( number, unique );
+		try {
+			FileOutputStream fos = new FileOutputStream(uniquesFile);
+			ObjectOutputStream out = new ObjectOutputStream(fos);
+			out.writeObject(uniques);
+			out.close();
+		} catch (Exception x) {
+			x.printStackTrace();
+		}
 		return unique;
+	}
+	
+	static File uniquesFile = new File("uniques.obj");
+	static TreeMap< Integer, ArrayList<Integer[]> > uniques = null;
+	
+	public static void main(String[] args ) {
+//		for (int i = 1; i < 12; i++) {
+//			Permutations perm = new Permutations(i);
+//			System.out.println(perm.monotonic().size());
+//		}
+		Permutations perm = new Permutations(3);
+		ArrayList<Integer[]> unique = perm.monotonic();
+		for (Integer[] p : unique) {
+			for (Integer i : p)
+				System.out.print(i + " ");
+			System.out.println();
+		}
+		
+		for (int i = 1; i < 2*2*2; i++) {
+			System.out.println( Integer.toBinaryString(i));
+		}
 	}
 
 }

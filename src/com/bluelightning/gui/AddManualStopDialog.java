@@ -16,6 +16,7 @@ import javax.swing.table.TableColumn;
 
 import com.bluelightning.Events;
 import com.bluelightning.Here2;
+import com.bluelightning.Main;
 import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.Events.AddManualStopEvent;
 import com.bluelightning.poi.POIResult;
@@ -147,6 +148,7 @@ public class AddManualStopDialog extends JDialog {
 						if (choiceTable.getSelectedRow() >= 0) {
 							POIResult result = choiceTableModel.getData().get(choiceTable.getSelectedRow());
 							Events.eventBus.post( new Events.AddManualStopEvent(result) );
+							Main.logger.info("dispose() on AMSD OK");
 							AddManualStopDialog.this.dispose();
 						}
 					}
@@ -161,6 +163,7 @@ public class AddManualStopDialog extends JDialog {
 
 					@Override
 					public void actionPerformed(ActionEvent event) {
+						Main.logger.info("dispose() on AMSD Cancel");
 						AddManualStopDialog.this.dispose();
 					}
 					

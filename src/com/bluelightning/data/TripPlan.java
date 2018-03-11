@@ -243,8 +243,10 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			sb.append(state);
 			sb.append(' ');
 			sb.append(road);
-			sb.append(" @ ");
-			sb.append(mileMarker);
+			if (mileMarker != null && !mileMarker.isEmpty()) {
+				sb.append(" @ ");
+				sb.append(mileMarker);
+			}
 			return sb.toString();
 		}
 	}
@@ -630,4 +632,8 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		return new ArrayList<>(dataList);
 	}
 
+	
+	public static void main( String[] args) {
+		//message = message.replaceAll("[^a-zA-Z0-9]", "");
+	}
 }
