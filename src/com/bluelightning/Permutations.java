@@ -21,177 +21,45 @@ import java.util.TreeMap;
 
 import com.bluelightning.data.TripPlan;
 
-public class Permutations implements Iterator<Integer[]> {
+public class Permutations {
 
 	private Integer number;
-	private Integer[] arr;
-	private int[] ind;
-	private boolean has_next;
-
-	public Integer[] output;// next() returns this array, make it public
 	
 	public Permutations(int number) {
 		this.number = number;
-//		Main.logger.info("Permutations " + number );
-		Integer[] arr = new Integer[number];
-		for (int i = 0; i < number; i++) {
-			arr[i] = i;
-		}
-		this.arr = arr.clone();
-		ind = new int[arr.length];
-		// convert an array of any elements into array of integers - first
-		// occurrence is used to enumerate
-		Map<Integer, Integer> hm = new HashMap<Integer, Integer>();
-		for (int i = 0; i < arr.length; i++) {
-			Integer n = hm.get(arr[i]);
-			if (n == null) {
-				hm.put(arr[i], i);
-				n = i;
-			}
-			ind[i] = n.intValue();
-		}
-		Arrays.sort(ind);// start with ascending sequence of integers
-
-		// output = new E[arr.length]; <-- cannot do in Java with generics, so
-		// use reflection
-		//output = (Integer[]) Array.newInstance(arr.getClass().getComponentType(), arr.length);
-		output = new Integer[ arr.length ];
-		has_next = true;
-	}
-
-	public boolean hasNext() {
-		return has_next;
-	}
-
-	/**
-	 * Computes next permutations. Same array instance is returned every time!
-	 * 
-	 * @return
-	 */
-	public Integer[] next() {
-		if (!has_next)
-			throw new NoSuchElementException();
-
-		for (int i = 0; i < ind.length; i++) {
-			output[i] = arr[ind[i]];
-		}
-
-		// get next permutation
-		has_next = false;
-		for (int tail = ind.length - 1; tail > 0; tail--) {
-			if (ind[tail - 1] < ind[tail]) {// still increasing
-
-				// find last element which does not exceed ind[tail-1]
-				int s = ind.length - 1;
-				while (ind[tail - 1] >= ind[s])
-					s--;
-
-				swap(ind, tail - 1, s);
-
-				// reverse order of elements in the tail
-				for (int i = tail, j = ind.length - 1; i < j; i++, j--) {
-					swap(ind, i, j);
-				}
-				has_next = true;
-				break;
-			}
-
-		}
-		return output;
-	}
-
-	private void swap(int[] arr, int i, int j) {
-		int t = arr[i];
-		arr[i] = arr[j];
-		arr[j] = t;
-	}
-
-	public void remove() {
-
-	}
-
-	public static boolean equals(Integer[] a1, Integer[] a2) {
-		if (a1.length != a2.length)
-			return false;
-		for (int i = 0; i < a1.length; i++) {
-			if (a1[i] != a2[i])
-				return false;
-		}
-		return true;
-	}
-
-	public static boolean contains(List<Integer[]> unique, Integer[] a) {
-		for (Integer[] u : unique) {
-			if (equals(u, a))
-				return true;
-		}
-		return false;
+		Main.logger.trace("Permutations " + number);
 	}
 
 	public ArrayList<Integer[]> monotonic() {
-		//Main.logger.info("monotonic");
-		if (uniques == null) {
-			try {
-				FileInputStream fis = new FileInputStream(uniquesFile);
-				ObjectInputStream in = new ObjectInputStream(fis);
-				uniques = (TreeMap< Integer, ArrayList<Integer[]> >) in.readObject();
-				in.close();
-			} catch (Exception x) {
-				uniques = new TreeMap<>();
-			}
+		Main.logger.trace("monotonic");
+		int N = 1 << number;
+		Main.logger.trace("monotonic " + N);
+		ArrayList<Integer[]> results = new ArrayList<>();
+		if (number <= 1) {
+			results.add( new Integer[]{0} );
+			return results;
 		}
-		ArrayList<Integer[]> unique = new ArrayList<>();
-		if (uniques.containsKey(number)) {
-			unique = uniques.get(number);
-			//Main.logger.info(String.format("  fetched %d", unique.size()) );
-			return unique;
-		}
-		int count = 0;
-		while (this.hasNext()) {
-			count++;
-			Integer[] next = this.next().clone();
-			for (int i = 1; i < next.length; i++) {
-				if (next[i] < next[i - 1]) {
-					List<Integer> list = Arrays.asList(next);
-					next = list.subList(0, i).toArray(new Integer[i]);
-					break;
+		for (int i = 1; i < N; i++) {
+			int w = i;
+			ArrayList<Integer> members = new ArrayList<>();
+			int pos = 0;
+			while (w != 0) {
+				if ( (w & 1) == 1) {
+					members.add(pos);
 				}
+				w = w >> 1;
+				pos++;
 			}
-			if (!Permutations.contains(unique, next)) {
-				unique.add(next);
-			}
+			results.add(members.toArray(new Integer[members.size()]));
 		}
-		//Main.logger.info(String.format("  exiting %d -> %d", count, unique.size()) );
-		uniques.put( number, unique );
-		try {
-			FileOutputStream fos = new FileOutputStream(uniquesFile);
-			ObjectOutputStream out = new ObjectOutputStream(fos);
-			out.writeObject(uniques);
-			out.close();
-		} catch (Exception x) {
-			x.printStackTrace();
-		}
-		return unique;
+		return results;
 	}
 	
-	static File uniquesFile = new File("uniques.obj");
-	static TreeMap< Integer, ArrayList<Integer[]> > uniques = null;
 	
 	public static void main(String[] args ) {
-//		for (int i = 1; i < 12; i++) {
-//			Permutations perm = new Permutations(i);
-//			System.out.println(perm.monotonic().size());
-//		}
-		Permutations perm = new Permutations(3);
-		ArrayList<Integer[]> unique = perm.monotonic();
-		for (Integer[] p : unique) {
-			for (Integer i : p)
-				System.out.print(i + " ");
-			System.out.println();
-		}
-		
-		for (int i = 1; i < 2*2*2; i++) {
-			System.out.println( Integer.toBinaryString(i));
+		for (int i = 1; i < 12; i++) {
+			Permutations perm = new Permutations(i);
+			System.out.println(perm.monotonic().size());
 		}
 	}
 

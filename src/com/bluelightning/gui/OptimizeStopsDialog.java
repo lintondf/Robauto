@@ -25,7 +25,9 @@ import javax.swing.table.TableColumn;
 import org.apache.commons.io.IOUtils;
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.DouglasPeuckerReducer;
 import com.bluelightning.Events;
+import com.bluelightning.GeodeticPosition;
 import com.bluelightning.Here2;
 import com.bluelightning.Main;
 import com.bluelightning.OptimizeStops;
@@ -57,6 +59,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -267,9 +271,23 @@ public class OptimizeStopsDialog extends JDialog {
 		}
 		
 	}
+	
+	public class OptimizeRoadModelListener implements TableModelListener {
+
+		@Override
+		public void tableChanged(TableModelEvent event) {
+			if (event.getColumn() == 1) {
+				TripLeg leg = optimizeStops.getTripPlan().getTripLeg(currentLeg);
+				optimizeStops.getTripPlan().updateRoadDirectionData(leg, roadTableModel.getData());
+				setCurrentLeg(leg);
+			}
+		}
+		
+	}
 
 	public void addListeners(OptimizeActionListener optimizeActionListener,
-			OptimizeLegSelectionListener optimizeLegSelectionListener) {
+			OptimizeLegSelectionListener optimizeLegSelectionListener,
+			OptimizeRoadModelListener optimizeRoadModelListener) {
 		
 		commitButton.addActionListener(optimizeActionListener);
 		chooseButton.addActionListener(optimizeActionListener);
@@ -277,6 +295,7 @@ public class OptimizeStopsDialog extends JDialog {
 		addBeforeButton.addActionListener(optimizeActionListener);
 		
 		legTable.getSelectionModel().addListSelectionListener(optimizeLegSelectionListener);
+		this.roadsTable.getModel().addTableModelListener(optimizeRoadModelListener);
 	}
 
 	protected static class LegTableModel extends AbstractTableModel {
@@ -380,6 +399,16 @@ public class OptimizeStopsDialog extends JDialog {
 		}
 
 		@Override
+		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+			if (data == null || rowIndex < 0 || rowIndex >= data.size() || columnIndex != 1)
+				return;
+			TripPlan.RoadDirectionData roadData = data.get(rowIndex);
+			roadData.direction = (String) aValue;
+			data.set(rowIndex, roadData);
+			fireTableCellUpdated(rowIndex, columnIndex);
+		}
+		
+		@Override
 		public Class<?> getColumnClass(int iCol) {
 			return String.class;
 		}
@@ -397,7 +426,12 @@ public class OptimizeStopsDialog extends JDialog {
 			this.data = data;
 			fireTableStructureChanged();
 		}
-		
+
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			return column == 1;
+		}
+
 	}
 	
 	
@@ -672,6 +706,30 @@ public class OptimizeStopsDialog extends JDialog {
 	}
 	
 	
+	protected ArrayList<TripPlan.StopData> limitTotalStops( ArrayList<TripPlan.StopData> stopDataList ) {
+		if (stopDataList.size() <= 16)
+			return stopDataList;
+		ArrayList<TripPlan.StopData> reduced = new ArrayList<>(stopDataList);
+		while (reduced.size() > 16) {
+			double leastValuablePeers = 1e12;
+			int    leastValuable = -1;
+			for (int i = 1; i < reduced.size()-1; i++) {
+				TripPlan.StopData before = reduced.get(i-1);
+				TripPlan.StopData current = reduced.get(i);
+				TripPlan.StopData after = reduced.get(i+1);
+				double value = Math.abs(current.trafficTime - before.trafficTime) + Math.abs(current.trafficTime - after.trafficTime);
+				if (value < leastValuablePeers) {
+					leastValuablePeers = value;
+					leastValuable = i;
+				}
+			}
+			if (leastValuable == -1)
+				break;
+			reduced.remove(leastValuable);
+		}
+		return reduced;
+	}
+	
 	public void generateLegStopChoices(int iLeg) {
 		Main.logger.info("Generating leg stop choices...");
 		while (getChoicesTabbedPane().getComponentCount() > 0) {
@@ -680,7 +738,12 @@ public class OptimizeStopsDialog extends JDialog {
 		// generate all possible permutations of driver assignments
 		// do not permute stopping at the arrival point (last in
 		// stopDataList)
-		Permutations perm = new Permutations(optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList.size() - 1);
+		optimizeStops.getTripPlan().getTripLeg(iLeg).roadDirectionDataList.forEach(System.out::println);
+		optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList.forEach(System.out::println);
+		ArrayList<TripPlan.StopData> reduced = limitTotalStops(optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList);
+		reduced.forEach(System.out::println);
+		
+		Permutations perm = new Permutations(reduced.size() - 1);
 		ArrayList<Integer[]> unique = perm.monotonic();
 		Main.logger.info(String.format("  %d unique", unique.size()));
 		Set<TripPlan.DriverAssignments> driverAssignmentsSet = new TreeSet<>();

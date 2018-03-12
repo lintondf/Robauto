@@ -11,10 +11,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.bluelightning.GeodeticPosition;
 import com.bluelightning.Here2;
 import com.bluelightning.Main;
 import com.bluelightning.OptimizeStops;
@@ -112,9 +114,11 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		}
 	}
 
-	private static class LegSummary implements Serializable {
+	private static class LegSummary implements Serializable, GeodeticPosition {
 		private static final long serialVersionUID = 1L;
 
+		public double    latitude;
+		public double    longitude;
 		public String[]  instructions; 
 		public String    startUserLabel; 
 		public String    endUserLabel;
@@ -125,6 +129,8 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		public ArrayList<POIResult> nearby = new ArrayList<>();
 	
 		public LegSummary(Leg leg, LegPoint start, LegPoint finish) {
+			latitude = leg.getEnd().getMappedPosition().getLatitude();
+			longitude = leg.getEnd().getMappedPosition().getLongitude();
 			instructions = new String[ leg.getManeuver().size() ];
 			Iterator<Maneuver> it = leg.getManeuver().iterator();
 			for (int i = 0; i < leg.getManeuver().size(); i++) {
@@ -153,11 +159,23 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		public String toString() {
 			return String.format("%s, %s, %s to %s", start.toString(), finish.toString(), this.startUserLabel, this.endUserLabel);
 		}
+
+		@Override
+		public double getLatitude() {
+			return latitude;
+		}
+
+		@Override
+		public double getLongitude() {
+			return longitude;
+		}
 	}
 
-	public static class StopData implements Serializable {
+	public static class StopData implements Serializable, GeodeticPosition {
 		private static final long serialVersionUID = 1L;
 	
+		public double    latitude;
+		public double    longitude;
 		public Boolean use;
 		public Boolean refuel;
 		public Double distance;
@@ -172,6 +190,8 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		public Double[] driveTimes;
 	
 		public StopData(POIResult result) {
+			this.latitude = result.poi.getLatitude();
+			this.longitude = result.poi.getLongitude();
 			this.use = true;
 			this.distance = result.legProgress.distance;
 			this.trafficTime = result.legProgress.trafficTime;
@@ -195,6 +215,8 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		}
 	
 		public StopData(LegSummary summary) {
+			this.latitude = summary.getLatitude();
+			this.longitude = summary.getLongitude();
 			this.use = true;
 			this.direction = "ARRIVE";
 			String[] fields = summary.endUserLabel.split("/");
@@ -248,6 +270,16 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 				sb.append(mileMarker);
 			}
 			return sb.toString();
+		}
+
+		@Override
+		public double getLatitude() {
+			return latitude;
+		}
+
+		@Override
+		public double getLongitude() {
+			return longitude;
 		}
 	}
 
@@ -496,9 +528,36 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		return true;
 	}
 
+	// input road direction data built from maneuver turn 'onto' instructions.
+	// add roads listed in stopDataList with unknown directions
+	protected void addUnknownDirectionRoads(ArrayList<RoadDirectionData> roadDirectionDataList,
+			ArrayList<StopData> stopDataList) {
+		
+		TreeMap<String, RoadDirectionData> roadDirectionMap = new TreeMap<>();
+		roadDirectionDataList.forEach( item -> {
+			roadDirectionMap.put( item.road, item );
+		} );
+		for (int i = 0; i < stopDataList.size()-1; i++) {
+			StopData stopData = stopDataList.get(i);
+			if (! roadDirectionMap.containsKey( stopData.road) ) {
+				RoadDirectionData roadDirectionData = new RoadDirectionData();
+				roadDirectionData.direction = "?";
+				roadDirectionData.road = stopData.road;
+				roadDirectionMap.put( roadDirectionData.road, roadDirectionData);
+			}
+		}
+		roadDirectionDataList.clear();
+		roadDirectionDataList.addAll( roadDirectionMap.values() );
+	}
+
 	public static ArrayList<TripPlan.StopData> getStopData(List<TripPlan.LegSummary> legSummary, int nDrivers, int iLeg, boolean includeTruckAreas,
 			List<TripPlan.RoadDirectionData> roadDirections) {
 		TripPlan.LegSummary summary = legSummary.get(iLeg);
+		return getStopData( legSummary, nDrivers, summary, includeTruckAreas, roadDirections);
+	}
+	
+	public static ArrayList<TripPlan.StopData> getStopData(List<TripPlan.LegSummary> legSummary, int nDrivers, LegSummary summary, boolean includeTruckAreas,
+			List<TripPlan.RoadDirectionData> roadDirections) {
 		ArrayList<TripPlan.StopData> dataList = new ArrayList<>();
 		for (POIResult r : summary.nearby) {
 			TripPlan.StopData data = new TripPlan.StopData(r);
@@ -592,9 +651,10 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 				tripLegs.add(tripLeg);
 				tripLeg.roadDirectionDataList = getRoadDirectionData(summary);
 				tripLeg.stopDataList = getStopData(legSummary, TripPlan.N_DRIVERS, iLeg, false, tripLeg.roadDirectionDataList);
+				addUnknownDirectionRoads( tripLeg.roadDirectionDataList, tripLeg.stopDataList );
 				tripLeg.driverAssignments = generateDriverAssignments(TripPlan.N_DRIVERS, tripLeg.legData, tripLeg.stopDataList );
 			}
-			for (int iPrevious = 0; iPrevious < this.legSummary.size(); iPrevious++) {
+			if (this.legSummary != null) for (int iPrevious = 0; iPrevious < this.legSummary.size(); iPrevious++) {
 				for (int jNew = 0; jNew < legSummary.size(); jNew++) {
 					boolean match = this.legSummary.get(iPrevious).getId().equalsIgnoreCase(legSummary.get(jNew).getId());
 					//System.out.println( match + ": " + this.legSummary.get(iPrevious).getId() + " vs " + legSummary.get(jNew).getId());
@@ -612,10 +672,10 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		this.tripLegs = tripLegs;
 	}
 
-	public ArrayList<RoadDirectionData> getRoadDirectionData(int iLeg) {
-		LegSummary summary = legSummary.get(iLeg);
-		return getRoadDirectionData(summary);
-	}
+//	public ArrayList<RoadDirectionData> getRoadDirectionData(int iLeg) {
+//		LegSummary summary = legSummary.get(iLeg);
+//		return getRoadDirectionData(summary);
+//	}
 
 	public ArrayList<RoadDirectionData> getRoadDirectionData(LegSummary summary) {
 		TreeSet<RoadDirectionData> dataList = new TreeSet<>();
@@ -631,9 +691,20 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		}
 		return new ArrayList<>(dataList);
 	}
+	
+	public void updateRoadDirectionData(TripLeg tripLeg, List<RoadDirectionData> list ) {
+		int i = tripLegs.indexOf(tripLeg);
+		tripLeg.roadDirectionDataList = new ArrayList<>( list );
+		tripLeg.stopDataList = getStopData(legSummary, TripPlan.N_DRIVERS, legSummary.get(i), false, tripLeg.roadDirectionDataList);
+		tripLeg.driverAssignments = generateDriverAssignments(TripPlan.N_DRIVERS, tripLeg.legData, tripLeg.stopDataList );
+	}
 
 	
 	public static void main( String[] args) {
 		//message = message.replaceAll("[^a-zA-Z0-9]", "");
+	}
+
+	public void setTripLegs(ArrayList<TripLeg> tripLegs) {
+		this.tripLegs = tripLegs;
 	}
 }

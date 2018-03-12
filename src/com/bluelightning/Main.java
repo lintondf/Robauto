@@ -244,7 +244,8 @@ public class Main {
 			final String html = dialog.updateTripData();
 			dialog.setCurrentLeg(tripPlan.getTripLeg(iLeg));
 
-			dialog.addListeners(dialog.new OptimizeActionListener(), dialog.new OptimizeLegSelectionListener());
+			dialog.addListeners(dialog.new OptimizeActionListener(), dialog.new OptimizeLegSelectionListener(),
+					dialog.new OptimizeRoadModelListener());
 
 			dialog.generateLegStopChoices( iLeg );
 			

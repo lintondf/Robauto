@@ -10,6 +10,7 @@ package org.jxmapviewer.viewer;
 
 import java.io.Serializable;
 
+import com.bluelightning.GeodeticPosition;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -18,7 +19,7 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author rbair
  */
-public class GeoPosition implements Serializable {
+public class GeoPosition implements Serializable, GeodeticPosition {
 
 	@SerializedName(value="latitude", alternate={"Latitude"})
 	protected double latitude;
