@@ -46,6 +46,7 @@ public class OptimizeStops {
 	}
 
 	public ArrayList<POIResult> getRouteSegmentPOI(Double start, Double finish) {
+		Main.logger.debug( String.format("gRSP %f %f", start, finish) );
 		ArrayList<POIResult> resultList = new ArrayList<>();
 		poiMap.forEach((kind, pset) -> {
 			resultList.addAll(pset.getPointsOfInterestAlongRoute(route, 5e3));

@@ -27,6 +27,8 @@ import javax.swing.SwingConstants;
 
 public class AddManualStopDialog extends JDialog {
 
+	private static final long serialVersionUID = 1L;
+
 	private final JPanel contentPanel = new JPanel();
 	private JTable choiceTable;
 	protected ChoiceTableModel choiceTableModel;

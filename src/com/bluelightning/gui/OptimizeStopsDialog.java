@@ -156,6 +156,8 @@ public class OptimizeStopsDialog extends JDialog {
 		double distance1 = stopsTableModel.getData().get(selected).totalDistance;
 		if (selected > 0) {
 			distance0 = stopsTableModel.getData().get(selected-1).totalDistance;
+		} else {
+			distance0 = stopsTableModel.getData().get(selected).totalDistance - stopsTableModel.getData().get(selected).distance;
 		}
 		handler = new CallbackHandler( currentLeg, true, selected);
 		startAddDialog( handler, distance0, distance1 );
@@ -280,6 +282,7 @@ public class OptimizeStopsDialog extends JDialog {
 				TripLeg leg = optimizeStops.getTripPlan().getTripLeg(currentLeg);
 				optimizeStops.getTripPlan().updateRoadDirectionData(leg, roadTableModel.getData());
 				setCurrentLeg(leg);
+				generateLegStopChoices(currentLeg);
 			}
 		}
 		
@@ -738,8 +741,8 @@ public class OptimizeStopsDialog extends JDialog {
 		// generate all possible permutations of driver assignments
 		// do not permute stopping at the arrival point (last in
 		// stopDataList)
-		optimizeStops.getTripPlan().getTripLeg(iLeg).roadDirectionDataList.forEach(System.out::println);
 		optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList.forEach(System.out::println);
+		optimizeStops.getTripPlan().getTripLeg(iLeg).roadDirectionDataList.forEach(System.out::println);
 		ArrayList<TripPlan.StopData> reduced = limitTotalStops(optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList);
 		reduced.forEach(System.out::println);
 		

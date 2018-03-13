@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.Main;
 import com.bluelightning.json.BoundingBox;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
@@ -130,6 +131,7 @@ public class POISet extends ArrayList<POI> {
 		ArrayList<POIResult> output = new ArrayList<>();
 		CumulativeTravel totalProgress = new CumulativeTravel();
 		for (Leg leg : route.getLeg()) {
+			//Main.logger.debug( String.format("  gPPOAR %s -> %s", leg.getStart().getUserLabel(), leg.getEnd().getUserLabel()) );
 			Map<POI, POIResult> nearby = pset.nearBy(leg, totalProgress, radiusMeters);
 			ArrayList<POIResult> byManeuver = new ArrayList<POIResult>();
 			for (Entry<POI, POIResult> e : nearby.entrySet()) {
@@ -137,13 +139,7 @@ public class POISet extends ArrayList<POI> {
 			}
 			Collections.sort(byManeuver);
 			for (POIResult r : byManeuver) {
-//				double angle = r.maneuver.getShapeHeadings().get(r.index);
-//				String heading = Here2.angle2Direction(angle);
-//				String[] fields = r.poi.getName().split(",");
-				//if (fields.length != 5 || fields[2].startsWith(heading.substring(0, 1))) {
-					output.add(r);
-					// System.out.println( r.toReport() );
-				//}
+				output.add(r);
 			}
 			totalProgress.distance += leg.getLength();
 			totalProgress.trafficTime += leg.getTrafficTime();
