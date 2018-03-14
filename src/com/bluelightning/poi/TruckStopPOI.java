@@ -15,6 +15,8 @@ import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.poi.POI.FuelAvailable;
 import com.opencsv.CSVReader;
 
+import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
 
 public class TruckStopPOI extends POIBase {
@@ -28,6 +30,8 @@ public class TruckStopPOI extends POIBase {
 	protected String exit;
 	protected String phone;
 	protected Image image;
+	protected static boolean hasGas = true;
+	protected static boolean hasDiesel = true;
 
 	protected static Image defaultImage;
 	protected static TreeMap<String, Image> imagesByName = new TreeMap<>();
@@ -104,7 +108,13 @@ public class TruckStopPOI extends POIBase {
 				break;
 			}
 		}
-		// TODO tagList
+		try {
+			tagList.add( new Tag("TruckStop") );
+			if (hasDiesel) tagList.add( new Tag("Diesel") );
+			if (hasGas) tagList.add( new Tag("Gas") );
+		} catch (IllegalValueException e) {
+			e.printStackTrace();
+		}
 		image = defaultImage;
 		for (String prefix : imagesByName.keySet()) {
 			if (name.toUpperCase().startsWith(prefix.toUpperCase())) {

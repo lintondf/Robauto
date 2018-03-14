@@ -176,18 +176,18 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	
 		public double    latitude;
 		public double    longitude;
-		public Boolean use;
-		public Boolean refuel;
-		public Double distance;
-		public Double trafficTime;
-		public Double totalDistance;
-		public String road;
-		public String state;
-		public String mileMarker;
-		public String direction;
-		public String fuelAvailable;
-		public String name;
-		public Double[] driveTimes;
+		public Boolean   use;
+		public Boolean   refuel;
+		public Double    distance;
+		public Double    trafficTime;
+		public Double    totalDistance;
+		public String    road;
+		public String    state;
+		public String    mileMarker;
+		public String    direction;
+		public String    fuelAvailable;
+		public String    name;
+		//public Double[] driveTimes;
 	
 		public StopData(POIResult result) {
 			this.latitude = result.poi.getLatitude();
@@ -248,15 +248,15 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			sb.append(",");
 			sb.append(name);
 			sb.append(",");
-			if (driveTimes != null) {
-				sb.append('[');
-				for (Double d : driveTimes) {
-					if (d != null)
-						sb.append(Here2.toPeriod(d.doubleValue()));
-					sb.append(",");
-				}
-				sb.append(']');
-			}
+//			if (driveTimes != null) {
+//				sb.append('[');
+//				for (Double d : driveTimes) {
+//					if (d != null)
+//						sb.append(Here2.toPeriod(d.doubleValue()));
+//					sb.append(",");
+//				}
+//				sb.append(']');
+//			}
 			return sb.toString();
 		}
 	
@@ -317,26 +317,22 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	
 		private static final long serialVersionUID = 1L;
 	
-		public static class Assignment implements Serializable {
+		public static class Turn implements Serializable {
 			private static final long serialVersionUID = 1L;
 	
-			public List<StopData> stops;
-			public List<Double> driveTimes;
+			public Integer  driver;
+			public StopData stop;
+			public Double   driveTime;
 		}
 	
 		public double driveImbalance;
 		public double[] totalDriveTimes;
-		public Assignment[] assignments;
+		public ArrayList<Turn> turns;
 		public double score;
 	
 		public DriverAssignments(int nDrivers) {
 			totalDriveTimes = new double[nDrivers];
-			assignments = new Assignment[nDrivers];
-			for (int i = 0; i < nDrivers; i++) {
-				assignments[i] = new Assignment();
-				assignments[i].stops = new ArrayList<>();
-				assignments[i].driveTimes = new ArrayList<>();
-			}
+			turns = new ArrayList<>();
 		}
 	
 		public String toString() {
@@ -349,11 +345,9 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			}
 			sb.append(']');
 			sb.append("  (");
-			for (Assignment a : assignments) {
+			for (Turn turn : turns) {
 				sb.append('[');
-				for (double d : a.driveTimes) {
-					sb.append(String.format("%s,", Here2.toPeriod(d)));
-				}
+				sb.append( String.format("%d: %s; %.0f", turn.driver, turn.stop.toString(), turn.driveTime) );
 				sb.append(']');
 			}
 			sb.append(")");
@@ -471,7 +465,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			tripPlan.log();
 			return tripPlan;
 		} catch (FileNotFoundException e) {
-			Main.logger.error( "Prior Trip Plan file not found on load ", e);
+			Main.logger.error( "Prior Trip Plan file not found on load.");
 			return new TripPlan();
 		} catch (Exception x) {
 			Main.logger.error( "Error loading prior trip plan ", x);
@@ -596,18 +590,20 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		double score = 0.0;
 		for (TripPlan.StopData stopData : sublist) {
 			//System.out.printf("%10.0f %10.0f %s\n", legData.trafficTime, stopData.trafficTime, stopData.toString());
-			driverAssignments.assignments[driver].stops.add(stopData);
+			TripPlan.DriverAssignments.Turn turn = new TripPlan.DriverAssignments.Turn ();
+			turn.driver = driver;
+			turn.stop = stopData;
 			double dTime = stopData.trafficTime - lastTime;
-			driverAssignments.assignments[driver].driveTimes.add(dTime);
+			turn.driveTime = dTime;
 			driverAssignments.totalDriveTimes[driver] += dTime;
 			score += OptimizeStops.scoreTime(dTime);
 			lastTime = stopData.trafficTime;
 			driver = (driver + 1) % nDrivers;
+			driverAssignments.turns.add(turn);
 		}
 		driverAssignments.driveImbalance = Math
 				.abs(driverAssignments.totalDriveTimes[1] - driverAssignments.totalDriveTimes[0]);
 		driverAssignments.score = score + driverAssignments.driveImbalance;
-		// System.out.println(driverAssignments);
 		return driverAssignments;
 	}
 	
@@ -706,5 +702,9 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	public void setTripLegs(ArrayList<TripLeg> tripLegs) {
 		this.tripLegs = tripLegs;
+	}
+
+	public ArrayList<TripLeg> getTripLegs() {
+		return tripLegs;
 	}
 }

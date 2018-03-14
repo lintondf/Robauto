@@ -45,6 +45,7 @@ import com.bluelightning.gui.OptimizeStopsDialog.OptimizeLegSelectionListener;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.POIMarker;
+import com.bluelightning.map.StopMarker;
 import com.bluelightning.poi.MurphyPOI;
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIResult;
@@ -61,6 +62,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
 import seedu.addressbook.data.AddressBook;
+import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.place.ReadOnlyPlace;
 import seedu.addressbook.data.place.VisitedPlace;
 import seedu.addressbook.logic.Logic;
 
@@ -175,6 +178,17 @@ public class Main {
 					}
 				});
 				break;
+				
+			case "ControlPanel.Finalize":
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						if (tripPlan.getRoute() != null) {
+							finalizeRoute();
+						}
+					}
+				});
+				break;
 
 			case "ControlPanel.Waypoints":
 				nearby.clear();
@@ -202,6 +216,53 @@ public class Main {
 			default:
 				break;
 			}
+		}
+		
+		private void finalizeRoute() {
+			logger.info("Finalizing route...");
+			if (tripPlan.getPlacesChanged()) {
+				tripPlan.setRoute(null);
+				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
+				logger.info("  Route points saved");
+			}
+			map.clearRoute();
+			ArrayList<Integer> markers = new ArrayList<>();
+			markers.add( StopMarker.ORIGIN );
+			ArrayList<Route> days = new ArrayList<>();
+			for (TripPlan.TripLeg tripLeg : tripPlan.getTripLegs()) {
+				ArrayList<VisitedPlace> places = new ArrayList<>();
+				String[] fields = tripLeg.legData.startLabel.split("/");
+				if (fields.length < 2) {
+					Main.logger.error("Invalid VisitedPlace label: " + tripLeg.legData.startLabel);
+					return;
+				}
+				List<ReadOnlyPlace> startMatches = addressBook.getPlacesWithAddress(fields[1]);
+				if (startMatches.isEmpty()) {
+					Main.logger.error("No matching address book entry for: " + tripLeg.legData.startLabel);
+					return;
+				}
+				VisitedPlace start = new VisitedPlace( startMatches.get(0) );
+				places.add(start);
+				int refuel = 0;
+				for (TripPlan.StopData stopData : tripLeg.stopDataList) {
+					try {
+						places.add( new VisitedPlace(stopData) );
+						refuel = (stopData.refuel) ? StopMarker.FUEL : 0;
+						markers.add( StopMarker.DRIVERS + refuel );
+					} catch (IllegalValueException e) {
+					}
+				} // for stopData
+				markers.set( markers.size()-1, StopMarker.OVERNIGHT + refuel);
+				places.forEach( place -> {
+					Main.logger.debug(place.toString());
+				});
+				days.add( Here2.computeRoute(places) );
+			} // tripLeg
+			markers.set( markers.size()-1, StopMarker.TERMINUS );
+			waypoints = map.showRoute( days, markers );
+			int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
+			mainPanel.getRightTabbedPane().setSelectedIndex(index);
+			logger.info("  Route shown on map");
 		}
 
 		private void route() {

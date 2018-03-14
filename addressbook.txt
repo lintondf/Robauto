@@ -84,4 +84,10 @@
         <latitude>41.7171837</latitude>
         <longitude>-70.5839532</longitude>
     </persons>
+    <persons>
+        <name>Walmart</name>
+        <address>461 W Reservoir Rd, Woodstock, VA 22664</address>
+        <latitude>38.8723699</latitude>
+        <longitude>-78.53022</longitude>
+    </persons>
 </AddressBook>

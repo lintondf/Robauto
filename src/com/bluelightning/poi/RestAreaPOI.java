@@ -9,6 +9,8 @@ import com.bluelightning.Here2;
 import com.bluelightning.LatLon;
 import com.opencsv.CSVReader;
 
+import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
 
 /**
@@ -50,7 +52,13 @@ public class RestAreaPOI extends POIBase {
 		parseColumnC( columnC );
 		String[] columnD = fields[3].split("\\|"); //[RR,PT,VM,Pets,HF]|RV Dump
 		parseColumnD( columnD );
-		// TODO tagList
+		try {
+			tagList.add( new Tag("RestArea") );
+			if (hasDiesel) tagList.add( new Tag("Diesel") );
+			if (hasGas) tagList.add( new Tag("Gas") );
+		} catch (IllegalValueException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void parseColumnC(String[] columnC) {

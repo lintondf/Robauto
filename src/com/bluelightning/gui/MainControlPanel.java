@@ -152,15 +152,27 @@ public class MainControlPanel extends JPanel {
 		JButton btnFirebug = new JButton("Firebug");
 		GridBagConstraints gbc_btnFirebug = new GridBagConstraints();
 		gbc_btnFirebug.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnFirebug.insets = new Insets(0, 0, 5, 0);
 		gbc_btnFirebug.gridx = 0;
-		gbc_btnFirebug.gridy = 3;
+		gbc_btnFirebug.gridy = 6;
 		btnFirebug.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.FireBug", event));
 			}
 		});
+		
+		JButton btnFinalizeRoute = new JButton("Finalize Route");
+		GridBagConstraints gbc_btnFinalizeRoute = new GridBagConstraints();
+		gbc_btnFinalizeRoute.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnFinalizeRoute.insets = new Insets(0, 0, 5, 0);
+		gbc_btnFinalizeRoute.gridx = 0;
+		gbc_btnFinalizeRoute.gridy = 3;
+		add(btnFinalizeRoute, gbc_btnFinalizeRoute);
 		add(btnFirebug, gbc_btnFirebug);
+		btnFinalizeRoute.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.Finalize", event));
+			}
+		});
 
 	}
 

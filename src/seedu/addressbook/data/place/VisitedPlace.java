@@ -2,7 +2,9 @@ package seedu.addressbook.data.place;
 
 import java.io.Serializable;
 
+import com.bluelightning.data.TripPlan;
 import com.bluelightning.poi.POI;
+import com.bluelightning.poi.POIBase;
 
 import seedu.addressbook.data.exception.IllegalValueException;
 import seedu.addressbook.data.tag.UniqueTagList;
@@ -26,8 +28,26 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 	}
 	
 	public VisitedPlace( POI poi ) throws IllegalValueException {
-		super(new Name(poi.getName()), poi.getLatitude(), poi.getLongitude(), new Address(poi.getAddress()), poi.getTags() );
+		super(new Name(poi.getName()), 
+			  poi.getLatitude(), 
+			  poi.getLongitude(), 
+			  new Address(poi.getAddress()), 
+			  poi.getTags() );
 		fuelAvailable = poi.getFuelAvailable();
+	}
+	
+	public VisitedPlace( TripPlan.StopData stop )  throws IllegalValueException {
+		super (new Name(stop.name),
+			   stop.getLatitude(),
+			   stop.getLongitude(),
+			   new Address(stop.getAddress()),
+			   POIBase.toFuelTags( POIBase.fromFuelString(stop.fuelAvailable)) );
+		fuelAvailable = POIBase.fromFuelString(stop.fuelAvailable);
+	}
+	
+	public String toString() {
+		String label = String.format("%s/%s", getName().fullName, getAddress().value );
+		return String.format("%10.6f, %10.6f  %s", getLatitude(), getLongitude(), label);
 	}
 	
 	public String toGeo() {
@@ -36,7 +56,6 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 		return String.format("geo!%f,%f;;%s", getLatitude(), getLongitude(), label);
 	}
 	
-
 	@Override
 	public int compareTo(VisitedPlace that) {
 		return visitOrder.compareTo(that.visitOrder);

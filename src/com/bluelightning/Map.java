@@ -12,6 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -43,7 +44,6 @@ import com.bluelightning.json.Route;
 import com.bluelightning.map.POIMarker;
 import com.bluelightning.map.RoutePainter;
 import com.bluelightning.map.StopMarker;
-import com.bluelightning.map.StopMarker.Kind;
 import com.bluelightning.map.SwingMarker;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.ButtonWaypointOverlayPainter;
@@ -163,15 +163,15 @@ public class Map {
 		
 		// Create waypoints from the geo-positions
 		ArrayList<ButtonWaypoint> waylist = new ArrayList<>();
-		StopMarker.Kind kind = Kind.ORIGIN;
-		String lastText = "";
+		int kind = StopMarker.ORIGIN;
+		String text = "";
 		for (Leg leg : route.getLeg()) {
-			String text = leg.getStart().getMappedRoadName() + " " + leg.getStart().getSideOfStreet();
+			text = leg.getStart().getUserLabel();
 			waylist.add(new StopMarker(kind, text, new LatLon(leg.getStart().getMappedPosition())));
-			kind = Kind.OVERNIGHT;
-			text = leg.getEnd().getMappedRoadName() + " " + leg.getEnd().getSideOfStreet();
+			kind = StopMarker.OVERNIGHT;
+			text = leg.getEnd().getUserLabel();
 		}
-		waylist.add(new StopMarker(Kind.TERMINUS, lastText, track.get(track.size() - 1)));
+		waylist.add(new StopMarker(StopMarker.TERMINUS, text, track.get(track.size() - 1)));
 
 		markerPainter = new ButtonWaypointOverlayPainter();
 		markerPainter.setWaypoints( new HashSet<ButtonWaypoint>(waylist));
@@ -304,6 +304,47 @@ public class Map {
 //		for (POIMarker w : nearby) {
 //			mapViewer.add(w);
 //		}
+	}
+
+	public List<ButtonWaypoint> showRoute(ArrayList<Route> days, ArrayList<Integer> markers) {
+		Iterator<Integer> iMarker = markers.iterator();
+		ArrayList<GeoPosition> track = new ArrayList<>(); 
+		days.forEach(route -> {
+			track.addAll( route.getShape() );
+		});
+		routePainter = new RoutePainter(track);
+		// Set the focus
+		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(track), 0.9);	
+		
+		// Create waypoints from the geo-positions
+		ArrayList<ButtonWaypoint> waylist = new ArrayList<>();
+		String text = "";
+		for (Route route : days) {
+			for (Leg leg : route.getLeg()) {
+				text = leg.getStart().getUserLabel();
+				waylist.add(new StopMarker(iMarker.next(), text, new LatLon(leg.getStart().getMappedPosition())));
+				text = leg.getEnd().getUserLabel();
+			}
+		}
+		waylist.add(new StopMarker(iMarker.next(), text, track.get(track.size() - 1)));
+
+		markerPainter = new ButtonWaypointOverlayPainter();
+		markerPainter.setWaypoints( new HashSet<ButtonWaypoint>(waylist));
+		
+        painters = new ArrayList<Painter<JXMapViewer>>();
+		painters.add(routePainter);
+		painters.add(markerPainter);
+
+		CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
+		mapViewer.setOverlayPainter(painter);
+		
+		// Add the JButtons to the map viewer
+		for (ButtonWaypoint w : waylist) {
+			mapViewer.add(w);
+			currentMarkers.add(w);
+		}
+		
+		return waylist;
 	}
 
 }

@@ -263,27 +263,21 @@ public class Report implements Serializable {
 	
 	public void add(int nDrivers, TripPlan.LegData legData,
 			TripPlan.DriverAssignments driverAssignments) {
+		
 		this.depart(formatUserLabel(legData.startLabel), "", 0.0);
-
-		List<Iterator<Double>> driveTimes = new ArrayList<Iterator<Double>>(
-				Arrays.asList(driverAssignments.assignments[0].driveTimes.iterator(),
-						driverAssignments.assignments[1].driveTimes.iterator()));
-		List<Iterator<TripPlan.StopData>> stopsIteratorsByDriver = new ArrayList<Iterator<TripPlan.StopData>>(Arrays.asList(
-				driverAssignments.assignments[0].stops.iterator(), driverAssignments.assignments[1].stops.iterator()));
-
-		int driver = 0;
+		Iterator<TripPlan.DriverAssignments.Turn> iTurn = driverAssignments.turns.iterator();
 		double lastDistance = 0.0;
-		while (stopsIteratorsByDriver.get(driver).hasNext()) {
-			TripPlan.StopData stopData = stopsIteratorsByDriver.get(driver).next();
-			Double driveTime = driveTimes.get(driver).next();
+		while (iTurn.hasNext()) {
+			TripPlan.DriverAssignments.Turn turn = iTurn.next();
+			TripPlan.StopData stopData = turn.stop;
+			Double driveTime = turn.driveTime;
 			int hours = (int) (driveTime / 3600.0);
 			int minutes = ((int) (driveTime / 60.0)) % 60;
 			double stepDistance = stopData.distance - lastDistance;
 			lastDistance = stopData.distance;
-			this.drive(driver, hours, minutes, stepDistance * Here2.METERS_TO_MILES);
+			this.drive(turn.driver, hours, minutes, stepDistance * Here2.METERS_TO_MILES);
 			double refuel = (stopData.refuel) ? this.fillUp() : 0.0;
 			this.stop(stopData.name, stopData.getAddress(), refuel );
-			driver = (driver + 1) % nDrivers;
 		}
 		this.arrive(0.0, formatUserLabel(legData.endLabel), "");
 	}

@@ -22,92 +22,135 @@ import com.bluelightning.map.SwingMarker;
 import com.bluelightning.poi.POI.FuelAvailable;
 import com.opencsv.CSVReader;
 
+import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
 
 public abstract class POIBase implements POI, Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	protected double latitude;
 	protected double longitude;
 	protected double tanLatitude;
 	protected double tanLongitude;
-	protected static Image  image;
-	
+	protected static Image image;
+
 	protected String name;
 	protected UniqueTagList tagList = new UniqueTagList();
-	
+
 	public static GeodeticCalculator geoCalc = new GeodeticCalculator();
 	public static Ellipsoid wgs84 = Ellipsoid.WGS84;
 
 	static {
-		if (image == null) try {
-			Dimension size = ButtonWaypoint.getImageSize();
-			image = ImageIO.read(new File("images/restarea.png"))
-					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
-		} catch (Exception x) {
-		}		
-	}
-	
-	public static String toFuelString( POI.FuelAvailable fa ) {
-		if (fa != null) switch (fa) {
-		case NO_FUEL: return "None";
-		case HAS_BOTH: return "Both";
-		case HAS_GAS: return "Gas";
-		case HAS_DIESEL: return "Diesel";
-		}
-		return "None";
+		if (image == null)
+			try {
+				Dimension size = ButtonWaypoint.getImageSize();
+				image = ImageIO.read(new File("images/restarea.png")).getScaledInstance((int) size.getWidth(),
+						(int) size.getHeight(), Image.SCALE_SMOOTH);
+			} catch (Exception x) {
+			}
 	}
 
-	
-	public POIBase() {}
-	
-	public POIBase( String[] fields ) {
-		// long (deg), lat (deg), name+, ...
-		this.setLongitude( Double.parseDouble( fields[0]) );
-		this.setLatitude( Double.parseDouble( fields[1]) );
-		this.setName( fields[2] );
+	public static String toFuelString(POI.FuelAvailable fa) {
+		if (fa != null)
+			switch (fa) {
+			case NO_FUEL:
+				return "None";
+			case HAS_BOTH:
+				return "Both";
+			case HAS_GAS:
+				return "Gas";
+			case HAS_DIESEL:
+				return "Diesel";
+			}
+		return "None";
 	}
 	
+	public static POI.FuelAvailable fromFuelString(String fa ) {
+		switch (fa) {
+		case "Both": return POI.FuelAvailable.HAS_BOTH;
+		case "Gas": return POI.FuelAvailable.HAS_GAS;
+		case "Diesel": return POI.FuelAvailable.HAS_DIESEL;
+		default: return POI.FuelAvailable.NO_FUEL;
+		}
+	}
+
+	public static UniqueTagList toFuelTags(POI.FuelAvailable fa) {
+		UniqueTagList tagList = new UniqueTagList();
+		try {
+			if (fa != null)
+				switch (fa) {
+				case NO_FUEL:
+					break;
+				case HAS_BOTH:
+					tagList.add(new Tag("Diesel"));
+					tagList.add(new Tag("Gas"));
+					break;
+				case HAS_GAS:
+					tagList.add(new Tag("Gas"));
+					break;
+				case HAS_DIESEL:
+					tagList.add(new Tag("Diesel"));
+					break;
+				}
+		} catch (Exception x) {
+		}
+		return tagList;
+	}
+
+	public POIBase() {
+	}
+
+	public POIBase(String[] fields) {
+		// long (deg), lat (deg), name+, ...
+		this.setLongitude(Double.parseDouble(fields[0]));
+		this.setLatitude(Double.parseDouble(fields[1]));
+		this.setName(fields[2]);
+	}
+
 	@Override
 	public String toString() {
-		return String.format("%8.5f, %8.5f, %s", latitude, longitude, name );
+		return String.format("%8.5f, %8.5f, %s", latitude, longitude, name);
 	}
-	
+
 	public GlobalCoordinates getCoordinates() {
-		return new GlobalCoordinates( latitude, longitude );
+		return new GlobalCoordinates(latitude, longitude);
 	}
-	
-	public double distance( POIBase that ) {
-//		GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84, 
-//				this.getCoordinates(), 
-//				that.getCoordinates());
-//		double d = curve.getEllipsoidalDistance();
+
+	public double distance(POIBase that) {
+		// GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84,
+		// this.getCoordinates(),
+		// that.getCoordinates());
+		// double d = curve.getEllipsoidalDistance();
 		double lat1R = Math.toRadians(this.getCoordinates().getLatitude());
 		double lat2R = Math.toRadians(that.getCoordinates().getLatitude());
 		double dLatR = Math.abs(lat2R - lat1R);
-		double dLngR = Math.abs(Math.toRadians(that.getCoordinates().getLongitude() - this.getCoordinates().getLongitude()));
-		double a = Math.sin(dLatR / 2) * Math.sin(dLatR / 2) + Math.cos(lat1R) * Math.cos(lat2R)
-				* Math.sin(dLngR / 2) * Math.sin(dLngR / 2);
+		double dLngR = Math
+				.abs(Math.toRadians(that.getCoordinates().getLongitude() - this.getCoordinates().getLongitude()));
+		double a = Math.sin(dLatR / 2) * Math.sin(dLatR / 2)
+				+ Math.cos(lat1R) * Math.cos(lat2R) * Math.sin(dLngR / 2) * Math.sin(dLngR / 2);
 		return 6378140.0 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 	}
-	
-	public double distance( GeoPosition point ) {
-		GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84, 
-				new GlobalCoordinates(point.getLatitude(), point.getLongitude()),
-				this.getCoordinates());
+
+	public double distance(GeoPosition point) {
+		GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84,
+				new GlobalCoordinates(point.getLatitude(), point.getLongitude()), this.getCoordinates());
 		double d = curve.getEllipsoidalDistance();
 		return d;
 	}
-	
+
 	/**
 	 * Wrapper function to accept the same arguments as the other examples
 	 * 
-	 * @param x3 - point x
-	 * @param y3 - point y
-	 * @param x1 - segment start x
+	 * @param x3
+	 *            - point x
+	 * @param y3
+	 *            - point y
+	 * @param x1
+	 *            - segment start x
 	 * @param y1
-	 * @param x2 - segment end x
+	 * @param x2
+	 *            - segment end x
 	 * @param y2
 	 * @return
 	 */
@@ -153,30 +196,32 @@ public abstract class POIBase implements POI, Serializable {
 
 		return closestPoint.distance(p3);
 	}
-	
-	public double roughDistance( GeoPosition seg1, GeoPosition seg2) {
-		double distDeg = distanceToSegment( this.getLongitude(), this.getLatitude(),
-				seg1.getLongitude(), seg1.getLatitude(), seg2.getLongitude(), seg2.getLatitude() );
-		return 6378140.0 * Math.toRadians( distDeg );
+
+	public double roughDistance(GeoPosition seg1, GeoPosition seg2) {
+		double distDeg = distanceToSegment(this.getLongitude(), this.getLatitude(), seg1.getLongitude(),
+				seg1.getLatitude(), seg2.getLongitude(), seg2.getLatitude());
+		return 6378140.0 * Math.toRadians(distDeg);
 	}
 
-	public double roughDistance( GeoPosition point) {
+	public double roughDistance(GeoPosition point) {
 		double dLat = this.getLatitude() - point.getLatitude();
 		double dLon = this.getLongitude() - point.getLongitude();
-		return 6378140.0 * Math.toRadians( Math.sqrt(dLat*dLat + dLon*dLon) );
-//		double lat1R = Math.toRadians(this.getCoordinates().getLatitude());
-//		double lat2R = Math.toRadians(point.getLatitude());
-//		double dLatR = Math.abs(lat2R - lat1R);
-//		double dLngR = Math.abs(Math.toRadians(point.getLongitude() - this.getCoordinates().getLongitude()));
-//		double a = Math.sin(dLatR / 2) * Math.sin(dLatR / 2) + Math.cos(lat1R) * Math.cos(lat2R)
-//				* Math.sin(dLngR / 2) * Math.sin(dLngR / 2);
-//		return 6378140.0 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		return 6378140.0 * Math.toRadians(Math.sqrt(dLat * dLat + dLon * dLon));
+		// double lat1R = Math.toRadians(this.getCoordinates().getLatitude());
+		// double lat2R = Math.toRadians(point.getLatitude());
+		// double dLatR = Math.abs(lat2R - lat1R);
+		// double dLngR = Math.abs(Math.toRadians(point.getLongitude() -
+		// this.getCoordinates().getLongitude()));
+		// double a = Math.sin(dLatR / 2) * Math.sin(dLatR / 2) +
+		// Math.cos(lat1R) * Math.cos(lat2R)
+		// * Math.sin(dLngR / 2) * Math.sin(dLngR / 2);
+		// return 6378140.0 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 	}
-	
-	public boolean isNearby( POIBase that, double cutoffMeters ) {
+
+	public boolean isNearby(POIBase that, double cutoffMeters) {
 		return distance(that) <= cutoffMeters;
 	}
-	
+
 	public double getLatitude() {
 		return latitude;
 	}
