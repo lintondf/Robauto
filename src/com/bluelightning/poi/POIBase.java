@@ -67,10 +67,10 @@ public abstract class POIBase implements POI, Serializable {
 	}
 	
 	public static POI.FuelAvailable fromFuelString(String fa ) {
-		switch (fa) {
-		case "Both": return POI.FuelAvailable.HAS_BOTH;
-		case "Gas": return POI.FuelAvailable.HAS_GAS;
-		case "Diesel": return POI.FuelAvailable.HAS_DIESEL;
+		switch (fa.toUpperCase()) {
+		case "BOTH": return POI.FuelAvailable.HAS_BOTH;
+		case "GAS": return POI.FuelAvailable.HAS_GAS;
+		case "DIESEL": return POI.FuelAvailable.HAS_DIESEL;
 		default: return POI.FuelAvailable.NO_FUEL;
 		}
 	}

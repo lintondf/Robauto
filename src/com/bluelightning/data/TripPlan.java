@@ -178,6 +178,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		public double    longitude;
 		public Boolean   use;
 		public Boolean   refuel;
+		public Boolean   drivers;  // true if switch drivers; or consider it
 		public Double    distance;
 		public Double    trafficTime;
 		public Double    totalDistance;
@@ -187,12 +188,12 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		public String    direction;
 		public String    fuelAvailable;
 		public String    name;
-		//public Double[] driveTimes;
 	
 		public StopData(POIResult result) {
 			this.latitude = result.poi.getLatitude();
 			this.longitude = result.poi.getLongitude();
 			this.use = true;
+			this.drivers = true;
 			this.distance = result.legProgress.distance;
 			this.trafficTime = result.legProgress.trafficTime;
 			this.totalDistance = result.totalProgress.distance;
@@ -218,6 +219,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			this.latitude = summary.getLatitude();
 			this.longitude = summary.getLongitude();
 			this.use = true;
+			this.drivers = true;
 			this.direction = "ARRIVE";
 			String[] fields = summary.endUserLabel.split("/");
 			this.road = (fields.length > 0) ? fields[1] : "";
@@ -235,8 +237,16 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			StringBuffer sb = new StringBuffer();
 			if (use != null) {
 				sb.append(use.toString());
-				sb.append(",");
 			}
+			sb.append(",");
+			if (drivers != null) {
+				sb.append(drivers.toString());
+			}
+			sb.append(",");
+			if (refuel != null) {
+				sb.append(refuel.toString());
+			}
+			sb.append(",");
 			sb.append(String.format("%5.1f, %5s,", distance * Here2.METERS_TO_MILES, Here2.toPeriod(trafficTime)));
 			sb.append(road);
 			sb.append('/');
@@ -573,16 +583,16 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			sublist.add(stopDataList.get(i.intValue()));
 		}
 		sublist.add( stopDataList.get(stopDataList.size()-1) );  // always stop at arrival point
-		return generateDriverAssignments(nDrivers, legData, stopDataList, sublist);
+		return generateDriverAssignments(nDrivers, legData, sublist);
 	}
 
-	public static TripPlan.DriverAssignments generateDriverAssignments(int nDrivers, TripPlan.LegData legData,
-			ArrayList<TripPlan.StopData> stopDataList) {
-		return generateDriverAssignments(nDrivers, legData, stopDataList, stopDataList);
-	}
+//	public static TripPlan.DriverAssignments generateDriverAssignments(int nDrivers, TripPlan.LegData legData,
+//			ArrayList<TripPlan.StopData> stopDataList) {
+//		return generateDriverAssignments(nDrivers, legData, stopDataList);
+//	}
 
 	public static TripPlan.DriverAssignments generateDriverAssignments(int nDrivers, TripPlan.LegData legData,
-			ArrayList<TripPlan.StopData> stopDataList, ArrayList<TripPlan.StopData> sublist) {
+			ArrayList<TripPlan.StopData> sublist) {
 
 		TripPlan.DriverAssignments driverAssignments = new TripPlan.DriverAssignments(nDrivers);
 		int driver = 0;

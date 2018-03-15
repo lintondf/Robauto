@@ -112,7 +112,7 @@ public class Main {
 		
 		@Subscribe
 		protected void handle(UiEvent event) {
-			System.out.println(event.source + " " + event.awtEvent);
+			//System.out.println(event.source + " " + event.awtEvent);
 			switch (event.source) {
 			case "RoutePanel.AddAfter":
 				tripPlan.setPlacesChanged(true);
@@ -302,13 +302,13 @@ public class Main {
 			dialog.setVisible(true);
 
 			int iLeg = 0; // start with first leg
-			final String html = dialog.updateTripData();
 			dialog.setCurrentLeg(tripPlan.getTripLeg(iLeg));
 
 			dialog.addListeners(dialog.new OptimizeActionListener(), dialog.new OptimizeLegSelectionListener(),
 					dialog.new OptimizeRoadModelListener());
 
 			dialog.generateLegStopChoices( iLeg );
+			final String html = dialog.updateTripData();
 			
 			SwingUtilities.invokeLater( new Runnable() {
 				@Override
