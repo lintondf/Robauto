@@ -20,6 +20,14 @@ public class Events {
 	// System-wide event bus
 	public static EventBus eventBus = new AsyncEventBus(new ForkJoinPool());
 	
+	public static class AddAddressStopEvent {
+		public POI   poi;
+		
+		public AddAddressStopEvent( POI poi) {
+			this.poi = poi;
+		}
+	}
+	
 	public static class AddManualStopEvent {
 		public POIResult   result;
 		

@@ -28,6 +28,8 @@ import seedu.addressbook.data.place.Name;
 import seedu.addressbook.data.place.Place;
 import seedu.addressbook.data.place.ReadOnlyPlace;
 import seedu.addressbook.data.place.UniquePlaceList;
+import seedu.addressbook.data.tag.Tag;
+import seedu.addressbook.data.tag.UniqueTagList;
 import seedu.addressbook.logic.Logic;
 
 import javax.swing.JScrollPane;
@@ -39,13 +41,17 @@ import javax.swing.JTextField;
 public class AddAddressDialog extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-	private JTable addressesTable;
+	protected JTable addressesTable;
 
 	protected Logic       controller = null;
 	protected AddressBook addressBook = null;
 	protected AddressesModel addressesModel;
 	private JTextField nameField;
 	private JTextField addressField;
+	private JTextField tagsField;
+	protected JButton btnCreateButton;
+	protected JButton okButton;
+	protected JButton cancelButton;
 	
 	protected static class AddressesModel extends AbstractTableModel {
 		
@@ -130,11 +136,36 @@ public class AddAddressDialog extends JDialog {
 		
 	}
 	
-	protected class AddAddressActionListener implements ActionListener {
+	public void createTag() {
+		try {
+			Place p = new Place();
+			p.setName( new Name( nameField.getText()) );
+			p.setAddress( new Address( addressField.getText() ) );
+			String[] tags = tagsField.getText().split(",");
+			UniqueTagList list = new UniqueTagList();
+			try {
+				for (String tagString : tags) {
+					Tag tag = new Tag(tagString);
+					list.add(tag);
+				}
+			} catch (Exception x) {}
+			p.setTags(list);
+			LatLon where = Here2.geocodeLookup(p.getAddress().value );
+			if (where != null) {
+				p.setLatitude( where.getLatitude() );
+				p.setLongitude( where.getLongitude() );
+				addressBook.add(p);
+				controller.getStorage().save(addressBook);
+				addressesModel.setData( addressBook.getAllPlaces() );
+			}
+		} catch (Exception x) {}
+	}
+	
+	public class AddAddressActionListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent event) {
-			System.out.println(event);
+			//System.out.println(event);
 			switch (event.getActionCommand()) {
 			case "Cancel":
 				Main.logger.info("dispose() on Cancel");
@@ -152,19 +183,7 @@ public class AddAddressDialog extends JDialog {
 				AddAddressDialog.this.dispose();
 				break;
 			case "Create":
-				try {
-					Place p = new Place();
-					p.setName( new Name( nameField.getText()) );
-					p.setAddress( new Address( addressField.getText() ) );
-					LatLon where = Here2.geocodeLookup(p.getAddress().value );
-					if (where != null) {
-						p.setLatitude( where.getLatitude() );
-						p.setLongitude( where.getLongitude() );
-						addressBook.add(p);
-						controller.getStorage().save(addressBook);
-						addressesModel.setData( addressBook.getAllPlaces() );
-					}
-				} catch (Exception x) {}
+				createTag();
 				break;
 			}
 		}
@@ -179,9 +198,9 @@ public class AddAddressDialog extends JDialog {
 		setModal(true);
 		this.controller = controller;
 		this.addressBook = addressBook;
-		AddAddressActionListener listener = new AddAddressActionListener();
+		//AddAddressActionListener listener = new AddAddressActionListener();
 		addressesModel = new AddressesModel( addressBook.getAllPlaces() );
-		setTitle("Select Waypoint to Add");
+		setTitle("Select Address to Add");
 		setBounds(100, 100, 900, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -224,9 +243,17 @@ public class AddAddressDialog extends JDialog {
 					addressField.setColumns(20);
 				}
 				{
-					JButton btnCreateButton = new JButton("Create");
+					btnCreateButton = new JButton("Create");
 					btnCreateButton.setActionCommand("Create");
-					btnCreateButton.addActionListener(listener);
+					{
+						JLabel lblTags = new JLabel("Tags");
+						addPane.add(lblTags);
+					}
+					{
+						tagsField = new JTextField();
+						addPane.add(tagsField);
+						tagsField.setColumns(10);
+					}
 					addPane.add(btnCreateButton);
 				}
 			}
@@ -235,20 +262,26 @@ public class AddAddressDialog extends JDialog {
 				buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 				lowerPane.add(buttonPane, BorderLayout.SOUTH);
 				{
-					JButton okButton = new JButton("OK");
+					okButton = new JButton("OK");
 					okButton.setActionCommand("OK");
-					okButton.addActionListener(listener);
 					buttonPane.add(okButton);
 					
 				}
 				{
-					JButton cancelButton = new JButton("Cancel");
+					cancelButton = new JButton("Cancel");
 					cancelButton.setActionCommand("Cancel");
-					cancelButton.addActionListener(listener);
 					buttonPane.add(cancelButton);
 				}
 			}
 		}
+
+	}
+
+	
+	public void setListener(ActionListener listener) {
+		btnCreateButton.addActionListener(listener);
+		okButton.addActionListener(listener);
+		cancelButton.addActionListener(listener);
 	}
 
 	/**
@@ -262,11 +295,14 @@ public class AddAddressDialog extends JDialog {
 			AddressBook addressBook = controller.getAddressBook();
 			System.out.println( addressBook.getAllPlaces().immutableListView().size());
 			AddAddressDialog dialog = new AddAddressDialog(controller, addressBook);
+			AddAddressActionListener listener = dialog.new AddAddressActionListener();
+			dialog.setListener( listener );
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
 
 }

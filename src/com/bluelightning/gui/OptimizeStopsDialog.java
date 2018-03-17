@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
@@ -42,16 +43,20 @@ import com.bluelightning.data.TripPlan.DriverAssignments.Turn;
 import com.bluelightning.data.TripPlan.LegData;
 import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.data.TripPlan.TripLeg;
+import com.bluelightning.Events.AddAddressStopEvent;
 import com.bluelightning.Events.AddManualStopEvent;
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.Main.MarkerKinds;
 import com.bluelightning.json.HereRoute;
+import com.bluelightning.json.Leg;
 import com.bluelightning.json.Route;
 import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
+
+import sun.swing.DefaultLookup;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JSplitPane;
@@ -125,7 +130,6 @@ public class OptimizeStopsDialog extends JDialog {
 		
 		@Subscribe
 		protected void handle( AddManualStopEvent event ) {
-			System.out.println( addBefore + " " + iRow + " " + event.result.toReport() );
 			Events.eventBus.unregister(this); // one shot
 			handler = null;
 			SwingUtilities.invokeLater( new Runnable() {
@@ -139,11 +143,51 @@ public class OptimizeStopsDialog extends JDialog {
 						dataList.add(iRow+1, data);
 					}
 					stopsTableModel.setData(dataList);
-					generateLegStopChoices();
 					OptimizeStopsDialog.this.optimizeStops.getTripPlan().getTripLeg(currentLeg).stopDataList = dataList;
+					generateLegStopChoices();
 				}
 			});
 		}
+		
+		@Subscribe
+		protected void handle( AddAddressStopEvent event ) {
+			Events.eventBus.unregister(this); // one shot			
+			handler = null;
+			SwingUtilities.invokeLater( new Runnable() {
+				@Override
+				public void run() {
+					ArrayList<TripPlan.StopData> dataList = OptimizeStopsDialog.this.stopsTableModel.getData();
+					POIResult result = POIResult.factory(OptimizeStopsDialog.this.optimizeStops.getTripPlan().getRoute(), event.poi );
+					System.out.println(dataList.size() + " " + result);
+					if (result != null) {
+						for (Leg leg : OptimizeStopsDialog.this.optimizeStops.getTripPlan().getRoute().getLeg() ) {
+							if (leg == result.leg) {
+								boolean added = false;
+								for (int i = 0; i < dataList.size(); i++) {
+									if (result.totalProgress.distance < dataList.get(i).totalDistance) {
+										dataList.add(i, new StopData(result) );
+										added = true;
+										break;
+									}
+								} // for i
+								if (!added) {
+									dataList.add(new StopData(result));
+								}
+								stopsTableModel.setData(dataList);
+								System.out.println(dataList.size());
+								OptimizeStopsDialog.this.optimizeStops.getTripPlan().getTripLeg(currentLeg).stopDataList = dataList;
+								generateLegStopChoices();
+								return;
+							}
+						} // for leg
+				        JOptionPane.showMessageDialog(null, "Selected address on route but not selected leg", "Add Stop from Address Book", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					} else {
+				        JOptionPane.showMessageDialog(null, "Selected address more than 30km from route", "Add Stop from Address Book", JOptionPane.INFORMATION_MESSAGE);
+					}
+				} // run()
+			} );
+		} // handle AddAddressStopEvent
 	}
 	
 	protected void addAfter() {
@@ -175,7 +219,7 @@ public class OptimizeStopsDialog extends JDialog {
 	
 	protected void startAddDialog(CallbackHandler handler, double distance0, double distance1) {
 			ArrayList<POIResult> segmentPOI = optimizeStops.getRouteSegmentPOI(distance0, distance1);
-			AddManualStopDialog addDialog = new AddManualStopDialog();
+			AddManualStopDialog addDialog = new AddManualStopDialog( optimizeStops.controller, optimizeStops.addressBook);
 			addDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			addDialog.setData(segmentPOI);
 			addDialog.setVisible(true);
@@ -489,13 +533,17 @@ public class OptimizeStopsDialog extends JDialog {
 	
 	
 	protected static class TriStateBooleanRenderer extends JCheckBox implements TableCellRenderer {
+		
+		static Color unselectedBackground;
+		
+		public TriStateBooleanRenderer() {
+		}
 
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//			this.setVisible(true);
-			this.setOpaque(false);
-//			this.setAlignmentX(CENTER_ALIGNMENT);
-//			this.setAlignmentY(CENTER_ALIGNMENT);
+			setOpaque(false);
+			//System.out.println(row + "," + column + " : " + isSelected + " " + table.getSelectionBackground() + "/"+ this.unselectedBackground);
+			//TODO this.setBackground( (hasFocus) ? table.getSelectionBackground() : this.unselectedBackground );
 			if (value == null) {
 				this.setEnabled(false);
 				this.setSelected(false);
@@ -504,6 +552,13 @@ public class OptimizeStopsDialog extends JDialog {
 				this.setSelected( (Boolean) value );
 			}
 			return this;
+		}
+
+		@Override
+		public void setBackground(Color color) {
+			super.setBackground(color);
+			if (unselectedBackground == null)
+				unselectedBackground = color;
 		}
 		
 	}

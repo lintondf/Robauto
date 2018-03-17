@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -19,7 +20,16 @@ import com.bluelightning.Here2;
 import com.bluelightning.Main;
 import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.Events.AddManualStopEvent;
+import com.bluelightning.poi.POI.FuelAvailable;
+import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POIResult;
+
+import seedu.addressbook.data.AddressBook;
+import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.place.ReadOnlyPlace;
+import seedu.addressbook.data.tag.Tag;
+import seedu.addressbook.data.tag.UniqueTagList;
+import seedu.addressbook.logic.Logic;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -120,10 +130,85 @@ public class AddManualStopDialog extends JDialog {
 		choiceTableModel.setData(data);
 	}
 	
+	protected class AddressPOI extends POIBase {
+		
+		public String address;
+		public ReadOnlyPlace place;
+		public FuelAvailable fuelAvailable = FuelAvailable.NO_FUEL;
+		
+		public AddressPOI(ReadOnlyPlace place) {
+			address = place.getAddress().toString();
+			this.place = place;
+			this.setLatitude(place.getLatitude());
+			this.setLongitude(place.getLongitude());
+			this.setName(place.getName().fullName);
+			try {
+				if (place.getTags().contains(new Tag("Gas")))
+					fuelAvailable = FuelAvailable.HAS_GAS;
+				if (place.getTags().contains(new Tag("Diesel")))
+					fuelAvailable = (fuelAvailable == FuelAvailable.HAS_GAS) ? FuelAvailable.HAS_BOTH : FuelAvailable.HAS_DIESEL;
+			} catch (IllegalValueException e) {
+			}
+		}
+
+		@Override
+		public String getAddress() {
+			return address;
+		}
+
+		@Override
+		public UniqueTagList getTags() {
+			return place.getTags();
+		}
+
+		@Override
+		public FuelAvailable getFuelAvailable() {
+			return fuelAvailable;
+		}
+		
+	}
+	
+	protected class AddAddressStopActionListener implements ActionListener {
+		
+		protected AddAddressDialog dialog;
+		
+		public AddAddressStopActionListener( AddAddressDialog dialog ) {
+			this.dialog = dialog;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			System.out.println("AASSA::action " + event);
+			switch (event.getActionCommand()) {
+			case "Cancel":
+				Main.logger.info("dispose() on Cancel");
+				dialog.dispose();
+				break;
+			case "OK":
+				ReadOnlyPlace place = null;
+				String address = (String) dialog.addressesModel.getValueAt( dialog.addressesTable.getSelectedRow(), 1);
+				List<ReadOnlyPlace> places = dialog.addressBook.getPlacesWithAddress(address);
+				if (places != null && !places.isEmpty()) {
+					place = places.get(0);
+					AddressPOI addressPOI = new AddressPOI(place);
+					Events.eventBus.post( new Events.AddAddressStopEvent(addressPOI) );
+				}
+				Main.logger.info("dispose() on OK");
+				dialog.dispose();
+				break;
+			case "Create":
+				dialog.createTag();
+				break;
+			}
+		}
+		
+	}
+	
 	/**
 	 * Create the dialog.
 	 */
-	public AddManualStopDialog() {
+	public AddManualStopDialog(Logic controller, AddressBook addressBook) {
+		setTitle("Add Stop");
 		choiceTableModel = new ChoiceTableModel();
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
@@ -139,6 +224,23 @@ public class AddManualStopDialog extends JDialog {
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			{
+				JButton btnAddFromAddressBook = new JButton("Add from Address Book");
+				btnAddFromAddressBook.setActionCommand("AddFromAddressBook");
+				buttonPane.add(btnAddFromAddressBook);
+				btnAddFromAddressBook.addActionListener( new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent event) {
+						AddAddressDialog dialog = new AddAddressDialog(controller, addressBook);
+						dialog.setListener( new AddAddressStopActionListener(dialog) );
+						dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+						dialog.setVisible(true);
+						AddManualStopDialog.this.dispose();
+					}
+					
+				});
+			}
 			{
 				JButton okButton = new JButton("OK");
 				okButton.setActionCommand("OK");
@@ -179,7 +281,7 @@ public class AddManualStopDialog extends JDialog {
 	 */
 	public static void main(String[] args) {
 		try {
-			AddManualStopDialog dialog = new AddManualStopDialog();
+			AddManualStopDialog dialog = new AddManualStopDialog(null, null);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {

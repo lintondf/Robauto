@@ -40,6 +40,7 @@ import com.bluelightning.gui.MainPanel;
 import com.bluelightning.gui.OptimizeStopsDialog;
 import com.bluelightning.gui.RoutePanel;
 import com.bluelightning.gui.WebBrowser;
+import com.bluelightning.gui.AddAddressDialog.AddAddressActionListener;
 import com.bluelightning.gui.OptimizeStopsDialog.OptimizeActionListener;
 import com.bluelightning.gui.OptimizeStopsDialog.OptimizeLegSelectionListener;
 import com.bluelightning.json.Route;
@@ -226,39 +227,42 @@ public class Main {
 				logger.info("  Route points saved");
 			}
 			map.clearRoute();
-			ArrayList<Integer> markers = new ArrayList<>();
-			markers.add( StopMarker.ORIGIN );
-			ArrayList<Route> days = new ArrayList<>();
-			for (TripPlan.TripLeg tripLeg : tripPlan.getTripLegs()) {
-				ArrayList<VisitedPlace> places = new ArrayList<>();
-				String[] fields = tripLeg.legData.startLabel.split("/");
-				if (fields.length < 2) {
-					Main.logger.error("Invalid VisitedPlace label: " + tripLeg.legData.startLabel);
-					return;
-				}
-				List<ReadOnlyPlace> startMatches = addressBook.getPlacesWithAddress(fields[1]);
-				if (startMatches.isEmpty()) {
-					Main.logger.error("No matching address book entry for: " + tripLeg.legData.startLabel);
-					return;
-				}
-				VisitedPlace start = new VisitedPlace( startMatches.get(0) );
-				places.add(start);
-				int refuel = 0;
-				for (TripPlan.StopData stopData : tripLeg.stopDataList) {
-					try {
-						places.add( new VisitedPlace(stopData) );
-						refuel = (stopData.refuel) ? StopMarker.FUEL : 0;
-						markers.add( StopMarker.DRIVERS + refuel );
-					} catch (IllegalValueException e) {
+			ArrayList<Route> days = tripPlan.getFinalizedDays();
+			ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
+			if (days.isEmpty()) {
+				markers.add( StopMarker.ORIGIN );
+				for (TripPlan.TripLeg tripLeg : tripPlan.getTripLegs()) {
+					ArrayList<VisitedPlace> places = new ArrayList<>();
+					String[] fields = tripLeg.legData.startLabel.split("/");
+					if (fields.length < 2) {
+						Main.logger.error("Invalid VisitedPlace label: " + tripLeg.legData.startLabel);
+						return;
 					}
-				} // for stopData
-				markers.set( markers.size()-1, StopMarker.OVERNIGHT + refuel);
-				places.forEach( place -> {
-					Main.logger.debug(place.toString());
-				});
-				days.add( Here2.computeRoute(places) );
-			} // tripLeg
-			markers.set( markers.size()-1, StopMarker.TERMINUS );
+					List<ReadOnlyPlace> startMatches = addressBook.getPlacesWithAddress(fields[1]);
+					if (startMatches.isEmpty()) {
+						Main.logger.error("No matching address book entry for: " + tripLeg.legData.startLabel);
+						return;
+					}
+					VisitedPlace start = new VisitedPlace( startMatches.get(0) );
+					places.add(start);
+					int refuel = 0;
+					for (TripPlan.StopData stopData : tripLeg.stopDataList) {
+						try {
+							places.add( new VisitedPlace(stopData) );
+							refuel = (stopData.refuel) ? StopMarker.FUEL : 0;
+							markers.add( StopMarker.DRIVERS + refuel );
+						} catch (IllegalValueException e) {
+						}
+					} // for stopData
+					markers.set( markers.size()-1, StopMarker.OVERNIGHT + refuel);
+					places.forEach( place -> {
+						Main.logger.debug(place.toString());
+					});
+					days.add( Here2.computeRoute(places) );
+				} // tripLeg
+				markers.set( markers.size()-1, StopMarker.TERMINUS );
+				tripPlan.setFinalizedRoute(days, markers);
+			}
 			waypoints = map.showRoute( days, markers );
 			int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 			mainPanel.getRightTabbedPane().setSelectedIndex(index);
@@ -295,7 +299,7 @@ public class Main {
 				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(tripPlan.getRoute(), 5e3));
 			});
 
-			OptimizeStops optimizeStops = new OptimizeStops(tripPlan, poiMap, nearbyMap);
+			OptimizeStops optimizeStops = new OptimizeStops(tripPlan, controller, addressBook, poiMap, nearbyMap);
 
 			dialog = new OptimizeStopsDialog(optimizeStops);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -361,6 +365,8 @@ public class Main {
 		private void routeAdd(boolean after) {
 			Events.eventBus.register(new CallbackHandler(after));
 			AddAddressDialog dialog = new AddAddressDialog(controller, addressBook);
+			AddAddressActionListener listener = dialog.new AddAddressActionListener();
+			dialog.setListener( listener );
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		}
@@ -580,13 +586,15 @@ public class Main {
 		logger.info("Loading previous trip plan");
 		tripPlan = TripPlan.load(tripPlanFile);
 		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
-		if (tripPlan.getRoute() != null) {
+		if (! tripPlan.getFinalizedDays().isEmpty()) {
+			Events.eventBus.post(new Events.UiEvent("ControlPanel.Finalize", null));
+		} else if (tripPlan.getRoute() != null) {
 			Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
-			Report report = tripPlan.getTripReport();
-			if (report != null) {
-				String html = report.toHtml();
-				resultsPane.setText(html);
-			}
+		}
+		Report report = tripPlan.getTripReport();
+		if (report != null) {
+			String html = report.toHtml();
+			resultsPane.setText(html);
 		}
 	}
 

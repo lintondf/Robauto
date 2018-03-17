@@ -51,12 +51,19 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	
 	protected List<TripPlan.LegSummary> legSummary;
 	
+	protected ArrayList<Route>    finalizedDays;
+	
+	protected ArrayList<Integer>  finalizedMarkers;
+
+	
 	public void debugClear() {
 		Main.logger.error("DEBUG CLEAR");
 		route = null;
 		tripLegs = new ArrayList<>();
 		legDataList = new ArrayList<>();
 		legSummary = new ArrayList<>();
+		finalizedDays = new ArrayList<>();
+		finalizedMarkers = new ArrayList<>();
 	}
 	
 
@@ -706,10 +713,6 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	}
 
 	
-	public static void main( String[] args) {
-		//message = message.replaceAll("[^a-zA-Z0-9]", "");
-	}
-
 	public void setTripLegs(ArrayList<TripLeg> tripLegs) {
 		this.tripLegs = tripLegs;
 	}
@@ -717,4 +720,22 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	public ArrayList<TripLeg> getTripLegs() {
 		return tripLegs;
 	}
+	
+	public void setFinalizedRoute( ArrayList<Route> days, ArrayList<Integer> markers ) {
+		this.finalizedDays = days;
+		this.finalizedMarkers = markers;
+	}
+
+	public ArrayList<Route> getFinalizedDays() {
+		if (finalizedDays == null)
+			finalizedDays = new ArrayList<>();
+		return finalizedDays;
+	}
+
+	public ArrayList<Integer> getFinalizedMarkers() {
+		if (finalizedMarkers == null)
+			finalizedMarkers = new ArrayList<>();
+		return finalizedMarkers;
+	}
+	
 }

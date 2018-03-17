@@ -38,6 +38,7 @@ public class POISet extends ArrayList<POI> {
 				result.distance = d;
 				result.index = i;
 				result.maneuver = null;
+				result.leg = null;
 				POIResult last = neighbors.get(p);
 				if (last != null) {
 					if (last.distance > result.distance) {
@@ -65,6 +66,7 @@ public class POISet extends ArrayList<POI> {
 				result.distance = d;
 				result.index = i;
 				result.maneuver = null;
+				result.leg = null;
 				POIResult last = neighbors.get(p);
 				if (last != null) {
 					if (last.distance > result.distance) {
@@ -96,6 +98,7 @@ public class POISet extends ArrayList<POI> {
 			for (POI poi : pList.keySet()) {
 				POIResult result = pList.get(poi);
 				result.maneuver = maneuver;
+				result.leg = leg;
 				result.legProgress = leg.getProgress(result);
 				result.totalProgress = legStart.plus(result.legProgress);
 				POIResult last = neighbors.get(maneuver);

@@ -16,6 +16,9 @@ import com.bluelightning.json.Route;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
 
+import seedu.addressbook.data.AddressBook;
+import seedu.addressbook.logic.Logic;
+
 /**
  * @author NOOK
  *
@@ -29,17 +32,10 @@ public class OptimizeStops {
 
 	protected Route route;
 	protected EnumMap<MarkerKinds, POISet> poiMap;
-	//protected List<TripPlan.LegSummary> legSummary;
 	protected TripPlan tripPlan;
+	public Logic controller;
+	public AddressBook addressBook;
 
-//	protected TripPlan.LegSummary getLegSummary(Leg leg) {
-//		for (TripPlan.LegSummary summary : legSummary) {
-//			if (summary.leg.hashCode() == leg.hashCode()) {
-//				return summary;
-//			}
-//		}
-//		return null;
-//	}
 	
 	public List<TripPlan.LegData> getUiLegData() {
 		return tripPlan.getTripLegData();
@@ -61,9 +57,11 @@ public class OptimizeStops {
 		return resultList;
 	}
 
-	public OptimizeStops(TripPlan tripPlan, EnumMap<MarkerKinds, POISet> poiMap,
+	public OptimizeStops(TripPlan tripPlan, Logic controller, AddressBook addressBook, EnumMap<MarkerKinds, POISet> poiMap,
 			EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap) {
 		this.tripPlan = tripPlan;
+		this.controller = controller;
+		this.addressBook = addressBook;
 		this.route = tripPlan.getRoute();
 		this.poiMap = poiMap;
 		ArrayList<POIResult> restAreas = nearbyMap.get(Main.MarkerKinds.RESTAREAS);
