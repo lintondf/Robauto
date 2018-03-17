@@ -246,12 +246,17 @@ public class Main {
 					VisitedPlace start = new VisitedPlace( startMatches.get(0) );
 					places.add(start);
 					int refuel = 0;
+					System.out.println(tripLeg.legData.startLabel);
+					tripLeg.stopDataList.forEach(System.out::println);
 					for (TripPlan.StopData stopData : tripLeg.stopDataList) {
-						try {
-							places.add( new VisitedPlace(stopData) );
-							refuel = (stopData.refuel) ? StopMarker.FUEL : 0;
-							markers.add( StopMarker.DRIVERS + refuel );
-						} catch (IllegalValueException e) {
+						if (stopData.use) {
+							try {
+								places.add( new VisitedPlace(stopData) );
+								refuel = (stopData.refuel) ? StopMarker.FUEL : 0;
+								markers.add( StopMarker.DRIVERS + refuel );
+							} catch (IllegalValueException e) {
+								e.printStackTrace();
+							}
 						}
 					} // for stopData
 					markers.set( markers.size()-1, StopMarker.OVERNIGHT + refuel);
@@ -271,6 +276,7 @@ public class Main {
 
 		private void route() {
 			logger.info("Planning route...");
+			tripPlan.setFinalizedRoute(null, null);
 			//tripPlan.debugClear();
 			if (tripPlan.getPlacesChanged()) {
 				tripPlan.setRoute(null);
@@ -291,6 +297,10 @@ public class Main {
 		}
 
 		private void optimizeStops() {
+			if (!tripPlan.getFinalizedDays().isEmpty()) {
+				waypoints = map.showRoute(tripPlan.getRoute());
+				tripPlan.setFinalizedRoute(null, null);
+			}
 			EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
 			EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
 			Main.loadPOIMap(poiMap);
@@ -459,7 +469,7 @@ public class Main {
 				}
 			}
 		}
-		return POI.FuelAvailable.NO_FUEL;
+		return new POI.FuelAvailable();
 	}
  
 	public class TextAreaAppender extends AppenderBase<ILoggingEvent> {

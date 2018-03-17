@@ -134,7 +134,7 @@ public class AddManualStopDialog extends JDialog {
 		
 		public String address;
 		public ReadOnlyPlace place;
-		public FuelAvailable fuelAvailable = FuelAvailable.NO_FUEL;
+		public FuelAvailable fuelAvailable = new FuelAvailable();
 		
 		public AddressPOI(ReadOnlyPlace place) {
 			address = place.getAddress().toString();
@@ -144,9 +144,9 @@ public class AddManualStopDialog extends JDialog {
 			this.setName(place.getName().fullName);
 			try {
 				if (place.getTags().contains(new Tag("Gas")))
-					fuelAvailable = FuelAvailable.HAS_GAS;
+					fuelAvailable.add(FuelAvailable.HAS_GAS);
 				if (place.getTags().contains(new Tag("Diesel")))
-					fuelAvailable = (fuelAvailable == FuelAvailable.HAS_GAS) ? FuelAvailable.HAS_BOTH : FuelAvailable.HAS_DIESEL;
+					fuelAvailable.add(FuelAvailable.HAS_DIESEL);
 			} catch (IllegalValueException e) {
 			}
 		}
@@ -197,7 +197,7 @@ public class AddManualStopDialog extends JDialog {
 				dialog.dispose();
 				break;
 			case "Create":
-				dialog.createTag();
+				dialog.createPlace();
 				break;
 			}
 		}

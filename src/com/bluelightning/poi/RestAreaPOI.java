@@ -7,6 +7,7 @@ import java.io.FileReader;
 
 import com.bluelightning.Here2;
 import com.bluelightning.LatLon;
+import com.bluelightning.poi.POI.FuelAvailable;
 import com.opencsv.CSVReader;
 
 import seedu.addressbook.data.exception.IllegalValueException;
@@ -121,6 +122,16 @@ public class RestAreaPOI extends POIBase {
 	}
 
 
+	@Override
+	public FuelAvailable getFuelAvailable() {
+		FuelAvailable fa = new FuelAvailable();
+		if (hasGas) 
+			fa.add( FuelAvailable.HAS_GAS );
+		if (hasDiesel)
+			fa.add( FuelAvailable.HAS_DIESEL );
+		return fa;
+	}
+	
 	public static POISet factory( String filePath ) {
 		POISet list = new POISet();
 		try {

@@ -1,6 +1,7 @@
 package com.bluelightning.poi;
 
 import java.awt.Image;
+import java.io.Serializable;
 import java.util.List;
 
 import org.gavaghan.geodesy.GlobalCoordinates;
@@ -28,7 +29,34 @@ public interface POI {
 	public String getAddress();
 	public UniqueTagList getTags();
 	
-	public enum  FuelAvailable {NO_FUEL, HAS_GAS, HAS_DIESEL, HAS_BOTH};
+	public static class FuelAvailable implements Serializable {
+		private static final long serialVersionUID = 1L;
+		
+		public static final int NO_FUEL = 0x0;
+		public static final int HAS_GAS = 0x1;
+		public static final int HAS_DIESEL = 0x2;
+		public static final int HAS_BOTH = 0x3;
+		
+		private int value = NO_FUEL;
+		
+		public int get() { return value; }
+		
+		public FuelAvailable set(int value) {
+			this.value = value;
+			return this;
+		}
+		
+		public FuelAvailable add(int value) {
+			this.value |= value;
+			return this;
+		}
+		
+		public Boolean has( int mask ) {
+			return (value & mask) == mask;
+		}
+	}
+	
+	//public enum  FuelAvailable {NO_FUEL, HAS_GAS, HAS_DIESEL, HAS_BOTH};
 	public FuelAvailable getFuelAvailable();
 	
 }

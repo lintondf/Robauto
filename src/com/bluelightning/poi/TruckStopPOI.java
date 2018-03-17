@@ -161,7 +161,7 @@ public class TruckStopPOI extends POIBase {
 
 	@Override
 	public FuelAvailable getFuelAvailable() {
-		return FuelAvailable.HAS_BOTH;
+		return new FuelAvailable().set(FuelAvailable.HAS_BOTH);
 	}
 	
 	public static POISet factory(String filePath) {

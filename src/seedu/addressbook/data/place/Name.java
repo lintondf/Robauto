@@ -13,8 +13,8 @@ import java.util.List;
 public class Name implements Serializable {
 
     public static final String EXAMPLE = "John Doe";
-    public static final String MESSAGE_NAME_CONSTRAINTS = "Person names should be spaces or alphanumeric characters";
-    public static final String NAME_VALIDATION_REGEX = "[\\p{Alnum} ]+";
+    //public static final String MESSAGE_NAME_CONSTRAINTS = "Person names should be spaces or alphanumeric characters";
+    //public static final String NAME_VALIDATION_REGEX = "[\\p{Alnum} ]+";
 
     public final String fullName;
 
@@ -25,9 +25,9 @@ public class Name implements Serializable {
      */
     public Name(String name) throws IllegalValueException {
         name = name.trim();
-        if (!isValidName(name)) {
-            throw new IllegalValueException(MESSAGE_NAME_CONSTRAINTS);
-        }
+//        if (!isValidName(name)) {
+//            throw new IllegalValueException(MESSAGE_NAME_CONSTRAINTS);
+//        }
         this.fullName = name;
     }
 
@@ -35,12 +35,12 @@ public class Name implements Serializable {
     	fullName = "";
 	}
 
-	/**
-     * Returns true if a given string is a valid person name.
-     */
-    public static boolean isValidName(String test) {
-        return test.matches(NAME_VALIDATION_REGEX);
-    }
+//	/**
+//     * Returns true if a given string is a valid person name.
+//     */
+//    public static boolean isValidName(String test) {
+//        return test.matches(NAME_VALIDATION_REGEX);
+//    }
 
     /**
      * Retrieves a listing of every word in the name, in order.

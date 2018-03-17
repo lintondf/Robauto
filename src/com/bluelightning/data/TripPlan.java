@@ -205,7 +205,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			this.trafficTime = result.legProgress.trafficTime;
 			this.totalDistance = result.totalProgress.distance;
 			this.fuelAvailable = POIBase.toFuelString( result.poi.getFuelAvailable() );
-			this.refuel = result.poi.getFuelAvailable() == POI.FuelAvailable.HAS_GAS || result.poi.getFuelAvailable() == POI.FuelAvailable.HAS_BOTH;
+			this.refuel = result.poi.getFuelAvailable().has( POI.FuelAvailable.HAS_GAS );
 			if (result.poi instanceof RestAreaPOI) {
 				RestAreaPOI restArea = (RestAreaPOI) result.poi;
 				this.direction = restArea.getDirection();
@@ -404,8 +404,10 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	}
 	
 	public Report getTripReport() {
-		Iterator<TripPlan.LegData> it = legDataList.iterator();
 		Report report = new Report();
+		if (legDataList == null || legDataList.isEmpty())
+			return report;
+		Iterator<TripPlan.LegData> it = legDataList.iterator();
 		for (TripLeg leg : tripLegs) {
 			leg.legData = it.next();
 			report.add( TripPlan.N_DRIVERS, leg.legData, leg.driverAssignments );

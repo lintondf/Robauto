@@ -136,7 +136,7 @@ public class AddAddressDialog extends JDialog {
 		
 	}
 	
-	public void createTag() {
+	public void createPlace() {
 		try {
 			Place p = new Place();
 			p.setName( new Name( nameField.getText()) );
@@ -183,7 +183,7 @@ public class AddAddressDialog extends JDialog {
 				AddAddressDialog.this.dispose();
 				break;
 			case "Create":
-				createTag();
+				createPlace();
 				break;
 			}
 		}

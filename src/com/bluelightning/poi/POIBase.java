@@ -53,25 +53,26 @@ public abstract class POIBase implements POI, Serializable {
 
 	public static String toFuelString(POI.FuelAvailable fa) {
 		if (fa != null)
-			switch (fa) {
-			case NO_FUEL:
+			switch (fa.get()) {
+			case POI.FuelAvailable.NO_FUEL:
 				return "None";
-			case HAS_BOTH:
+			case POI.FuelAvailable.HAS_BOTH:
 				return "Both";
-			case HAS_GAS:
+			case POI.FuelAvailable.HAS_GAS:
 				return "Gas";
-			case HAS_DIESEL:
+			case POI.FuelAvailable.HAS_DIESEL:
 				return "Diesel";
 			}
 		return "None";
 	}
 	
 	public static POI.FuelAvailable fromFuelString(String fa ) {
+		POI.FuelAvailable out = new POI.FuelAvailable();
 		switch (fa.toUpperCase()) {
-		case "BOTH": return POI.FuelAvailable.HAS_BOTH;
-		case "GAS": return POI.FuelAvailable.HAS_GAS;
-		case "DIESEL": return POI.FuelAvailable.HAS_DIESEL;
-		default: return POI.FuelAvailable.NO_FUEL;
+		case "BOTH": return out.set(POI.FuelAvailable.HAS_BOTH);
+		case "GAS": return out.set(POI.FuelAvailable.HAS_GAS);
+		case "DIESEL": return out.set(POI.FuelAvailable.HAS_DIESEL);
+		default: return out.set(POI.FuelAvailable.NO_FUEL);
 		}
 	}
 
@@ -79,17 +80,17 @@ public abstract class POIBase implements POI, Serializable {
 		UniqueTagList tagList = new UniqueTagList();
 		try {
 			if (fa != null)
-				switch (fa) {
-				case NO_FUEL:
+				switch (fa.get()) {
+				case POI.FuelAvailable.NO_FUEL:
 					break;
-				case HAS_BOTH:
+				case POI.FuelAvailable.HAS_BOTH:
 					tagList.add(new Tag("Diesel"));
 					tagList.add(new Tag("Gas"));
 					break;
-				case HAS_GAS:
+				case POI.FuelAvailable.HAS_GAS:
 					tagList.add(new Tag("Gas"));
 					break;
-				case HAS_DIESEL:
+				case POI.FuelAvailable.HAS_DIESEL:
 					tagList.add(new Tag("Diesel"));
 					break;
 				}
@@ -255,6 +256,6 @@ public abstract class POIBase implements POI, Serializable {
 
 	@Override
 	public FuelAvailable getFuelAvailable() {
-		return FuelAvailable.NO_FUEL;
+		return new FuelAvailable().set(FuelAvailable.NO_FUEL);
 	}
 }

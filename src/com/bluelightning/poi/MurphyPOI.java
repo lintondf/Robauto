@@ -192,13 +192,12 @@ public class MurphyPOI extends POIBase {
 
 	@Override
 	public FuelAvailable getFuelAvailable() {
-		if (hasGas && hasDiesel) 
-			return FuelAvailable.HAS_BOTH;
-		else if (hasDiesel)
-			return FuelAvailable.HAS_DIESEL;
-		else if (hasGas)
-			return FuelAvailable.HAS_GAS;
-		return FuelAvailable.NO_FUEL;
+		FuelAvailable fa = new FuelAvailable();
+		if (hasGas) 
+			fa.add( FuelAvailable.HAS_GAS );
+		if (hasDiesel)
+			fa.add( FuelAvailable.HAS_DIESEL );
+		return fa;
 	}
 	
 	public static void main(String[] args) {

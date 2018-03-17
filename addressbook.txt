@@ -79,7 +79,7 @@
         <longitude>-78.849603</longitude>
     </persons>
     <persons>
-        <name>mobile</name>
+        <name>Mobile</name>
         <address>360 MacArthur Blvd, Buzzards Bay, MA </address>
         <latitude>41.7171837</latitude>
         <longitude>-70.5839532</longitude>

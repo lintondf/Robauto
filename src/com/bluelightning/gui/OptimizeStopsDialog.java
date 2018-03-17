@@ -115,6 +115,8 @@ public class OptimizeStopsDialog extends JDialog {
 	protected ArrayList<TripPlan.DriverAssignments> presentedChoices;
 
 	protected JTabbedPane tabbedPane;
+
+	protected JButton removeButton;
 	
 	public class CallbackHandler {
 		
@@ -139,8 +141,10 @@ public class OptimizeStopsDialog extends JDialog {
 					ArrayList<TripPlan.StopData> dataList = stopsTableModel.getData();
 					if (addBefore) {
 						dataList.add(iRow, data);
+						stopsTableModel.fireTableRowsInserted(iRow, iRow);
 					} else {
 						dataList.add(iRow+1, data);
+						stopsTableModel.fireTableRowsInserted(iRow+1, iRow+1);
 					}
 					stopsTableModel.setData(dataList);
 					OptimizeStopsDialog.this.optimizeStops.getTripPlan().getTripLeg(currentLeg).stopDataList = dataList;
@@ -217,6 +221,17 @@ public class OptimizeStopsDialog extends JDialog {
 		startAddDialog( handler, distance0, distance1 );
 	}
 	
+	protected void remove() {
+		int selected = stopsTable.getSelectedRow();
+		if (selected < 0)
+			return;
+		stopsTableModel.getData().remove(selected);
+		stopsTableModel.fireTableRowsDeleted(selected, selected);
+		OptimizeStopsDialog.this.optimizeStops.getTripPlan().getTripLeg(currentLeg).stopDataList = stopsTableModel.getData();
+		generateLegStopChoices();
+
+	}
+	
 	protected void startAddDialog(CallbackHandler handler, double distance0, double distance1) {
 			ArrayList<POIResult> segmentPOI = optimizeStops.getRouteSegmentPOI(distance0, distance1);
 			AddManualStopDialog addDialog = new AddManualStopDialog( optimizeStops.controller, optimizeStops.addressBook);
@@ -286,6 +301,9 @@ public class OptimizeStopsDialog extends JDialog {
 				}
 				Main.logger.info("dispose() on OSD Cancel");
 				OptimizeStopsDialog.this.dispose();
+				break;
+			case "Remove":
+				remove();
 				break;
 			case "Add Before":
 				addBefore();
@@ -377,7 +395,7 @@ public class OptimizeStopsDialog extends JDialog {
 		chooseButton.addActionListener(optimizeActionListener);
 		addAfterButton.addActionListener(optimizeActionListener);
 		addBeforeButton.addActionListener(optimizeActionListener);
-		
+		removeButton.addActionListener(optimizeActionListener);
 		legTable.getSelectionModel().addListSelectionListener(optimizeLegSelectionListener);
 		roadsTable.getModel().addTableModelListener(optimizeRoadModelListener);
 		
@@ -820,6 +838,11 @@ public class OptimizeStopsDialog extends JDialog {
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			{
+				removeButton = new JButton("Remove");
+				removeButton.setActionCommand("Remove");
+				buttonPane.add(removeButton);
+			}
 			{
 				addBeforeButton = new JButton("Add Before");
 				addBeforeButton.setActionCommand("Add Before");
