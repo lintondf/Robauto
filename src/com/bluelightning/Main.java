@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map.Entry;
+
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -43,6 +45,8 @@ import com.bluelightning.gui.WebBrowser;
 import com.bluelightning.gui.AddAddressDialog.AddAddressActionListener;
 import com.bluelightning.gui.OptimizeStopsDialog.OptimizeActionListener;
 import com.bluelightning.gui.OptimizeStopsDialog.OptimizeLegSelectionListener;
+import com.bluelightning.json.Leg;
+import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.POIMarker;
@@ -55,6 +59,7 @@ import com.bluelightning.poi.RestAreaPOI;
 import com.bluelightning.poi.SamsClubPOI;
 import com.bluelightning.poi.TruckStopPOI;
 import com.bluelightning.poi.WalmartPOI;
+import com.bluelightning.poi.POI.FuelAvailable;
 import com.google.common.eventbus.Subscribe;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -214,6 +219,20 @@ public class Main {
 				map.updateWaypoints(nearby);
 				break;
 
+			case "ControlPanel.CoPilotOutput":
+				if (! tripPlan.getFinalizedPlaces().isEmpty()) {
+					outputToCopilot( tripPlan.getFinalizedPlaces() );
+				}
+				break;
+				
+			case "ControlPanel.ClearActions":
+				System.out.println(event.source + " " + event.awtEvent);
+				JComboBox box = (JComboBox) event.awtEvent.getSource();
+				String action = (String) box.getSelectedItem();
+				System.out.println( action );
+				tripPlan.clear( action );
+				break;
+				
 			default:
 				break;
 			}
@@ -230,6 +249,7 @@ public class Main {
 			ArrayList<Route> days = tripPlan.getFinalizedDays();
 			ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
 			if (days.isEmpty()) {
+				ArrayList< ArrayList< VisitedPlace > > allPlaces = new ArrayList<>();
 				markers.add( StopMarker.ORIGIN );
 				for (TripPlan.TripLeg tripLeg : tripPlan.getTripLegs()) {
 					ArrayList<VisitedPlace> places = new ArrayList<>();
@@ -260,13 +280,14 @@ public class Main {
 						}
 					} // for stopData
 					markers.set( markers.size()-1, StopMarker.OVERNIGHT + refuel);
-					places.forEach( place -> {
-						Main.logger.debug(place.toString());
-					});
+//					places.forEach( place -> {
+//						Main.logger.debug(place.toString());
+//					});
 					days.add( Here2.computeRoute(places) );
+					allPlaces.add( places );
 				} // tripLeg
 				markers.set( markers.size()-1, StopMarker.TERMINUS );
-				tripPlan.setFinalizedRoute(days, markers);
+				tripPlan.setFinalizedRoute(days, markers, allPlaces);
 			}
 			waypoints = map.showRoute( days, markers );
 			int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
@@ -276,8 +297,7 @@ public class Main {
 
 		private void route() {
 			logger.info("Planning route...");
-			tripPlan.setFinalizedRoute(null, null);
-			//tripPlan.debugClear();
+			tripPlan.setFinalizedRoute(null, null, null);
 			if (tripPlan.getPlacesChanged()) {
 				tripPlan.setRoute(null);
 				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
@@ -299,14 +319,14 @@ public class Main {
 		private void optimizeStops() {
 			if (!tripPlan.getFinalizedDays().isEmpty()) {
 				waypoints = map.showRoute(tripPlan.getRoute());
-				tripPlan.setFinalizedRoute(null, null);
+				tripPlan.setFinalizedRoute(null, null, null);
 			}
 			EnumMap<Main.MarkerKinds, POISet> poiMap = new EnumMap<>(Main.MarkerKinds.class);
 			EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
 			Main.loadPOIMap(poiMap);
 			nearbyMap.clear();
 			poiMap.forEach((kind, set) -> {
-				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(tripPlan.getRoute(), 5e3));
+				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(tripPlan.getRoute(), 2e3));
 			});
 
 			OptimizeStops optimizeStops = new OptimizeStops(tripPlan, controller, addressBook, poiMap, nearbyMap);
@@ -354,7 +374,8 @@ public class Main {
 					public void run() {
 						int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
 						VisitedPlace place = new VisitedPlace(event.place);
-						place.setFuelAvailable( getNearByFuel(place.getLatitude(), place.getLongitude(), 1e3) );
+						if (place.getFuelAvailable().get() == FuelAvailable.NO_FUEL)
+							place.setFuelAvailable( getNearByFuel(place.getLatitude(), place.getLongitude(), 2e3) );
 						ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
 						if (places == null)
 							places = new ArrayList<>();
@@ -566,6 +587,7 @@ public class Main {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		browserCanvas.initialize(frame);
+		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
 		// logging to text area can start once frame is visible
 		rootLogger.addAppender(textAreaAppender);
@@ -598,6 +620,7 @@ public class Main {
 		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
 		if (! tripPlan.getFinalizedDays().isEmpty()) {
 			Events.eventBus.post(new Events.UiEvent("ControlPanel.Finalize", null));
+			reportDetails( tripPlan.getFinalizedDays() );
 		} else if (tripPlan.getRoute() != null) {
 			Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
 		}
@@ -606,7 +629,57 @@ public class Main {
 			String html = report.toHtml();
 			resultsPane.setText(html);
 		}
+		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
+
+	private void outputToCopilot(ArrayList<ArrayList<VisitedPlace>> finalizedPlaces) {
+		CoPilot13Format format = new CoPilot13Format();
+		int iDay = 1;
+		for (ArrayList<VisitedPlace> dayStops : finalizedPlaces) {
+			try {
+				String title = String.format("Day-%02d", iDay++);
+				String opath = String.format("\\\\Surfacepro3\\na\\save\\%s.trp", title);
+			    PrintWriter stream = new PrintWriter(opath, CoPilot13Format.UTF16LE_ENCODING);
+	//			PrintWriter stream = new PrintWriter(System.out);
+				format.write(title, dayStops, stream, 0, dayStops.size() );
+				stream.close();
+			} catch (Exception x) {
+				Main.logger.error("Failed to write CoPilot file: ", x );
+				x.printStackTrace();
+			}
+		}
+	}
+
+
+	private void reportDetails(ArrayList<Route> finalizedDays) {
+		int iDay = 1;
+		for(Route dayRoute : finalizedDays) {
+			System.out.printf("Day %d\n", iDay);
+			iDay++;
+			double dayTime = 0.0;
+			double dayDistance = 0.0;
+			for (Leg leg : dayRoute.getLeg()) {
+				System.out.printf("  Leg from %s to %s\n", leg.getStart().getUserLabel(), leg.getEnd().getUserLabel() );
+				double legTime = 0.0;
+				double legDistance = 0.0;
+				for (Maneuver maneuver : leg.getManeuver()) {
+					dayTime += maneuver.getTrafficTime();
+					dayDistance += maneuver.getLength();
+					legTime += maneuver.getTrafficTime();
+					legDistance += maneuver.getLength();
+					System.out.printf("    %6.1f %-6s  %6.1f %-6s %6.1f %-6s: %s\n", 
+							dayDistance*Here2.METERS_TO_MILES,
+							Here2.toPeriod(dayTime),
+							legDistance*Here2.METERS_TO_MILES, 
+							Here2.toPeriod(legTime), 
+							maneuver.getLength()*Here2.METERS_TO_MILES, 
+							Here2.toPeriod(maneuver.getTrafficTime()), 
+							maneuver.getInstruction() );
+				}
+			}
+		}
+	}
+
 
 	public static void main(String[] args) {
 		Main main = new Main();

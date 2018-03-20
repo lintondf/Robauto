@@ -21,6 +21,7 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 	double  fuel;            // amount to purchase in gallons; zero if none
 	
 	public VisitedPlace() {
+		super();
 	}
 
 	public VisitedPlace(ReadOnlyPlace source) {

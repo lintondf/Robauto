@@ -5,6 +5,7 @@
         <address>15 Mill Creek Circle, Pooler, GA</address>
         <latitude>32.13932</latitude>
         <longitude>-81.24487</longitude>
+        <tagged>Gas</tagged>
     </persons>
     <persons>
         <name>Grandfather Campground</name>
@@ -59,6 +60,7 @@
         <address>2110 Bells Hwy, Walterboro, SC 29488</address>
         <latitude>32.9324299</latitude>
         <longitude>-80.6945099</longitude>
+        <tagged>Gas</tagged>
     </persons>
     <persons>
         <name>Shell Point</name>
@@ -79,15 +81,24 @@
         <longitude>-78.849603</longitude>
     </persons>
     <persons>
-        <name>Mobile</name>
-        <address>360 MacArthur Blvd, Buzzards Bay, MA </address>
-        <latitude>41.7171837</latitude>
-        <longitude>-70.5839532</longitude>
-    </persons>
-    <persons>
         <name>Walmart</name>
         <address>461 W Reservoir Rd, Woodstock, VA 22664</address>
         <latitude>38.8723699</latitude>
         <longitude>-78.53022</longitude>
     </persons>
+    <persons>
+        <name>Mobile</name>
+        <address>360 MacArthur Blvd, Buzzards Bay, MA</address>
+        <latitude>41.7171837</latitude>
+        <longitude>-70.5839532</longitude>
+        <tagged>Gas</tagged>
+    </persons>
+    <persons>
+        <name>Exxon</name>
+        <address>446 W Reservoir Rd, Woodstock, VA 22664</address>
+        <latitude>38.87228</latitude>
+        <longitude>-78.52915</longitude>
+        <tagged>Gas</tagged>
+    </persons>
+    <tags>Gas</tags>
 </AddressBook>

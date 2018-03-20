@@ -15,8 +15,11 @@ import javax.swing.JCheckBox;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.EnumMap;
 import java.awt.GridLayout;
+import javax.swing.JComboBox;
 
 public class MainControlPanel extends JPanel {
 
@@ -167,12 +170,42 @@ public class MainControlPanel extends JPanel {
 		gbc_btnFinalizeRoute.gridx = 0;
 		gbc_btnFinalizeRoute.gridy = 3;
 		add(btnFinalizeRoute, gbc_btnFinalizeRoute);
-		add(btnFirebug, gbc_btnFirebug);
 		btnFinalizeRoute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.Finalize", event));
 			}
 		});
+		
+		JButton btnCopilotOutput = new JButton("CoPilot Output");
+		GridBagConstraints gbc_btnCopilotOutput = new GridBagConstraints();
+		gbc_btnCopilotOutput.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnCopilotOutput.insets = new Insets(0, 0, 5, 0);
+		gbc_btnCopilotOutput.gridx = 0;
+		gbc_btnCopilotOutput.gridy = 4;
+		add(btnCopilotOutput, gbc_btnCopilotOutput);
+		btnCopilotOutput.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.CoPilotOutput", event));
+			}
+		});
+		
+		
+		String[] actions = {"Normal", "Clear Route", "Clear Places"};
+		JComboBox clearActionsBox = new JComboBox(actions);
+		GridBagConstraints gbc_clearActionsBox = new GridBagConstraints();
+		gbc_clearActionsBox.insets = new Insets(0, 0, 5, 0);
+		gbc_clearActionsBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_clearActionsBox.gridx = 0;
+		gbc_clearActionsBox.gridy = 5;
+		add(clearActionsBox, gbc_clearActionsBox);
+		clearActionsBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.ClearActions", event));
+			}
+		});
+		
+		
+		add(btnFirebug, gbc_btnFirebug);
 
 	}
 

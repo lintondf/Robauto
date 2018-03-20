@@ -10,7 +10,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jxmapviewer.viewer.GeoPosition;
+import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.place.Address;
+import seedu.addressbook.data.place.Name;
+import seedu.addressbook.data.place.VisitedPlace;
+import seedu.addressbook.data.tag.UniqueTagList;
+
+//import org.jxmapviewer.viewer.VisitedPlace;
 
 /*
  * Based on https://github.com/cpesch/RouteConverter
@@ -34,6 +40,7 @@ public class CoPilot13Format  {
     protected static final Pattern NAME_VALUE_PATTERN = Pattern.compile("(.+?)" + NAME_VALUE_SEPARATOR + "(.+|)");
     protected static final double INTEGER_FACTOR = 1000000.0;
 
+    private static final String NAME = "Name";
     private static final String CREATOR = "Creator";
     private static final String LONGITUDE = "Longitude";
     private static final String LATITUDE = "Latitude";
@@ -108,7 +115,7 @@ public class CoPilot13Format  {
 //        write(route, target, UTF16LE_ENCODING, startIndex, endIndex);
 //    }
 
-    public void write(String routeName, List<GeoPosition> positions, PrintWriter writer, int startIndex, int endIndex) {
+    public void write(String routeName, List<VisitedPlace> positions, PrintWriter writer, int startIndex, int endIndex) {
         // with UTF-16LE no BOM is written, UnicodeLittle would write one by is not supported
         // (see http://java.sun.com/j2se/1.4.2/docs/guide/intl/encoding.doc.html)
         // but the fix from http://mindprod.com/jgloss/encoding.html helped me
@@ -125,11 +132,11 @@ public class CoPilot13Format  {
 //    public BaseNavigationPosition getDuplicateFirstPosition(BaseRoute<BaseNavigationPosition, BaseNavigationFormat> route) {
 //        List<BaseNavigationPosition> positions = route.getPositions();
 //        NavigationPosition first = positions.get(0);
-//        return asGeoPosition(first.getLongitude(), first.getLatitude(), "Start:" + first.getDescription());
+//        return asVisitedPlace(first.getLongitude(), first.getLatitude(), "Start:" + first.getDescription());
 //    }
 
-    public List<GeoPosition> read(BufferedReader reader) throws IOException {
-        List<GeoPosition> positions = new ArrayList<>();
+    public List<VisitedPlace> read(BufferedReader reader) throws IOException {
+        List<VisitedPlace> positions = new ArrayList<>();
         
         Map<String, String> map = null;
         String routeName = null;
@@ -154,7 +161,7 @@ public class CoPilot13Format  {
             } else if (line.startsWith(START_STOP) || line.startsWith(START_STOP_OPT)) {
                 map = new HashMap<>();
             } else if (line.startsWith(END_STOP)) {
-                GeoPosition position = parsePosition(map);
+                VisitedPlace position = parsePosition(map);
                 positions.add(position);
             } else if (isNameValue(line)) {
                 String name = parseName(line);
@@ -189,21 +196,36 @@ public class CoPilot13Format  {
             throw new IllegalArgumentException("'" + line + "' does not match");
         return matcher.group(2);
     }
-
-    GeoPosition parsePosition(Map<String, String> map) {
+    
+    public static String safeTrim(String in) {
+    	if (in == null)
+    		return "";
+    	return trim(in);
+    }
+ 
+    VisitedPlace parsePosition(Map<String, String> map) {
+        String name = safeTrim(map.get(NAME));
         Integer latitude = parseInteger(map.get(LATITUDE));
         Integer longitude = parseInteger(map.get(LONGITUDE));
-        String state = trim(map.get(STATE));
-        String zip = trim(map.get(ZIP));
-        String city = trim(map.get(CITY));
-        String county = trim(map.get(COUNTY));
-        String address = trim(map.get(ADDRESS));
+        String state = safeTrim(map.get(STATE));
+        String zip = safeTrim(map.get(ZIP));
+        String city = safeTrim(map.get(CITY));
+        String county = safeTrim(map.get(COUNTY));
+        String streetAddress = safeTrim(map.get(ADDRESS));
+        String address = String.format("%s, %s, %s, %s", streetAddress, city, state, zip );
         String description = (state != null ? state + (zip != null ? "-" : " ") : "") +
                 (zip != null ? zip + " " : "") + (city != null ? city : "") +
-                (county != null ? ", " + county : "") + (address != null ? ", " + address : "");
-        return new GeoPosition( 
-                latitude / INTEGER_FACTOR,
-        		longitude / INTEGER_FACTOR);
+                (county != null ? ", " + county : "") + (streetAddress != null ? ", " + streetAddress : "");
+        VisitedPlace place = new VisitedPlace();
+        try {
+			place.setName( new Name(name) );
+			place.setAddress(new Address(address) );
+			place.setTags(new UniqueTagList());
+		} catch (IllegalValueException e) {
+		}
+        place.setLatitude( latitude / INTEGER_FACTOR );
+        place.setLongitude( longitude / INTEGER_FACTOR );
+        return place;
     }
     
     protected String GENERATED_BY = "Robauto";
@@ -218,40 +240,30 @@ public class CoPilot13Format  {
         writer.println();
     }
 
-    protected void writePositions(List<GeoPosition> positions, PrintWriter writer, int startIndex, int endIndex) {
+    protected void writePositions(List<VisitedPlace> positions, PrintWriter writer, int startIndex, int endIndex) {
         for (int i = startIndex; i < endIndex; i++) {
-            GeoPosition position = positions.get(i);
+            VisitedPlace position = positions.get(i);
             writer.println(START_STOP + NAME_VALUE_SEPARATOR + STOP + " " + i);
             String longitude = formatIntAsString((int) (position.getLongitude() * INTEGER_FACTOR));
             writer.println(LONGITUDE + NAME_VALUE_SEPARATOR + longitude);
             String latitude = formatIntAsString((int) (position.getLatitude() * INTEGER_FACTOR));
             writer.println(LATITUDE + NAME_VALUE_SEPARATOR + latitude);
-
-            // TODO write decomposed description
-            // Name=
-            // Address=11 Veilchenstrasse
-            // City=Gladbeck
-            // State=DE
-            // County=Recklinghausen
-            // Zip=47853
-
-//            String description = position.getDescription();
-//            int index = description.indexOf(',');
-//            String city = index != -1 ? description.substring(0, index) : description;
-//            city = trim(city);
-//            String address = index != -1 ? description.substring(index + 1) : description;
-//            address = trim(address);
-//            boolean first = i == startIndex;
-//            boolean last = i == endIndex - 1;
-//
-//            // only store address if there was a comma in the description
-//            writer.println(ADDRESS + NAME_VALUE_SEPARATOR + (index != -1 ? address : ""));
-//            // otherwise store description als city
-//            writer.println(CITY + NAME_VALUE_SEPARATOR + city);
-//            if (first || last /* TODO || preferences.getBoolean("writeTargets", false)*/)
-//                writer.println(SHOW + NAME_VALUE_SEPARATOR + "1"); // Target/Stop target
-//            else
-                writer.println(SHOW + NAME_VALUE_SEPARATOR + "1"); // Waypoint TODO
+            String name = position.getName().fullName;
+            writer.println(NAME + NAME_VALUE_SEPARATOR + name);
+            String[] address = position.getAddress().toString().split(",");
+            if (address.length > 0) {
+                writer.println(ADDRESS + NAME_VALUE_SEPARATOR + address[0]);
+            	if (address.length > 1) {
+                    writer.println(CITY + NAME_VALUE_SEPARATOR + address[1]);
+            		if (address.length > 2) {
+                        writer.println(STATE + NAME_VALUE_SEPARATOR + address[2]);
+            			if (address.length > 3) {
+                            writer.println(ZIP + NAME_VALUE_SEPARATOR + address[3]);            				
+            			}
+            		}
+            	}
+            }
+            writer.println(SHOW + NAME_VALUE_SEPARATOR + "1"); // Waypoint TODO
             writer.println(SEQUENCE + NAME_VALUE_SEPARATOR + i);
             writer.println(END_STOP);
             writer.println();

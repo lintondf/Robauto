@@ -31,7 +31,7 @@ public class OptimizeStops {
 	protected double nDrivers = 2;
 
 	protected Route route;
-	protected EnumMap<MarkerKinds, POISet> poiMap;
+	public EnumMap<MarkerKinds, POISet> poiMap;
 	protected TripPlan tripPlan;
 	public Logic controller;
 	public AddressBook addressBook;
@@ -45,7 +45,7 @@ public class OptimizeStops {
 		Main.logger.debug( String.format("gRSP %f %f", start, finish) );
 		ArrayList<POIResult> resultList = new ArrayList<>();
 		poiMap.forEach((kind, pset) -> {
-			resultList.addAll(pset.getPointsOfInterestAlongRoute(route, 5e3));
+			resultList.addAll(pset.getPointsOfInterestAlongRoute(route, 500));
 		});
 		Iterator<POIResult> it = resultList.iterator();
 		while (it.hasNext()) {

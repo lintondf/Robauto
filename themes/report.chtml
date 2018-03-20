@@ -82,6 +82,13 @@
 				<td class="step-field" style="text-align:center"></td>
 			</tr>
 {#}
+{#turnByTurnDay}
+<div style="page-break-after: always;">
+	<h1>{$dayTitle}</h1>
+	<table>
+		{$legs}
+	</table>
+</div>
 {#kml}
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
