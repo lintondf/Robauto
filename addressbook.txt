@@ -100,5 +100,11 @@
         <longitude>-78.52915</longitude>
         <tagged>Gas</tagged>
     </persons>
+    <persons>
+        <name>Riverwalk</name>
+        <address>2118, 201 SW St Lucie Ave, Stuart, FL 34994</address>
+        <latitude>27.20005</latitude>
+        <longitude>-80.2544099</longitude>
+    </persons>
     <tags>Gas</tags>
 </AddressBook>

@@ -103,6 +103,8 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 	}
 
 	public POI.FuelAvailable getFuelAvailable() {
+		if (fuelAvailable == null)
+			fuelAvailable = new POI.FuelAvailable();
 		return fuelAvailable;
 	}
 

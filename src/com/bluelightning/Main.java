@@ -1,9 +1,12 @@
 package com.bluelightning;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -14,6 +17,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map.Entry;
 
+import javax.imageio.ImageIO;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -76,7 +80,7 @@ import seedu.addressbook.logic.Logic;
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
 
 public class Main {
-	
+
 	protected static final String INITIAL_RESULTS_TEXT = "<html><center>Run Optimize Stops to populate this panel</center></html>";
 
 	protected File tripPlanFile = new File("RobautoTripPlan.obj");
@@ -90,7 +94,7 @@ public class Main {
 	protected EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
 	protected ArrayList<ButtonWaypoint> nearby = new ArrayList<>();
 	protected MainPanel mainPanel;
-	protected WebBrowser browserCanvas;
+	// protected WebBrowser browserCanvas;
 	protected Logic controller;
 	protected AddressBook addressBook;
 	public static Logger logger;
@@ -100,9 +104,11 @@ public class Main {
 		@Subscribe
 		protected void handle(POIClickEvent event) {
 			System.out.println(event.toString());
-			browserCanvas.moveTo(event.poi.getLatitude(), event.poi.getLongitude());
-			int index = mainPanel.getRightTabbedPane().indexOfTab("AllStays");
-			mainPanel.getRightTabbedPane().setSelectedIndex(index);
+			// browserCanvas.moveTo(event.poi.getLatitude(),
+			// event.poi.getLongitude());
+			// int index =
+			// mainPanel.getRightTabbedPane().indexOfTab("AllStays");
+			// mainPanel.getRightTabbedPane().setSelectedIndex(index);
 		}
 	}
 
@@ -110,12 +116,22 @@ public class Main {
 		nearbyMap.put(key, pset.getPointsOfInterestAlongRoute(route, controlPanel.getMarkerSearchRadius(key)));
 	}
 
+	public static BufferedImage getScreenShot(Component component) {
+
+		BufferedImage image = new BufferedImage(component.getWidth(), component.getHeight(),
+				BufferedImage.TYPE_INT_RGB);
+		// call the Component's paint method, using
+		// the Graphics object of the image.
+		component.paint(image.getGraphics()); // alternately use .printAll(..)
+		return image;
+	}
+
 	public class UiHandler {
 		@Subscribe
 		protected void handle(StopsCommitEvent event) {
 			resultsPane.setText(event.html);
 		}
-		
+
 		@Subscribe
 		protected void handle(UiEvent event) {
 			//System.out.println(event.source + " " + event.awtEvent);
@@ -221,7 +237,18 @@ public class Main {
 
 			case "ControlPanel.CoPilotOutput":
 				if (! tripPlan.getFinalizedPlaces().isEmpty()) {
-					outputToCopilot( tripPlan.getFinalizedPlaces() );
+					try {
+						outputToCopilot( tripPlan.getFinalizedPlaces() );
+					} catch (Exception x) {
+						x.printStackTrace();
+					}
+				}
+				BufferedImage i = getScreenShot( mapViewer );
+				try {
+				    File outputfile = new File("saved.png");
+				    ImageIO.write(i, "png", outputfile);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				break;
 				
@@ -237,7 +264,7 @@ public class Main {
 				break;
 			}
 		}
-		
+
 		private void finalizeRoute() {
 			logger.info("Finalizing route...");
 			if (tripPlan.getPlacesChanged()) {
@@ -249,8 +276,8 @@ public class Main {
 			ArrayList<Route> days = tripPlan.getFinalizedDays();
 			ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
 			if (days.isEmpty()) {
-				ArrayList< ArrayList< VisitedPlace > > allPlaces = new ArrayList<>();
-				markers.add( StopMarker.ORIGIN );
+				ArrayList<ArrayList<VisitedPlace>> allPlaces = new ArrayList<>();
+				markers.add(StopMarker.ORIGIN);
 				for (TripPlan.TripLeg tripLeg : tripPlan.getTripLegs()) {
 					ArrayList<VisitedPlace> places = new ArrayList<>();
 					String[] fields = tripLeg.legData.startLabel.split("/");
@@ -263,7 +290,7 @@ public class Main {
 						Main.logger.error("No matching address book entry for: " + tripLeg.legData.startLabel);
 						return;
 					}
-					VisitedPlace start = new VisitedPlace( startMatches.get(0) );
+					VisitedPlace start = new VisitedPlace(startMatches.get(0));
 					places.add(start);
 					int refuel = 0;
 					System.out.println(tripLeg.legData.startLabel);
@@ -271,25 +298,25 @@ public class Main {
 					for (TripPlan.StopData stopData : tripLeg.stopDataList) {
 						if (stopData.use) {
 							try {
-								places.add( new VisitedPlace(stopData) );
+								places.add(new VisitedPlace(stopData));
 								refuel = (stopData.refuel) ? StopMarker.FUEL : 0;
-								markers.add( StopMarker.DRIVERS + refuel );
+								markers.add(StopMarker.DRIVERS + refuel);
 							} catch (IllegalValueException e) {
 								e.printStackTrace();
 							}
 						}
 					} // for stopData
-					markers.set( markers.size()-1, StopMarker.OVERNIGHT + refuel);
-//					places.forEach( place -> {
-//						Main.logger.debug(place.toString());
-//					});
-					days.add( Here2.computeRoute(places) );
-					allPlaces.add( places );
+					markers.set(markers.size() - 1, StopMarker.OVERNIGHT + refuel);
+					// places.forEach( place -> {
+					// Main.logger.debug(place.toString());
+					// });
+					days.add(Here2.computeRoute(places));
+					allPlaces.add(places);
 				} // tripLeg
-				markers.set( markers.size()-1, StopMarker.TERMINUS );
+				markers.set(markers.size() - 1, StopMarker.TERMINUS);
 				tripPlan.setFinalizedRoute(days, markers, allPlaces);
 			}
-			waypoints = map.showRoute( days, markers );
+			waypoints = map.showRoute(days, markers);
 			int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 			mainPanel.getRightTabbedPane().setSelectedIndex(index);
 			logger.info("  Route shown on map");
@@ -303,14 +330,16 @@ public class Main {
 				tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
 				logger.info("  Route points saved");
 			}
-			Route route = Here2.computeRoute(tripPlan);  // will reload from routeJson if not empty
+			Route route = Here2.computeRoute(tripPlan); // will reload from
+														// routeJson if not
+														// empty
 			logger.info("  Route planned");
 			if (route != null) {
 				waypoints = map.showRoute(route);
 				int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 				mainPanel.getRightTabbedPane().setSelectedIndex(index);
 				logger.info("  Route shown on map");
-				tripPlan.setRoute( route );
+				tripPlan.setRoute(route);
 			}
 			tripPlan.save(tripPlanFile);
 			logger.info("  Trip plan saved");
@@ -341,17 +370,16 @@ public class Main {
 			dialog.addListeners(dialog.new OptimizeActionListener(), dialog.new OptimizeLegSelectionListener(),
 					dialog.new OptimizeRoadModelListener());
 
-			dialog.generateLegStopChoices( iLeg );
+			dialog.generateLegStopChoices(iLeg);
 			final String html = dialog.updateTripData();
-			
-			SwingUtilities.invokeLater( new Runnable() {
+
+			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					resultsPane.setText(html);
 				}
 			});
 		}
-
 
 		private CallbackHandler handler = null;
 		protected OptimizeStopsDialog dialog = null;
@@ -375,7 +403,7 @@ public class Main {
 						int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
 						VisitedPlace place = new VisitedPlace(event.place);
 						if (place.getFuelAvailable().get() == FuelAvailable.NO_FUEL)
-							place.setFuelAvailable( getNearByFuel(place.getLatitude(), place.getLongitude(), 2e3) );
+							place.setFuelAvailable(getNearByFuel(place.getLatitude(), place.getLongitude(), 2e3));
 						ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
 						if (places == null)
 							places = new ArrayList<>();
@@ -397,7 +425,7 @@ public class Main {
 			Events.eventBus.register(new CallbackHandler(after));
 			AddAddressDialog dialog = new AddAddressDialog(controller, addressBook);
 			AddAddressActionListener listener = dialog.new AddAddressActionListener();
-			dialog.setListener( listener );
+			dialog.setListener(listener);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		}
@@ -468,13 +496,12 @@ public class Main {
 		poiMap.put(Main.MarkerKinds.MURPHY, pset);
 		// TODO Costco, Cabelas
 	}
-	
-	
-	public POI.FuelAvailable getNearByFuel(double latitude, double longitude, double radius ) {
-		GeoPosition position = new GeoPosition( latitude, longitude );
+
+	public POI.FuelAvailable getNearByFuel(double latitude, double longitude, double radius) {
+		GeoPosition position = new GeoPosition(latitude, longitude);
 		for (POISet pset : poiMap.values()) {
-			java.util.Map<POI, POIResult> map = pset.nearBy( position, 0, radius );
-			if (! map.isEmpty()) {
+			java.util.Map<POI, POIResult> map = pset.nearBy(position, 0, radius);
+			if (!map.isEmpty()) {
 				POIResult closest = null;
 				for (POIResult r : map.values()) {
 					if (closest == null) {
@@ -492,7 +519,7 @@ public class Main {
 		}
 		return new POI.FuelAvailable();
 	}
- 
+
 	public class TextAreaAppender extends AppenderBase<ILoggingEvent> {
 
 		Layout<ILoggingEvent> layout;
@@ -552,8 +579,6 @@ public class Main {
 		this.resultsPane = resultsPane;
 	}
 
-	
-	
 	public Main() {
 		logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -570,23 +595,23 @@ public class Main {
 		map = new com.bluelightning.Map();
 		mapViewer = map.getMapViewer();
 		mainPanel.getRightTabbedPane().addTab("Map", null, mapViewer, null);
-		browserCanvas = WebBrowser.factory(mainPanel);
+		// browserCanvas = WebBrowser.factory(mainPanel);
 		controlPanel = new MainControlPanel();
 		mainPanel.getLeftPanel().add(controlPanel);
 		frame.setContentPane(mainPanel);
-		
+
 		resultsPane = new JTextPane();
 		resultsPane.setVisible(true);
 		resultsPane.setContentType("text/html");
 		resultsPane.setEditable(false);
-		resultsPane.setText( INITIAL_RESULTS_TEXT );
+		resultsPane.setText(INITIAL_RESULTS_TEXT);
 		JScrollPane scroll = new JScrollPane(resultsPane);
 		mainPanel.getRightTabbedPane().addTab("Results", null, scroll, null);
 		// frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		frame.setSize(800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		browserCanvas.initialize(frame);
+		// browserCanvas.initialize(frame);
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
 		// logging to text area can start once frame is visible
@@ -605,7 +630,7 @@ public class Main {
 			controller.getStorage().load();
 			addressBook = controller.getAddressBook();
 		} catch (Exception x) {
-			logger.trace( x.getMessage() );
+			logger.trace(x.getMessage());
 		}
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -618,9 +643,9 @@ public class Main {
 		logger.info("Loading previous trip plan");
 		tripPlan = TripPlan.load(tripPlanFile);
 		routePanel.getWaypointsModel().setData(tripPlan.getPlaces());
-		if (! tripPlan.getFinalizedDays().isEmpty()) {
+		if (!tripPlan.getFinalizedDays().isEmpty()) {
 			Events.eventBus.post(new Events.UiEvent("ControlPanel.Finalize", null));
-			reportDetails( tripPlan.getFinalizedDays() );
+			reportDetails(tripPlan.getFinalizedDays());
 		} else if (tripPlan.getRoute() != null) {
 			Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
 		}
@@ -639,27 +664,26 @@ public class Main {
 			try {
 				String title = String.format("Day-%02d", iDay++);
 				String opath = String.format("\\\\Surfacepro3\\na\\save\\%s.trp", title);
-			    PrintWriter stream = new PrintWriter(opath, CoPilot13Format.UTF16LE_ENCODING);
-	//			PrintWriter stream = new PrintWriter(System.out);
-				format.write(title, dayStops, stream, 0, dayStops.size() );
+				PrintWriter stream = new PrintWriter(opath, CoPilot13Format.UTF16LE_ENCODING);
+				// PrintWriter stream = new PrintWriter(System.out);
+				format.write(title, dayStops, stream, 0, dayStops.size());
 				stream.close();
 			} catch (Exception x) {
-				Main.logger.error("Failed to write CoPilot file: ", x );
+				Main.logger.error("Failed to write CoPilot file: ", x);
 				x.printStackTrace();
 			}
 		}
 	}
 
-
 	private void reportDetails(ArrayList<Route> finalizedDays) {
 		int iDay = 1;
-		for(Route dayRoute : finalizedDays) {
+		for (Route dayRoute : finalizedDays) {
 			System.out.printf("Day %d\n", iDay);
 			iDay++;
 			double dayTime = 0.0;
 			double dayDistance = 0.0;
 			for (Leg leg : dayRoute.getLeg()) {
-				System.out.printf("  Leg from %s to %s\n", leg.getStart().getUserLabel(), leg.getEnd().getUserLabel() );
+				System.out.printf("  Leg from %s to %s\n", leg.getStart().getUserLabel(), leg.getEnd().getUserLabel());
 				double legTime = 0.0;
 				double legDistance = 0.0;
 				for (Maneuver maneuver : leg.getManeuver()) {
@@ -667,19 +691,15 @@ public class Main {
 					dayDistance += maneuver.getLength();
 					legTime += maneuver.getTrafficTime();
 					legDistance += maneuver.getLength();
-					System.out.printf("    %6.1f %-6s  %6.1f %-6s %6.1f %-6s: %s\n", 
-							dayDistance*Here2.METERS_TO_MILES,
-							Here2.toPeriod(dayTime),
-							legDistance*Here2.METERS_TO_MILES, 
-							Here2.toPeriod(legTime), 
-							maneuver.getLength()*Here2.METERS_TO_MILES, 
-							Here2.toPeriod(maneuver.getTrafficTime()), 
-							maneuver.getInstruction() );
+					System.out.printf("    %6.1f %-6s  %6.1f %-6s %6.1f %-6s: %s\n",
+							dayDistance * Here2.METERS_TO_MILES, Here2.toPeriod(dayTime),
+							legDistance * Here2.METERS_TO_MILES, Here2.toPeriod(legTime),
+							maneuver.getLength() * Here2.METERS_TO_MILES, Here2.toPeriod(maneuver.getTrafficTime()),
+							maneuver.getInstruction());
 				}
 			}
 		}
 	}
-
 
 	public static void main(String[] args) {
 		Main main = new Main();

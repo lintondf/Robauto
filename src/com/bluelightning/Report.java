@@ -114,6 +114,30 @@ public class Report implements Serializable {
 			c.set("rows", sb.toString());
 			return c.toString();
 		}
+
+		public String getDay() {
+			return day;
+		}
+
+		public String getDuration() {
+			return duration;
+		}
+
+		public String getDistance() {
+			return distance;
+		}
+
+		public List<Step> getSteps() {
+			return steps;
+		}
+
+		public Step getFirstStep() {
+			return firstStep;
+		}
+
+		public Step getLastStep() {
+			return lastStep;
+		}
 	}
 
 	public static class Step {
@@ -475,5 +499,9 @@ public class Report implements Serializable {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		String json = gson.toJson(report);
 		System.out.println(json);
+	}
+
+	public List<Day> getDays() {
+		return days;
 	}
 }
