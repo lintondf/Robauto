@@ -27,13 +27,13 @@ public class Permutations {
 	
 	public Permutations(int number) {
 		this.number = number;
-		Main.logger.trace("Permutations " + number);
+		RobautoMain.logger.trace("Permutations " + number);
 	}
 
 	public ArrayList<Integer[]> monotonic() {
-		Main.logger.trace("monotonic");
+		RobautoMain.logger.trace("monotonic");
 		int N = 1 << number;
-		Main.logger.trace("monotonic " + N);
+		RobautoMain.logger.trace("monotonic " + N);
 		ArrayList<Integer[]> results = new ArrayList<>();
 		if (number <= 1) {
 			results.add( new Integer[]{0} );

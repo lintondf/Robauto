@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
-import com.bluelightning.Main;
+import com.bluelightning.RobautoMain;
 
 /**
  * @author NOOK
@@ -106,7 +106,7 @@ public class StopMarker extends ButtonWaypoint {
 		this.text = text;
 		this.setToolTipText(text);
 		this.addMouseListener(new StopMarkerMouseListener());
-		Main.logger.debug(String.format("StopMarker %o %s", kind, geoPosition.toString() ) );
+		RobautoMain.logger.debug(String.format("StopMarker %o %s", kind, geoPosition.toString() ) );
 	}
 	
 	private class StopMarkerMouseListener implements MouseListener {

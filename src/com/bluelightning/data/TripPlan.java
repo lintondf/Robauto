@@ -23,7 +23,6 @@ import javax.swing.SwingUtilities;
 
 import com.bluelightning.GeodeticPosition;
 import com.bluelightning.Here2;
-import com.bluelightning.Main;
 import com.bluelightning.OptimizeStops;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
@@ -36,6 +35,7 @@ import com.bluelightning.poi.RestAreaPOI;
 import javafx.util.Pair;
 
 import com.bluelightning.Report;
+import com.bluelightning.RobautoMain;
 
 import seedu.addressbook.data.place.VisitedPlace;
 
@@ -446,7 +446,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	}
 
 	public void log() {
-		Main.logger.info(this.toString());
+		RobautoMain.logger.info(this.toString());
 	}
 
 	public void save(File file) {
@@ -501,14 +501,14 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 			tripPlan.placesChanged = false;
 			tripPlan.setRoute(tripPlan.getRoute());
-			Main.logger.info("Load complete");
+			RobautoMain.logger.info("Load complete");
 			tripPlan.log();
 			return tripPlan;
 		} catch (FileNotFoundException e) {
-			Main.logger.error("Prior Trip Plan file not found on load.");
+			RobautoMain.logger.error("Prior Trip Plan file not found on load.");
 			return new TripPlan();
 		} catch (Exception x) {
-			Main.logger.error("Error loading prior trip plan ", x);
+			RobautoMain.logger.error("Error loading prior trip plan ", x);
 			return new TripPlan();
 		}
 	}

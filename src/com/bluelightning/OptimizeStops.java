@@ -9,7 +9,7 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 
-import com.bluelightning.Main.MarkerKinds;
+import com.bluelightning.PlannerMode.MarkerKinds;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Route;
@@ -42,7 +42,7 @@ public class OptimizeStops {
 	}
 
 	public ArrayList<POIResult> getRouteSegmentPOI(Double start, Double finish) {
-		Main.logger.debug( String.format("gRSP %f %f", start, finish) );
+		RobautoMain.logger.debug( String.format("gRSP %f %f", start, finish) );
 		ArrayList<POIResult> resultList = new ArrayList<>();
 		poiMap.forEach((kind, pset) -> {
 			resultList.addAll(pset.getPointsOfInterestAlongRoute(route, 500));
@@ -58,13 +58,13 @@ public class OptimizeStops {
 	}
 
 	public OptimizeStops(TripPlan tripPlan, Logic controller, AddressBook addressBook, EnumMap<MarkerKinds, POISet> poiMap,
-			EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap) {
+			EnumMap<PlannerMode.MarkerKinds, ArrayList<POIResult>> nearbyMap) {
 		this.tripPlan = tripPlan;
 		this.controller = controller;
 		this.addressBook = addressBook;
 		this.route = tripPlan.getRoute();
 		this.poiMap = poiMap;
-		ArrayList<POIResult> restAreas = nearbyMap.get(Main.MarkerKinds.RESTAREAS);
+		ArrayList<POIResult> restAreas = nearbyMap.get(PlannerMode.MarkerKinds.RESTAREAS);
 		tripPlan.setRoute(route, restAreas);
 	}
 

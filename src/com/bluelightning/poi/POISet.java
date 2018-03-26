@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
-import com.bluelightning.Main;
+import com.bluelightning.PlannerMode;
 import com.bluelightning.json.BoundingBox;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;

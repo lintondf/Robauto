@@ -17,7 +17,7 @@ import javax.swing.table.TableColumn;
 
 import com.bluelightning.Events;
 import com.bluelightning.Here2;
-import com.bluelightning.Main;
+import com.bluelightning.RobautoMain;
 import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.Events.AddManualStopEvent;
 import com.bluelightning.poi.POI.FuelAvailable;
@@ -181,7 +181,7 @@ public class AddManualStopDialog extends JDialog {
 			System.out.println("AASSA::action " + event);
 			switch (event.getActionCommand()) {
 			case "Cancel":
-				Main.logger.info("dispose() on Cancel");
+				RobautoMain.logger.info("dispose() on Cancel");
 				dialog.dispose();
 				break;
 			case "OK":
@@ -193,7 +193,7 @@ public class AddManualStopDialog extends JDialog {
 					AddressPOI addressPOI = new AddressPOI(place);
 					Events.eventBus.post( new Events.AddAddressStopEvent(addressPOI) );
 				}
-				Main.logger.info("dispose() on OK");
+				RobautoMain.logger.info("dispose() on OK");
 				dialog.dispose();
 				break;
 			case "Create":
@@ -252,7 +252,7 @@ public class AddManualStopDialog extends JDialog {
 						if (choiceTable.getSelectedRow() >= 0) {
 							POIResult result = choiceTableModel.getData().get(choiceTable.getSelectedRow());
 							Events.eventBus.post( new Events.AddManualStopEvent(result) );
-							Main.logger.info("dispose() on AMSD OK");
+							RobautoMain.logger.info("dispose() on AMSD OK");
 							AddManualStopDialog.this.dispose();
 						}
 					}
@@ -267,7 +267,7 @@ public class AddManualStopDialog extends JDialog {
 
 					@Override
 					public void actionPerformed(ActionEvent event) {
-						Main.logger.info("dispose() on AMSD Cancel");
+						RobautoMain.logger.info("dispose() on AMSD Cancel");
 						AddManualStopDialog.this.dispose();
 					}
 					

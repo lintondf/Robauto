@@ -42,9 +42,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import com.bluelightning.Events;
-import com.bluelightning.Main;
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.Events.WebBrowserOpenEvent;
+import com.bluelightning.RobautoMain;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -120,7 +120,7 @@ public final class WebBrowser extends Canvas {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				// Dispose of the native component cleanly
-				Main.logger.info("dispose() on WB/Window Closing");
+				RobautoMain.logger.info("dispose() on WB/Window Closing");
 				browserCanvas.dispose();
 				mock.dispose();
 			}
@@ -361,7 +361,7 @@ public final class WebBrowser extends Canvas {
 				display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						Main.logger.info("dispose() on WB/Exiting");
+						RobautoMain.logger.info("dispose() on WB/Exiting");
 //						System.out.println(Thread.currentThread() + " run() exiting 2 " + shell.isDisposed());
 						if (!shell.isDisposed())
 							shell.dispose();

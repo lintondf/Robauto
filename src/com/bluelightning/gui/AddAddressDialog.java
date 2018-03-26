@@ -18,7 +18,7 @@ import javax.swing.table.TableColumn;
 import com.bluelightning.Events;
 import com.bluelightning.Here2;
 import com.bluelightning.LatLon;
-import com.bluelightning.Main;
+import com.bluelightning.RobautoMain;
 import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.Events.AddWaypointEvent;
 
@@ -168,7 +168,7 @@ public class AddAddressDialog extends JDialog {
 			//System.out.println(event);
 			switch (event.getActionCommand()) {
 			case "Cancel":
-				Main.logger.info("dispose() on Cancel");
+				RobautoMain.logger.info("dispose() on Cancel");
 				AddAddressDialog.this.dispose();
 				break;
 			case "OK":
@@ -179,7 +179,7 @@ public class AddAddressDialog extends JDialog {
 					place = places.get(0);
 					Events.eventBus.post( new Events.AddWaypointEvent(place) );
 				}
-				Main.logger.info("dispose() on OK");
+				RobautoMain.logger.info("dispose() on OK");
 				AddAddressDialog.this.dispose();
 				break;
 			case "Create":

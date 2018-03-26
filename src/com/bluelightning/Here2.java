@@ -168,7 +168,7 @@ public class Here2 {
 	    		return location;
 	    	}
 	    }
-	    Main.logger.debug(response);
+	    RobautoMain.logger.debug(response);
 	    return null;
 	}
 	

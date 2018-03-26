@@ -33,10 +33,11 @@ import com.bluelightning.DouglasPeuckerReducer;
 import com.bluelightning.Events;
 import com.bluelightning.GeodeticPosition;
 import com.bluelightning.Here2;
-import com.bluelightning.Main;
+import com.bluelightning.PlannerMode;
 import com.bluelightning.OptimizeStops;
 import com.bluelightning.Permutations;
 import com.bluelightning.Report;
+import com.bluelightning.RobautoMain;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.DriverAssignments;
 import com.bluelightning.data.TripPlan.DriverAssignments.Turn;
@@ -47,7 +48,7 @@ import com.bluelightning.data.TripPlan.TripLeg;
 import com.bluelightning.Events.AddAddressStopEvent;
 import com.bluelightning.Events.AddManualStopEvent;
 import com.bluelightning.Events.UiEvent;
-import com.bluelightning.Main.MarkerKinds;
+import com.bluelightning.PlannerMode.MarkerKinds;
 import com.bluelightning.json.HereRoute;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Route;
@@ -235,12 +236,12 @@ public class OptimizeStopsDialog extends JDialog {
 		// invalidate the current leg and reload all; will preserve others 
 		TripPlan tripPlan = OptimizeStopsDialog.this.optimizeStops.getTripPlan();
 		tripPlan.getLegSummary().set( currentLeg, new LegSummary() );
-		EnumMap<Main.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(Main.MarkerKinds.class);
+		EnumMap<PlannerMode.MarkerKinds, ArrayList<POIResult>> nearbyMap = new EnumMap<>(PlannerMode.MarkerKinds.class);
 		nearbyMap.clear();
 		OptimizeStopsDialog.this.optimizeStops.poiMap.forEach((kind, set) -> {
 			nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(tripPlan.getRoute(), 2e3));
 		});
-		ArrayList<POIResult> restAreas = nearbyMap.get(Main.MarkerKinds.RESTAREAS);
+		ArrayList<POIResult> restAreas = nearbyMap.get(PlannerMode.MarkerKinds.RESTAREAS);
 		tripPlan.setRoute(tripPlan.getRoute(), restAreas);
 	}
 
@@ -323,7 +324,7 @@ public class OptimizeStopsDialog extends JDialog {
 					Events.eventBus.unregister(handler);
 					handler = null;
 				}
-				Main.logger.info("dispose() on OSD Cancel");
+				RobautoMain.logger.info("dispose() on OSD Cancel");
 				OptimizeStopsDialog.this.dispose();
 				break;
 			case "Reset Stops":
@@ -357,7 +358,7 @@ public class OptimizeStopsDialog extends JDialog {
 					Events.eventBus.unregister(handler);
 					handler = null;
 				}
-				Main.logger.info("dispose() on OSD Commit");
+				RobautoMain.logger.info("dispose() on OSD Commit");
 				OptimizeStopsDialog.this.dispose();
 				break;
 			default:
@@ -372,16 +373,16 @@ public class OptimizeStopsDialog extends JDialog {
 		@Override
 		public void valueChanged(ListSelectionEvent event) {
 			if (!event.getValueIsAdjusting()) {
-				Main.logger.info("OSD/OLSL VC " + currentLeg + " -> " + legTable.getSelectedRow());
+				RobautoMain.logger.info("OSD/OLSL VC " + currentLeg + " -> " + legTable.getSelectedRow());
 				if (currentLeg >= 0) { // save table into prior selection
 					optimizeStops.getTripPlan().getTripLeg(currentLeg).stopDataList = getStopTable();
 				}
 				currentLeg = legTable.getSelectedRow();
 				if (currentLeg >= 0) {
 					setCurrentLeg(optimizeStops.getTripPlan().getTripLeg(currentLeg));
-					Main.logger.info("OSD/OLSL VC A");
+					RobautoMain.logger.info("OSD/OLSL VC A");
 					generateLegStopChoices(currentLeg);
-					Main.logger.info("OSD/OLSL VC exiting");
+					RobautoMain.logger.info("OSD/OLSL VC exiting");
 				}
 			}
 		}
@@ -983,7 +984,7 @@ public class OptimizeStopsDialog extends JDialog {
 	}
 
 	public void generateLegStopChoices(int iLeg) {
-		Main.logger.info("Generating leg stop choices...");
+		RobautoMain.logger.info("Generating leg stop choices...");
 		while (getChoicesTabbedPane().getComponentCount() > 0) {
 			getChoicesTabbedPane().removeTabAt(0);
 		}
@@ -996,13 +997,13 @@ public class OptimizeStopsDialog extends JDialog {
 
 		Permutations perm = new Permutations(reduced.size() - 1);
 		ArrayList<Integer[]> unique = perm.monotonic();
-		Main.logger.info(String.format("  %d unique", unique.size()));
+		RobautoMain.logger.info(String.format("  %d unique", unique.size()));
 		Set<TripPlan.DriverAssignments> driverAssignmentsSet = new TreeSet<>();
 		for (Integer[] elements : unique) {
 			driverAssignmentsSet.add(TripPlan.generateDriverAssignments(TripPlan.N_DRIVERS,
 					optimizeStops.getTripPlan().getTripLeg(iLeg).legData, reduced, elements));
 		}
-		Main.logger.info(String.format("  %d assignments", driverAssignmentsSet.size()));
+		RobautoMain.logger.info(String.format("  %d assignments", driverAssignmentsSet.size()));
 		Iterator<TripPlan.DriverAssignments> it = driverAssignmentsSet.iterator();
 
 		presentedChoices = new ArrayList<>();
@@ -1024,7 +1025,7 @@ public class OptimizeStopsDialog extends JDialog {
 				panel.add(scrollPane);
 			}
 		} // for i
-		Main.logger.info("  reported");
+		RobautoMain.logger.info("  reported");
 	}
 
 }
