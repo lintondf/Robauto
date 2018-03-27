@@ -7,20 +7,93 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import com.bluelightning.Events.StopsCommitEvent;
+import com.bluelightning.Events.UiEvent;
+import com.bluelightning.PlannerMode.UiHandler;
+import com.google.common.eventbus.Subscribe;
+
+import javax.swing.JSplitPane;
+import java.awt.FlowLayout;
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JScrollPane;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
+import java.awt.Font;
+
 public class TravelMode extends JFrame {
 
 	private JPanel contentPane;
+	protected JList listOfDays;
+	protected JSplitPane splitPane;
+	
+	public class UiHandler {
+		@Subscribe
+		protected void handle(UiEvent event) {
+			//System.out.println(event.source + " " + event.awtEvent);
+			switch (event.source) {
+			case "TravelControl.PlannerMode":
+				Events.eventBus.post( new Events.UiEvent("PlannerMode", null));
+				break;
+			}
+		}
+	}
 
 	/**
 	 * Create the frame.
 	 */
 	public TravelMode() {
+		setTitle("Robauto - Travel Mode");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+		contentPane.setLayout(new BorderLayout(0, 0));
+		
+		JPanel buttonPanel = new JPanel();
+		contentPane.add(buttonPanel, BorderLayout.SOUTH);
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+		
+		JButton btnPlannerMode = new JButton("Planner Mode");
+		btnPlannerMode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				Events.eventBus.post( new Events.UiEvent("TravelControl.PlannerMode", event));
+			}
+		});
+		buttonPanel.add(btnPlannerMode);
+		
+		JButton btnPriorDay = new JButton("Prior Day");
+		buttonPanel.add(btnPriorDay);
+		
+		JButton btnNextDay = new JButton("Next Day");
+		buttonPanel.add(btnNextDay);
+		
+		JButton btnSelectDay = new JButton("Select Day");
+		buttonPanel.add(btnSelectDay);
+		
+		splitPane = new JSplitPane();
+		contentPane.add(splitPane, BorderLayout.CENTER);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		contentPane.add(scrollPane, BorderLayout.NORTH);
+		
+		String[] days = {"Day 01 - Melbourne to Pooler", "Day 02 - Pooler to Banner Elk"};
+		listOfDays = new JList(days);
+		listOfDays.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		scrollPane.setViewportView(listOfDays);
+		scrollPane.setVisible(true);
+		splitPane.setVisible(false);
+		
+		SwingUtilities.updateComponentTreeUI(this);
+		
+		// Bind event handlers
+		Events.eventBus.register(new UiHandler());
+		
 	}
 
 	/**

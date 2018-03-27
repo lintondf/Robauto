@@ -99,6 +99,10 @@ public class PlannerMode {
 	protected JTextPane resultsPane;
 
 	protected JFrame frame;
+
+	protected ch.qos.logback.classic.Logger rootLogger;
+
+	protected TextAreaAppender textAreaAppender;
 	
 	public void setVisible( boolean tf ) {
 		frame.setVisible(tf);
@@ -254,6 +258,10 @@ public class PlannerMode {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				break;
+				
+			case "ControlPanel.TravelMode":
+				Events.eventBus.post( new Events.UiEvent("TravelMode", null));
 				break;
 				
 			case "ControlPanel.ClearActions":
@@ -586,8 +594,8 @@ public class PlannerMode {
 	public PlannerMode() {
 		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-		ch.qos.logback.classic.Logger rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
-		TextAreaAppender textAreaAppender = new TextAreaAppender(lc);
+		rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
+		textAreaAppender = new TextAreaAppender(lc);
 		textAreaAppender.start();
 
 		frame = new JFrame("RobAuto RV Trip Planner");
@@ -611,9 +619,13 @@ public class PlannerMode {
 		JScrollPane scroll = new JScrollPane(resultsPane);
 		mainPanel.getRightTabbedPane().addTab("Results", null, scroll, null);
 		// frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		frame.setSize(800, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
+		frame.setSize(800, 600);
+		SwingUtilities.updateComponentTreeUI(frame);
+		frame.pack();
+	}
+	
+	public void initialize() {
 		// browserCanvas.initialize(frame);
 		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 

@@ -162,6 +162,7 @@ public class MainControlPanel extends JPanel {
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.FireBug", event));
 			}
 		});
+		add(btnFirebug, gbc_btnFirebug);
 		
 		JButton btnFinalizeRoute = new JButton("Finalize Route");
 		GridBagConstraints gbc_btnFinalizeRoute = new GridBagConstraints();
@@ -176,27 +177,13 @@ public class MainControlPanel extends JPanel {
 			}
 		});
 		
-		JButton btnCopilotOutput = new JButton("CoPilot Output");
-		GridBagConstraints gbc_btnCopilotOutput = new GridBagConstraints();
-		gbc_btnCopilotOutput.fill = GridBagConstraints.HORIZONTAL;
-		gbc_btnCopilotOutput.insets = new Insets(0, 0, 5, 0);
-		gbc_btnCopilotOutput.gridx = 0;
-		gbc_btnCopilotOutput.gridy = 4;
-		add(btnCopilotOutput, gbc_btnCopilotOutput);
-		btnCopilotOutput.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				Events.eventBus.post( new Events.UiEvent("ControlPanel.CoPilotOutput", event));
-			}
-		});
-		
-		
 		String[] actions = {"Normal", "Clear Route", "Clear Places"};
 		JComboBox clearActionsBox = new JComboBox(actions);
 		GridBagConstraints gbc_clearActionsBox = new GridBagConstraints();
 		gbc_clearActionsBox.insets = new Insets(0, 0, 5, 0);
 		gbc_clearActionsBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_clearActionsBox.gridx = 0;
-		gbc_clearActionsBox.gridy = 5;
+		gbc_clearActionsBox.gridy = 4;
 		add(clearActionsBox, gbc_clearActionsBox);
 		clearActionsBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
@@ -205,7 +192,19 @@ public class MainControlPanel extends JPanel {
 		});
 		
 		
-		add(btnFirebug, gbc_btnFirebug);
+		JButton btnTravelMode = new JButton("Travel Mode");
+		GridBagConstraints gbc_btnCopilotOutput = new GridBagConstraints();
+		gbc_btnCopilotOutput.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnCopilotOutput.insets = new Insets(0, 0, 5, 0);
+		gbc_btnCopilotOutput.gridx = 0;
+		gbc_btnCopilotOutput.gridy = 5;
+		add(btnTravelMode, gbc_btnCopilotOutput);
+		btnTravelMode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.TravelMode", event));
+			}
+		});
+		
 
 	}
 
