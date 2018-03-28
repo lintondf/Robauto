@@ -14,7 +14,6 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.PlannerMode.UiHandler;
-import com.bluelightning.RobautoMain.ModeHandler;
 import com.google.common.eventbus.Subscribe;
 
 import javax.swing.JSplitPane;
@@ -36,8 +35,20 @@ import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
 import java.awt.Font;
+import java.rmi.registry.Registry;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 public class TravelMode extends JPanel {
+	
+	public static class HandleTripPlanUpdate implements TripPlanUpdate {
+		@Override
+		public String update(String msg) throws RemoteException {
+			System.out.println(msg);
+			return msg;
+		}
+	}
 
 	protected JList listOfDays;
 	protected JSplitPane splitPane;
@@ -99,6 +110,19 @@ public class TravelMode extends JPanel {
 		// Bind event handlers
 		Events.eventBus.register(new UiHandler());
 		
+		try {
+            HandleTripPlanUpdate obj = new HandleTripPlanUpdate();
+            TripPlanUpdate stub = (TripPlanUpdate) UnicastRemoteObject.exportObject(obj, 0);
+
+            // Bind the remote object's stub in the registry
+            Registry registry = LocateRegistry.getRegistry();
+            registry.bind("Update", stub);
+
+            System.out.println("Server ready");
+        } catch (Exception e) {
+            System.err.println("Server exception: " + e.toString());
+            e.printStackTrace();
+        }	
 	}
 
 	/**
@@ -129,6 +153,7 @@ public class TravelMode extends JPanel {
 		    // If Nimbus is not available, you can set the GUI to another look and feel.
 		}
 	}
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {

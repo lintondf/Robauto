@@ -42,7 +42,6 @@ import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
-import com.bluelightning.RobautoMain.ModeHandler;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.DriverAssignments;
 import com.bluelightning.data.TripPlan.LegData;
@@ -83,6 +82,9 @@ import seedu.addressbook.data.exception.IllegalValueException;
 import seedu.addressbook.data.place.ReadOnlyPlace;
 import seedu.addressbook.data.place.VisitedPlace;
 import seedu.addressbook.logic.Logic;
+
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
 
@@ -262,16 +264,15 @@ public class PlannerMode extends JPanel {
 				break;
 				
 			case "ControlPanel.TravelMode":
-				try {
-					String javaDir = "C:\\ProgramData\\Oracle\\Java\\javapath\\java.exe";
-					ProcessBuilder pb = new ProcessBuilder();
-					pb.command( Arrays.asList( javaDir, "-cp", "Robauto.jar", "com.bluelightning.TravelMode" ) );
-					pb.redirectErrorStream(true);
-					Process p = pb.start();
-					System.exit(0);
-				} catch (Exception x) {
-					x.printStackTrace();
-				}
+		        try {
+		            Registry registry = LocateRegistry.getRegistry(null);
+		            TripPlanUpdate stub = (TripPlanUpdate) registry.lookup("Update");
+		            String response = stub.update("my message");
+		            System.out.println("response: " + response);
+		        } catch (Exception e) {
+		            System.err.println("Client exception: " + e.toString());
+		            e.printStackTrace();
+		        }
 				break;
 				
 			case "ControlPanel.ClearActions":
