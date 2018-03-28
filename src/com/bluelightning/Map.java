@@ -38,7 +38,6 @@ import org.jxmapviewer.viewer.WaypointPainter;
 
 import com.bluelightning.gui.MainControlPanel;
 import com.bluelightning.gui.MainPanel;
-import com.bluelightning.gui.WebBrowser;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.POIMarker;
@@ -212,99 +211,99 @@ public class Map {
 	
 //	public static
 
-	public static void showMap(List<GeoPosition> track, Route route, List<POIMarker> nearby) {
-		JXMapViewer mapViewer = new JXMapViewer();
-
-		// Display the viewer in a JFrame
-		JFrame frame = new JFrame("RobAuto RV Trip Planner");
-		MainPanel mainPanel = new MainPanel();
-		mainPanel.getLeftPanel().setLayout(new BorderLayout() );
-		mainPanel.getRightTabbedPane().addTab("Planner", null, mapViewer, null);
-		WebBrowser browserCanvas = WebBrowser.factory(mainPanel);
-		mainPanel.getLeftPanel().add( new MainControlPanel() );
-		frame.setContentPane(mainPanel);
-		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-		frame.setSize(800, 600);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);
-		browserCanvas.initialize(frame);
-
-		// Create a TileFactoryInfo for OpenStreetMap
-		TileFactoryInfo info = new OSMTileFactoryInfo();
-		DefaultTileFactory tileFactory = new DefaultTileFactory(info);
-		tileFactory.setThreadPoolSize(8);
-		// Setup local file cache
-		File cacheDir = new File(System.getProperty("user.home") + File.separator + ".jxmapviewer2");
-		LocalResponseCache.installResponseCache(info.getBaseURL(), cacheDir, false);
-
-		mapViewer.setTileFactory(tileFactory);
-
-		// Add interactions
-		MouseInputListener mia = new PanMouseInputListener(mapViewer);
-		mapViewer.addMouseListener(mia);
-		mapViewer.addMouseMotionListener(mia);
-		mapViewer.addMouseListener(new CenterMapListener(mapViewer));
-		mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(mapViewer));
-		mapViewer.addKeyListener(new PanKeyListener(mapViewer));
-		mapViewer.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3) {
-					java.awt.Point p = e.getPoint();
-					GeoPosition geo = mapViewer.convertPointToGeoPosition(p);
-					System.out.println("X:" + geo.getLatitude() + ",Y:" + geo.getLongitude());
-				}
-			}
-		});
-		mapViewer.addPropertyChangeListener("zoom", new PropertyChangeListener() {
-
-			@Override
-			public void propertyChange(PropertyChangeEvent event) {
-				Integer zoom = (Integer) event.getNewValue();
-				System.out.println(zoom + " " + zoomMetersPerPixel[zoom] *  mapViewer.getBounds().getWidth() );
-			}
-			
-		});
-		mapViewer.setCenterPosition( new GeoPosition(28, -81));
-		mapViewer.setZoom(10);
-
-//		RoutePainter routePainter = new RoutePainter(track);
+//	public static void showMap(List<GeoPosition> track, Route route, List<POIMarker> nearby) {
+//		JXMapViewer mapViewer = new JXMapViewer();
 //
-//		// Set the focus
-//		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(track), 0.9);
+//		// Display the viewer in a JFrame
+//		JFrame frame = new JFrame("RobAuto RV Trip Planner");
+//		MainPanel mainPanel = new MainPanel();
+//		mainPanel.getLeftPanel().setLayout(new BorderLayout() );
+//		mainPanel.getRightTabbedPane().addTab("Planner", null, mapViewer, null);
+//		WebBrowser browserCanvas = WebBrowser.factory(mainPanel);
+//		mainPanel.getLeftPanel().add( new MainControlPanel() );
+//		frame.setContentPane(mainPanel);
+//		//frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+//		frame.setSize(800, 600);
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		frame.setVisible(true);
+//		browserCanvas.initialize(frame);
 //
-//		// Create waypoints from the geo-positions
-//		ArrayList<DefaultWaypoint> waylist = new ArrayList<>();
-//		for (Leg leg : route.getLeg()) {
-//			waylist.add(new DefaultWaypoint(new LatLon(leg.getStart().getMappedPosition())));
-//		}
-//		waylist.add(new DefaultWaypoint(track.get(track.size() - 1)));
-//		Set<DefaultWaypoint> waypoints = new HashSet<DefaultWaypoint>(waylist);
+//		// Create a TileFactoryInfo for OpenStreetMap
+//		TileFactoryInfo info = new OSMTileFactoryInfo();
+//		DefaultTileFactory tileFactory = new DefaultTileFactory(info);
+//		tileFactory.setThreadPoolSize(8);
+//		// Setup local file cache
+//		File cacheDir = new File(System.getProperty("user.home") + File.separator + ".jxmapviewer2");
+//		LocalResponseCache.installResponseCache(info.getBaseURL(), cacheDir, false);
 //
-//		// Create a waypoint painter that takes all the waypoints
-//		WaypointPainter<DefaultWaypoint> waypointPainter = new WaypointPainter<DefaultWaypoint>();
-//		waypointPainter.setWaypoints(waypoints);
+//		mapViewer.setTileFactory(tileFactory);
 //
-//		Set<POIMarker> markers = new HashSet<POIMarker>(nearby);
+//		// Add interactions
+//		MouseInputListener mia = new PanMouseInputListener(mapViewer);
+//		mapViewer.addMouseListener(mia);
+//		mapViewer.addMouseMotionListener(mia);
+//		mapViewer.addMouseListener(new CenterMapListener(mapViewer));
+//		mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(mapViewer));
+//		mapViewer.addKeyListener(new PanKeyListener(mapViewer));
+//		mapViewer.addMouseListener(new MouseAdapter() {
+//			public void mouseClicked(MouseEvent e) {
+//				if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3) {
+//					java.awt.Point p = e.getPoint();
+//					GeoPosition geo = mapViewer.convertPointToGeoPosition(p);
+//					System.out.println("X:" + geo.getLatitude() + ",Y:" + geo.getLongitude());
+//				}
+//			}
+//		});
+//		mapViewer.addPropertyChangeListener("zoom", new PropertyChangeListener() {
 //
-//		// Set the overlay painter
-//		WaypointPainter<POIMarker> markerPainter = new POIMarkerOverlayPainter();
-//		markerPainter.setWaypoints(markers);
+//			@Override
+//			public void propertyChange(PropertyChangeEvent event) {
+//				Integer zoom = (Integer) event.getNewValue();
+//				System.out.println(zoom + " " + zoomMetersPerPixel[zoom] *  mapViewer.getBounds().getWidth() );
+//			}
+//			
+//		});
+//		mapViewer.setCenterPosition( new GeoPosition(28, -81));
+//		mapViewer.setZoom(10);
 //
-//		// Create a compound painter that uses both the route-painter and the
-//		// waypoint-painter
-//		List<Painter<JXMapViewer>> painters = new ArrayList<Painter<JXMapViewer>>();
-//		painters.add(routePainter);
-//		painters.add(waypointPainter);
-//		painters.add(markerPainter);
-//
-//		CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
-//		mapViewer.setOverlayPainter(painter);
-//		
-//		// Add the JButtons to the map viewer
-//		for (POIMarker w : nearby) {
-//			mapViewer.add(w);
-//		}
-	}
+////		RoutePainter routePainter = new RoutePainter(track);
+////
+////		// Set the focus
+////		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(track), 0.9);
+////
+////		// Create waypoints from the geo-positions
+////		ArrayList<DefaultWaypoint> waylist = new ArrayList<>();
+////		for (Leg leg : route.getLeg()) {
+////			waylist.add(new DefaultWaypoint(new LatLon(leg.getStart().getMappedPosition())));
+////		}
+////		waylist.add(new DefaultWaypoint(track.get(track.size() - 1)));
+////		Set<DefaultWaypoint> waypoints = new HashSet<DefaultWaypoint>(waylist);
+////
+////		// Create a waypoint painter that takes all the waypoints
+////		WaypointPainter<DefaultWaypoint> waypointPainter = new WaypointPainter<DefaultWaypoint>();
+////		waypointPainter.setWaypoints(waypoints);
+////
+////		Set<POIMarker> markers = new HashSet<POIMarker>(nearby);
+////
+////		// Set the overlay painter
+////		WaypointPainter<POIMarker> markerPainter = new POIMarkerOverlayPainter();
+////		markerPainter.setWaypoints(markers);
+////
+////		// Create a compound painter that uses both the route-painter and the
+////		// waypoint-painter
+////		List<Painter<JXMapViewer>> painters = new ArrayList<Painter<JXMapViewer>>();
+////		painters.add(routePainter);
+////		painters.add(waypointPainter);
+////		painters.add(markerPainter);
+////
+////		CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
+////		mapViewer.setOverlayPainter(painter);
+////		
+////		// Add the JButtons to the map viewer
+////		for (POIMarker w : nearby) {
+////			mapViewer.add(w);
+////		}
+//	}
 
 	public List<ButtonWaypoint> showRoute(ArrayList<Route> days, ArrayList<Integer> markers) {
 		Iterator<Integer> iMarker = markers.iterator();

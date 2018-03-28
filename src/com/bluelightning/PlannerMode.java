@@ -53,7 +53,6 @@ import com.bluelightning.gui.MainControlPanel;
 import com.bluelightning.gui.MainPanel;
 import com.bluelightning.gui.OptimizeStopsDialog;
 import com.bluelightning.gui.RoutePanel;
-import com.bluelightning.gui.WebBrowser;
 import com.bluelightning.gui.AddAddressDialog.AddAddressActionListener;
 import com.bluelightning.gui.OptimizeStopsDialog.OptimizeActionListener;
 import com.bluelightning.gui.OptimizeStopsDialog.OptimizeLegSelectionListener;

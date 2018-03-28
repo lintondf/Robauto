@@ -7,7 +7,6 @@ import java.util.concurrent.ForkJoinPool;
 
 import javax.swing.JFrame;
 
-import com.bluelightning.gui.WebBrowser;
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIResult;
 import com.google.common.eventbus.AsyncEventBus;
@@ -67,16 +66,6 @@ public class Events {
 		public UiEvent( String source, AWTEvent awtEvent ) {
 			this.source = source;
 			this.awtEvent = awtEvent;
-		}
-	}
-	
-	public static class WebBrowserOpenEvent {
-		public WebBrowser browserCanvas;
-		public String href;
-		
-		public WebBrowserOpenEvent( WebBrowser browserCanvas, String href) {
-			this.browserCanvas = browserCanvas;
-			this.href = href;
 		}
 	}
 	
