@@ -1,16 +1,21 @@
 package com.bluelightning;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -47,12 +52,10 @@ public class RobautoMain {
 				public void run() {
 					switch (event.source) {
 					case "PlannerMode":
-						plannerMode.setVisible(true);
-						travelMode.setVisible(false);
+						frame.setContentPane(plannerMode);
 						break;
 					case "TravelMode":
-						plannerMode.setVisible(false);
-						travelMode.setVisible(true);
+						frame.setContentPane(travelMode);
 						break;
 					default:
 						break;
@@ -64,7 +67,7 @@ public class RobautoMain {
 
 	private static void initLookAndFeel() {
 		try {
-			double pixelSize = 50;
+			double pixelSize = 30;
 			double fontSize = 0.8 * pixelSize * Toolkit.getDefaultToolkit().getScreenResolution() / 72.0;
 		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 		        if ("Nimbus".equals(info.getName())) {
@@ -111,6 +114,8 @@ public class RobautoMain {
 //			e.printStackTrace();
 //		}
 	}
+	
+	public static JFrame frame;
 
 	public static void main(String[] args) {
 		initLookAndFeel();
@@ -118,11 +123,31 @@ public class RobautoMain {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					frame = new JFrame();
+					frame.setTitle("Robauto - Travel Mode");
+					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+					
 					plannerMode = new PlannerMode();
-					plannerMode.setVisible(true);
-					plannerMode.initialize();
 					travelMode = new TravelMode();
-					travelMode.setVisible(false);
+					
+					frame.setContentPane(plannerMode);
+					// frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+					frame.setSize(800, 600);
+					SwingUtilities.updateComponentTreeUI(frame);
+					frame.pack();
+					frame.setVisible(true);
+					frame.addWindowListener(new WindowAdapter() {
+						@Override
+						public void windowClosing(WindowEvent e) {
+							RobautoMain.tripPlan.setPlaces(plannerMode.routePanel.getWaypointsModel().getData());
+							RobautoMain.tripPlan.save(plannerMode.tripPlanFile);
+						}
+					});
+					frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					plannerMode.initialize();
+					frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

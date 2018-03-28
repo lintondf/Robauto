@@ -79,7 +79,7 @@ import seedu.addressbook.logic.Logic;
 
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
 
-public class PlannerMode {
+public class PlannerMode extends JPanel {
 
 	protected static final String INITIAL_RESULTS_TEXT = "<html><center>Run Optimize Stops to populate this panel</center></html>";
 
@@ -98,16 +98,10 @@ public class PlannerMode {
 	protected AddressBook addressBook;
 	protected JTextPane resultsPane;
 
-	protected JFrame frame;
-
 	protected ch.qos.logback.classic.Logger rootLogger;
 
 	protected TextAreaAppender textAreaAppender;
 	
-	public void setVisible( boolean tf ) {
-		frame.setVisible(tf);
-	}
-
 	public class POIClickHandler {
 		@Subscribe
 		protected void handle(POIClickEvent event) {
@@ -592,13 +586,13 @@ public class PlannerMode {
 	}
 
 	public PlannerMode() {
+		setLayout(new BorderLayout());
 		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
 		textAreaAppender = new TextAreaAppender(lc);
 		textAreaAppender.start();
 
-		frame = new JFrame("RobAuto RV Trip Planner");
 		mainPanel = new MainPanel();
 		mainPanel.getLeftPanel().setLayout(new BorderLayout());
 		routePanel = new RoutePanel(new Events.EventActionListener());
@@ -609,7 +603,7 @@ public class PlannerMode {
 		// browserCanvas = WebBrowser.factory(mainPanel);
 		controlPanel = new MainControlPanel();
 		mainPanel.getLeftPanel().add(controlPanel);
-		frame.setContentPane(mainPanel);
+		this.add(mainPanel);
 
 		resultsPane = new JTextPane();
 		resultsPane.setVisible(true);
@@ -618,16 +612,10 @@ public class PlannerMode {
 		resultsPane.setText(INITIAL_RESULTS_TEXT);
 		JScrollPane scroll = new JScrollPane(resultsPane);
 		mainPanel.getRightTabbedPane().addTab("Results", null, scroll, null);
-		// frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(800, 600);
-		SwingUtilities.updateComponentTreeUI(frame);
-		frame.pack();
 	}
 	
 	public void initialize() {
 		// browserCanvas.initialize(frame);
-		frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
 		// logging to text area can start once frame is visible
 		rootLogger.addAppender(textAreaAppender);
@@ -647,13 +635,6 @@ public class PlannerMode {
 		} catch (Exception x) {
 			RobautoMain.logger.trace(x.getMessage());
 		}
-		frame.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				RobautoMain.tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
-				RobautoMain.tripPlan.save(tripPlanFile);
-			}
-		});
 
 		RobautoMain.logger.info("Loading previous trip plan");
 		RobautoMain.tripPlan = TripPlan.load(tripPlanFile);
@@ -669,7 +650,6 @@ public class PlannerMode {
 			String html = report.toHtml();
 			resultsPane.setText(html);
 		}
-		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 
 	private void outputToCopilot(ArrayList<ArrayList<VisitedPlace>> finalizedPlaces) {

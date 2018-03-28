@@ -25,9 +25,8 @@ import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import java.awt.Font;
 
-public class TravelMode extends JFrame {
+public class TravelMode extends JPanel {
 
-	private JPanel contentPane;
 	protected JList listOfDays;
 	protected JSplitPane splitPane;
 	
@@ -47,16 +46,10 @@ public class TravelMode extends JFrame {
 	 * Create the frame.
 	 */
 	public TravelMode() {
-		setTitle("Robauto - Travel Mode");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(new BorderLayout(0, 0));
+		setLayout(new BorderLayout());
 		
 		JPanel buttonPanel = new JPanel();
-		contentPane.add(buttonPanel, BorderLayout.SOUTH);
+		this.add(buttonPanel, BorderLayout.SOUTH);
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
 		
 		JButton btnPlannerMode = new JButton("Planner Mode");
@@ -77,10 +70,10 @@ public class TravelMode extends JFrame {
 		buttonPanel.add(btnSelectDay);
 		
 		splitPane = new JSplitPane();
-		contentPane.add(splitPane, BorderLayout.CENTER);
+		this.add(splitPane, BorderLayout.CENTER);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		contentPane.add(scrollPane, BorderLayout.NORTH);
+		this.add(scrollPane, BorderLayout.NORTH);
 		
 		String[] days = {"Day 01 - Melbourne to Pooler", "Day 02 - Pooler to Banner Elk"};
 		listOfDays = new JList(days);
