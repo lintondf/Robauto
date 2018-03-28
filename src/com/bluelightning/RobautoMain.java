@@ -75,18 +75,8 @@ public class RobautoMain {
 		            NimbusLookAndFeel laf = (NimbusLookAndFeel) UIManager.getLookAndFeel();
 		            //laf.getDefaults().entrySet().forEach(System.out::println);
 		            Font font = new Font("Tahoma", Font.BOLD, (int) fontSize );
-//		            FontMetrics metrics = graphics.getFontMetrics(font);
-//		         // get the height of a line of text in this
-//		         // font and render context
-//		         int hgt = metrics.getHeight();
-//		            laf.getDefaults().put("Button.font", font );
-//		            laf.getDefaults().put("CheckBox.font", font );
-//		            laf.getDefaults().put("ComboBox.font", font );
-//		            laf.getDefaults().put("Label.font", font );
-//		            laf.getDefaults().put("List.font", font );
 		            laf.getDefaults().put("defaultFont", font );
 		            laf.getDefaults().put("ScrollBar.thumbHeight", pixelSize);
-		            //laf.getDefaults().put("ScrollBar:\"ScrollBar.button\".size", pixelSize);
 		            laf.getDefaults().put("Table.rowHeight", pixelSize); 
 		            break;
 		        }
@@ -94,25 +84,6 @@ public class RobautoMain {
 		} catch (Exception e) {
 		    // If Nimbus is not available, you can set the GUI to another look and feel.
 		}
-//		SynthLookAndFeel lookAndFeel = new SynthLookAndFeel();
-//
-//		// SynthLookAndFeel load() method throws a checked exception
-//		// (java.text.ParseException) so it must be handled
-//		try {
-//			lookAndFeel.load(new FileInputStream("resources/synth.xml"), RobautoMain.class);
-//			UIManager.setLookAndFeel(lookAndFeel);
-//		}
-//
-//		catch (ParseException e) {
-//			System.err.println("Couldn't get specified look and feel (" + lookAndFeel + "), for some reason.");
-//			System.err.println("Using the default look and feel.");
-//			e.printStackTrace();
-//		} catch (UnsupportedLookAndFeelException e) {
-//			e.printStackTrace();
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 	}
 	
 	public static JFrame frame;

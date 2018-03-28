@@ -3,13 +3,17 @@ package com.bluelightning;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +29,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +42,7 @@ import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
+import com.bluelightning.RobautoMain.ModeHandler;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.DriverAssignments;
 import com.bluelightning.data.TripPlan.LegData;
@@ -255,7 +263,16 @@ public class PlannerMode extends JPanel {
 				break;
 				
 			case "ControlPanel.TravelMode":
-				Events.eventBus.post( new Events.UiEvent("TravelMode", null));
+				try {
+					String javaDir = "C:\\ProgramData\\Oracle\\Java\\javapath\\java.exe";
+					ProcessBuilder pb = new ProcessBuilder();
+					pb.command( Arrays.asList( javaDir, "-cp", "Robauto.jar", "com.bluelightning.TravelMode" ) );
+					pb.redirectErrorStream(true);
+					Process p = pb.start();
+					System.exit(0);
+				} catch (Exception x) {
+					x.printStackTrace();
+				}
 				break;
 				
 			case "ControlPanel.ClearActions":
@@ -696,4 +713,61 @@ public class PlannerMode extends JPanel {
 		}
 	}
 
+	public static JFrame frame;
+
+	private static void initLookAndFeel(double textSizeInPixels, double fontSize) {
+		try {
+			System.out.println( Toolkit.getDefaultToolkit().getScreenSize() );
+			//double fontSize = 0.8 * textSizeInPixels * Toolkit.getDefaultToolkit().getScreenResolution() / 72.0;
+			System.out.printf("%f %d %f\n", textSizeInPixels, Toolkit.getDefaultToolkit().getScreenResolution(), fontSize);
+		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+		        if ("Nimbus".equals(info.getName())) {
+		            UIManager.setLookAndFeel(info.getClassName());
+		            NimbusLookAndFeel laf = (NimbusLookAndFeel) UIManager.getLookAndFeel();
+		            //laf.getDefaults().entrySet().forEach(System.out::println);
+		            Font font = new Font("Tahoma", Font.BOLD, (int) fontSize );
+		            System.out.println(font);
+		            laf.getDefaults().put("defaultFont", font );
+		            laf.getDefaults().put("ScrollBar.thumbHeight", (int) textSizeInPixels);
+		            laf.getDefaults().put("Table.rowHeight", (int) textSizeInPixels); 
+		            break;
+		        }
+		    }
+		} catch (Exception e) {
+		    // If Nimbus is not available, you can set the GUI to another look and feel.
+		}
+	}
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					initLookAndFeel( 30, 24 );
+					frame = new JFrame();
+					frame.setTitle("Robauto - Planner Mode");
+					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+					
+					PlannerMode plannerMode = new PlannerMode();
+					
+					frame.setContentPane(plannerMode);
+					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+					SwingUtilities.updateComponentTreeUI(frame);
+					frame.pack();
+					frame.setVisible(true);
+					frame.addWindowListener(new WindowAdapter() {
+						@Override
+						public void windowClosing(WindowEvent e) {
+							RobautoMain.tripPlan.setPlaces(plannerMode.routePanel.getWaypointsModel().getData());
+							RobautoMain.tripPlan.save(plannerMode.tripPlanFile);
+						}
+					});
+					frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					plannerMode.initialize();
+					frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 }
