@@ -1,5 +1,6 @@
 package seedu.addressbook.data.place;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import seedu.addressbook.data.exception.IllegalValueException;
@@ -10,11 +11,12 @@ import seedu.addressbook.data.exception.IllegalValueException;
  */
 public class Address implements Serializable {
 
-    public static final String EXAMPLE = "123, some street";
+	private static final long serialVersionUID = -10030140998752416L;
+	public static final String EXAMPLE = "123, some street";
     public static final String MESSAGE_ADDRESS_CONSTRAINTS = "Person addresses can be in any format";
     public static final String ADDRESS_VALIDATION_REGEX = ".+";
 
-    public final String value;
+    public String value;
     private boolean isPrivate;
 
     /**
@@ -33,6 +35,24 @@ public class Address implements Serializable {
     public Address() {
 		value = "";
 	}
+    
+    public String getCity() {
+    	if (value == null || value.isEmpty())
+    		return "";
+    	String[] fields = value.split(",");
+    	if (fields.length < 2)
+    		return "";
+    	return fields[1].trim();
+    }
+
+    public String getState() {
+    	if (value == null || value.isEmpty())
+    		return "";
+    	String[] fields = value.split(",");
+    	if (fields.length < 3)
+    		return "";
+    	return fields[2].trim();
+    }
 
 	/**
      * Returns true if a given string is a valid person email.
@@ -61,4 +81,11 @@ public class Address implements Serializable {
     public boolean isPrivate() {
         return isPrivate;
     }
+    
+//    private void readObject(java.io.ObjectInputStream in)
+//    		 throws IOException, ClassNotFoundException {
+//        int version = in.readInt();
+//        this.value = (String)in.readObject();
+//        this.isPrivate = (Boolean)in.readObject();
+//    }
 }

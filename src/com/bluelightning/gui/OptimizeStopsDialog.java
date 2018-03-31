@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -38,6 +40,7 @@ import com.bluelightning.OptimizeStops;
 import com.bluelightning.Permutations;
 import com.bluelightning.Report;
 import com.bluelightning.RobautoMain;
+import com.bluelightning.TripPlanUpdate;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.DriverAssignments;
 import com.bluelightning.data.TripPlan.DriverAssignments.Turn;
@@ -1027,5 +1030,6 @@ public class OptimizeStopsDialog extends JDialog {
 		} // for i
 		RobautoMain.logger.info("  reported");
 	}
+
 
 }

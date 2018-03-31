@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -36,6 +38,7 @@ import javafx.util.Pair;
 
 import com.bluelightning.Report;
 import com.bluelightning.RobautoMain;
+import com.bluelightning.TripPlanUpdate;
 
 import seedu.addressbook.data.place.VisitedPlace;
 
@@ -64,6 +67,19 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	protected ArrayList<Integer> finalizedMarkers;
 
 	protected ArrayList<ArrayList<VisitedPlace>> finalizedPlaces;
+	
+	public void tripPlanUpdated(String savePath) {
+		try {
+		    Registry registry = LocateRegistry.getRegistry("192.168.0.13", RobautoMain.REGISTRY_PORT);
+		    TripPlanUpdate stub = (TripPlanUpdate) registry.lookup("Update");
+		    String response = stub.update(savePath);
+		    System.out.println("tripPlanUpdated::response: " + response);
+		} catch (Exception e) {
+		    System.err.println("Client exception: " + e.toString());
+		    e.printStackTrace();
+		}
+	}
+	
 
 	public void clear(String action) {
 		switch (action) {

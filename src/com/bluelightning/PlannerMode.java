@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.PrintWriter;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -82,9 +83,6 @@ import seedu.addressbook.data.exception.IllegalValueException;
 import seedu.addressbook.data.place.ReadOnlyPlace;
 import seedu.addressbook.data.place.VisitedPlace;
 import seedu.addressbook.logic.Logic;
-
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
 
@@ -263,18 +261,6 @@ public class PlannerMode extends JPanel {
 				}
 				break;
 				
-			case "ControlPanel.TravelMode":
-		        try {
-		            Registry registry = LocateRegistry.getRegistry(null);
-		            TripPlanUpdate stub = (TripPlanUpdate) registry.lookup("Update");
-		            String response = stub.update("my message");
-		            System.out.println("response: " + response);
-		        } catch (Exception e) {
-		            System.err.println("Client exception: " + e.toString());
-		            e.printStackTrace();
-		        }
-				break;
-				
 			case "ControlPanel.ClearActions":
 				System.out.println(event.source + " " + event.awtEvent);
 				JComboBox box = (JComboBox) event.awtEvent.getSource();
@@ -339,7 +325,7 @@ public class PlannerMode extends JPanel {
 				markers.set(markers.size() - 1, StopMarker.TERMINUS);
 				RobautoMain.tripPlan.setFinalizedRoute(days, markers, allPlaces);
 			}
-			waypoints = map.showRoute(days, markers);
+			waypoints = map.showRoute(days, markers, Map.ALL_DAYS);
 			int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 			mainPanel.getRightTabbedPane().setSelectedIndex(index);
 			RobautoMain.logger.info("  Route shown on map");
@@ -365,6 +351,7 @@ public class PlannerMode extends JPanel {
 				RobautoMain.tripPlan.setRoute(route);
 			}
 			RobautoMain.tripPlan.save(tripPlanFile);
+			RobautoMain.tripPlan.tripPlanUpdated( tripPlanFile.getAbsolutePath() );
 			RobautoMain.logger.info("  Trip plan saved");
 		}
 
@@ -604,7 +591,7 @@ public class PlannerMode extends JPanel {
 
 	public PlannerMode() {
 		setLayout(new BorderLayout());
-		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.Robauto");
+		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoPlanner");
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
 		textAreaAppender = new TextAreaAppender(lc);
@@ -738,13 +725,26 @@ public class PlannerMode extends JPanel {
 		}
 	}
 	public static void main(String[] args) {
+		java.net.InetAddress localMachine = null;
+		try {
+			localMachine = java.net.InetAddress.getLocalHost();
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		final String hostName = (localMachine != null) ? localMachine.getHostName() : "localhost";
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					initLookAndFeel( 30, 24 );
+					if ( hostName.toUpperCase().startsWith("SURFACE") )
+						initLookAndFeel( 30, 24 );
 					frame = new JFrame();
 					frame.setTitle("Robauto - Planner Mode");
 					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+					Image icon = ImageIO.read(new File("images/icon-planner.jpg"))
+							.getScaledInstance((int)64, (int)64, Image.SCALE_SMOOTH);
+					frame.setIconImage(icon);
+
 					
 					PlannerMode plannerMode = new PlannerMode();
 					
@@ -758,6 +758,7 @@ public class PlannerMode extends JPanel {
 						public void windowClosing(WindowEvent e) {
 							RobautoMain.tripPlan.setPlaces(plannerMode.routePanel.getWaypointsModel().getData());
 							RobautoMain.tripPlan.save(plannerMode.tripPlanFile);
+							RobautoMain.tripPlan.tripPlanUpdated( plannerMode.tripPlanFile.getAbsolutePath() );
 						}
 					});
 					frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

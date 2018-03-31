@@ -70,7 +70,7 @@
     </persons>
     <persons>
         <name>Maple Lane Farms</name>
-        <address>224 Upper-Charleston Rd. Charleston, ME 04422</address>
+        <address>224 Upper-Charleston Rd, Charleston, ME 04422</address>
         <latitude>45.08825</latitude>
         <longitude>-69.01912</longitude>
     </persons>

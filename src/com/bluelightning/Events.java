@@ -59,6 +59,10 @@ public class Events {
 		}
 	}
 	
+	public static class TripPlanUpdated {
+		public TripPlanUpdated() {}
+	}
+	
 	public static class UiEvent {
 		public String source;
 		public AWTEvent awtEvent;

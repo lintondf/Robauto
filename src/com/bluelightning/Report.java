@@ -324,6 +324,21 @@ public class Report implements Serializable {
 		return c.toString();
 	}
 
+	public String toHtml(Day day) {
+		if (theme == null) {
+			theme = new Theme();
+		}
+		Chunk c = theme.makeChunk("report#report");
+		StringBuffer sb = new StringBuffer();
+		sb.append(day.toHtml());
+		c.set("body", sb.toString());
+		try {
+			String css = IOUtils.toString(new FileInputStream("themes/style.css"));
+			c.set("styles", css);
+		} catch (Exception x) {}
+		return c.toString();
+	}
+
 	public static void test_basic(String[] args) {
 		Report report = new Report();
 
