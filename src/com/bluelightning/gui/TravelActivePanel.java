@@ -12,6 +12,7 @@ public class TravelActivePanel extends JPanel {
 	protected JPanel leftPanel;
 	protected JProgressBar progressBar;
 	protected JTextPane textPane;
+	private JPanel componentsPanel;
 
 	/**
 	 * Create the panel.
@@ -36,6 +37,9 @@ public class TravelActivePanel extends JPanel {
 		
 		textPane = new JTextPane();
 		rightPanel.add(textPane, BorderLayout.CENTER);
+		
+		componentsPanel = new JPanel();
+		rightPanel.add(componentsPanel, BorderLayout.NORTH);
 
 	}
 
@@ -61,6 +65,14 @@ public class TravelActivePanel extends JPanel {
 
 	public void setTextPane(JTextPane textArea) {
 		this.textPane = textArea;
+	}
+
+	public JPanel getComponentsPanel() {
+		return componentsPanel;
+	}
+
+	public void setComponentsPanel(JPanel componentsPanel) {
+		this.componentsPanel = componentsPanel;
 	}
 
 }

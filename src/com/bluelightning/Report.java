@@ -29,6 +29,9 @@ import com.x5.util.Base64;
 
 public class Report implements Serializable {
 
+	public static double MPG = 7.0;
+	public static double FUEL_CAPACITY = 80.0;
+
 	/**
 	 * 
 	 */
@@ -187,8 +190,8 @@ public class Report implements Serializable {
 		}
 	}
 
-	protected double mpg = 7.0;
-	protected double fuelLevel = 80.0; // gallons
+	protected double mpg = MPG;
+	protected double fuelLevel = FUEL_CAPACITY; // gallons
 	protected Day lastDay = null;
 
 	public double fillUp() {

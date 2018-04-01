@@ -493,6 +493,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	@SuppressWarnings("unchecked")
 	public static TripPlan load(File file) {
 		try {
+			RobautoMain.logger.info("Load started " + file.getName());
 			FileInputStream fis = new FileInputStream(file);
 			ObjectInputStream in = new ObjectInputStream(fis);
 			TripPlan tripPlan = new TripPlan();

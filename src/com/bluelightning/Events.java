@@ -43,6 +43,14 @@ public class Events {
 		}
 	}
 	
+	public static class GpsEvent {
+		public GPS.Fix  fix;
+		
+		public GpsEvent( GPS.Fix fix ) {
+			this.fix = fix;
+		}
+	}
+	
 	public static class POIClickEvent {
 		public POI   poi;
 		

@@ -47,6 +47,17 @@ public class ButtonWaypoint extends JButton implements Waypoint {
 	}
 
 
+	/**
+	 * Set a new GeoPosition for this Waypoint
+	 * @param coordinate a new position
+	 */
+	public void setPosition(GeoPosition coordinate)
+	{
+		GeoPosition old = getPosition();
+		this.geoPosition = coordinate;
+		firePropertyChange("position", old, getPosition());
+	}
+	
 	public static Dimension getImageSize() {
 		return size;
 	}

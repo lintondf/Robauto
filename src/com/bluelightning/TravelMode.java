@@ -2,6 +2,7 @@ package com.bluelightning;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 
@@ -33,6 +34,7 @@ import java.awt.FlowLayout;
 
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -43,6 +45,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 
 import javax.swing.JScrollPane;
@@ -56,6 +59,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.bluelightning.gui.TravelActivePanel;
@@ -69,13 +73,23 @@ public class TravelMode extends JPanel {
 	protected Map          map;
 	protected JXMapViewer  mapViewer;
 	
+	/** HandleTripPlanUpdate - respond to RMI update() calls when PlannerMode changes TripPlan on disk.
+	 */
 	public class HandleTripPlanUpdate implements TripPlanUpdate {
 		@Override
-		public String update(String tripPlanPath) throws RemoteException {
+		public String update(final String tripPlanPath) throws RemoteException {
 			System.out.println(tripPlanPath);
-			tripPlan = TripPlan.load( new File(tripPlanPath) );
-			report = tripPlan.getTripReport();
-			Events.eventBus.post( new Events.TripPlanUpdated() );
+			final File tripPlanFile = new File(tripPlanPath); 
+			try {
+				SwingUtilities.invokeAndWait( new Runnable() {
+					@Override
+					public void run() {
+						initialize( tripPlanFile );
+					}
+				});
+			} catch (InvocationTargetException | InterruptedException e) {
+				e.printStackTrace();
+			}
 			return Boolean.toString(tripPlan != null);
 		}
 	}
@@ -96,41 +110,91 @@ public class TravelMode extends JPanel {
 		}
 	}
 	
-	public class UpdateHandler {
-		@Subscribe
-		protected void handle(Events.TripPlanUpdated event) {
-		}		
-	}
-	
 	protected int currentDay = 0;
 	
 	protected void nextDay() {
 		int n = listOfDays.getModel().getSize();
 		currentDay = (currentDay+1) % n;
-		showDay();
+		setDay();
 	}
 	
 	protected void priorDay() {
 		int n = listOfDays.getModel().getSize();
 		currentDay = (currentDay-1) % n;
-		showDay();
+		setDay();
 	}
 	
-	protected void showDay() {
+	protected double distanceTravelled;
+	protected double currentFuel;
+	
+	protected void setFuelLevel() {
+		activePanel.getProgressBar().setMaximum( (int) Report.FUEL_CAPACITY ); 
+		activePanel.getProgressBar().setStringPainted(true);
+		activePanel.getProgressBar().setValue( (int) currentFuel );
+		int eigths = (int) (8.0 * currentFuel / Report.FUEL_CAPACITY);
+		eigths = Math.min( Math.max(eigths, 0), 8);
+		final String[] values = {"E", "1/8", "1/4", "3/8", "1/2", "5/8", "3/4", "7/8","F"};
+		String fraction = values[eigths];
+		String report = String.format("%s (%.0f gallons; %.0f MTE)", fraction, currentFuel, Report.MPG * currentFuel );
+		activePanel.getProgressBar().setString(report);
+	}
+	
+	protected GPS gps = new GPS();
+	
+	public class GpsHandler {
+		@Subscribe
+		public void handle( final Events.GpsEvent event ) {
+			System.out.println( event.fix.toString() + " " + distanceTravelled );
+			distanceTravelled += Here2.METERS_TO_MILES * event.fix.movement;
+			currentFuel -= Here2.METERS_TO_MILES * event.fix.movement / Report.MPG;
+			SwingUtilities.invokeLater( new Runnable() {
+				@Override
+				public void run() {
+					setFuelLevel();
+					map.moveYouAreHere(event.fix);				
+				}
+			} );
+		}
+	}
+	
+	protected void setupGps( Route route ) {
+		route.getLeg().forEach(g->{
+			System.out.println(g.getLength()*Here2.METERS_TO_MILES);
+		});
+		Dimension size = ButtonWaypoint.getImageSize();
+		Image image = null;
+		try {
+			image = ImageIO.read(new File("images/youarehere.png"))
+					.getScaledInstance(2 * (int)size.getWidth(), 2 * (int)size.getHeight(), Image.SCALE_SMOOTH);
+		} catch (Exception x) {}
+
+		List<GeoPosition> path = route.getShape();
+		final Iterator<GeoPosition> it = path.iterator();
+		final ButtonWaypoint buttonWaypoint = new ButtonWaypoint(new ImageIcon(image), it.next() );
+		map.setYouAreHere(buttonWaypoint);
+		Events.eventBus.register( new GpsHandler() );
+		gps.debugSetup( it );
+	}
+	
+	protected void setDay() {
+		final Report.Day day = report.getDays().get(currentDay);
+		final ArrayList<Route> days = tripPlan.getFinalizedDays();
+		final ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
+		currentFuel = Double.parseDouble(day.steps.get(0).drive.fuelRemaining);
+		distanceTravelled = 0.0;
+		setupGps( days.get(currentDay) );
 		SwingUtilities.invokeLater( new Runnable() {
 			@Override
 			public void run() {
 				try { Thread.sleep(500); } catch (Exception x) {}
 				map.clearRoute();
-				ArrayList<Route> days = tripPlan.getFinalizedDays();
-				ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
 				List<ButtonWaypoint> waypoints = map.showRoute(days, markers, currentDay);
 			}
 		} );
 		activePanel.getTextPane().setContentType("text/html");
 		activePanel.getTextPane().setEditable(false);
-		activePanel.getTextPane().setText(
-				report.toHtml(report.getDays().get(currentDay) ) );
+		activePanel.getTextPane().setText( report.toHtml( day ) );
+		setFuelLevel();
 	}
 	
 	public class DaySelectionListener implements ListSelectionListener {
@@ -142,7 +206,7 @@ public class TravelMode extends JPanel {
 			activePanel.setVisible(true);
 			map.clearRoute();
 			currentDay = listOfDays.getSelectedIndex();
-			showDay();
+			setDay();
 		}
 	}
 
@@ -205,11 +269,18 @@ public class TravelMode extends JPanel {
 		mapViewer = map.getMapViewer();
 		activePanel.getLeftPanel().add(mapViewer, BorderLayout.CENTER);
 		
+		activePanel.getComponentsPanel().setVisible(false);
+		
+//		try {
+//			Image image = ImageIO.read(new File("images/compass.jpg"));
+//			activePanel.getComponentsPanel().add(new ImageIcon(image));
+//		} catch (Exception x) {}
+//
+		
 		SwingUtilities.updateComponentTreeUI(this);
 		
 		// Bind event handlers
 		Events.eventBus.register(new UiHandler());
-		Events.eventBus.register(new UpdateHandler());
 		
 		try {
             HandleTripPlanUpdate obj = new HandleTripPlanUpdate();

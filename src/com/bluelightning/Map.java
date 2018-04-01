@@ -19,6 +19,7 @@ import java.util.TreeSet;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
 import org.jxmapviewer.JXMapViewer;
@@ -210,6 +211,8 @@ public class Map {
 	}
 	
 	public static final int ALL_DAYS = -1;
+	
+	protected ButtonWaypoint  youAreHere = null;
 
 	public List<ButtonWaypoint> showRoute(ArrayList<Route> days, ArrayList<Integer> markers, int whichDay) {
 		Iterator<Integer> iMarker = markers.iterator();
@@ -223,6 +226,8 @@ public class Map {
 		
 		// Create waypoints from the geo-positions
 		ArrayList<ButtonWaypoint> waylist = new ArrayList<>();
+		if (youAreHere != null)
+			waylist.add(youAreHere);
 		String text = "";
 		for (int i = 0; i < days.size(); i++) {
 			Route route = days.get(i);
@@ -239,7 +244,8 @@ public class Map {
 		waylist.add(new StopMarker(iMarker.next(), text, track.get(track.size() - 1)));
 
 		markerPainter = new ButtonWaypointOverlayPainter();
-		markerPainter.setWaypoints( new HashSet<ButtonWaypoint>(waylist));
+		HashSet<ButtonWaypoint> buttonWaypointSet = new HashSet<>(waylist);
+		markerPainter.setWaypoints( buttonWaypointSet );
 		
         painters = new ArrayList<Painter<JXMapViewer>>();
 		painters.add(routePainter);
@@ -257,9 +263,27 @@ public class Map {
 		// Set the focus
 		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(track), 0.9);	
 		mapViewer.calculateZoomFrom( new HashSet<GeoPosition>(track) );
-		System.out.println( mapViewer.getCenterPosition() );
-		System.out.println( mapViewer.getZoom() );
 		return waylist;
+	}
+
+	public ButtonWaypoint getYouAreHere() {
+		return youAreHere;
+	}
+
+	public void setYouAreHere(ButtonWaypoint youAreHere) {
+		this.youAreHere = youAreHere;
+	}
+	
+	public void moveYouAreHere( GeoPosition where) {
+		if (youAreHere != null) {
+			SwingUtilities.invokeLater( new Runnable() {
+				@Override
+				public void run() {
+					youAreHere.setPosition(where);
+					mapViewer.validate();			
+				}
+			});
+		}
 	}
 
 }
