@@ -106,5 +106,11 @@
         <latitude>27.20005</latitude>
         <longitude>-80.2544099</longitude>
     </persons>
+    <persons>
+        <name>Norrie SP</name>
+        <address>9 Old Post Road, Staatsburg, NY 12580</address>
+        <latitude>41.84363</latitude>
+        <longitude>-73.92999</longitude>
+    </persons>
     <tags>Gas</tags>
 </AddressBook>

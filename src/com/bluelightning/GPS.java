@@ -18,7 +18,7 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 public class GPS {
 	
-	protected static File gpsDat = new File("gpssave.dat");
+	protected static File gpsDat = new File("//SurfacePro3/NA/save/gpssave.dat");
 	protected static Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 	protected static GeodeticCalculator geoCalc = new GeodeticCalculator();
 	protected static Ellipsoid wgs84 = Ellipsoid.WGS84;
@@ -79,6 +79,8 @@ public class GPS {
 				}
 				fields = lines.get(2).split("=");
 				if (fields[0].equalsIgnoreCase("UTCDate")) {
+					if (fields[1].length() < 6)
+						fields[1] = "0"+fields[1];
 					int year = Integer.parseInt(fields[1].substring(0, 2));
 					int month = Integer.parseInt(fields[1].substring(2, 4));
 					int day = Integer.parseInt(fields[1].substring(4, 6));
@@ -89,6 +91,8 @@ public class GPS {
 				}
 				fields = lines.get(3).split("=");
 				if (fields[0].equalsIgnoreCase("UTCTime")) {
+					if (fields[1].length() < 6)
+						fields[1] = "0"+fields[1];
 					int hour = Integer.parseInt(fields[1].substring(0, 2));
 					int minutes = Integer.parseInt(fields[1].substring(2, 4));
 					int seconds = Integer.parseInt(fields[1].substring(4, 6));
@@ -111,6 +115,7 @@ public class GPS {
 				return fix;
 			} catch (IOException e) {
 				RobautoMain.logger.error("Bad gpssave.dat: ", e );
+				e.printStackTrace();
 				return null;
 			}
 		}
@@ -133,21 +138,74 @@ public class GPS {
 		lastFix = fix;
 	}
 	
+	Thread readerThread = null;
 	
-	public void debugSetup(final Iterator<GeoPosition> it) {
-		Thread t = new Thread( new Runnable() {
+	public void initialize() {
+		readerThread = new Thread(new Runnable(){
 			@Override
 			public void run() {
-				Date date = new Date();
-				while (it.hasNext()) {
-					final GeoPosition position = it.next();
-					try { Thread.sleep(100); } catch (Exception x) {}
-					date = new Date( date.getTime() + 10000L );
-					addObservation( new Fix( date, position ) ); 
+				System.out.println("Starting normal: " +this);
+				while (!Thread.interrupted()) {
+					try { 
+						Thread.sleep(10000L);  // file updates every 60 seconds
+						Fix fix = Fix.readGpsDataFile();
+						if (fix != null) {
+							addObservation( fix );
+						}
+					} catch (Exception x) {
+						x.printStackTrace();
+						break;
+					}
 				}
+				System.out.println("Exiting normal: " +this);
+			}
+		});
+		readerThread.start();
+	}
+	
+	public void shutdown() {
+		if (readerThread != null) {
+			readerThread.interrupt();
+			try {
+				readerThread.join(1000);
+			} catch (Exception x) {
+				readerThread.destroy();
+			}
+		}
+	}
+
+	
+	Thread debugThread = null;
+	
+	public void debugSetup(final Iterator<GeoPosition> it) {
+		if (debugThread != null) {
+			debugThread.interrupt();
+			try {
+				debugThread.join(1000);
+			} catch (Exception x) {
+				debugThread.destroy();
+			}
+		}
+		lastFix = null;
+		Thread debugThread = new Thread( new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("Starting: " +this);
+				Date date = new Date();
+				while (!Thread.interrupted() && it.hasNext()) {
+					final GeoPosition position = it.next();
+					try { 
+						Thread.sleep(100); 
+						date = new Date( date.getTime() + 10000L );
+						addObservation( new Fix( date, position ) ); 
+					} catch (Exception x) {
+						break;
+					}
+				}
+				System.out.println("Exiting: " +this);
 			}
 		} );
-		t.start();
+		debugThread.start();
 	}
 	
 	public static void main(String[] args) {

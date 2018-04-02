@@ -117,11 +117,11 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			sb.append('\n');
 			sb.append(String.format("   roadDirectionDataList (%d)\n", roadDirectionDataList.size()));
 			for (RoadDirectionData data : this.roadDirectionDataList) {
-				sb.append("     " + data.toString());
+				sb.append("     " + data.toString() + "\n");
 			}
 			sb.append(String.format("   stopDataList (%d)\n", stopDataList.size()));
 			for (StopData stopData : this.stopDataList) {
-				sb.append("      " + stopData.toString());
+				sb.append("      " + stopData.toString() + "\n");
 			}
 
 			sb.append("    driverAssignments: " + this.driverAssignments.toString());
