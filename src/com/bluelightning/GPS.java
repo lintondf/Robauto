@@ -128,6 +128,8 @@ public class GPS {
 			GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84, 
 					new GlobalCoordinates(lastFix), new GlobalCoordinates(fix));
 			fix.heading = curve.getAzimuth();
+			if (Double.isNaN(fix.heading))
+				fix.heading = 0.0;
 			double dt = 1e-3 * (double)(fix.date.getTime() - lastFix.date.getTime());
 			if (dt > 0.0 && Double.isFinite(curve.getEllipsoidalDistance())) {
 				fix.movement = curve.getEllipsoidalDistance();

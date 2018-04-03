@@ -164,16 +164,16 @@ public class TravelStatus {
 		Chunk c = theme.makeChunk("report#report");
 		Chunk t = theme.makeChunk("report#travel");
 		StringBuffer sb = new StringBuffer();
-		sb.append( String.format("<TR><TD>%s</TD><TD>%.1f</TD><TD></TD></TR>\n", "Distance To Next [miles]", 
-				Here2.METERS_TO_MILES*distanceToNext ) );
 		sb.append( String.format("<TR>%s</TR>\n", drivingTime.toHtmlRow()) );
 		sb.append( String.format("<TR>%s</TR>\n", distanceDriven.toHtmlRow()) );
 		sb.append( String.format("<TR>%s</TR>\n", stoppedTime.toHtmlRow()) );
+		t.set("trackerRows", sb.toString());
 		
+		sb = new StringBuffer();
 		for (UpcomingStop upcomingStop : upcomingStops) {
 			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
 		}
-		t.set("travelRows", sb.toString() );
+		t.set("upcomingRows", sb.toString() );
 		c.set("body", t.toString());
 		try {
 			String css = IOUtils.toString(new FileInputStream("themes/style.css"));

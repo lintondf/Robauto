@@ -72,7 +72,7 @@ public class TravelMode extends JPanel {
 
 	public static String hostName = "localhost";
 	public static boolean isSurface = false;
-	public static boolean gpsNormal = false;
+	public static boolean gpsNormal = true;
 
 	public TripPlan tripPlan = null;
 	public Report report = null;
@@ -134,8 +134,9 @@ public class TravelMode extends JPanel {
 		setDay();
 	}
 
-	protected double distanceTraveled;
-	protected double currentFuel;
+	protected double distanceTraveled;  // [m]
+	protected double currentFuel;  // [gallons]
+	protected double timeStopped;    // [s]
 
 	protected void setFuelLevel() {
 		activePanel.getProgressBar().setMaximum((int) Report.FUEL_CAPACITY);
@@ -160,12 +161,16 @@ public class TravelMode extends JPanel {
 				startTime = event.fix.date;
 			if (event.fix.movement == 0.0)
 				startTime = event.fix.date;
-			System.out.printf("%s %5.1f %6.4f\n", event.fix.toString(), distanceTraveled, 
+			System.out.printf("%s %5.1f %6.4f\n", event.fix.toString(), Here2.METERS_TO_MILES * distanceTraveled, 
 					Here2.METERS_TO_MILES * event.fix.movement / Report.MPG);
-			distanceTraveled += Here2.METERS_TO_MILES * event.fix.movement;
+			distanceTraveled += event.fix.movement;
+			if (event.fix.speed < 0.1) {
+				timeStopped += 60;
+				travelStatus.stopped(timeStopped);
+			}
 			currentFuel -= Here2.METERS_TO_MILES * event.fix.movement / Report.MPG;
 			double timeSoFar = 0.001 * (double) (event.fix.date.getTime() - startTime.getTime());
-			travelStatus.update(timeSoFar, distanceTraveled/Here2.METERS_TO_MILES);
+			travelStatus.update(timeSoFar, distanceTraveled);
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {

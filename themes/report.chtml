@@ -15,9 +15,22 @@
 </html>
 {#}
 {#travel}
+<br/>	
 	<table class="bpTable">
+	<thead>
+	<TR><TD></TD><TD>Total</TD><TD>So Far</TD><TD>Delta</TD></TR>
+	</thead>
 		<tbody>
-			{$travelRows}
+			{$trackerRows}
+		</tbody>
+	</table>
+<br/>	
+	<table class="bpTable">
+	<thead>
+	<TR><TD></TD><TD>Time</TD><TD>Distance</TD></TR>
+	</thead>
+		<tbody>
+			{$upcomingRows}
 		</tbody>
 	</table>
 <br/>	
