@@ -763,10 +763,11 @@ public class PlannerMode extends JPanel {
 					});
 					frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					plannerMode.initialize();
-					frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 				} catch (Exception e) {
 					e.printStackTrace();
+				} finally {					
+					frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				}
 			}
 		});

@@ -154,6 +154,8 @@ public class GPS {
 						if (fix != null) {
 							addObservation( fix );
 						}
+					} catch (InterruptedException ix) {
+						break;
 					} catch (Exception x) {
 						x.printStackTrace();
 						break;

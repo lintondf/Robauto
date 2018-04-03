@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
+import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
 import javax.swing.SwingUtilities;
 
@@ -473,6 +474,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		lastModified = new Date();
 
 		try {
+			int step = 1;
 			FileOutputStream fos = new FileOutputStream(file);
 			ObjectOutputStream out = new ObjectOutputStream(fos);
 			out.writeObject(lastModified);
@@ -490,13 +492,19 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		} catch (Exception x) {
 			x.printStackTrace();
 		}
+		
 	}
 
 	@SuppressWarnings("unchecked")
 	public static TripPlan load(File file, JFrame frame ) {
 		try {
 			RobautoMain.logger.info("Load started " + file.getName());
-			FileInputStream fis = new FileInputStream(file);
+			InputStream fis = new FileInputStream(file);
+			if (frame != null) {
+				ProgressMonitorInputStream pmis = new ProgressMonitorInputStream( frame, "Loading trip plan...", fis);
+				pmis.getProgressMonitor().setMillisToPopup(100);
+				fis = pmis;
+			}
 			ObjectInputStream in = new ObjectInputStream(fis);
 			TripPlan tripPlan = new TripPlan();
 			tripPlan.lastModified = (Date) in.readObject();
