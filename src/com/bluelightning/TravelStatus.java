@@ -23,6 +23,12 @@ public class TravelStatus {
 	
 	static Theme theme;
 	
+	protected static final String oTD = "<TD style='font-size:48pt'>";
+	protected static final String obcTD = "<TD style='font-size:48pt;font-weight:bolder;text-align:center'>";
+	protected static final String oblTD = "<TD style='font-size:48pt;font-weight:bolder;text-align:left'>";
+	protected static final String orTD = "<TD style='font-size:48pt;text-align:right'>";
+	protected static final String cTD = "</TD>";
+	
 	public static String toDeltaPeriod( double seconds ) {
 		String prefix = "+";
 		if (seconds < 0) {
@@ -54,8 +60,9 @@ public class TravelStatus {
 			this.delta = actual - planned;
 		}
 		public String toHtmlRow() {
-			return String.format("<TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%.1f</TD><TD style='font-size:48pt'>%.1f</TD><TD style='font-size:48pt'>%.1f</TD>", title,
-					planned, actual, (actual-planned) );
+			return String.format("%s%s%s%s%.1f%s%s%.1f%s%s%.1f%s", 
+					oblTD, title, cTD,
+					orTD, planned, cTD, orTD, actual, cTD, oTD, (actual-planned), cTD );
 		}
 	}
 	
@@ -67,9 +74,11 @@ public class TravelStatus {
 		
 		@Override
 		public String toHtmlRow() {
-			return String.format("<TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%.1f</TD><TD style='font-size:48pt'>%.1f</TD><TD style='font-size:48pt'>%.1f</TD>", title,
-					Here2.METERS_TO_MILES*planned, Here2.METERS_TO_MILES*actual, 
-					Here2.METERS_TO_MILES*(actual-planned) );
+			return String.format("%s%s%s%s%.1f%s%s%.1f%s%s%.1f%s", 
+					oblTD, title, cTD,
+					orTD, Here2.METERS_TO_MILES*planned, cTD,
+					orTD, Here2.METERS_TO_MILES*actual, cTD, 
+					orTD, Here2.METERS_TO_MILES*(actual-planned), cTD );
 		}
 	}
 
@@ -80,8 +89,11 @@ public class TravelStatus {
 		
 		@Override
 		public String toHtmlRow() {
-			return String.format("<TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%s</TD>", title,
-					Here2.toPeriod(planned), Here2.toPeriod(actual), toDeltaPeriod(actual-planned) );
+			return String.format("%s%s%s%s%s%s%s%s%s%s%s%s", 
+					oblTD, title, cTD,
+					orTD, Here2.toPeriod(planned), cTD,
+					orTD, Here2.toPeriod(actual), cTD,
+					orTD, toDeltaPeriod(actual-planned), cTD );
 		}
 	}
 	
@@ -105,8 +117,10 @@ public class TravelStatus {
 		}
 		
 		public String toHtmlRow() {
-			return String.format("<TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%.1f</TD>", name,
-					Here2.toPeriod(timeRemaining), Here2.METERS_TO_MILES*distanceRemaining);
+			return String.format("%s%s%s%s%s%s%s%.1f%s", 
+					oblTD, name, cTD,
+					orTD, Here2.toPeriod(timeRemaining), cTD,
+					orTD, Here2.METERS_TO_MILES*distanceRemaining, cTD);
 		}
 	}
 	
