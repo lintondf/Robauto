@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
+import javax.swing.ProgressMonitorInputStream;
 import javax.swing.SwingUtilities;
 
 import com.bluelightning.GeodeticPosition;
@@ -491,7 +493,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static TripPlan load(File file) {
+	public static TripPlan load(File file, JFrame frame ) {
 		try {
 			RobautoMain.logger.info("Load started " + file.getName());
 			FileInputStream fis = new FileInputStream(file);

@@ -210,6 +210,9 @@ public class TravelMode extends JPanel {
 		currentFuel = Double.parseDouble(drive.fuelRemaining) + Double.parseDouble(drive.fuelUsed);
 		distanceTraveled = 0.0;
 		setupGps(days.get(currentDay));
+		travelStatus = new TravelStatus( tripPlan.getTripLeg(currentDay));
+		activePanel.getTextPane().setContentType("text/html");
+		activePanel.getTextPane().setEditable(false);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -219,12 +222,10 @@ public class TravelMode extends JPanel {
 				}
 				map.clearRoute();
 				List<ButtonWaypoint> waypoints = map.showRoute(days, markers, currentDay);
+				activePanel.getSplitPane().setDividerLocation(0.4);
+				activePanel.getTextPane().setText(travelStatus.toHtml());
 			}
 		});
-		travelStatus = new TravelStatus( tripPlan.getTripLeg(currentDay));
-		activePanel.getTextPane().setContentType("text/html");
-		activePanel.getTextPane().setEditable(false);
-		activePanel.getTextPane().setText(travelStatus.toHtml()); //report.toHtml(day));
 		setFuelLevel();
 	}
 
@@ -288,7 +289,7 @@ public class TravelMode extends JPanel {
 		dayListScrollPane = new JScrollPane();
 		this.add(dayListScrollPane, BorderLayout.NORTH);
 
-		String[] days = { "Day 01 - Melbourne to Pooler", "Day 02 - Pooler to Banner Elk" };
+		String[] days = { "Loading Finalized Route..." };
 		listOfDays = new JList<String>(days);
 		// listOfDays.setVisibleRowCount(-1);
 		listOfDays.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -329,26 +330,40 @@ public class TravelMode extends JPanel {
 
 	protected void initialize(File tripPlanFile) {
 		activePanel.getProgressBar().setValue(-1);
-		tripPlan = TripPlan.load(tripPlanFile);
-		report = tripPlan.getTripReport();
+		Thread t = new Thread( new Runnable() {
+			@Override
+			public void run() {
+				tripPlan = TripPlan.load(tripPlanFile, frame);
+				report = tripPlan.getTripReport();
 
-		ArrayList<ArrayList<VisitedPlace>> placesByDay = tripPlan.getFinalizedPlaces();
-		int dayNo = 1;
-		DefaultListModel<String> model = new DefaultListModel<>();
-		for (ArrayList<VisitedPlace> stops : placesByDay) {
-			int iLast = stops.size() - 1;
-			Address from = stops.get(0).getAddress();
-			System.out.println(from.toString());
-			Address to = stops.get(iLast).getAddress();
-			System.out.println(to.toString());
-			String entry = String.format("Day %02d: %s, %s to %s, %s", dayNo++, from.getCity(), from.getState(),
-					to.getCity(), to.getState());
-			System.out.println(entry);
-			model.addElement(entry);
-		}
-		listOfDays.setModel(model);
-
-		map.clearRoute();
+				ArrayList<ArrayList<VisitedPlace>> placesByDay = tripPlan.getFinalizedPlaces();
+				int dayNo = 1;
+				DefaultListModel<String> model = new DefaultListModel<>();
+				for (ArrayList<VisitedPlace> stops : placesByDay) {
+					int iLast = stops.size() - 1;
+					Address from = stops.get(0).getAddress();
+					System.out.println(from.toString());
+					Address to = stops.get(iLast).getAddress();
+					System.out.println(to.toString());
+					String entry = String.format("Day %02d: %s, %s to %s, %s", dayNo++, from.getCity(), from.getState(),
+							to.getCity(), to.getState());
+					System.out.println(entry);
+					model.addElement(entry);
+				}
+				if (model.isEmpty()) {
+					model.addElement("No Finalized Route Stops Found");
+				}
+				SwingUtilities.invokeLater( new Runnable() {
+					@Override
+					public void run() {
+						if ( model.size() > 0 )
+							listOfDays.setModel(model);
+						map.clearRoute();
+					}
+				});
+			}
+		} );
+		t.start();
 	}
 
 	/**

@@ -396,6 +396,7 @@ public class OptimizeStopsDialog extends JDialog {
 
 		@Override
 		public void valueChanged(ListSelectionEvent event) {
+			System.out.println(event);
 			if (!event.getValueIsAdjusting()) {
 				System.out.println(event);
 				int which = stopsTable.getSelectedRow();
@@ -439,6 +440,7 @@ public class OptimizeStopsDialog extends JDialog {
 						System.out.println(event);
 						updateTripReport();
 						optimizeStops.getTripPlan().getTripLeg(currentLeg).stopDataList = stopsTableModel.getData();
+						generateLegStopChoices(currentLeg);
 					}
 				}
 			}

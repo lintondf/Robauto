@@ -641,7 +641,7 @@ public class PlannerMode extends JPanel {
 		}
 
 		RobautoMain.logger.info("Loading previous trip plan");
-		RobautoMain.tripPlan = TripPlan.load(tripPlanFile);
+		RobautoMain.tripPlan = TripPlan.load(tripPlanFile, frame);
 		routePanel.getWaypointsModel().setData(RobautoMain.tripPlan.getPlaces());
 		if (!RobautoMain.tripPlan.getFinalizedDays().isEmpty()) {
 			Events.eventBus.post(new Events.UiEvent("ControlPanel.Finalize", null));

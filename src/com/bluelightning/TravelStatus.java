@@ -54,7 +54,7 @@ public class TravelStatus {
 			this.delta = actual - planned;
 		}
 		public String toHtmlRow() {
-			return String.format("<TD>%s</TD><TD>%.1f</TD><TD>%.1f</TD><TD>%.1f</TD>", title,
+			return String.format("<TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%.1f</TD><TD style='font-size:48pt'>%.1f</TD><TD style='font-size:48pt'>%.1f</TD>", title,
 					planned, actual, (actual-planned) );
 		}
 	}
@@ -67,7 +67,7 @@ public class TravelStatus {
 		
 		@Override
 		public String toHtmlRow() {
-			return String.format("<TD>%s</TD><TD>%.1f</TD><TD>%.1f</TD><TD>%.1f</TD>", title,
+			return String.format("<TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%.1f</TD><TD style='font-size:48pt'>%.1f</TD><TD style='font-size:48pt'>%.1f</TD>", title,
 					Here2.METERS_TO_MILES*planned, Here2.METERS_TO_MILES*actual, 
 					Here2.METERS_TO_MILES*(actual-planned) );
 		}
@@ -80,7 +80,7 @@ public class TravelStatus {
 		
 		@Override
 		public String toHtmlRow() {
-			return String.format("<TD>%s</TD><TD>%s</TD><TD>%s</TD><TD>%s</TD>", title,
+			return String.format("<TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%s</TD>", title,
 					Here2.toPeriod(planned), Here2.toPeriod(actual), toDeltaPeriod(actual-planned) );
 		}
 	}
@@ -105,7 +105,7 @@ public class TravelStatus {
 		}
 		
 		public String toHtmlRow() {
-			return String.format("<TD>%s</TD><TD>%s</TD><TD>%.1f</TD>", name,
+			return String.format("<TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%s</TD><TD style='font-size:48pt'>%.1f</TD>", name,
 					Here2.toPeriod(timeRemaining), Here2.METERS_TO_MILES*distanceRemaining);
 		}
 	}
@@ -188,7 +188,7 @@ public class TravelStatus {
 		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.TravelStatus");
 		ArrayList<TripLeg> tripLegs = null;
 		if (false) {
-			TripPlan tripPlan = TripPlan.load( new File("RobautoTripPlan.obj") );
+			TripPlan tripPlan = TripPlan.load( new File("RobautoTripPlan.obj"), null );
 			tripLegs = tripPlan.getTripLegs();
 			try {
 				FileOutputStream fos = new FileOutputStream(tripLegsFile);

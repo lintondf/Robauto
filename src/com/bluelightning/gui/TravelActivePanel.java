@@ -13,6 +13,7 @@ public class TravelActivePanel extends JPanel {
 	protected JProgressBar progressBar;
 	protected JTextPane textPane;
 	private JPanel componentsPanel;
+	protected JSplitPane splitPane;
 
 	/**
 	 * Create the panel.
@@ -20,8 +21,9 @@ public class TravelActivePanel extends JPanel {
 	public TravelActivePanel() {
 		setLayout(new BorderLayout(0, 0));
 		
-		JSplitPane splitPane = new JSplitPane();
-		splitPane.setResizeWeight(0.5);
+		splitPane = new JSplitPane();
+		splitPane.setResizeWeight(0.4);
+		
 		add(splitPane, BorderLayout.CENTER);
 		
 		leftPanel = new JPanel();
@@ -73,6 +75,10 @@ public class TravelActivePanel extends JPanel {
 
 	public void setComponentsPanel(JPanel componentsPanel) {
 		this.componentsPanel = componentsPanel;
+	}
+
+	public JSplitPane getSplitPane() {
+		return splitPane;
 	}
 
 }

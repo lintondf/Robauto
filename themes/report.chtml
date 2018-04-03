@@ -18,7 +18,7 @@
 <br/>	
 	<table class="bpTable">
 	<thead>
-	<TR><TD></TD><TD>Total</TD><TD>So Far</TD><TD>Delta</TD></TR>
+	<TR><TD style="font-size:48pt"></TD><TD style="font-size:48pt">Total</TD><TD style="font-size:48pt">So Far</TD><TD style="font-size:48pt">Delta</TD></TR>
 	</thead>
 		<tbody>
 			{$trackerRows}
@@ -27,7 +27,7 @@
 <br/>	
 	<table class="bpTable">
 	<thead>
-	<TR><TD></TD><TD>Time</TD><TD>Distance</TD></TR>
+	<TR><TD style="font-size:48pt"></TD><TD style="font-size:48pt">Time</TD><TD style="font-size:48pt">Distance</TD></TR>
 	</thead>
 		<tbody>
 			{$upcomingRows}
