@@ -65,7 +65,7 @@ public class RoutePanel extends JPanel {
 		
 		private static final long serialVersionUID = 1L;
 		protected static final String[] names = {"Day", "Via","Name","Address","Latitude","Longitude","Fuel"};
-		protected static final double[] widths = {0.05, 0.05, 0.30,    0.35,   0.10,     0.10,        0.05};
+		protected static final double[] widths = {0.05,  0.05, 0.30,    0.35,   0.10,     0.10,        0.05};
 		protected static final boolean[] centered = {true, true, false, false, false, false, true};
 		
 		AddAddressDialog dialog;
@@ -170,6 +170,15 @@ public class RoutePanel extends JPanel {
 				if (centered[i])
 					stopsTable.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );
 			}
+			TableColumn dayColumn = stopsTable.getColumnModel().getColumn(0);
+			JComboBox comboBox = new JComboBox();
+			comboBox.addItem("1");
+			comboBox.addItem("2");
+			comboBox.addItem("3");
+			comboBox.addItem("4");
+			comboBox.addItem("5");
+			comboBox.addItem("6");
+			dayColumn.setCellEditor(new DefaultCellEditor(comboBox));
 		}
 		
 	}
@@ -182,29 +191,6 @@ public class RoutePanel extends JPanel {
 	public RoutePanel(ActionListener listener) {
 		waypointsModel = new WaypointsModel();
 		waypointsTable = new JTable(waypointsModel);
-		TableColumn dayColumn = waypointsTable.getColumnModel().getColumn(0);
-		JComboBox<String> comboBox = new JComboBox<String>();
-		comboBox.addItem("1");
-		comboBox.addItem("2");
-		comboBox.addItem("3");
-		comboBox.addItem("4");
-		comboBox.addItem("5");
-		comboBox.addItem("6");
-		comboBox.addItem("7");
-		comboBox.addItem("8");
-		comboBox.addItem("9");
-		comboBox.addItem("10");
-		comboBox.addItem("11");
-		comboBox.addItem("12");
-		comboBox.addItem("13");
-		comboBox.addItem("14");
-		comboBox.addItem("15");
-		comboBox.addItem("16");
-		comboBox.addItem("17");
-		comboBox.addItem("18");
-		comboBox.addItem("19");
-		comboBox.addItem("20");
-		dayColumn.setCellEditor(new DefaultCellEditor(comboBox));
 
 		JScrollPane scrollPane = new JScrollPane(waypointsTable);
 		waypointsTable.setFillsViewportHeight(true);
@@ -224,6 +210,7 @@ public class RoutePanel extends JPanel {
 			public void componentResized(ComponentEvent event) {
 				Dimension dim = event.getComponent().getSize();
 				waypointsModel.resizeColumns(waypointsTable, dim.getWidth());
+				waypointsModel.layoutColumns(waypointsTable);
 			}
 
 			@Override
