@@ -22,10 +22,12 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 	
 	public VisitedPlace() {
 		super();
+		visitOrder = new Integer(1);
 	}
 
 	public VisitedPlace(ReadOnlyPlace source) {
 		super(source);
+		visitOrder = new Integer(1);
 	}
 	
 	public VisitedPlace( POI poi ) throws IllegalValueException {
@@ -35,6 +37,7 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 			  new Address(poi.getAddress()), 
 			  poi.getTags() );
 		fuelAvailable = poi.getFuelAvailable();
+		visitOrder = new Integer(1);
 	}
 	
 	public VisitedPlace( TripPlan.StopData stop )  throws IllegalValueException {
@@ -44,6 +47,7 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 			   new Address(stop.getAddress()),
 			   POIBase.toFuelTags( POIBase.fromFuelString(stop.fuelAvailable)) );
 		fuelAvailable = POIBase.fromFuelString(stop.fuelAvailable);
+		visitOrder = new Integer(1);
 	}
 	
 	public String toString() {
@@ -99,7 +103,7 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 	}
 
 	public Integer getVisitOrder() {
-		return visitOrder;
+		return (visitOrder == null) ? new Integer(1) : visitOrder;
 	}
 
 	public void setVisitOrder(Integer visitOrder) {

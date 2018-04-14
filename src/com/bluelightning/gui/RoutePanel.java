@@ -38,9 +38,12 @@ import seedu.addressbook.logic.Logic;
 
 import javax.swing.JTable;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import java.awt.GridLayout;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -61,9 +64,9 @@ public class RoutePanel extends JPanel {
 	public static class WaypointsModel extends AbstractTableModel {
 		
 		private static final long serialVersionUID = 1L;
-		protected static final String[] names = {"Via","Name","Address","Latitude","Longitude","Fuel"};
-		protected static final double[] widths = {0.05, 0.30,    0.40,   0.10,     0.10,        0.05};
-		protected static final boolean[] centered = {true, false, false, false, false, true};
+		protected static final String[] names = {"Day", "Via","Name","Address","Latitude","Longitude","Fuel"};
+		protected static final double[] widths = {0.05, 0.05, 0.30,    0.35,   0.10,     0.10,        0.05};
+		protected static final boolean[] centered = {true, true, false, false, false, false, true};
 		
 		AddAddressDialog dialog;
 		protected ArrayList<VisitedPlace> placesList;
@@ -91,16 +94,18 @@ public class RoutePanel extends JPanel {
 			VisitedPlace place = placesList.get(iRow);
 			switch (iCol) {
 			case 0:
+				return Integer.toString( place.getVisitOrder() );
+			case 1:
 				return place.isPassThru();
-			case 1: 
+			case 2: 
 				return place.getName().fullName;
-			case 2:
-				return place.getAddress().value;
 			case 3:
-				return String.format("%12.6f", place.getLatitude() );
+				return place.getAddress().value;
 			case 4:
-				return String.format("%12.6f", place.getLongitude() );
+				return String.format("%12.6f", place.getLatitude() );
 			case 5:
+				return String.format("%12.6f", place.getLongitude() );
+			case 6:
 				return POIBase.toFuelString( place.getFuelAvailable());
 			}
 			return null;
@@ -108,16 +113,23 @@ public class RoutePanel extends JPanel {
 
 		@Override
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-			if (placesList == null || rowIndex < 0 || rowIndex >= placesList.size() || columnIndex != 0)
+			if (placesList == null || rowIndex < 0 || rowIndex >= placesList.size() || columnIndex > 1)
 				return;
 			VisitedPlace place = placesList.get(rowIndex);
-			place.setPassThru( (Boolean) aValue );
+			switch (columnIndex) {
+			case 0:
+				place.setVisitOrder( Integer.parseInt( (String) aValue ) );
+				break;
+			case 1:
+				place.setPassThru( (Boolean) aValue );
+				break;
+			}
 			fireTableCellUpdated(rowIndex, columnIndex);
 		}
 
 		@Override
 		public Class<?> getColumnClass(int iCol) {
-			if (iCol == 0)
+			if (iCol == 1)
 				return Boolean.class;
 			return String.class;
 		}
@@ -129,7 +141,7 @@ public class RoutePanel extends JPanel {
 
 		@Override
 		public boolean isCellEditable(int row, int column) {
-			return column == 0;
+			return column < 2;
 		}
 
 		public ArrayList<VisitedPlace> getData() {
@@ -168,24 +180,32 @@ public class RoutePanel extends JPanel {
 	 * Create the panel.
 	 */
 	public RoutePanel(ActionListener listener) {
-//		String[] pointAddresses = { "3533 Carambola Cir, Melbourne, FL", "15 Mill Creek Circle, Pooler, GA",
-//				"125 Riverside Dr, Banner Elk, NC", "2350 So Pleasant Valley Rd, Winchester, VA 22601",
-//				"10654 Breezewood Dr, Woodstock, MD 21163-1317", "1365 Boston Post Road, Milford, CT",
-//				"836 Palmer Avenue, Falmouth, MA", "100 Cabelas Blvd, Scarborough, ME", "7 Manor Lane, Sullivan, ME" };
-//		
-//		String[] columnNames = {"Address","PassThru","Latitude","Longitude"};
-//		Object[][] data = {
-//				{"3533 Carambola Cir, Melbourne, FL", new Boolean(false), new Double(28), new Double(-81)}
-//		};
-//		int[] columnWidths = { 200, 10, 50, 50 };
-//		waypointTable = new JTable(data, columnNames);
-//		TableColumn column = null;
-//		for (int i = 0; i < columnWidths.length; i++) {
-//		    column = waypointTable.getColumnModel().getColumn(i);
-//	        column.setPreferredWidth(columnWidths[i]);
-//		}
 		waypointsModel = new WaypointsModel();
 		waypointsTable = new JTable(waypointsModel);
+		TableColumn dayColumn = waypointsTable.getColumnModel().getColumn(0);
+		JComboBox<String> comboBox = new JComboBox<String>();
+		comboBox.addItem("1");
+		comboBox.addItem("2");
+		comboBox.addItem("3");
+		comboBox.addItem("4");
+		comboBox.addItem("5");
+		comboBox.addItem("6");
+		comboBox.addItem("7");
+		comboBox.addItem("8");
+		comboBox.addItem("9");
+		comboBox.addItem("10");
+		comboBox.addItem("11");
+		comboBox.addItem("12");
+		comboBox.addItem("13");
+		comboBox.addItem("14");
+		comboBox.addItem("15");
+		comboBox.addItem("16");
+		comboBox.addItem("17");
+		comboBox.addItem("18");
+		comboBox.addItem("19");
+		comboBox.addItem("20");
+		dayColumn.setCellEditor(new DefaultCellEditor(comboBox));
+
 		JScrollPane scrollPane = new JScrollPane(waypointsTable);
 		waypointsTable.setFillsViewportHeight(true);
 		setLayout(new BorderLayout(0, 0));
@@ -217,6 +237,7 @@ public class RoutePanel extends JPanel {
 //		splitPane2.setResizeWeight(0.5);
 //		splitPane2.setOrientation(JSplitPane.VERTICAL_SPLIT);
 //		add(splitPane2);
+		
 		
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setResizeWeight(0.9);
