@@ -52,9 +52,13 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 	}
 	
 	public String toGeo() {
+		return toGeo(passThru);
+	}
+	
+	public String toGeo(Boolean passThru) {
 		//geo!37.7914050,-122.3987030;;My Home
 		String label = String.format("%s/%s", getName().fullName, getAddress().value );
-		return String.format("geo!%f,%f;;%s", getLatitude(), getLongitude(), label);
+		return String.format("geo!%s!%f,%f;;%s", (passThru)? "passThrough" : "stopOver", getLatitude(), getLongitude(), label);
 	}
 	
 	@Override

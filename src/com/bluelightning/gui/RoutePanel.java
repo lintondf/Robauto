@@ -18,6 +18,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import com.bluelightning.data.TripPlan;
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIBase;
 
@@ -106,6 +107,15 @@ public class RoutePanel extends JPanel {
 		}
 
 		@Override
+		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+			if (placesList == null || rowIndex < 0 || rowIndex >= placesList.size() || columnIndex != 0)
+				return;
+			VisitedPlace place = placesList.get(rowIndex);
+			place.setPassThru( (Boolean) aValue );
+			fireTableCellUpdated(rowIndex, columnIndex);
+		}
+
+		@Override
 		public Class<?> getColumnClass(int iCol) {
 			if (iCol == 0)
 				return Boolean.class;
@@ -115,6 +125,11 @@ public class RoutePanel extends JPanel {
 		@Override
 		public String getColumnName(int iCol) {
 			return names[iCol];
+		}
+
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			return column == 0;
 		}
 
 		public ArrayList<VisitedPlace> getData() {

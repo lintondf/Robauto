@@ -38,7 +38,7 @@ import com.google.gson.JsonElement;
 			return String.format("%10.6f, %10.6f", latitude, longitude );
 		}
 		public String toGeo() {
-			return String.format("geo!%f,%f", latitude, longitude);
+			return String.format("geo!stopOver!%f,%f", latitude, longitude);
 		}
 		
 		public GeoPosition toGeoPosition() {

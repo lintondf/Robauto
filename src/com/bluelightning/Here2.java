@@ -96,6 +96,7 @@ public class Here2 {
 	protected static String routingXmlUrl = "https://route.cit.api.here.com/routing/7.2/calculateroute.xml";
 	protected static String routingUrl = "https://route.cit.api.here.com/routing/7.2/calculateroute.json";
 	protected static String geocodeUrl = "https://geocoder.cit.api.here.com/6.2/geocode.json";
+	protected static String reverseGeocodeUrl = "https://reverse.geocoder.cit.api.here.com/6.2/reversegeocode.json";
 
 	protected static JsonElement getNestedJsonElement( JsonElement element, List<String> fields ) {
 		if (element == null)
@@ -135,8 +136,17 @@ public class Here2 {
 			String url = String.format("%s?%s", urlBase, IOUtils.toString(x.getContent()));
 			HttpGet httpGet = new HttpGet(url);
 			CloseableHttpResponse response2 = httpclient.execute(httpGet);
-			if (response2.getStatusLine().getStatusCode() != 200)
+			if (response2.getStatusLine().getStatusCode() != 200) {
+				System.out.println( url );
+				System.out.println( response2.getStatusLine() );
+				System.out.println( response2.getStatusLine().getReasonPhrase() );
+				System.out.println( response2.getEntity() );
+				System.out.println( response2.getEntity().getContent() );
+			    response = IOUtils.toString(response2.getEntity().getContent());
+			    System.out.println(response);
+			    EntityUtils.consume(response2.getEntity());
 				return null;
+			}
 		    HttpEntity entity2 = response2.getEntity();
 		    response = IOUtils.toString(entity2.getContent());
 		    EntityUtils.consume(entity2);
@@ -147,6 +157,16 @@ public class Here2 {
 		return response;
 	}
 	
+	public static String geocodeReverseLookup( GeoPosition where) {
+		List<BasicNameValuePair> nvps = getBasicValuePair();
+		nvps.add( new BasicNameValuePair("prox", 
+				String.format("%f,%f,100", where.getLatitude(), where.getLongitude())));
+		nvps.add( new BasicNameValuePair("mode", "retrieveAddresses")); 
+		String response = getRestResponse( reverseGeocodeUrl, nvps );
+	    JsonElement jelement = new JsonParser().parse(response);
+	    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	    return gson.toJson(jelement).toString();
+	}
 	
 	public static LatLon geocodeLookup( String address ) {
 		return geocodeLookup(address, false);
@@ -183,24 +203,29 @@ public class Here2 {
 	}
 	
 
+	protected static final String routeOptions = "fastest;truck;traffic:disabled";
+	
 	protected static HereRoutePlus getRouteBase(List<BasicNameValuePair> nvps, String mode) {
+		nvps.add(new BasicNameValuePair("mode", mode));
 		nvps.add(new BasicNameValuePair("alternatives", "3"));
 		nvps.add(new BasicNameValuePair("metricSystem", "imperial"));
 		nvps.add(new BasicNameValuePair("instructionFormat", "text"));
 		nvps.add(new BasicNameValuePair("representation", "navigation"));
-		nvps.add(new BasicNameValuePair("RouteAttributes", "waypoints,summary,legs"));
+		nvps.add(new BasicNameValuePair("RouteAttributes", "waypoints,summary,legs,notes"));
 		nvps.add(new BasicNameValuePair("legAttributes", "maneuvers,waypoint,length,travelTime,links"));
 		nvps.add(new BasicNameValuePair("linkAttributes", "speedLimit,truckRestrictions,roadName"));
 		nvps.add(new BasicNameValuePair("maneuverAttributes", 
-				"position,length,travelTime,roadName,roadNumber,signPost,freewayExit,link"));
+				"position,length,travelTime,roadName,roadNumber,signPost,freewayExit,link,notes"));
 		nvps.add(new BasicNameValuePair("avoidAreas", //TL/BR
 				"42.53689200787314,-71.2738037109375;42.232584749313325,-70.9332275390625" ));// Boston
 //				"41.86547012230937,-73.73199462890625;41.21998578493921,-72.47955322265625" ));
 
-		nvps.add(new BasicNameValuePair("mode", mode));
 		nvps.add(new BasicNameValuePair("limitedWeight", "1"));  //TODO
+		nvps.add(new BasicNameValuePair("truckRestrictionPenalty", "soft"));
 		nvps.add(new BasicNameValuePair("height", Double.toString(146.0 / 12.0 * 0.3048)));          // TODO
 		String json = getRestResponse( routingUrl, nvps );
+		if (json == null)
+			return null;
 		System.out.println("REST bytes: " + json.length() );
 	    JsonElement jelement = new JsonParser().parse(json);
 	    try {
@@ -211,20 +236,6 @@ public class Here2 {
 	    HereRoute hereRoute = (HereRoute) Here2.gson.fromJson(jelement, HereRoute.class);
 	    HereRoutePlus plus = new HereRoutePlus( hereRoute, json );
 	    return plus;
-//	    System.out.println( hereRoute );
-//	    JsonArray routes = Here.getNestedJsonArray(jelement, Arrays.asList("response", "route"));
-//	    if (routes != null && routes.size() > 0) {
-//	    	for (JsonElement route : routes) {
-//	    		if (route.isJsonObject()) {
-//	    			Route r = Route.factory( route );
-//	    			return r;
-//	    		}
-//	    	}
-//	    }
-//	    /*
-//	     * route [ waypoint [] ]
-//	     */
-//	    return null;
 	}
 	
 	protected static HereRoutePlus getRoute(LatLon from, List<LatLon> vias, LatLon to, String mode) {
@@ -327,7 +338,7 @@ public class Here2 {
 			for (String address : pointAddresses) {
 				points.add(geocodeLookup(address));
 			}
-			plus = getRoute( points, "fastest;truck;traffic:disabled" );
+			plus = getRoute( points, routeOptions );
 		}
 		return computeRouteBase( plus.route, pointAddresses );
 	}
@@ -340,10 +351,19 @@ public class Here2 {
 			ArrayList<Object> shape = new ArrayList<>();
 			String[] pointAddresses = new String[2];
 			double lastPoint = 0;
-			for (int i = 1; i < tripPlan.getPlaces().size(); i++) {
-				pointAddresses[0] = tripPlan.getPlaces().get(i-1).getAddress().value;
-				pointAddresses[1] = tripPlan.getPlaces().get(i).getAddress().value;
-				HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces().subList(i-1, i+1), "fastest;truck;traffic:disabled"  );
+			int n = tripPlan.getPlaces().size();
+			if (n < 2)
+				return null;
+			tripPlan.getPlaces().get(0).setPassThru(false);
+			tripPlan.getPlaces().get(n-1).setPassThru(false);
+			for (int i = 0; i < n; i++) {
+				pointAddresses[0] = tripPlan.getPlaces().get(i).getAddress().value;
+				int j = i + 1;
+				while (j < n && tripPlan.getPlaces().get(j).isPassThru()) {
+					j++;
+				}
+				pointAddresses[1] = tripPlan.getPlaces().get(j).getAddress().value;
+				HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces().subList(i, j+1), routeOptions  );
 				Route r = computeRouteBase( hereRoute.route, pointAddresses );
 				Leg leg = r.getLeg().iterator().next(); 
 				leg.setFirstPoint( leg.getFirstPoint() + lastPoint );
@@ -351,6 +371,7 @@ public class Here2 {
 				lastPoint = leg.getLastPoint();
 				legs.add(leg);
 				shape.addAll( leg.getShape() );
+				i = j;
 			}
 			route.setLeg(legs);
 			route.setShape(shape);
@@ -368,7 +389,7 @@ public class Here2 {
 			pointAddresses[i] = tripPlan.getPlaces().get(i).getAddress().value;
 		}
 		if (tripPlan.getRoute() == null) {
-			HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces(), "fastest;truck;traffic:disabled"  );
+			HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces(), routeOptions  );
 			return computeRouteBase( hereRoute.route, pointAddresses );
 		} else {
 			return tripPlan.getRoute();
@@ -380,7 +401,7 @@ public class Here2 {
 		for (int i = 0; i < pointAddresses.length; i++) {
 			pointAddresses[i] = places.get(i).getAddress().value;
 		}
-		HereRoutePlus hereRoute = getRouteFromPlaces( places, "fastest;truck;traffic:disabled"  );
+		HereRoutePlus hereRoute = getRouteFromPlaces( places, routeOptions  );
 		return computeRouteBase( hereRoute.route, pointAddresses );
 	}
 	
@@ -394,6 +415,7 @@ public class Here2 {
 		// find shortest after adjusting speeds
 		while (it.hasNext()) {
 			Route r = it.next();
+			System.out.println( r.getSummary().getText() +  "  " + r.getSummary().getDistance() + " " + r.getSummary().getTrafficTime() );
 			if (route == null) {
 				route = r;
 			} else {
@@ -452,12 +474,12 @@ public class Here2 {
 //						routeShape = Route.parseShape(maneuver.getShape());
 //					}
 				}
-				System.out.printf("LEG TO %s: %5.1f mi; %s %s; %5.1f\n", 
-						pointAddresses[pointIndex++],
-						leg.getLength()*METERS_TO_MILES, 
-						Here2.toPeriod(leg.getTrafficTime()), 
-						Here2.toPeriod(leg.getTravelTime()),
-						leg.getLength()*METERS_TO_MILES / (leg.getTrafficTime()/3600.0) );
+//				System.out.printf("LEG TO %s: %5.1f mi; %s %s; %5.1f\n", 
+//						pointAddresses[pointIndex++],
+//						leg.getLength()*METERS_TO_MILES, 
+//						Here2.toPeriod(leg.getTrafficTime()), 
+//						Here2.toPeriod(leg.getTravelTime()),
+//						leg.getLength()*METERS_TO_MILES / (leg.getTrafficTime()/3600.0) );
 			} // for leg
 			
 //			printPointsOfInterestAlongRoute( route, "POI/RestAreasCombined_USA.csv");

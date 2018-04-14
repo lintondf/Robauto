@@ -112,5 +112,23 @@
         <latitude>41.84363</latitude>
         <longitude>-73.92999</longitude>
     </persons>
+    <persons>
+        <name>Presnick</name>
+        <address>96 Willard Street, Cocoa, FL</address>
+        <latitude>28.35648</latitude>
+        <longitude>-80.72467</longitude>
+    </persons>
+    <persons>
+        <name>Walmart</name>
+        <address>1801 US-421, Wilkesboro, NC 28697</address>
+        <latitude>36.15023</latitude>
+        <longitude>-81.19421</longitude>
+    </persons>
+    <persons>
+        <name>Titusville Camping</name>
+        <address>7275 South US Highway 1 Titusville, FL 32780</address>
+        <latitude>28.5042401</latitude>
+        <longitude>-80.7837401</longitude>
+    </persons>
     <tags>Gas</tags>
 </AddressBook>

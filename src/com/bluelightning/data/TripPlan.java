@@ -72,15 +72,15 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	protected ArrayList<ArrayList<VisitedPlace>> finalizedPlaces;
 	
 	public void tripPlanUpdated(String savePath) {
-		try {
-		    Registry registry = LocateRegistry.getRegistry("192.168.0.13", RobautoMain.REGISTRY_PORT);
-		    TripPlanUpdate stub = (TripPlanUpdate) registry.lookup("Update");
-		    String response = stub.update(savePath);
-		    System.out.println("tripPlanUpdated::response: " + response);
-		} catch (Exception e) {
-		    System.err.println("Client exception: " + e.toString());
-		    e.printStackTrace();
-		}
+//		try {
+//		    Registry registry = LocateRegistry.getRegistry("192.168.0.13", RobautoMain.REGISTRY_PORT);
+//		    TripPlanUpdate stub = (TripPlanUpdate) registry.lookup("Update");
+//		    String response = stub.update(savePath);
+//		    System.out.println("tripPlanUpdated::response: " + response);
+//		} catch (Exception e) {
+//		    System.err.println("Client exception: " + e.toString());
+//		    e.printStackTrace();
+//		}
 	}
 	
 

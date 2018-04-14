@@ -120,6 +120,7 @@ public class Map {
 					java.awt.Point p = e.getPoint();
 					GeoPosition geo = mapViewer.convertPointToGeoPosition(p);
 					System.out.println("X:" + geo.getLatitude() + ",Y:" + geo.getLongitude());
+					System.out.println( Here2.geocodeReverseLookup( geo ) );
 				}
 			}
 		});

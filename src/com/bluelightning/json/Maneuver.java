@@ -682,9 +682,11 @@ public class Maneuver implements Serializable, Comparable<Maneuver>, PostProcess
 			GlobalCoordinates p1 = new GlobalCoordinates( shapePoints.get(i-1) );
 			GlobalCoordinates p2 = new GlobalCoordinates( shapePoints.get(i) );
 			GeodeticCurve curve = POIBase.geoCalc.calculateGeodeticCurve(POIBase.wgs84, p1, p2 );
-			d += curve.getEllipsoidalDistance();
-			shapeDistances.add(d);
-			shapeHeadings.add( curve.getAzimuth() );
+			if (Double.isFinite(curve.getAzimuth()) && Double.isFinite(curve.getEllipsoidalDistance())) {
+				d += curve.getEllipsoidalDistance();
+				shapeDistances.add(d);
+				shapeHeadings.add( curve.getAzimuth() );
+			}
 		}
 		if (shapeHeadings.size() > 1) {
 			shapeHeadings.set(0, shapeHeadings.get(1));
