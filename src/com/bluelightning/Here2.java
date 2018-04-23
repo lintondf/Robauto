@@ -340,7 +340,7 @@ public class Here2 {
 			}
 			plus = getRoute( points, routeOptions );
 		}
-		return computeRouteBase( plus.route, pointAddresses );
+		return computeRouteBase( plus.route );
 	}
 	
 	
@@ -349,29 +349,26 @@ public class Here2 {
 			Route route = new Route();
 			TreeSet<Leg> legs = new TreeSet<>();
 			ArrayList<Object> shape = new ArrayList<>();
-			String[] pointAddresses = new String[2];
 			double lastPoint = 0;
 			int n = tripPlan.getPlaces().size();
 			if (n < 2)
 				return null;
 			tripPlan.getPlaces().get(0).setPassThru(false);
 			tripPlan.getPlaces().get(n-1).setPassThru(false);
-			for (int i = 0; i < n; i++) {
-				pointAddresses[0] = tripPlan.getPlaces().get(i).getAddress().value;
+			for (int i = 0; i < n-1; i++) {
 				int j = i + 1;
-				while (j < n && tripPlan.getPlaces().get(j).isPassThru()) {
+				while (j < n-1 && !tripPlan.getPlaces().get(j).isOvernight()) {
 					j++;
 				}
-				pointAddresses[1] = tripPlan.getPlaces().get(j).getAddress().value;
 				HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces().subList(i, j+1), routeOptions  );
-				Route r = computeRouteBase( hereRoute.route, pointAddresses );
+				Route r = computeRouteBase( hereRoute.route );
 				Leg leg = r.getLeg().iterator().next(); 
 				leg.setFirstPoint( leg.getFirstPoint() + lastPoint );
 				leg.setLastPoint( leg.getLastPoint() + lastPoint);
 				lastPoint = leg.getLastPoint();
 				legs.add(leg);
 				shape.addAll( leg.getShape() );
-				i = j;
+				i = j-1;
 			}
 			route.setLeg(legs);
 			route.setShape(shape);
@@ -384,28 +381,20 @@ public class Here2 {
 
 
 	public static Route computeRoute0(TripPlan tripPlan) {
-		String[] pointAddresses = new String[tripPlan.getPlaces().size()];
-		for (int i = 0; i < pointAddresses.length; i++) {
-			pointAddresses[i] = tripPlan.getPlaces().get(i).getAddress().value;
-		}
 		if (tripPlan.getRoute() == null) {
 			HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces(), routeOptions  );
-			return computeRouteBase( hereRoute.route, pointAddresses );
+			return computeRouteBase( hereRoute.route );
 		} else {
 			return tripPlan.getRoute();
 		}
 	}
 
 	public static Route computeRoute( List<VisitedPlace> places ) {
-		String[] pointAddresses = new String[places.size()];
-		for (int i = 0; i < pointAddresses.length; i++) {
-			pointAddresses[i] = places.get(i).getAddress().value;
-		}
 		HereRoutePlus hereRoute = getRouteFromPlaces( places, routeOptions  );
-		return computeRouteBase( hereRoute.route, pointAddresses );
+		return computeRouteBase( hereRoute.route );
 	}
 	
-	protected static Route computeRouteBase( HereRoute hereRoute, String[] pointAddresses ) {
+	protected static Route computeRouteBase( HereRoute hereRoute ) {
 		//HereRoute hereRoute = plus.route;
 		System.out.println(hereRoute.getResponse().getMetaInfo());
 		Set<Route> routes = hereRoute.getResponse().getRoute();

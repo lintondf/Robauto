@@ -130,5 +130,11 @@
         <latitude>28.5042401</latitude>
         <longitude>-80.7837401</longitude>
     </persons>
+    <persons>
+        <name>Bakery</name>
+        <address>Yalaha Bakery, 8210 FL-48, Yalaha, FL 34797</address>
+        <latitude>28.73937</latitude>
+        <longitude>-81.8181</longitude>
+    </persons>
     <tags>Gas</tags>
 </AddressBook>

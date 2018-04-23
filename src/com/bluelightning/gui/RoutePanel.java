@@ -64,9 +64,9 @@ public class RoutePanel extends JPanel {
 	public static class WaypointsModel extends AbstractTableModel {
 		
 		private static final long serialVersionUID = 1L;
-		protected static final String[] names = {"Day", "Via","Name","Address","Latitude","Longitude","Fuel"};
+		protected static final String[] names = {"Overnight", "Via","Name","Address","Latitude","Longitude","Fuel"};
 		protected static final double[] widths = {0.05,  0.05, 0.30,    0.35,   0.10,     0.10,        0.05};
-		protected static final boolean[] centered = {true, true, false, false, false, false, true};
+		protected static final boolean[] centered = {false, false, false, false, false, false, true};
 		
 		AddAddressDialog dialog;
 		protected ArrayList<VisitedPlace> placesList;
@@ -94,7 +94,7 @@ public class RoutePanel extends JPanel {
 			VisitedPlace place = placesList.get(iRow);
 			switch (iCol) {
 			case 0:
-				return Integer.toString( place.getVisitOrder() );
+				return place.isOvernight();
 			case 1:
 				return place.isPassThru();
 			case 2: 
@@ -118,7 +118,7 @@ public class RoutePanel extends JPanel {
 			VisitedPlace place = placesList.get(rowIndex);
 			switch (columnIndex) {
 			case 0:
-				place.setVisitOrder( Integer.parseInt( (String) aValue ) );
+				place.setOvernight( (Boolean) aValue );
 				break;
 			case 1:
 				place.setPassThru( (Boolean) aValue );
@@ -129,7 +129,7 @@ public class RoutePanel extends JPanel {
 
 		@Override
 		public Class<?> getColumnClass(int iCol) {
-			if (iCol == 1)
+			if (iCol <= 1)
 				return Boolean.class;
 			return String.class;
 		}
@@ -170,15 +170,15 @@ public class RoutePanel extends JPanel {
 				if (centered[i])
 					stopsTable.getColumnModel().getColumn(i).setCellRenderer( centerRenderer );
 			}
-			TableColumn dayColumn = stopsTable.getColumnModel().getColumn(0);
-			JComboBox comboBox = new JComboBox();
-			comboBox.addItem("1");
-			comboBox.addItem("2");
-			comboBox.addItem("3");
-			comboBox.addItem("4");
-			comboBox.addItem("5");
-			comboBox.addItem("6");
-			dayColumn.setCellEditor(new DefaultCellEditor(comboBox));
+//			TableColumn dayColumn = stopsTable.getColumnModel().getColumn(0);
+//			JComboBox comboBox = new JComboBox();
+//			comboBox.addItem("1");
+//			comboBox.addItem("2");
+//			comboBox.addItem("3");
+//			comboBox.addItem("4");
+//			comboBox.addItem("5");
+//			comboBox.addItem("6");
+//			dayColumn.setCellEditor(new DefaultCellEditor(comboBox));
 		}
 		
 	}

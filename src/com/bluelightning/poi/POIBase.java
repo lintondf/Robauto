@@ -180,7 +180,7 @@ public abstract class POIBase implements POI, Serializable {
 		final double yDelta = p2.getY() - p1.getY();
 
 		if ((xDelta == 0) && (yDelta == 0)) {
-			throw new IllegalArgumentException("p1 and p2 cannot be the same point");
+			return p1.distance(p3);
 		}
 
 		final double u = ((p3.getX() - p1.getX()) * xDelta + (p3.getY() - p1.getY()) * yDelta)
