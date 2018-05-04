@@ -640,8 +640,12 @@ public class Maneuver implements Serializable, Comparable<Maneuver>, PostProcess
 				this.baseTime = this.length / speedLimit;
 				this.travelTime = this.baseTime;
 				this.trafficTime = trafficDelay * this.travelTime;
+			} else if (getLength() > 1e3) {
+				System.out.println("adjustSpeeds:  No speed limit for " + getLength()+ "m : " + link );
 			}
-		}    	
+		} else if (getLength() > 1e3) {
+			System.out.println("adjustSpeeds:  No link for " + getLength()+ "m : " + link );
+		}
     }
     
     protected Integer ordinal;

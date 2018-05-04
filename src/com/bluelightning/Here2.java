@@ -52,6 +52,9 @@ import seedu.addressbook.data.place.VisitedPlace;
 public class Here2 {
 	
 	//https://developer.here.com/documentation
+
+	protected static final String routeOptions = "fastest;truck;traffic:disabled"; // "fastest;car;traffic:disabled"; //
+	
 	
 	public static Gson gson = new GsonBuilder()
 		.registerTypeAdapterFactory(new PostProcessingEnabler())
@@ -203,8 +206,6 @@ public class Here2 {
 	}
 	
 
-	protected static final String routeOptions = "fastest;truck;traffic:disabled";
-	
 	protected static HereRoutePlus getRouteBase(List<BasicNameValuePair> nvps, String mode) {
 		nvps.add(new BasicNameValuePair("mode", mode));
 		nvps.add(new BasicNameValuePair("alternatives", "3"));
@@ -446,11 +447,12 @@ public class Here2 {
 						linkDetails = String.format("%.0f,%.0f,%s", speed, speedLimit, truckRestrictions);
 					}
 					CumulativeTravel progress = leg.getProgress(maneuver);
-					System.out.printf("%-5s: %5.1f mi / %s; %7.1f mi / %s  [%s/%s/%s] %s\n", maneuver.getId(), 
+					System.out.printf("%-5s: %5.1f mi / %s; %7.1f mi / %s; %5.0f;  [%s/%s/%s] %s\n", maneuver.getId(), 
 							maneuver.getLength()*METERS_TO_MILES,
 							Here2.toPeriod(maneuver.getTrafficTime()),
 							progress.distance*METERS_TO_MILES,
 							Here2.toPeriod(progress.trafficTime),
+							speed,
 							maneuver.getRoadName(), maneuver.getRoadNumber(),
 							linkDetails,
 							//angle2Direction(maneuver.getStartAngle()), // angle at start of maneuver

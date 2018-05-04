@@ -130,6 +130,7 @@ public class TravelStatus {
 	protected double           distanceToNext;
 	
 	protected List<UpcomingStop> upcomingStops;
+	protected List<UpcomingStop> availableStops;
 	
 	protected TripLeg            tripLeg;
 	
@@ -140,12 +141,16 @@ public class TravelStatus {
 		stoppedTime = new TimeTracker( "Stopped [hh:mm]", 0.0 );
 		distanceDriven = new DistanceTracker( "Driving [miles]", tripLeg.legData.distance );
 		upcomingStops = new ArrayList<>();
+		availableStops = new ArrayList<>();
 		for (TripPlan.StopData stopData : tripLeg.stopDataList) {
+			UpcomingStop upcomingStop = new UpcomingStop( stopData.name, stopData.trafficTime, stopData.distance );
 			if (stopData.use) {
-				UpcomingStop upcomingStop = new UpcomingStop( stopData.name, stopData.trafficTime, stopData.distance );
 				upcomingStops.add( upcomingStop );
+			} else {
+				availableStops.add( upcomingStop );
 			}
 		}
+		
 	}
 	
 	
@@ -156,10 +161,15 @@ public class TravelStatus {
 	public void update( double timeSoFar, double distanceSoFar) {
 		drivingTime.update(timeSoFar);
 		distanceDriven.update(distanceSoFar);
-		Iterator<UpcomingStop> it = upcomingStops.iterator();
+		update(upcomingStops, timeSoFar, distanceSoFar );
+		update(availableStops, timeSoFar, distanceSoFar );
+	}
+	
+	protected void update(List<UpcomingStop> stops, double timeSoFar, double distanceSoFar ) {
+		Iterator<UpcomingStop> it = stops.iterator();
 		distanceToNext = 0.0;
-		if (!upcomingStops.isEmpty()) {
-			distanceToNext = upcomingStops.get(0).distanceRemaining;
+		if (!stops.isEmpty()) {
+			distanceToNext = stops.get(0).distanceRemaining;
 		}
 		while (it.hasNext()) {
 			UpcomingStop upcomingStop = it.next();
@@ -188,6 +198,11 @@ public class TravelStatus {
 			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
 		}
 		t.set("upcomingRows", sb.toString() );
+		sb = new StringBuffer();
+		for (UpcomingStop upcomingStop : availableStops) {
+			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
+		}
+		t.set("availableRows", sb.toString() );
 		c.set("body", t.toString());
 		try {
 			String css = IOUtils.toString(new FileInputStream("themes/style.css"));

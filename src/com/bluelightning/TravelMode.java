@@ -14,6 +14,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
+import org.gavaghan.geodesy.GeodeticCurve;
+import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.LoggerFactory;
@@ -65,8 +67,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.bluelightning.gui.TravelActivePanel;
+import com.bluelightning.json.Leg;
+import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
+import com.bluelightning.poi.POIBase;
 
 public class TravelMode extends JPanel {
 
@@ -80,6 +85,7 @@ public class TravelMode extends JPanel {
 	protected JXMapViewer mapViewer;
 	
 	public TravelStatus travelStatus = null;
+	public List<GlobalCoordinates> maneuverStarts = null;
 
 	/**
 	 * HandleTripPlanUpdate - respond to RMI update() calls when PlannerMode
@@ -150,6 +156,16 @@ public class TravelMode extends JPanel {
 		activePanel.getProgressBar().setString(report);
 	}
 
+	protected boolean nearManeuver( GPS.Fix fix ) {
+		GlobalCoordinates where = new GlobalCoordinates( fix.getLatitude(), fix.getLongitude() );
+		for (GlobalCoordinates point : maneuverStarts) {
+			GeodeticCurve curve = POIBase.geoCalc.calculateGeodeticCurve(POIBase.wgs84, where, point );
+			if (curve.getEllipsoidalDistance() < 2.0 / Here2.METERS_TO_MILES)
+				return true;
+		}
+		return false;
+	}
+	
 	protected GPS gps = new GPS();
 
 	public class GpsHandler {
@@ -157,12 +173,14 @@ public class TravelMode extends JPanel {
 		
 		@Subscribe
 		public void handle(final Events.GpsEvent event) {
+			RobautoMain.logger.info( event.fix.toString() );
 			if (startTime == null)
 				startTime = event.fix.date;
 			if (event.fix.movement == 0.0)
 				startTime = event.fix.date;
-			System.out.printf("%s %5.1f %6.4f\n", event.fix.toString(), Here2.METERS_TO_MILES * distanceTraveled, 
-					Here2.METERS_TO_MILES * event.fix.movement / Report.MPG);
+			RobautoMain.logger.debug(
+					String.format("%s %5.1f %6.4f\n", event.fix.toString(), Here2.METERS_TO_MILES * distanceTraveled, 
+							Here2.METERS_TO_MILES * event.fix.movement / Report.MPG) );
 			distanceTraveled += event.fix.movement;
 			if (event.fix.speed < 0.1) {
 				timeStopped += 60;
@@ -177,6 +195,11 @@ public class TravelMode extends JPanel {
 					setFuelLevel();
 					map.moveYouAreHere(event.fix);
 					activePanel.getTextPane().setText(travelStatus.toHtml());
+					activePanel.getScroll().getVerticalScrollBar().setValue(0);
+					if (event.fix.speed > 0.1 && nearManeuver(event.fix)) {
+						RobautoMain.logger.info("toBack");
+						frame.toBack();
+					}
 				}
 			});
 		}
@@ -210,9 +233,20 @@ public class TravelMode extends JPanel {
 		currentFuel = Double.parseDouble(drive.fuelRemaining) + Double.parseDouble(drive.fuelUsed);
 		distanceTraveled = 0.0;
 		setupGps(days.get(currentDay));
-		travelStatus = new TravelStatus( tripPlan.getTripLeg(currentDay));
+		travelStatus = new TravelStatus( tripPlan.getTripLeg(currentDay) );
 		activePanel.getTextPane().setContentType("text/html");
 		activePanel.getTextPane().setEditable(false);
+		maneuverStarts = new ArrayList<GlobalCoordinates>();
+		for (Leg leg : days.get(currentDay).getLeg() ) {
+			for (Maneuver manuever : leg.getManeuver() ) {
+				List<GeoPosition> points = manuever.getShape();
+				if (! points.isEmpty()) {
+					RobautoMain.logger.info(
+							String.format("%10.6f %10.6f %s\n", points.get(0).getLatitude(), points.get(0).getLongitude(), manuever.getInstruction() ) );
+					maneuverStarts.add( new GlobalCoordinates(points.get(0).getLatitude(), points.get(0).getLongitude()) );
+				}
+			}
+		}
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -224,6 +258,7 @@ public class TravelMode extends JPanel {
 				List<ButtonWaypoint> waypoints = map.showRoute(days, markers, currentDay);
 				activePanel.getSplitPane().setDividerLocation(0.4);
 				activePanel.getTextPane().setText(travelStatus.toHtml());
+				activePanel.getScroll().getVerticalScrollBar().setValue(0);
 			}
 		});
 		setFuelLevel();
@@ -433,6 +468,14 @@ public class TravelMode extends JPanel {
 					frame.pack();
 					frame.setVisible(true);
 					frame.addWindowListener(new WindowAdapter() {
+//						@Override
+//						public void windowActivated(WindowEvent e) {
+//							try {
+//								Thread.sleep(10*1000);
+//							} catch (Exception x) {}
+//							System.out.println("toBack");
+//							frame.toBack();
+//						}
 						@Override
 						public void windowClosing(WindowEvent e) {
 							if (travelMode.gps != null) {
