@@ -218,8 +218,9 @@ public class Here2 {
 		nvps.add(new BasicNameValuePair("maneuverAttributes", 
 				"position,length,travelTime,roadName,roadNumber,signPost,freewayExit,link,notes"));
 		nvps.add(new BasicNameValuePair("avoidAreas", //TL/BR
-				"42.53689200787314,-71.2738037109375;42.232584749313325,-70.9332275390625" ));// Boston
+				"42.53689200787314,-71.2738037109375;42.232584749313325,-70.9332275390625" + // Boston
 //				"41.86547012230937,-73.73199462890625;41.21998578493921,-72.47955322265625" ));
+		        "!40.95812268616409,-74.30740356445312;40.637925243274374,-73.740234375" ));// NYC
 
 		nvps.add(new BasicNameValuePair("limitedWeight", "1"));  //TODO
 		nvps.add(new BasicNameValuePair("truckRestrictionPenalty", "soft"));

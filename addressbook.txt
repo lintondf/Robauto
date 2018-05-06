@@ -161,6 +161,12 @@
         <longitude>-77.4655422</longitude>
         <tagged>Fuel</tagged>
     </persons>
+    <persons>
+        <name>Pat2 Club</name>
+        <address>1601 Atlantic Beach Dr, Atlantic Beach, FL 32233</address>
+        <latitude>30.34135</latitude>
+        <longitude>-81.40743</longitude>
+    </persons>
     <tags>Gas</tags>
     <tags>Fuel</tags>
 </AddressBook>
