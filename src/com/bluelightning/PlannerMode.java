@@ -259,6 +259,15 @@ public class PlannerMode extends JPanel {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				String html = RobautoMain.tripPlan.getTripReport().toHtml();
+				try {
+					PrintWriter out = new PrintWriter("report.html");
+					out.println(html);
+					out.close();
+				} catch (Exception x) {
+					x.printStackTrace();
+				}
+				
 				break;
 				
 			case "ControlPanel.ClearActions":
@@ -382,13 +391,21 @@ public class PlannerMode extends JPanel {
 
 			dialog.generateLegStopChoices(iLeg);
 			final String html = dialog.updateTripData();
-
+			try {
+				PrintWriter out = new PrintWriter("report.html");
+				out.println(html);
+				out.close();
+			} catch (Exception x) {
+				x.printStackTrace();
+			}
+			
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					resultsPane.setText(html);
 				}
 			});
+			
 		}
 
 		private CallbackHandler handler = null;
