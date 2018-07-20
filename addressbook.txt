@@ -136,5 +136,37 @@
         <latitude>28.73937</latitude>
         <longitude>-81.8181</longitude>
     </persons>
+    <persons>
+        <name>Pat2</name>
+        <address>1684 Atlantic Beach Dr, Atlantic Beach, FL</address>
+        <latitude>30.3438848</latitude>
+        <longitude>-81.4081825</longitude>
+    </persons>
+    <persons>
+        <name>Santee SP</name>
+        <address>251 State Park Rd, Santee, SC 29142</address>
+        <latitude>33.5520799</latitude>
+        <longitude>-80.50297</longitude>
+    </persons>
+    <persons>
+        <name>Walmart</name>
+        <address>10001 Southpoint Parkway Fredericksburg, VA 22407</address>
+        <latitude>38.23681</latitude>
+        <longitude>-77.5068299</longitude>
+    </persons>
+    <persons>
+        <name>Flying J</name>
+        <address>23826 Rogers Clark Blvd, Ruther Glen, VA 22546</address>
+        <latitude>37.9390189</latitude>
+        <longitude>-77.4655422</longitude>
+        <tagged>Fuel</tagged>
+    </persons>
+    <persons>
+        <name>Pat2 Club</name>
+        <address>1601 Atlantic Beach Dr, Atlantic Beach, FL 32233</address>
+        <latitude>30.34135</latitude>
+        <longitude>-81.40743</longitude>
+    </persons>
     <tags>Gas</tags>
+    <tags>Fuel</tags>
 </AddressBook>

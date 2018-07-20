@@ -259,6 +259,15 @@ public class PlannerMode extends JPanel {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				String html = RobautoMain.tripPlan.getTripReport().toHtml();
+				try {
+					PrintWriter out = new PrintWriter("report.html");
+					out.println(html);
+					out.close();
+				} catch (Exception x) {
+					x.printStackTrace();
+				}
+				
 				break;
 				
 			case "ControlPanel.ClearActions":
@@ -382,13 +391,21 @@ public class PlannerMode extends JPanel {
 
 			dialog.generateLegStopChoices(iLeg);
 			final String html = dialog.updateTripData();
-
+			try {
+				PrintWriter out = new PrintWriter("report.html");
+				out.println(html);
+				out.close();
+			} catch (Exception x) {
+				x.printStackTrace();
+			}
+			
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					resultsPane.setText(html);
 				}
 			});
+			
 		}
 
 		private CallbackHandler handler = null;
@@ -690,10 +707,12 @@ public class PlannerMode extends JPanel {
 					dayDistance += maneuver.getLength();
 					legTime += maneuver.getTrafficTime();
 					legDistance += maneuver.getLength();
-					System.out.printf("    %6.1f %-6s  %6.1f %-6s %6.1f %-6s: %s\n",
+					double speed = maneuver.getLength() / maneuver.getTrafficTime(); 
+					System.out.printf("    %6.1f %-6s  %6.1f %-6s %6.1f %-6s %6.1f: %s\n",
 							dayDistance * Here2.METERS_TO_MILES, Here2.toPeriod(dayTime),
 							legDistance * Here2.METERS_TO_MILES, Here2.toPeriod(legTime),
 							maneuver.getLength() * Here2.METERS_TO_MILES, Here2.toPeriod(maneuver.getTrafficTime()),
+							speed * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR,
 							maneuver.getInstruction());
 				}
 			}

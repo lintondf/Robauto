@@ -27,10 +27,19 @@
 <br/>	
 	<table class="bpTable">
 	<thead>
-	<TR><TD style='font-size:48pt;font-weight:bolder;text-align:center'></TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Time</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Distance</TD></TR>
+	<TR><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Planned Stops</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Time</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Distance</TD></TR>
 	</thead>
 		<tbody>
 			{$upcomingRows}
+		</tbody>
+	</table>
+<br/>	
+	<table class="bpTable">
+	<thead>
+	<TR><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Available Stops</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Time</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Distance</TD></TR>
+	</thead>
+		<tbody>
+			{$availableRows}
 		</tbody>
 	</table>
 <br/>	

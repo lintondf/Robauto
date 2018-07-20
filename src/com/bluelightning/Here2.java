@@ -52,6 +52,9 @@ import seedu.addressbook.data.place.VisitedPlace;
 public class Here2 {
 	
 	//https://developer.here.com/documentation
+
+	protected static final String routeOptions = "fastest;truck;traffic:disabled"; // "fastest;car;traffic:disabled"; //
+	
 	
 	public static Gson gson = new GsonBuilder()
 		.registerTypeAdapterFactory(new PostProcessingEnabler())
@@ -203,8 +206,6 @@ public class Here2 {
 	}
 	
 
-	protected static final String routeOptions = "fastest;truck;traffic:disabled";
-	
 	protected static HereRoutePlus getRouteBase(List<BasicNameValuePair> nvps, String mode) {
 		nvps.add(new BasicNameValuePair("mode", mode));
 		nvps.add(new BasicNameValuePair("alternatives", "3"));
@@ -217,8 +218,9 @@ public class Here2 {
 		nvps.add(new BasicNameValuePair("maneuverAttributes", 
 				"position,length,travelTime,roadName,roadNumber,signPost,freewayExit,link,notes"));
 		nvps.add(new BasicNameValuePair("avoidAreas", //TL/BR
-				"42.53689200787314,-71.2738037109375;42.232584749313325,-70.9332275390625" ));// Boston
+				"42.53689200787314,-71.2738037109375;42.232584749313325,-70.9332275390625" + // Boston
 //				"41.86547012230937,-73.73199462890625;41.21998578493921,-72.47955322265625" ));
+		        "!40.95812268616409,-74.30740356445312;40.637925243274374,-73.740234375" ));// NYC
 
 		nvps.add(new BasicNameValuePair("limitedWeight", "1"));  //TODO
 		nvps.add(new BasicNameValuePair("truckRestrictionPenalty", "soft"));
@@ -446,11 +448,12 @@ public class Here2 {
 						linkDetails = String.format("%.0f,%.0f,%s", speed, speedLimit, truckRestrictions);
 					}
 					CumulativeTravel progress = leg.getProgress(maneuver);
-					System.out.printf("%-5s: %5.1f mi / %s; %7.1f mi / %s  [%s/%s/%s] %s\n", maneuver.getId(), 
+					System.out.printf("%-5s: %5.1f mi / %s; %7.1f mi / %s; %5.0f;  [%s/%s/%s] %s\n", maneuver.getId(), 
 							maneuver.getLength()*METERS_TO_MILES,
 							Here2.toPeriod(maneuver.getTrafficTime()),
 							progress.distance*METERS_TO_MILES,
 							Here2.toPeriod(progress.trafficTime),
+							speed,
 							maneuver.getRoadName(), maneuver.getRoadNumber(),
 							linkDetails,
 							//angle2Direction(maneuver.getStartAngle()), // angle at start of maneuver

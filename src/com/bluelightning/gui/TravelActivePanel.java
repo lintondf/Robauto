@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JSplitPane;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
@@ -14,6 +15,7 @@ public class TravelActivePanel extends JPanel {
 	protected JTextPane textPane;
 	private JPanel componentsPanel;
 	protected JSplitPane splitPane;
+	protected JScrollPane scroll;
 
 	/**
 	 * Create the panel.
@@ -38,7 +40,8 @@ public class TravelActivePanel extends JPanel {
 		rightPanel.add(progressBar, BorderLayout.SOUTH);
 		
 		textPane = new JTextPane();
-		rightPanel.add(textPane, BorderLayout.CENTER);
+		scroll = new JScrollPane(textPane);
+		rightPanel.add(scroll, BorderLayout.CENTER);
 		
 		componentsPanel = new JPanel();
 		rightPanel.add(componentsPanel, BorderLayout.NORTH);
@@ -79,6 +82,10 @@ public class TravelActivePanel extends JPanel {
 
 	public JSplitPane getSplitPane() {
 		return splitPane;
+	}
+
+	public JScrollPane getScroll() {
+		return scroll;
 	}
 
 }

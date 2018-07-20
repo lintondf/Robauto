@@ -1,6 +1,7 @@
 
 package com.bluelightning.json;
 
+import com.bluelightning.Here2;
 import com.bluelightning.LatLon;
 
 import java.io.Serializable;
@@ -169,11 +170,14 @@ public class Route implements Serializable, PostProcessingEnabler.PostProcessabl
 		summary.setBaseTime(0.0);
 		summary.setTrafficTime(0.0);
 		summary.setTravelTime(0.0);
+		summary.setDistance(0.0);
 		BoundingBox box = null;
 		for (Leg leg : getLeg()) {
 			summary.setBaseTime( summary.getBaseTime() + leg.getBaseTime() );
 			summary.setTrafficTime( summary.getTrafficTime() + leg.getTrafficTime() );
 			summary.setTravelTime( summary.getTravelTime() + leg.getTravelTime() );
+			summary.setDistance( summary.getDistance() + leg.getLength() );
+			
 			if (box == null) {
 				box = leg.getBoundingBox();
 			} else {
@@ -193,6 +197,9 @@ public class Route implements Serializable, PostProcessingEnabler.PostProcessabl
 				box.setBottomRight(boxBR);
 			}
 		}
+		String text = String.format("The trip takes %.1f mi and %s h", summary.getDistance() * Here2.METERS_TO_MILES,
+				Here2.toPeriod( summary.getTrafficTime() ));
+		summary.setText(text);
 		setBoundingBox(box);
 	}
 
