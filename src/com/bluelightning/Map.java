@@ -37,6 +37,7 @@ import org.jxmapviewer.viewer.LocalResponseCache;
 import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.jxmapviewer.viewer.WaypointPainter;
 
+import com.bluelightning.Garmin.TrackPoint;
 import com.bluelightning.gui.MainControlPanel;
 import com.bluelightning.gui.MainPanel;
 import com.bluelightning.json.Leg;
@@ -47,6 +48,7 @@ import com.bluelightning.map.StopMarker;
 import com.bluelightning.map.SwingMarker;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.ButtonWaypointOverlayPainter;
+import com.sun.prism.paint.Color;
 
 
 /**
@@ -155,6 +157,34 @@ public class Map {
 		mapViewer.setCenterPosition( new GeoPosition(28, -81));
 		mapViewer.setZoom(10);
 	}
+	
+	public void show(ArrayList<List<GeoPosition>> tracks, ArrayList<ButtonWaypoint> waylist) {
+		java.awt.Color[] colors = {java.awt.Color.RED, java.awt.Color.BLUE};
+		int iColor = 0;
+		
+		markerPainter = new ButtonWaypointOverlayPainter();
+		markerPainter.setWaypoints( new HashSet<ButtonWaypoint>(waylist));
+		
+        painters = new ArrayList<Painter<JXMapViewer>>();
+        for (List<GeoPosition> track : tracks ) {
+        	routePainter = new RoutePainter(track);
+        	routePainter.setColor( colors[iColor++] );
+			painters.add(routePainter);
+        }
+		// Set the focus
+		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(tracks.get(0)), 0.9);	
+		painters.add(markerPainter);
+
+		CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
+		mapViewer.setOverlayPainter(painter);
+		
+		// Add the JButtons to the map viewer
+		for (ButtonWaypoint w : waylist) {
+			mapViewer.add(w);
+			currentMarkers.add(w);
+		}
+	}
+	
 	
 	public List<ButtonWaypoint> showRoute( Route route) {
 		List<GeoPosition> track = route.getShape();

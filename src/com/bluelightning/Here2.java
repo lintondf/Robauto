@@ -243,7 +243,7 @@ public class Here2 {
 		int i = 0;
 		nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), from.toGeo()));
 		for (LatLon via : vias) {
-			nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), via.toGeo()));			
+			nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), via.toVia()));			
 		}
 		nvps.add(new BasicNameValuePair(String.format("waypoint%d", i++), to.toGeo()));
 		return getRouteBase( nvps, mode );
@@ -394,7 +394,7 @@ public class Here2 {
 		return computeRouteBase( hereRoute.route );
 	}
 	
-	protected static Route computeRouteBase( HereRoute hereRoute ) {
+	public static Route computeRouteBase( HereRoute hereRoute ) {
 		//HereRoute hereRoute = plus.route;
 		System.out.println(hereRoute.getResponse().getMetaInfo());
 		Set<Route> routes = hereRoute.getResponse().getRoute();

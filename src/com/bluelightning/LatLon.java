@@ -34,11 +34,25 @@ import com.google.gson.JsonElement;
 			longitude = mappedPosition.getLongitude();
 		}
 
+		public LatLon(double latitude, double longitude) {
+			this.latitude = latitude;
+			this.longitude = longitude;
+		}
+
+		public LatLon(LatLon that) {
+			this.latitude = that.latitude;
+			this.longitude = that.longitude;
+		}
+
 		public String toString() {
 			return String.format("%10.6f, %10.6f", latitude, longitude );
 		}
 		public String toGeo() {
 			return String.format("geo!stopOver!%f,%f", latitude, longitude);
+		}
+		
+		public String toVia() {
+			return String.format("geo!passThrough!%f,%f", latitude, longitude);
 		}
 		
 		public GeoPosition toGeoPosition() {

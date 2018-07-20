@@ -92,4 +92,12 @@ public class RoutePainter implements Painter<JXMapViewer>
 			lastY = (int) pt.getY();
 		}
 	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
 }
