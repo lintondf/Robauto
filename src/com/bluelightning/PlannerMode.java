@@ -190,11 +190,20 @@ public class PlannerMode extends JPanel {
 					}
 				});
 				break;
+			case "ControlPanel.StopsToBasecamp":
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						stopsToBasecamp();
+					}
+				});
+				break;
 			case "ControlPanel.Route":
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						route();
+						//route();
+						importBasecampRoute();
 					}
 				});
 				break;
@@ -339,6 +348,39 @@ public class PlannerMode extends JPanel {
 			mainPanel.getRightTabbedPane().setSelectedIndex(index);
 			RobautoMain.logger.info("  Route shown on map");
 		}
+		
+		private void stopsToBasecamp() {
+			RobautoMain.logger.info("Writing stops.GPX...");
+			boolean pf = Garmin.writeToGPX(routePanel.getWaypointsModel().getData(), "/Users/lintondf/stops.GPX");
+			RobautoMain.logger.info((pf) ? "  Stops written"  : "  Stop write failed");
+		}
+		
+		private void importBasecampRoute() {
+			RobautoMain.logger.info("Importing Basecamp route...");
+			List<VisitedPlace> places = routePanel.getWaypointsModel().getData();
+			ArrayList<BaseCamp> days = new ArrayList<>();
+			for (int i = 1; i < places.size(); i++) {
+				String path = String.format("/Users/lintondf/day%d.pdf", i);
+				BaseCamp baseCamp = new BaseCamp( path );
+				days.add(baseCamp);
+			}
+			RobautoMain.logger.info(String.format("  %d days loaded", days.size()));
+			ArrayList< List<GeoPosition> > tracks = new ArrayList<>();
+			tracks.add(days.get(0).garmin.track);
+			Route route = days.get(0).route;
+			map.show(tracks, days.get(0).vias );
+			int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
+			mainPanel.getRightTabbedPane().setSelectedIndex(index);
+			RobautoMain.logger.info("  Route shown on map");
+			RobautoMain.tripPlan.setRoute(route);
+			RobautoMain.tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
+			RobautoMain.logger.info("  Route points saved");
+			RobautoMain.tripPlan.save(tripPlanFile);
+			RobautoMain.tripPlan.tripPlanUpdated( tripPlanFile.getAbsolutePath() );
+			RobautoMain.logger.info("  Trip plan saved");
+		}
+
+		
 
 		private void route() {
 			RobautoMain.logger.info("Planning route...");

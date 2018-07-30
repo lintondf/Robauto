@@ -59,6 +59,7 @@ public class POISet extends ArrayList<POI> {
 		HashMap<POI, POIResult> neighbors = new HashMap<POI, POIResult>();
 		for (POI p : this) {
 			double d = p.roughDistance(seg1, seg2);
+			//System.out.printf("%10.3f %s\n", d, p.getName() );
 			if (d <= rangeMeters) {
 				POIResult result = new POIResult();
 				result.poi = p;
@@ -93,7 +94,9 @@ public class POISet extends ArrayList<POI> {
 
 	public Map<POI, POIResult> nearBy(Leg leg, CumulativeTravel legStart, double rangeMeters) {
 		HashMap<POI, POIResult> neighbors = new HashMap<POI, POIResult>();
+		//System.out.printf("POISet::nB M%d\n", leg.getManeuver().size() );
 		for (Maneuver maneuver : leg.getManeuver()) {
+			//System.out.printf("POISet::nB M.S%d\n", maneuver.getShape().size() );
 			Map<POI, POIResult> pList = nearBy(maneuver.getShape(), rangeMeters);
 			for (POI poi : pList.keySet()) {
 				POIResult result = pList.get(poi);
@@ -126,6 +129,8 @@ public class POISet extends ArrayList<POI> {
 					&& p.getLongitude() <= box.getBottomRight().getLongitude())
 				trim.add(p);
 		}
+		//System.out.printf("POISet::filter %d -> %d\n", this.size(), trim.size() );
+		//trim.forEach(System.out::println);
 		return trim;
 	}
 
@@ -133,6 +138,7 @@ public class POISet extends ArrayList<POI> {
 		POISet pset = filter(route.getBoundingBox());
 		ArrayList<POIResult> output = new ArrayList<>();
 		CumulativeTravel totalProgress = new CumulativeTravel();
+		//System.out.printf("POISet::gPOIAR %d\n", route.getLeg().size());
 		for (Leg leg : route.getLeg()) {
 			//Main.logger.debug( String.format("  gPPOAR %s -> %s", leg.getStart().getUserLabel(), leg.getEnd().getUserLabel()) );
 			Map<POI, POIResult> nearby = pset.nearBy(leg, totalProgress, radiusMeters);

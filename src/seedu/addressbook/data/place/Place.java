@@ -16,7 +16,7 @@ import com.bluelightning.LatLon;
  * Represents a Place in the address book.
  * Guarantees: details are present and not null, field values are validated.
  */
-public class Place implements ReadOnlyPlace, Serializable {
+public class Place implements ReadOnlyPlace, Serializable, Comparable<Place> {
 
     private Name name;
     private Double latitude;
@@ -151,6 +151,12 @@ public class Place implements ReadOnlyPlace, Serializable {
 
 	public void setAddress(Address address) {
 		this.address = address;
+	}
+
+
+	@Override
+	public int compareTo(Place o) {
+		return this.name.toString().compareTo(o.name.toString());
 	}
 
 }

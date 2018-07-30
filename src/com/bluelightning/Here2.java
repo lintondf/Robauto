@@ -396,6 +396,52 @@ public class Here2 {
 		return computeRouteBase( hereRoute.route );
 	}
 	
+	public static void reportRoute( Route route ) {
+		System.out.printf("%d indicents\n", route.getIncident().size() );
+		for (Incident incident : route.getIncident() ) {
+			System.out.println(incident);
+		}
+		System.out.printf("%d maneuvergroups\n", route.getManeuverGroup().size() );
+		for (ManeuverGroup group : route.getManeuverGroup()) {
+			System.out.println( group );
+		}
+		System.out.printf("%d shapes\n", route.getShape().size() );
+		//writeKml( "shape.kml", route.getShape() );
+		System.out.printf("%d waypoints\n", route.getWaypoint().size() );
+		for (Waypoint waypoint : route.getWaypoint()) {
+			System.out.println( waypoint );
+		}
+		System.out.printf("%d legs\n", route.getLeg().size() );
+		List<GeoPosition> routeShape = route.getShape();
+		int pointIndex = 1;
+		for (Leg leg : route.getLeg()) {
+			System.out.println( leg.getSummary() );
+			System.out.printf("%d links\n", leg.getLink().size() );
+			System.out.printf("%d Maneuvers\n", leg.getManeuver().size() );
+			for (Maneuver maneuver : leg.getManeuver()) {
+				Link link = leg.getLinkMap().get(maneuver.getId());
+				String linkDetails = "";
+				double speed = METERS_PER_SECOND_TO_MILES_PER_HOUR*(maneuver.getLength() / maneuver.getTrafficTime());
+				if (link != null) {
+					String truckRestrictions = (link.getTruckRestrictions() == null || link.getTruckRestrictions().getHeight() == null) ?
+							"None" : String.format("%.1f ft", link.getTruckRestrictions().getHeight()/0.3048);
+					double speedLimit = (link.getSpeedLimit() == null) ? 0.0 : METERS_PER_SECOND_TO_MILES_PER_HOUR*link.getSpeedLimit();
+					linkDetails = String.format("%.0f,%.0f,%s", speed, speedLimit, truckRestrictions);
+				}
+				CumulativeTravel progress = leg.getProgress(maneuver);
+				System.out.printf("%-5s: %5.1f mi / %s; %7.1f mi / %s; %5.0f; %d [%s/%s/%s] %s\n", maneuver.getId(), 
+						maneuver.getLength()*METERS_TO_MILES,
+						Here2.toPeriod(maneuver.getTrafficTime()),
+						progress.distance*METERS_TO_MILES,
+						Here2.toPeriod(progress.trafficTime),
+						speed,
+						maneuver.getShape().size(),
+						maneuver.getRoadName(), maneuver.getRoadNumber(), linkDetails,
+						maneuver.getInstruction() );
+			}
+		} // for leg
+	}
+	
 	public static Route computeRouteBase( HereRoute hereRoute ) {
 		//HereRoute hereRoute = plus.route;
 		System.out.println(hereRoute.getResponse().getMetaInfo());
@@ -416,72 +462,7 @@ public class Here2 {
 			}
 		}
 		if (route != null) {
-			System.out.printf("%d indicents\n", route.getIncident().size() );
-			for (Incident incident : route.getIncident() ) {
-				System.out.println(incident);
-			}
-			System.out.printf("%d maneuvergroups\n", route.getManeuverGroup().size() );
-			for (ManeuverGroup group : route.getManeuverGroup()) {
-				System.out.println( group );
-			}
-			System.out.printf("%d shapes\n", route.getShape().size() );
-			//writeKml( "shape.kml", route.getShape() );
-			System.out.printf("%d waypoints\n", route.getWaypoint().size() );
-			for (Waypoint waypoint : route.getWaypoint()) {
-				System.out.println( waypoint );
-			}
-			System.out.printf("%d legs\n", route.getLeg().size() );
-			List<GeoPosition> routeShape = route.getShape();
-			int pointIndex = 1;
-			for (Leg leg : route.getLeg()) {
-				System.out.println( leg.getSummary() );
-				System.out.printf("%d links\n", leg.getLink().size() );
-				System.out.printf("%d Maneuvers\n", leg.getManeuver().size() );
-				for (Maneuver maneuver : leg.getManeuver()) {
-					Link link = leg.getLinkMap().get(maneuver.getId());
-					String linkDetails = "";
-					double speed = METERS_PER_SECOND_TO_MILES_PER_HOUR*(maneuver.getLength() / maneuver.getTrafficTime());
-					if (link != null) {
-						String truckRestrictions = (link.getTruckRestrictions() == null || link.getTruckRestrictions().getHeight() == null) ?
-								"None" : String.format("%.1f ft", link.getTruckRestrictions().getHeight()/0.3048);
-						double speedLimit = (link.getSpeedLimit() == null) ? 0.0 : METERS_PER_SECOND_TO_MILES_PER_HOUR*link.getSpeedLimit();
-						linkDetails = String.format("%.0f,%.0f,%s", speed, speedLimit, truckRestrictions);
-					}
-					CumulativeTravel progress = leg.getProgress(maneuver);
-					System.out.printf("%-5s: %5.1f mi / %s; %7.1f mi / %s; %5.0f;  [%s/%s/%s] %s\n", maneuver.getId(), 
-							maneuver.getLength()*METERS_TO_MILES,
-							Here2.toPeriod(maneuver.getTrafficTime()),
-							progress.distance*METERS_TO_MILES,
-							Here2.toPeriod(progress.trafficTime),
-							speed,
-							maneuver.getRoadName(), maneuver.getRoadNumber(),
-							linkDetails,
-							//angle2Direction(maneuver.getStartAngle()), // angle at start of maneuver
-							maneuver.getInstruction() );
-//					int i = maneuver.getInstruction().indexOf(" onto ");
-//					if (i >= 0)
-//						System.out.println(maneuver.getInstruction().substring(i));
-//					System.out.printf("    %s: %s\n", maneuver.getShapeQuality(), toString(maneuver.getShape()));
-//					if (maneuver.getId().equals("M40")) {
-//						routeShape = Route.parseShape(maneuver.getShape());
-//					}
-				}
-//				System.out.printf("LEG TO %s: %5.1f mi; %s %s; %5.1f\n", 
-//						pointAddresses[pointIndex++],
-//						leg.getLength()*METERS_TO_MILES, 
-//						Here2.toPeriod(leg.getTrafficTime()), 
-//						Here2.toPeriod(leg.getTravelTime()),
-//						leg.getLength()*METERS_TO_MILES / (leg.getTrafficTime()/3600.0) );
-			} // for leg
-			
-//			printPointsOfInterestAlongRoute( route, "POI/RestAreasCombined_USA.csv");
-//			printPointsOfInterestAlongRoute( route, "POI/SamsClubs_USA.csv");
-//			POISet pset = WalmartPOI.factory(); //TruckStopPOI.factory(); // POIBase.factory("POI/Costco_USA_Canada.csv");
-//			ArrayList<POISet.POIResult> nearby = pset.getPointsOfInterestAlongRoute(route, 5e3 );
-//			pset = SamsClubPOI.factory();
-//			nearby.addAll(pset.getPointsOfInterestAlongRoute(route, 5e3 ));
-//			
-//			com.bluelightning.Map.showMap(routeShape, route, POIMarker.factory(nearby));
+			reportRoute(route);
 			return route;
 		} // for route
 		return null;

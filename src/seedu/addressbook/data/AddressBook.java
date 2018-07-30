@@ -185,4 +185,8 @@ public class AddressBook {
         // use this method for custom fields hashing instead of implementing your own
         return Objects.hash(allPlaces, allTags);
     }
+
+	public void sort() {
+		allPlaces.sort();
+	}
 }

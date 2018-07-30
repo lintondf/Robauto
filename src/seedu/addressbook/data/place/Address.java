@@ -36,6 +36,15 @@ public class Address implements Serializable {
 		value = "";
 	}
     
+    public String getStreetAddress() {
+    	if (value == null || value.isEmpty())
+    		return "";
+    	String[] fields = value.split(",");
+    	if (fields.length < 1)
+    		return "";
+    	return fields[0].trim();
+    }
+
     public String getCity() {
     	if (value == null || value.isEmpty())
     		return "";

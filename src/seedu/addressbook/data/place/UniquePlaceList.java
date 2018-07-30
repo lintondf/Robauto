@@ -146,4 +146,8 @@ public class UniquePlaceList implements Iterable<Place> {
         return internalList.hashCode();
     }
 
+	public void sort() {
+		Collections.sort(internalList);
+	}
+
 }

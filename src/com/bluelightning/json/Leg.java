@@ -332,7 +332,6 @@ public class Leg implements Serializable, PostProcessingEnabler.PostProcessable,
 
 	@Override
 	public int compareTo(Leg o) {
-		// TODO Auto-generated method stub
 		return (int) (this.firstPoint - o.firstPoint);
 	}
 

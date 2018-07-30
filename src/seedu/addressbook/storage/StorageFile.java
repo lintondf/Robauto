@@ -91,6 +91,7 @@ public class StorageFile {
         try (final Writer fileWriter =
                      new BufferedWriter(new FileWriter(path.toFile()))) {
 
+        	addressBook.sort();
             final AdaptedAddressBook toSave = new AdaptedAddressBook(addressBook);
             final Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -118,6 +119,7 @@ public class StorageFile {
             if (loaded.isAnyRequiredFieldMissing()) {
                 throw new StorageOperationException("File data missing some elements");
             }
+            loaded.toModelType().sort();
             return loaded.toModelType();
 
         /* Note: Here, we are using an exception to create the file if it is missing. However, we should minimize

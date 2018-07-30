@@ -126,12 +126,25 @@ public class MainControlPanel extends JPanel {
 		});
 		panel.add(chckbxRestAreas);
 		
-		JButton bthPlanRoute = new JButton("Plan Route");
+		JButton bthStopsToBasecamp = new JButton("Stops to Basecamp");
+		GridBagConstraints gbc_bthStopsToBasecamp = new GridBagConstraints();
+		gbc_bthStopsToBasecamp.fill = GridBagConstraints.HORIZONTAL;
+		gbc_bthStopsToBasecamp.insets = new Insets(0, 0, 5, 0);
+		gbc_bthStopsToBasecamp.gridx = 0;
+		gbc_bthStopsToBasecamp.gridy = 1;
+		bthStopsToBasecamp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.StopsToBasecamp", event));
+			}
+		});
+		add(bthStopsToBasecamp, gbc_bthStopsToBasecamp);
+		
+		JButton bthPlanRoute = new JButton("Import Basecamp Route");
 		GridBagConstraints gbc_bthPlanRoute = new GridBagConstraints();
 		gbc_bthPlanRoute.fill = GridBagConstraints.HORIZONTAL;
 		gbc_bthPlanRoute.insets = new Insets(0, 0, 5, 0);
 		gbc_bthPlanRoute.gridx = 0;
-		gbc_bthPlanRoute.gridy = 1;
+		gbc_bthPlanRoute.gridy = 2;
 		bthPlanRoute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.Route", event));
@@ -144,7 +157,7 @@ public class MainControlPanel extends JPanel {
 		gbc_btnOptimizeStops.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnOptimizeStops.insets = new Insets(0, 0, 5, 0);
 		gbc_btnOptimizeStops.gridx = 0;
-		gbc_btnOptimizeStops.gridy = 2;
+		gbc_btnOptimizeStops.gridy = 3;
 		btnOptimizeStops.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.Optimize", event));
@@ -156,7 +169,7 @@ public class MainControlPanel extends JPanel {
 		GridBagConstraints gbc_btnFirebug = new GridBagConstraints();
 		gbc_btnFirebug.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnFirebug.gridx = 0;
-		gbc_btnFirebug.gridy = 6;
+		gbc_btnFirebug.gridy = 7;
 		btnFirebug.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				Events.eventBus.post( new Events.UiEvent("ControlPanel.FireBug", event));
@@ -169,7 +182,7 @@ public class MainControlPanel extends JPanel {
 		gbc_btnFinalizeRoute.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnFinalizeRoute.insets = new Insets(0, 0, 5, 0);
 		gbc_btnFinalizeRoute.gridx = 0;
-		gbc_btnFinalizeRoute.gridy = 3;
+		gbc_btnFinalizeRoute.gridy = 4;
 		add(btnFinalizeRoute, gbc_btnFinalizeRoute);
 		btnFinalizeRoute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
@@ -183,7 +196,7 @@ public class MainControlPanel extends JPanel {
 		gbc_clearActionsBox.insets = new Insets(0, 0, 5, 0);
 		gbc_clearActionsBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_clearActionsBox.gridx = 0;
-		gbc_clearActionsBox.gridy = 4;
+		gbc_clearActionsBox.gridy = 5;
 		add(clearActionsBox, gbc_clearActionsBox);
 		clearActionsBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
@@ -197,7 +210,7 @@ public class MainControlPanel extends JPanel {
 		gbc_btnCopilotOutput.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnCopilotOutput.insets = new Insets(0, 0, 5, 0);
 		gbc_btnCopilotOutput.gridx = 0;
-		gbc_btnCopilotOutput.gridy = 5;
+		gbc_btnCopilotOutput.gridy = 6;
 		add(btnTravelMode, gbc_btnCopilotOutput);
 		btnTravelMode.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {

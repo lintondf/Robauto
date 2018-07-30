@@ -9,7 +9,7 @@ import com.bluelightning.poi.POIBase;
 import seedu.addressbook.data.exception.IllegalValueException;
 import seedu.addressbook.data.tag.UniqueTagList;
 
-public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Serializable {
+public class VisitedPlace extends Place implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -65,11 +65,6 @@ public class VisitedPlace extends Place implements Comparable<VisitedPlace>, Ser
 		return String.format("geo!%s!%f,%f;;%s", (passThru)? "passThrough" : "stopOver", getLatitude(), getLongitude(), label);
 	}
 	
-	@Override
-	public int compareTo(VisitedPlace that) {
-		return visitOrder.compareTo(that.visitOrder);
-	}
-
 	public boolean isPassThru() {
 		return passThru;
 	}
