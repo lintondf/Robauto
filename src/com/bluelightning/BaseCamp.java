@@ -191,8 +191,10 @@ public class BaseCamp {
 	public ArrayList<Turn> turns = new ArrayList<>();
 	public ArrayList<ButtonWaypoint> vias;
 	
+	public BaseCamp() {} // for generics users only
+	
 	public BaseCamp( String pdfPath ) {
-		
+		System.out.println("BASECAMP: " + pdfPath);
 		String htmlPath = pdfPath.replace(".pdf", ".html");
 		String gpxPath = pdfPath.replace(".pdf", ".GPX");
 		File htmlFile = new File(htmlPath);
@@ -301,7 +303,7 @@ public class BaseCamp {
 				TrackPoint trackPoint = garmin.trackPoints.get(iTrack);
 				System.out.println( iTrack + " : " +  trackPoint);
 				StopMarker wp = new StopMarker(StopMarker.DRIVERS, Integer.toString(iTrack) + ":" + current.toString(), trackPoint);
-				vias.add(wp);
+				//vias.add(wp);
 				viaPoints.add(trackPoint);
 			}
 		}
@@ -310,6 +312,9 @@ public class BaseCamp {
 		mappedPosition.setLongitude( garmin.trackPoints.get(0).getLongitude());
 		Start start = new Start();
 		if (garmin.wpts.size() > 1) {
+			StopMarker marker = new StopMarker( StopMarker.ORIGIN, garmin.wpts.get(0).getName(), 
+					new GeoPosition( mappedPosition.getLatitude(), mappedPosition.getLongitude()) );
+			vias.add( marker );
 			String label = String.format("%s/%s", garmin.wpts.get(0).getName(), garmin.wpts.get(0).getDesc() );
 			start.setUserLabel(label);
 		}
@@ -319,6 +324,9 @@ public class BaseCamp {
 		mappedPosition.setLongitude( garmin.trackPoints.get(garmin.trackPoints.size()-1).getLongitude());
 		End end = new End();
 		if (garmin.wpts.size() > 1) {
+			StopMarker marker = new StopMarker( StopMarker.TERMINUS, garmin.wpts.get(0).getName(), 
+					new GeoPosition( mappedPosition.getLatitude(), mappedPosition.getLongitude()) );
+			vias.add( marker );
 			String label = String.format("%s/%s", garmin.wpts.get(1).getName(), garmin.wpts.get(1).getDesc() );
 			end.setUserLabel(label);
 		}
@@ -365,39 +373,6 @@ public class BaseCamp {
 	}
 	
 
-	private BoundingBox generateBoundingBox(List<TrackPoint> trackPoints) {
-		BoundingBox box = new BoundingBox();
-		BottomRight br = new BottomRight();
-		TopLeft tl = new TopLeft();
-		if (trackPoints.size() > 0) {
-			br.setLatitude( trackPoints.get(0).getLatitude());
-			tl.setLatitude( trackPoints.get(0).getLatitude());
-			br.setLongitude( trackPoints.get(0).getLongitude());
-			tl.setLongitude( trackPoints.get(0).getLongitude());
-			for (int i = 1; i < trackPoints.size(); i++) {
-				double latitude = trackPoints.get(i).getLatitude();
-				double longitude = trackPoints.get(i).getLongitude();
-				if (latitude > tl.getLatitude()) {
-					tl.setLatitude( latitude );
-				}
-				if (latitude < br.getLatitude()) {
-					br.setLatitude(latitude);
-				}
-				if (longitude < tl.getLongitude()) {
-					tl.setLongitude(longitude);
-				}
-				if (longitude > br.getLatitude()) {
-					br.setLongitude(longitude);
-				}
-			}
-		}
-		box.setBottomRight(br);
-		box.setTopLeft(tl);
-		//System.out.printf( "BB %10.6f %10.6f  %10.6f %10.6f\n", tl.getLatitude(), br.getLatitude(), tl.getLongitude(), br.getLongitude() );
-		return box;
-	}
-
-
 	private int findNearestTrackPoint(Turn current, int iTrack,
 			List<TrackPoint> trackPoints) {
 		while (iTrack < trackPoints.size()) {
@@ -430,6 +405,38 @@ public class BaseCamp {
 			iTrack++;
 		}
 		return iTrack;
+	}
+
+	public <A extends GeodeticPosition> BoundingBox generateBoundingBox(List<A> position) {
+		BoundingBox box = new BoundingBox();
+		BottomRight br = new BottomRight();
+		TopLeft tl = new TopLeft();
+		if (position.size() > 0) {
+			br.setLatitude( position.get(0).getLatitude());
+			tl.setLatitude( position.get(0).getLatitude());
+			br.setLongitude( position.get(0).getLongitude());
+			tl.setLongitude( position.get(0).getLongitude());
+			for (int i = 1; i < position.size(); i++) {
+				double latitude = position.get(i).getLatitude();
+				double longitude = position.get(i).getLongitude();
+				if (latitude > tl.getLatitude()) {
+					tl.setLatitude( latitude );
+				}
+				if (latitude < br.getLatitude()) {
+					br.setLatitude(latitude);
+				}
+				if (longitude < tl.getLongitude()) {
+					tl.setLongitude(longitude);
+				}
+				if (longitude > br.getLatitude()) {
+					br.setLongitude(longitude);
+				}
+			}
+		}
+		box.setBottomRight(br);
+		box.setTopLeft(tl);
+		//System.out.printf( "BB %10.6f %10.6f  %10.6f %10.6f\n", tl.getLatitude(), br.getLatitude(), tl.getLongitude(), br.getLongitude() );
+		return box;
 	}
 
 	// ((\d+)\sft)?(([1-9]\d*(\.\d+))\smi)?((\d+)\shour\(s\))?((,\s)?(\d+)\sminutes)?((\d+)\sseconds)?$

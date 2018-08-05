@@ -696,7 +696,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			if (it.hasNext())
 				current.fuelAvailability = POIBase.toFuelString(it.next().getFuelAvailable());
 			Iterator<Leg> itLeg = route.getLeg().iterator();
-			for (int iLeg = 0; iLeg < route.getLeg().size(); iLeg++) {
+			for (int iLeg = 0; itLeg.hasNext(); iLeg++) {
 				Leg leg = itLeg.next();
 				LegPoint next = new LegPoint(current);
 				next.fuelAvailability = POIBase.toFuelString(it.next().getFuelAvailable());

@@ -1,19 +1,23 @@
 package com.bluelightning.gui;
 
 import javax.swing.JPanel;
+
 import java.awt.BorderLayout;
+
+import javax.swing.JButton;
 import javax.swing.JSplitPane;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.text.DefaultCaret;
 
 public class TravelActivePanel extends JPanel {
 
 	protected JPanel leftPanel;
 	protected JProgressBar progressBar;
 	protected JTextPane textPane;
-	private JPanel componentsPanel;
+	protected TravelSpeedPanel componentsPanel;
 	protected JSplitPane splitPane;
 	protected JScrollPane scroll;
 
@@ -39,12 +43,14 @@ public class TravelActivePanel extends JPanel {
 		progressBar = new JProgressBar();
 		rightPanel.add(progressBar, BorderLayout.SOUTH);
 		
+//		componentsPanel = new TravelSpeedPanel();
+//		rightPanel.add(componentsPanel, BorderLayout.NORTH);
+
 		textPane = new JTextPane();
 		scroll = new JScrollPane(textPane);
 		rightPanel.add(scroll, BorderLayout.CENTER);
-		
-		componentsPanel = new JPanel();
-		rightPanel.add(componentsPanel, BorderLayout.NORTH);
+		DefaultCaret caret = (DefaultCaret) textPane.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 
 	}
 
@@ -72,11 +78,11 @@ public class TravelActivePanel extends JPanel {
 		this.textPane = textArea;
 	}
 
-	public JPanel getComponentsPanel() {
+	public TravelSpeedPanel getComponentsPanel() {
 		return componentsPanel;
 	}
 
-	public void setComponentsPanel(JPanel componentsPanel) {
+	public void setComponentsPanel(TravelSpeedPanel componentsPanel) {
 		this.componentsPanel = componentsPanel;
 	}
 

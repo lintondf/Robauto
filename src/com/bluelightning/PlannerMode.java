@@ -43,6 +43,7 @@ import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
+import com.bluelightning.Garmin.TrackPoint;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.DriverAssignments;
 import com.bluelightning.data.TripPlan.LegData;
@@ -355,20 +356,61 @@ public class PlannerMode extends JPanel {
 			RobautoMain.logger.info((pf) ? "  Stops written"  : "  Stop write failed");
 		}
 		
+		private ArrayList<ButtonWaypoint> mergeVias( List<BaseCamp> baseCamps) {
+			ArrayList<ButtonWaypoint> vias = new ArrayList<>();
+			for (BaseCamp baseCamp : baseCamps) {
+				vias.addAll( baseCamp.vias);
+				StopMarker marker = (StopMarker) vias.get( vias.size()-1 );
+				marker.setKind( StopMarker.OVERNIGHT);
+			}
+			StopMarker marker = (StopMarker) vias.get( vias.size()-1 );
+			marker.setKind( StopMarker.TERMINUS);
+			return vias;
+		}
+		
+		
+		private Route mergeRoutes( List<BaseCamp> baseCamps) {
+			Route route = new Route();
+			List<Object> routeShape = new ArrayList<>();
+			List<TrackPoint> routeTrackPoints = new ArrayList<>();
+			TreeSet<Leg> legs = new TreeSet<>();
+			double firstPoint = 0;
+			double lastPoint = 0;
+			for (BaseCamp baseCamp : baseCamps) {
+				Leg leg = baseCamp.route.getLeg().iterator().next();
+				lastPoint += leg.getShape().size();
+				leg.setFirstPoint(firstPoint);
+				leg.setLastPoint(lastPoint);
+				legs.add( leg );
+				firstPoint += leg.getShape().size();
+				routeTrackPoints.addAll(baseCamp.garmin.trackPoints);
+				for (TrackPoint point : baseCamp.garmin.trackPoints) {
+					routeShape.add( String.format("%15.8f, %15.8f", point.getLatitude(), point.getLongitude()) );
+				}
+			}
+			route.setLeg(legs);
+			route.setShape(routeShape);
+			if (! baseCamps.isEmpty())
+				route.setBoundingBox( baseCamps.get(0).generateBoundingBox(routeTrackPoints) );
+			return route;
+		}
+		
 		private void importBasecampRoute() {
 			RobautoMain.logger.info("Importing Basecamp route...");
 			List<VisitedPlace> places = routePanel.getWaypointsModel().getData();
 			ArrayList<BaseCamp> days = new ArrayList<>();
-			for (int i = 1; i < places.size(); i++) {
-				String path = String.format("/Users/lintondf/day%d.pdf", i);
+			for (int i = 0; i < places.size()-1; i++) {
+				String path = String.format("/Users/lintondf/day%d.pdf", i+1);
 				BaseCamp baseCamp = new BaseCamp( path );
 				days.add(baseCamp);
 			}
 			RobautoMain.logger.info(String.format("  %d days loaded", days.size()));
 			ArrayList< List<GeoPosition> > tracks = new ArrayList<>();
-			tracks.add(days.get(0).garmin.track);
-			Route route = days.get(0).route;
-			map.show(tracks, days.get(0).vias );
+			Route route = mergeRoutes( days );
+			route.setBoundingBox( (new BaseCamp()).generateBoundingBox( route.getShape() ) );
+			Here2.reportRoute(route);
+			tracks.add(route.getShape());
+			map.show(tracks, mergeVias( days ) );
 			int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 			mainPanel.getRightTabbedPane().setSelectedIndex(index);
 			RobautoMain.logger.info("  Route shown on map");

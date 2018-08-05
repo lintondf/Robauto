@@ -220,15 +220,18 @@ public class Garmin extends JPanel {
 			FileReader fir = new FileReader(new File(path));
 			GpxType gpx = GpxUtil.unmarshal11(fir);
 			List<RteType> rtes = gpx.getRte();
-			wpts = gpx.getWpt();
-			
+			wpts = new ArrayList<>();
 			waylist = new ArrayList<>();
-			int kind = StopMarker.ORIGIN;
 			String text = "";
+			StopMarker stopMarker = null;
 
 			for (RteType rte : rtes) {
 				System.out.println("RTE: " + rte.getName());
 				List<WptType> rtepts = rte.getRtept();
+				if (! rtepts.isEmpty()) {
+					wpts.add( rtepts.get(0) ); // from first waypoint to last waypoint
+					wpts.add( rtepts.get(rtepts.size()-1) );
+				}
 				for (WptType rtept : rtepts) {
 					System.out.println("RTEPT: " + rtept.getName() + " "
 							+ rtept.getCmt() + " " + rtept.getLat() + ","
@@ -237,16 +240,18 @@ public class Garmin extends JPanel {
 							rtept.getLon().doubleValue());
 					add(where);
 					text = rtept.getCmt();
-					waylist.add(new StopMarker(kind, text, where));
-					kind = StopMarker.OVERNIGHT;
+					if (stopMarker == null) {
+						stopMarker = new StopMarker(StopMarker.ORIGIN, text, where);
+						
+					} else {
+						stopMarker = new StopMarker(StopMarker.TERMINUS, text, where);						
+					}
+					
 					ExtensionsType extensions = rtept.getExtensions();
 					List<Object> any = extensions.getAny();
 					for (Object ext : any) {
 						if (ext instanceof JAXBElement) {
 							JAXBElement element = (JAXBElement) ext;
-							System.out.println("JAXBElement: "
-									+ element.getName() + " : "
-									+ element.getValue());
 							switch (element.getName().toString()) {
 							case "{http://www.garmin.com/xmlschemas/GpxExtensions/v3}RoutePointExtension":
 								RoutePointExtensionT rpext = (RoutePointExtensionT) element
@@ -267,8 +272,9 @@ public class Garmin extends JPanel {
 						} else {
 							System.out.println("UNKNOWN: " + ext);
 						}
-					}
-				}
+					} // for ext
+				} // for wpt
+				waylist.add(stopMarker);
 			}
 		} catch (Exception x) {
 			x.printStackTrace();
@@ -307,7 +313,8 @@ public class Garmin extends JPanel {
 								rtept.getLon().doubleValue());
 						add(where);
 						text = rtept.getCmt();
-						waylist.add(new StopMarker(kind, text, where));
+						StopMarker stopMarker = new StopMarker(kind, text, where);
+						waylist.add(stopMarker);
 						kind = StopMarker.OVERNIGHT;
 						ExtensionsType extensions = rtept.getExtensions();
 						List<Object> any = extensions.getAny();

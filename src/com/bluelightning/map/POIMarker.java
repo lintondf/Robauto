@@ -34,8 +34,8 @@ public class POIMarker extends ButtonWaypoint {
 				new GeoPosition(result.poi.getLatitude(), result.poi.getLongitude() ));
 		this.result = result;
 		setToolTipText(result.toReport());
-		setSize((int) ButtonWaypoint.size.getWidth(), (int) ButtonWaypoint.size.getHeight());
-		setPreferredSize(ButtonWaypoint.size);
+		setSize((int) ButtonWaypoint.preferredSize.getWidth(), (int) ButtonWaypoint.preferredSize.getHeight());
+		setPreferredSize(ButtonWaypoint.preferredSize);
 		addMouseListener(new POIMarkerMouseListener());
 		setVisible(true);
 	}

@@ -109,6 +109,10 @@ public class StopMarker extends ButtonWaypoint {
 		//RobautoMain.logger.debug(String.format("StopMarker %o %s", kind, geoPosition.toString() ) );
 	}
 	
+	public void setKind( int kind ) {
+		this.setIcon( new ImageIcon(images.get(kind)) );
+	}
+	
 	private class StopMarkerMouseListener implements MouseListener {
 
 		@Override

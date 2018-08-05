@@ -18,6 +18,8 @@ import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineSegment;
 import org.slf4j.LoggerFactory;
 
 import com.bluelightning.Events.StopsCommitEvent;
@@ -74,10 +76,12 @@ import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.poi.POIBase;
 
 public class TravelMode extends JPanel {
+	
+	public static final int ICON_SCALE = 1;
 
 	public static String hostName = "localhost";
 	public static boolean isSurface = false;
-	public static boolean gpsNormal = true;
+	public static boolean gpsNormal = false;
 
 	public TripPlan tripPlan = null;
 	public Report report = null;
@@ -85,7 +89,23 @@ public class TravelMode extends JPanel {
 	protected JXMapViewer mapViewer;
 	
 	public TravelStatus travelStatus = null;
-	public List<GlobalCoordinates> maneuverStarts = null;
+	
+	public static class ManeuverMetrics {
+		
+		Maneuver maneuver;
+		ArrayList<LineSegment> segments = new ArrayList<>();
+		
+		public ManeuverMetrics( Maneuver maneuver) {
+			this.maneuver = maneuver;
+			for (int i = 1; i < maneuver.getShape().size(); i++) {
+				Coordinate p1 = new Coordinate( maneuver.getShape().get(i-1).getLongitude(), maneuver.getShape().get(i-1).getLatitude() );
+				Coordinate p2 = new Coordinate( maneuver.getShape().get(i-1).getLongitude(), maneuver.getShape().get(i-1).getLatitude() );
+				segments.add( new LineSegment(p1, p2 ) );
+			}
+		}
+	}
+	
+	public List<ManeuverMetrics> maneuverMetrics = null;
 
 	/**
 	 * HandleTripPlanUpdate - respond to RMI update() calls when PlannerMode
@@ -155,15 +175,25 @@ public class TravelMode extends JPanel {
 		String report = String.format("%s (%.0f gallons; %.0f MTE)", fraction, currentFuel, Report.MPG * currentFuel);
 		activePanel.getProgressBar().setString(report);
 	}
+	
+	//protected double
 
-	protected boolean nearManeuver( GPS.Fix fix ) {
-		GlobalCoordinates where = new GlobalCoordinates( fix.getLatitude(), fix.getLongitude() );
-		for (GlobalCoordinates point : maneuverStarts) {
-			GeodeticCurve curve = POIBase.geoCalc.calculateGeodeticCurve(POIBase.wgs84, where, point );
-			if (curve.getEllipsoidalDistance() < 2.0 / Here2.METERS_TO_MILES)
-				return true;
+	protected Maneuver findCurrentManeuver( GPS.Fix fix ) {
+		Coordinate where = new Coordinate( fix.getLongitude(), fix.getLatitude() );
+		double closestDistance = 7e6;
+		Maneuver closest = null;
+		if (maneuverMetrics == null)
+			return null;
+		for (ManeuverMetrics metrics : maneuverMetrics) {
+			for (LineSegment segment : metrics.segments) {
+				double d = segment.distance(where);
+				if (d < closestDistance) {
+					closestDistance = d;
+					closest = metrics.maneuver;
+				}
+			}
 		}
-		return false;
+		return closest;
 	}
 	
 	protected GPS gps = new GPS();
@@ -182,6 +212,10 @@ public class TravelMode extends JPanel {
 					String.format("%s %5.1f %6.4f\n", event.fix.toString(), Here2.METERS_TO_MILES * distanceTraveled, 
 							Here2.METERS_TO_MILES * event.fix.movement / Report.MPG) );
 			distanceTraveled += event.fix.movement;
+			Maneuver currentManeuver = findCurrentManeuver( event.fix );
+			if (currentManeuver != null) {
+				travelStatus.update(event.fix.speed, currentManeuver);
+			}
 			if (event.fix.speed < 0.1) {
 				timeStopped += 60;
 				travelStatus.stopped(timeStopped);
@@ -195,13 +229,19 @@ public class TravelMode extends JPanel {
 					setFuelLevel();
 					map.moveYouAreHere(event.fix);
 					activePanel.getTextPane().setText(travelStatus.toHtml());
-					activePanel.getScroll().getVerticalScrollBar().setValue(0);
-					if (event.fix.speed > 0.1 && nearManeuver(event.fix)) {
-						RobautoMain.logger.info("toBack");
-						frame.toBack();
-					}
+					activePanel.getTextPane().setCaretPosition( 0 );
+//					if (event.fix.speed > 0.1 && nearManeuver(event.fix)) {
+//						RobautoMain.logger.info("toBack");
+//						frame.toBack();
+//					}
 				}
 			});
+//			SwingUtilities.invokeLater(new Runnable() {
+//				@Override
+//				public void run() {
+//					activePanel.getScroll().getVerticalScrollBar().setValue(0);
+//				}
+//			});
 		}
 	}
 
@@ -209,8 +249,10 @@ public class TravelMode extends JPanel {
 		Dimension size = ButtonWaypoint.getImageSize();
 		Image image = null;
 		try {
-			image = ImageIO.read(new File("images/youarehere.png")).getScaledInstance(2 * (int) size.getWidth(),
-					2 * (int) size.getHeight(), Image.SCALE_SMOOTH);
+			image = ImageIO.read(new File("images/youarehere.png")).getScaledInstance(
+					ICON_SCALE * (int) size.getWidth(),
+					ICON_SCALE * (int) size.getHeight(), 
+					Image.SCALE_SMOOTH);
 		} catch (Exception x) {
 		}
 
@@ -236,14 +278,12 @@ public class TravelMode extends JPanel {
 		travelStatus = new TravelStatus( tripPlan.getTripLeg(currentDay) );
 		activePanel.getTextPane().setContentType("text/html");
 		activePanel.getTextPane().setEditable(false);
-		maneuverStarts = new ArrayList<GlobalCoordinates>();
+		maneuverMetrics = new ArrayList<>();
 		for (Leg leg : days.get(currentDay).getLeg() ) {
 			for (Maneuver manuever : leg.getManeuver() ) {
 				List<GeoPosition> points = manuever.getShape();
 				if (! points.isEmpty()) {
-					RobautoMain.logger.info(
-							String.format("%10.6f %10.6f %s\n", points.get(0).getLatitude(), points.get(0).getLongitude(), manuever.getInstruction() ) );
-					maneuverStarts.add( new GlobalCoordinates(points.get(0).getLatitude(), points.get(0).getLongitude()) );
+					maneuverMetrics.add( new ManeuverMetrics(manuever) );
 				}
 			}
 		}
@@ -258,6 +298,7 @@ public class TravelMode extends JPanel {
 				List<ButtonWaypoint> waypoints = map.showRoute(days, markers, currentDay);
 				activePanel.getSplitPane().setDividerLocation(0.4);
 				activePanel.getTextPane().setText(travelStatus.toHtml());
+				activePanel.getTextPane().setCaretPosition( 0 );
 				activePanel.getScroll().getVerticalScrollBar().setValue(0);
 			}
 		});
@@ -336,8 +377,6 @@ public class TravelMode extends JPanel {
 		mapViewer = map.getMapViewer();
 		activePanel.getLeftPanel().add(mapViewer, BorderLayout.CENTER);
 
-		activePanel.getComponentsPanel().setVisible(false);
-
 		// try {
 		// Image image = ImageIO.read(new File("images/compass.jpg"));
 		// activePanel.getComponentsPanel().add(new ImageIcon(image));
@@ -352,11 +391,11 @@ public class TravelMode extends JPanel {
 		try {
 			HandleTripPlanUpdate obj = new HandleTripPlanUpdate();
 			TripPlanUpdate stub = (TripPlanUpdate) UnicastRemoteObject.exportObject(obj, 0);
-
-			// Bind the remote object's stub in the registry
-			Registry registry = LocateRegistry.getRegistry("192.168.0.13", RobautoMain.REGISTRY_PORT);
-			registry.bind("Update", stub);
-
+			if (isSurface) {
+				// Bind the remote object's stub in the registry
+				Registry registry = LocateRegistry.getRegistry(localHostAddress.toString(), RobautoMain.REGISTRY_PORT);
+				registry.bind("Update", stub);
+			}
 			System.out.println("Server ready");
 		} catch (Exception e) {
 			System.err.println("Server exception: " + e.toString());
@@ -406,6 +445,8 @@ public class TravelMode extends JPanel {
 	 */
 
 	public static JFrame frame;
+
+	private static String localHostAddress;
 	protected JScrollPane dayListScrollPane;
 
 	private static void initLookAndFeel(double textSizeInPixels, double fontSize) {
@@ -446,6 +487,7 @@ public class TravelMode extends JPanel {
 			return;
 		}
 		System.out.println("Hostname of local machine: " + localMachine.getHostName() + " " + localMachine);
+		localHostAddress = localMachine.getHostAddress();
 
 		final File tripPlanFile = new File("RobautoTripPlan.obj");
 		EventQueue.invokeLater(new Runnable() {

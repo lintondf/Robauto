@@ -12,10 +12,12 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
+import org.tools4j.meanvar.MeanVarianceSampler;
 
 import com.bluelightning.Report.Day;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.TripLeg;
+import com.bluelightning.json.Maneuver;
 import com.x5.template.Chunk;
 import com.x5.template.Theme;
 
@@ -124,6 +126,10 @@ public class TravelStatus {
 		}
 	}
 	
+	protected double  speed;
+	protected Maneuver maneuver = null;
+	protected MeanVarianceSampler meanSpeed = null;
+	
 	protected TimeTracker  drivingTime;
 	protected TimeTracker  stoppedTime;
 	protected DistanceTracker  distanceDriven;
@@ -153,6 +159,16 @@ public class TravelStatus {
 		
 	}
 	
+	public void update( double speed, Maneuver maneuver ) {
+		this.speed = speed;
+		if (this.maneuver == null || this.maneuver != maneuver) {
+			this.maneuver = maneuver;
+			meanSpeed = new MeanVarianceSampler();
+		}
+		if (meanSpeed != null) {
+			meanSpeed.add(speed);
+		}
+	}
 	
 	public void stopped( double timeStopped ) {
 		stoppedTime.update(timeStopped);
@@ -187,6 +203,17 @@ public class TravelStatus {
 		}
 		Chunk c = theme.makeChunk("report#report");
 		Chunk t = theme.makeChunk("report#travel");
+		
+		t.set("currentSpeed", String.format("%3.0f", speed * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR ));
+		t.set("legAverageSpeed", "   ");
+		t.set("legExpectedSpeed", "   ");
+		if (meanSpeed != null) {
+			t.set("legAverageSpeed", String.format("%3.0f", meanSpeed.getMean() * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR) );
+		}
+		if (maneuver.getLength() > 0 && maneuver.getTrafficTime() > 0) {
+			double expectedSpeed = maneuver.getLength() / maneuver.getTrafficTime() * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR;
+			t.set("legExpectedSpeed", String.format("%3.0f", expectedSpeed) );
+		}
 		StringBuffer sb = new StringBuffer();
 		sb.append( String.format("<TR>%s</TR>\n", drivingTime.toHtmlRow()) );
 		sb.append( String.format("<TR>%s</TR>\n", distanceDriven.toHtmlRow()) );
