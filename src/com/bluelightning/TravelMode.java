@@ -50,6 +50,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 
@@ -80,8 +84,8 @@ public class TravelMode extends JPanel {
 	public static final int ICON_SCALE = 1;
 
 	public static String hostName = "localhost";
-	public static boolean isSurface = false;
-	public static boolean gpsNormal = false;
+	public static boolean isSurface = true;
+	public static boolean gpsNormal = true;
 
 	public TripPlan tripPlan = null;
 	public Report report = null;
@@ -197,6 +201,7 @@ public class TravelMode extends JPanel {
 	}
 	
 	protected GPS gps = new GPS();
+	protected ObjectOutputStream gpsOos;
 
 	public class GpsHandler {
 		Date  startTime = null;
@@ -204,6 +209,12 @@ public class TravelMode extends JPanel {
 		@Subscribe
 		public void handle(final Events.GpsEvent event) {
 			RobautoMain.logger.info( event.fix.toString() );
+			if (gpsOos != null) {
+				try {
+					gpsOos.writeObject( event.fix );
+				} catch (IOException e) {
+				}
+			}
 			if (startTime == null)
 				startTime = event.fix.date;
 			if (event.fix.movement == 0.0)
@@ -488,6 +499,7 @@ public class TravelMode extends JPanel {
 		}
 		System.out.println("Hostname of local machine: " + localMachine.getHostName() + " " + localMachine);
 		localHostAddress = localMachine.getHostAddress();
+		File file = new File("gps-trace.obj");
 
 		final File tripPlanFile = new File("RobautoTripPlan.obj");
 		EventQueue.invokeLater(new Runnable() {
@@ -503,6 +515,12 @@ public class TravelMode extends JPanel {
 					frame.setIconImage(icon);
 
 					TravelMode travelMode = new TravelMode();
+					try {
+						FileOutputStream fos = new FileOutputStream(file);
+						travelMode.gpsOos = new ObjectOutputStream( fos );
+					} catch (IOException e) {
+						travelMode.gpsOos = null;
+					}
 
 					frame.setContentPane(travelMode);
 					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -522,6 +540,12 @@ public class TravelMode extends JPanel {
 						public void windowClosing(WindowEvent e) {
 							if (travelMode.gps != null) {
 								travelMode.gps.shutdown();
+							}
+							if (travelMode.gpsOos != null) {
+								try {
+									travelMode.gpsOos.close();
+								} catch (IOException x) {
+								}
 							}
 						}
 					});

@@ -3,6 +3,7 @@ package com.bluelightning;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -24,7 +25,7 @@ public class GPS {
 	protected static Ellipsoid wgs84 = Ellipsoid.WGS84;
 	
 	
-	public static class Fix extends GeoPosition {
+	public static class Fix extends GeoPosition implements Serializable {
 
 		double speed;
 		double heading;
