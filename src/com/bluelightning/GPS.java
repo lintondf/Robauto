@@ -156,7 +156,7 @@ public class GPS {
 	SerialGps serialGps = null;
 	
 	public void initialize(boolean isSurface) {
-		serialGps = new SerialGps((isSurface) ? "COM4" : "XGPS10M-4269F2-SPPDev");
+		serialGps = new SerialGps((isSurface) ? "COM3" : "XGPS10M-4269F2-SPPDev");
 		serialGps.addStateListener(state -> {
 			System.out.println( state.toString() );
 			if (state.quality > 0) {
