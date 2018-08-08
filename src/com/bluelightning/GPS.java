@@ -17,6 +17,10 @@ import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.gps.NMEA;
+import com.bluelightning.gps.SerialGps;
+import com.bluelightning.gps.NMEA.GpsState;
+
 public class GPS {
 	
 	protected static File gpsDat = new File("//SurfacePro3/NA/save/gpssave.dat");
@@ -33,6 +37,13 @@ public class GPS {
 		Date   date;
 		
 		public Fix() {}
+		
+		public Fix(GpsState state ) {
+			super( state.lat, state.lon);
+			date = state.toDate();
+			speed = state.velocity * 0.514444; // knots -> m/s
+			heading = state.dir;
+		}
 		
 		public Fix( Date when, GeoPosition position ) {
 			this.date = when;
@@ -142,30 +153,40 @@ public class GPS {
 	}
 	
 	Thread readerThread = null;
+	SerialGps serialGps = null;
 	
-	public void initialize() {
-		readerThread = new Thread(new Runnable(){
-			@Override
-			public void run() {
-				System.out.println("Starting normal: " +this);
-				while (!Thread.interrupted()) {
-					try { 
-						Thread.sleep(10000L);  // file updates every 60 seconds
-						Fix fix = Fix.readGpsDataFile();
-						if (fix != null) {
-							addObservation( fix );
-						}
-					} catch (InterruptedException ix) {
-						break;
-					} catch (Exception x) {
-						x.printStackTrace();
-						break;
-					}
-				}
-				System.out.println("Exiting normal: " +this);
+	public void initialize(boolean isSurface) {
+		serialGps = new SerialGps((isSurface) ? "COM4" : "XGPS10M-4269F2-SPPDev");
+		serialGps.addStateListener(state -> {
+			System.out.println( state.toString() );
+			if (state.quality > 0) {
+				Fix fix = new Fix( state );
+				addObservation(fix);
 			}
-		});
-		readerThread.start();
+		} );
+		serialGps.start();
+//		readerThread = new Thread(new Runnable(){
+//			@Override
+//			public void run() {
+//				System.out.println("Starting normal: " +this);
+//				while (!Thread.interrupted()) {
+//					try { 
+//						Thread.sleep(10000L);  // file updates every 60 seconds
+//						Fix fix = Fix.readGpsDataFile();
+//						if (fix != null) {
+//							addObservation( fix );
+//						}
+//					} catch (InterruptedException ix) {
+//						break;
+//					} catch (Exception x) {
+//						x.printStackTrace();
+//						break;
+//					}
+//				}
+//				System.out.println("Exiting normal: " +this);
+//			}
+//		});
+//		readerThread.start();
 	}
 	
 	public void shutdown() {

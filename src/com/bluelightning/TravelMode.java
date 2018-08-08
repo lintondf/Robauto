@@ -197,6 +197,7 @@ public class TravelMode extends JPanel {
 				}
 			}
 		}
+		System.out.println( closest );
 		return closest;
 	}
 	
@@ -227,7 +228,7 @@ public class TravelMode extends JPanel {
 			if (currentManeuver != null) {
 				travelStatus.update(event.fix.speed, currentManeuver);
 			}
-			if (event.fix.speed < 0.1) {
+			if (travelStatus != null && event.fix.speed < 0.1) {
 				timeStopped += 60;
 				travelStatus.stopped(timeStopped);
 			}
@@ -273,7 +274,7 @@ public class TravelMode extends JPanel {
 		map.setYouAreHere(buttonWaypoint);
 		Events.eventBus.register(new GpsHandler());
 		if (gpsNormal)
-			gps.initialize();
+			gps.initialize(isSurface);
 		else
 			gps.debugSetup(it);
 	}

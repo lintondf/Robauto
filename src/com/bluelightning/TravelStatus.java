@@ -210,7 +210,7 @@ public class TravelStatus {
 		if (meanSpeed != null) {
 			t.set("legAverageSpeed", String.format("%3.0f", meanSpeed.getMean() * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR) );
 		}
-		if (maneuver.getLength() > 0 && maneuver.getTrafficTime() > 0) {
+		if (maneuver != null && maneuver.getLength() > 0 && maneuver.getTrafficTime() > 0) {
 			double expectedSpeed = maneuver.getLength() / maneuver.getTrafficTime() * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR;
 			t.set("legExpectedSpeed", String.format("%3.0f", expectedSpeed) );
 		}
