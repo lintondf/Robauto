@@ -50,9 +50,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
@@ -69,6 +71,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -85,7 +88,7 @@ public class TravelMode extends JPanel {
 
 	public static String hostName = "localhost";
 	public static boolean isSurface = true;
-	public static boolean gpsNormal = true;
+	public static boolean gpsNormal = false;
 
 	public TripPlan tripPlan = null;
 	public Report report = null;
@@ -110,6 +113,7 @@ public class TravelMode extends JPanel {
 	}
 	
 	public List<ManeuverMetrics> maneuverMetrics = null;
+	public HashMap<Maneuver, Maneuver> nextManeuverMap = null;
 
 	/**
 	 * HandleTripPlanUpdate - respond to RMI update() calls when PlannerMode
@@ -197,11 +201,12 @@ public class TravelMode extends JPanel {
 				}
 			}
 		}
-		System.out.println( closest );
+		//System.out.println( closest );
 		return closest;
 	}
 	
 	protected GPS gps = new GPS();
+	protected ObjectInputStream gpsOis;
 	protected ObjectOutputStream gpsOos;
 
 	public class GpsHandler {
@@ -226,7 +231,7 @@ public class TravelMode extends JPanel {
 			distanceTraveled += event.fix.movement;
 			Maneuver currentManeuver = findCurrentManeuver( event.fix );
 			if (currentManeuver != null) {
-				travelStatus.update(event.fix.speed, currentManeuver);
+				travelStatus.update(event.fix.speed, currentManeuver, nextManeuverMap.get(currentManeuver));
 			}
 			if (travelStatus != null && event.fix.speed < 0.1) {
 				timeStopped += 60;
@@ -235,6 +240,7 @@ public class TravelMode extends JPanel {
 			currentFuel -= Here2.METERS_TO_MILES * event.fix.movement / Report.MPG;
 			double timeSoFar = 0.001 * (double) (event.fix.date.getTime() - startTime.getTime());
 			travelStatus.update(timeSoFar, distanceTraveled);
+			travelStatus.update( event.fix );
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
@@ -275,8 +281,9 @@ public class TravelMode extends JPanel {
 		Events.eventBus.register(new GpsHandler());
 		if (gpsNormal)
 			gps.initialize(isSurface);
-		else
-			gps.debugSetup(it);
+		else {
+			gps.debugSetup(gpsOis);
+		}
 	}
 
 	protected void setDay() {
@@ -291,12 +298,18 @@ public class TravelMode extends JPanel {
 		activePanel.getTextPane().setContentType("text/html");
 		activePanel.getTextPane().setEditable(false);
 		maneuverMetrics = new ArrayList<>();
+		nextManeuverMap = new HashMap<>();
+		Maneuver lastManeuver = null;
 		for (Leg leg : days.get(currentDay).getLeg() ) {
-			for (Maneuver manuever : leg.getManeuver() ) {
-				List<GeoPosition> points = manuever.getShape();
+			for (Maneuver maneuver : leg.getManeuver() ) {
+				List<GeoPosition> points = maneuver.getShape();
 				if (! points.isEmpty()) {
-					maneuverMetrics.add( new ManeuverMetrics(manuever) );
+					maneuverMetrics.add( new ManeuverMetrics(maneuver) );
 				}
+				if (lastManeuver != null) {
+					nextManeuverMap.put( lastManeuver, maneuver);
+				}
+				lastManeuver = maneuver;
 			}
 		}
 		SwingUtilities.invokeLater(new Runnable() {
@@ -420,6 +433,7 @@ public class TravelMode extends JPanel {
 			@Override
 			public void run() {
 				tripPlan = TripPlan.load(tripPlanFile, frame);
+				//Here2.reportRoute(tripPlan.getRoute());
 				report = tripPlan.getTripReport();
 
 				ArrayList<ArrayList<VisitedPlace>> placesByDay = tripPlan.getFinalizedPlaces();
@@ -516,11 +530,23 @@ public class TravelMode extends JPanel {
 					frame.setIconImage(icon);
 
 					TravelMode travelMode = new TravelMode();
-					try {
-						FileOutputStream fos = new FileOutputStream(file);
-						travelMode.gpsOos = new ObjectOutputStream( fos );
-					} catch (IOException e) {
-						travelMode.gpsOos = null;
+					if (gpsNormal) {
+						try {
+							FileOutputStream fos = new FileOutputStream(file);
+							travelMode.gpsOos = new ObjectOutputStream( fos );
+						} catch (IOException e) {
+							e.printStackTrace();
+							travelMode.gpsOos = null;
+						}
+					} else {
+						try {
+							FileInputStream fis = new FileInputStream(file);
+							travelMode.gpsOis = new ObjectInputStream( fis );
+						} catch (IOException e) {
+							e.printStackTrace();
+							travelMode.gpsOis = null;
+						}
+						
 					}
 
 					frame.setContentPane(travelMode);

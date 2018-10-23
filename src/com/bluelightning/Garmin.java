@@ -16,7 +16,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -71,8 +73,8 @@ public class Garmin extends JPanel {
 	protected static GeodeticCalculator geoCalc = new GeodeticCalculator();
 	protected static Ellipsoid wgs84 = Ellipsoid.WGS84;
 
-	protected int dups = 0;
-	protected int nearby = 0;
+//	protected int dups = 0;
+//	protected int nearby = 0;
 
 	public static class TrackPoint extends LatLon {
 		public double distancePriorToHere;
@@ -91,32 +93,38 @@ public class Garmin extends JPanel {
 		}
 	}
 
-	protected void add(LatLon point) {
-		TrackPoint tp = new TrackPoint(point);
-		if (track.isEmpty()) {
-			track.add(tp);
-			trackPoints.add(tp);
-		} else {
-			TrackPoint last = (TrackPoint) track.get(track.size() - 1);
-			if (last.getLatitude() == point.getLatitude()
-					&& last.getLongitude() == point.getLongitude()) {
-				dups++;
-				return;
+	
+	public static class Day {
+		protected void add(LatLon point) {
+			TrackPoint tp = new TrackPoint(point);
+			if (track.isEmpty()) {
+				track.add(tp);
+				trackPoints.add(tp);
+			} else {
+				TrackPoint last = (TrackPoint) track.get(track.size() - 1);
+				if (last.getLatitude() == point.getLatitude()
+						&& last.getLongitude() == point.getLongitude()) {
+					return;
+				}
+				GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84,
+						new GlobalCoordinates(last), new GlobalCoordinates(point));
+				tp.distancePriorToHere = curve.getEllipsoidalDistance();
+				tp.distanceStartToHere = last.distanceStartToHere
+						+ curve.getEllipsoidalDistance();
+				tp.heading = curve.getAzimuth();
+				track.add(tp);
+				trackPoints.add(tp);
 			}
-			GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84,
-					new GlobalCoordinates(last), new GlobalCoordinates(point));
-			tp.distancePriorToHere = curve.getEllipsoidalDistance();
-			tp.distanceStartToHere = last.distanceStartToHere
-					+ curve.getEllipsoidalDistance();
-			tp.heading = curve.getAzimuth();
-			track.add(tp);
-			trackPoints.add(tp);
 		}
+		
+		public List<WptType> wpts = new ArrayList<>();
+		public ArrayList<ButtonWaypoint> waylist = new ArrayList<>();
+		public List<GeoPosition> track = new ArrayList<>();
+		public List<TrackPoint> trackPoints = new ArrayList<>();		
 	}
 	
-	public ArrayList<ButtonWaypoint> waylist;
-	public List<GeoPosition> track = new ArrayList<>();
-	public List<TrackPoint> trackPoints = new ArrayList<>();
+	public ArrayList<Day> days = new ArrayList<>();
+	public ArrayList<VisitedPlace> places = new ArrayList<>();
 	
 	static JAXBContext context11 =
         newContext(slash.navigation.gpx.binding11.ObjectFactory.class,
@@ -213,24 +221,26 @@ public class Garmin extends JPanel {
 		}
 	}
 	
-	public List<WptType> wpts;
-
 	public Garmin(String path) {
+		this(new File(path));
+	}
+	
+	public Garmin( File file ) {
 		try {
-			FileReader fir = new FileReader(new File(path));
+			FileReader fir = new FileReader(file);
 			GpxType gpx = GpxUtil.unmarshal11(fir);
 			List<RteType> rtes = gpx.getRte();
-			wpts = new ArrayList<>();
-			waylist = new ArrayList<>();
 			String text = "";
 			StopMarker stopMarker = null;
 
 			for (RteType rte : rtes) {
+				Day day = new Day();
+				days.add(day);
 				System.out.println("RTE: " + rte.getName());
 				List<WptType> rtepts = rte.getRtept();
 				if (! rtepts.isEmpty()) {
-					wpts.add( rtepts.get(0) ); // from first waypoint to last waypoint
-					wpts.add( rtepts.get(rtepts.size()-1) );
+					day.wpts.add( rtepts.get(0) ); // from first waypoint to last waypoint
+					day.wpts.add( rtepts.get(rtepts.size()-1) );
 				}
 				for (WptType rtept : rtepts) {
 					System.out.println("RTEPT: " + rtept.getName() + " "
@@ -238,13 +248,13 @@ public class Garmin extends JPanel {
 							+ rtept.getLon());
 					LatLon where = new LatLon(rtept.getLat().doubleValue(),
 							rtept.getLon().doubleValue());
-					add(where);
+					day.add(where);
 					text = rtept.getCmt();
 					if (stopMarker == null) {
-						stopMarker = new StopMarker(StopMarker.ORIGIN, text, where);
-						
+						stopMarker = new StopMarker(StopMarker.ORIGIN, rtept.getName(), text, where);
+						addPlace( new VisitedPlace( stopMarker ) );
 					} else {
-						stopMarker = new StopMarker(StopMarker.TERMINUS, text, where);						
+						stopMarker = new StopMarker(StopMarker.TERMINUS, rtept.getName(), text, where);						
 					}
 					
 					ExtensionsType extensions = rtept.getExtensions();
@@ -263,7 +273,7 @@ public class Garmin extends JPanel {
 									where = new LatLon(point.getLat()
 											.doubleValue(), point.getLon()
 											.doubleValue());
-									add(where);
+									day.add(where);
 								}
 								break;
 							default:
@@ -274,103 +284,112 @@ public class Garmin extends JPanel {
 						}
 					} // for ext
 				} // for wpt
-				waylist.add(stopMarker);
+				day.waylist.add(stopMarker);
+				addPlace( new VisitedPlace( stopMarker ) );
 			}
 		} catch (Exception x) {
 			x.printStackTrace();
 		}
 
 	}
-
-	public Garmin() {
-		setLayout(new BorderLayout());
-		map = new com.bluelightning.Map();
-		mapViewer = map.getMapViewer();
-		this.add(mapViewer, BorderLayout.CENTER);
-		String path = "/Users/lintondf/basecamp.GPX";
-		try {
-			FileReader fir = new FileReader(new File(path));
-			GpxType gpx = GpxUtil.unmarshal11(fir);
-			System.out.println(gpx);
-			// List<WptType> wpts = gpx.getWpt();
-			// for (WptType wpt : wpts) {
-			// System.out.println("WPT: " + wpt.getName() + " " + wpt.getCmt());
-			// }
-			List<RteType> rtes = gpx.getRte();
-			waylist = new ArrayList<>();
-			int kind = StopMarker.ORIGIN;
-			String text = "";
-
-			for (RteType rte : rtes) {
-				if (rte.getName().startsWith("Maine Home to")) {
-					System.out.println("RTE: " + rte.getName());
-					List<WptType> rtepts = rte.getRtept();
-					for (WptType rtept : rtepts) {
-						System.out.println("RTEPT: " + rtept.getName() + " "
-								+ rtept.getCmt() + " " + rtept.getLat() + ","
-								+ rtept.getLon());
-						LatLon where = new LatLon(rtept.getLat().doubleValue(),
-								rtept.getLon().doubleValue());
-						add(where);
-						text = rtept.getCmt();
-						StopMarker stopMarker = new StopMarker(kind, text, where);
-						waylist.add(stopMarker);
-						kind = StopMarker.OVERNIGHT;
-						ExtensionsType extensions = rtept.getExtensions();
-						List<Object> any = extensions.getAny();
-						for (Object ext : any) {
-							if (ext instanceof JAXBElement) {
-								JAXBElement element = (JAXBElement) ext;
-								System.out.println("JAXBElement: "
-										+ element.getName() + " : "
-										+ element.getValue());
-								switch (element.getName().toString()) {
-								case "{http://www.garmin.com/xmlschemas/GpxExtensions/v3}RoutePointExtension":
-									RoutePointExtensionT rpext = (RoutePointExtensionT) element
-											.getValue();
-									System.out.println("AutoroutePointT #"
-											+ rpext.getRpt().size());
-									List<AutoroutePointT> points = rpext
-											.getRpt();
-									for (AutoroutePointT point : points) {
-										where = new LatLon(point.getLat()
-												.doubleValue(), point.getLon()
-												.doubleValue());
-										add(where);
-									}
-									break;
-								default:
-									break;
-								}
-							} else {
-								System.out.println("UNKNOWN: " + ext);
-							}
-						}
-					}
-				}
-			}
-			if (!track.isEmpty()) {
-				// validateTrack( track );
-				waylist.add(new StopMarker(StopMarker.TERMINUS, text, track
-						.get(track.size() - 1)));
-				System.out.println(track.size() + " track points; " + dups
-						+ " " + nearby);
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						ArrayList< List<GeoPosition> > tracks = new ArrayList<>();
-						tracks.add(track);
-						map.show(tracks, waylist);
-					}
-				});
-			}
-			// List<TrkType> trks = gpx.getTrk();
-			// for (TrkType trk : trks) {
-			// System.out.println( "TRK: " + trk.getName() );
-			// }
-		} catch (Exception x) {
-			x.printStackTrace();
+	
+	private void addPlace( VisitedPlace place ) {
+		if (! places.isEmpty()) {
+			if (places.get(places.size()-1).getName().equals(place.getName()))
+				return;
 		}
+		places.add( place );
 	}
+
+//	public Garmin() {
+//		setLayout(new BorderLayout());
+//		map = new com.bluelightning.Map();
+//		mapViewer = map.getMapViewer();
+//		this.add(mapViewer, BorderLayout.CENTER);
+//		String path = "/Users/lintondf/basecamp.GPX";
+//		try {
+//			FileReader fir = new FileReader(new File(path));
+//			GpxType gpx = GpxUtil.unmarshal11(fir);
+//			System.out.println(gpx);
+//			// List<WptType> wpts = gpx.getWpt();
+//			// for (WptType wpt : wpts) {
+//			// System.out.println("WPT: " + wpt.getName() + " " + wpt.getCmt());
+//			// }
+//			List<RteType> rtes = gpx.getRte();
+//			waylist = new ArrayList<>();
+//			int kind = StopMarker.ORIGIN;
+//			String text = "";
+//
+//			for (RteType rte : rtes) {
+//				if (rte.getName().startsWith("Maine Home to")) {
+//					System.out.println("RTE: " + rte.getName());
+//					List<WptType> rtepts = rte.getRtept();
+//					for (WptType rtept : rtepts) {
+//						System.out.println("RTEPT: " + rtept.getName() + " "
+//								+ rtept.getCmt() + " " + rtept.getLat() + ","
+//								+ rtept.getLon());
+//						LatLon where = new LatLon(rtept.getLat().doubleValue(),
+//								rtept.getLon().doubleValue());
+//						add(where);
+//						text = rtept.getCmt();
+//						StopMarker stopMarker = new StopMarker(kind, text, where);
+//						waylist.add(stopMarker);
+//						kind = StopMarker.OVERNIGHT;
+//						ExtensionsType extensions = rtept.getExtensions();
+//						List<Object> any = extensions.getAny();
+//						for (Object ext : any) {
+//							if (ext instanceof JAXBElement) {
+//								JAXBElement element = (JAXBElement) ext;
+//								System.out.println("JAXBElement: "
+//										+ element.getName() + " : "
+//										+ element.getValue());
+//								switch (element.getName().toString()) {
+//								case "{http://www.garmin.com/xmlschemas/GpxExtensions/v3}RoutePointExtension":
+//									RoutePointExtensionT rpext = (RoutePointExtensionT) element
+//											.getValue();
+//									System.out.println("AutoroutePointT #"
+//											+ rpext.getRpt().size());
+//									List<AutoroutePointT> points = rpext
+//											.getRpt();
+//									for (AutoroutePointT point : points) {
+//										where = new LatLon(point.getLat()
+//												.doubleValue(), point.getLon()
+//												.doubleValue());
+//										add(where);
+//									}
+//									break;
+//								default:
+//									break;
+//								}
+//							} else {
+//								System.out.println("UNKNOWN: " + ext);
+//							}
+//						}
+//					}
+//				}
+//			}
+//			if (!track.isEmpty()) {
+//				// validateTrack( track );
+//				waylist.add(new StopMarker(StopMarker.TERMINUS, text, track
+//						.get(track.size() - 1)));
+////				System.out.println(track.size() + " track points; " + dups
+////						+ " " + nearby);
+//				EventQueue.invokeLater(new Runnable() {
+//					public void run() {
+//						ArrayList< List<GeoPosition> > tracks = new ArrayList<>();
+//						tracks.add(track);
+//						map.show(tracks, waylist);
+//					}
+//				});
+//			}
+//			// List<TrkType> trks = gpx.getTrk();
+//			// for (TrkType trk : trks) {
+//			// System.out.println( "TRK: " + trk.getName() );
+//			// }
+//		} catch (Exception x) {
+//			x.printStackTrace();
+//		}
+//	}
 
 	private void validateTrack(List<GeoPosition> track) {
 		for (GeoPosition where : track) {
@@ -386,20 +405,21 @@ public class Garmin extends JPanel {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Logic controller;
-		AddressBook addressBook;
-
-		try {
-			controller = new Logic();
-			controller.getStorage().load();
-			addressBook = controller.getAddressBook();
-			FileReader fir = new FileReader(new File("/Users/lintondf/wpt.GPX"));
-			GpxType gpx = GpxUtil.unmarshal11(fir);
-
-			writeToGPX( addressBook, "/Users/lintondf/addressBook.GPX");
-		} catch (Exception x) {
-			RobautoMain.logger.trace(x.getMessage());
-		}
+		Garmin garmin = new Garmin( "/Users/lintondf/ME2FL_2018.GPX" ); 
+//		Logic controller;
+//		AddressBook addressBook;
+//
+//		try {
+//			controller = new Logic();
+//			controller.getStorage().load();
+//			addressBook = controller.getAddressBook();
+//			FileReader fir = new FileReader(new File("/Users/lintondf/wpt.GPX"));
+//			GpxType gpx = GpxUtil.unmarshal11(fir);
+//
+//			writeToGPX( addressBook, "/Users/lintondf/addressBook.GPX");
+//		} catch (Exception x) {
+//			RobautoMain.logger.trace(x.getMessage());
+//		}
 
 	}
 

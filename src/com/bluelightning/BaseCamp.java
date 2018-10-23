@@ -186,17 +186,18 @@ public class BaseCamp {
 	
 	static final String pdfBox = "/Users/lintondf/GIT/Robauto/pdfbox-app-2.0.9.jar";
 	
-	public Garmin garmin;
+	public Garmin.Day day;
 	public Route route;
 	public ArrayList<Turn> turns = new ArrayList<>();
 	public ArrayList<ButtonWaypoint> vias;
 	
 	public BaseCamp() {} // for generics users only
 	
-	public BaseCamp( String pdfPath ) {
+	public BaseCamp( Garmin.Day day, String pdfPath ) {
+		this.day = day;
 		System.out.println("BASECAMP: " + pdfPath);
 		String htmlPath = pdfPath.replace(".pdf", ".html");
-		String gpxPath = pdfPath.replace(".pdf", ".GPX");
+		//String gpxPath = pdfPath.replace(".pdf", ".GPX");
 		File htmlFile = new File(htmlPath);
 		if (!htmlFile.exists()) {
 			String[] pdfBoxCommand = {
@@ -211,7 +212,7 @@ public class BaseCamp {
 			Execute.run(pdfBoxCommand);
 		}
 		try {
-			Document doc = Jsoup.parse(new File(htmlPath), "UTF-8");
+			Document doc = Jsoup.parse(htmlFile, "UTF-8");
 			Elements body = doc.getElementsByTag("BODY");
 			if (!body.isEmpty()) {
 				Elements divs = body.first().children();
@@ -235,26 +236,27 @@ public class BaseCamp {
 					}
 				}
 			}
+			htmlFile.delete();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
-		garmin = new Garmin( gpxPath );
-		garmin.setLayout(new BorderLayout());
-		map = new com.bluelightning.Map();
-		mapViewer = map.getMapViewer();
-		garmin.add(mapViewer, BorderLayout.CENTER);
-//		for (int i = 0; i < 500; i++)
-//			System.out.println( garmin.trackPoints.get(i) );
-		System.out.println( garmin.trackPoints.get(garmin.trackPoints.size()-1) );
+//		garmin = new Garmin( gpxPath );
+//		garmin.setLayout(new BorderLayout());
+//		map = new com.bluelightning.Map();
+//		mapViewer = map.getMapViewer();
+//		garmin.add(mapViewer, BorderLayout.CENTER);
+////		for (int i = 0; i < 500; i++)
+////			System.out.println( garmin.trackPoints.get(i) );
+//		System.out.println( garmin.trackPoints.get(garmin.trackPoints.size()-1) );
 		
 		route = new Route();
 		List<Object> routeShape = new ArrayList<>();
-		for (TrackPoint point : garmin.trackPoints) {
+		for (TrackPoint point : day.trackPoints) {
 			routeShape.add( String.format("%15.8f, %15.8f", point.getLatitude(), point.getLongitude()) );
 		}
 		route.setShape( routeShape );
-		route.setBoundingBox( generateBoundingBox(garmin.trackPoints) );
+		route.setBoundingBox( generateBoundingBox(day.trackPoints) );
 		Leg leg = new Leg();
 		leg.setShape( routeShape );
 		leg.setFirstPoint(0.0);
@@ -275,7 +277,7 @@ public class BaseCamp {
 			
 			Maneuver maneuver = new Maneuver();
 			leg.getManeuver().add(maneuver);
-			iTrack = findNearestTrackPoint( current, iTrack, garmin.trackPoints );
+			iTrack = findNearestTrackPoint( current, iTrack, day.trackPoints );
 			List<Object> maneuverShape = new ArrayList<Object>();
 			if (startTrack < iTrack && iTrack < leg.getShape().size()) {
 				maneuverShape.addAll( leg.getShape().subList(startTrack, iTrack) );
@@ -299,8 +301,8 @@ public class BaseCamp {
 			startTrack = iTrack;
 			iTrack++;
 			iTurn++;
-			if (iTrack < garmin.trackPoints.size()) {
-				TrackPoint trackPoint = garmin.trackPoints.get(iTrack);
+			if (iTrack < day.trackPoints.size()) {
+				TrackPoint trackPoint = day.trackPoints.get(iTrack);
 				System.out.println( iTrack + " : " +  trackPoint);
 				StopMarker wp = new StopMarker(StopMarker.DRIVERS, Integer.toString(iTrack) + ":" + current.toString(), trackPoint);
 				//vias.add(wp);
@@ -308,26 +310,26 @@ public class BaseCamp {
 			}
 		}
 		MappedPosition mappedPosition = new MappedPosition();
-		mappedPosition.setLatitude( garmin.trackPoints.get(0).getLatitude());
-		mappedPosition.setLongitude( garmin.trackPoints.get(0).getLongitude());
+		mappedPosition.setLatitude( day.trackPoints.get(0).getLatitude());
+		mappedPosition.setLongitude( day.trackPoints.get(0).getLongitude());
 		Start start = new Start();
-		if (garmin.wpts.size() > 1) {
-			StopMarker marker = new StopMarker( StopMarker.ORIGIN, garmin.wpts.get(0).getName(), 
+		if (day.wpts.size() > 1) {
+			StopMarker marker = new StopMarker( StopMarker.ORIGIN, day.wpts.get(0).getName(), 
 					new GeoPosition( mappedPosition.getLatitude(), mappedPosition.getLongitude()) );
 			vias.add( marker );
-			String label = String.format("%s/%s", garmin.wpts.get(0).getName(), garmin.wpts.get(0).getDesc() );
+			String label = String.format("%s/%s", day.wpts.get(0).getName(), day.wpts.get(0).getDesc() );
 			start.setUserLabel(label);
 		}
 		start.setMappedPosition(mappedPosition);
 		leg.setStart(start);
-		mappedPosition.setLatitude( garmin.trackPoints.get(garmin.trackPoints.size()-1).getLatitude());
-		mappedPosition.setLongitude( garmin.trackPoints.get(garmin.trackPoints.size()-1).getLongitude());
+		mappedPosition.setLatitude( day.trackPoints.get(day.trackPoints.size()-1).getLatitude());
+		mappedPosition.setLongitude( day.trackPoints.get(day.trackPoints.size()-1).getLongitude());
 		End end = new End();
-		if (garmin.wpts.size() > 1) {
-			StopMarker marker = new StopMarker( StopMarker.TERMINUS, garmin.wpts.get(0).getName(), 
+		if (day.wpts.size() > 1) {
+			StopMarker marker = new StopMarker( StopMarker.TERMINUS, day.wpts.get(0).getName(), 
 					new GeoPosition( mappedPosition.getLatitude(), mappedPosition.getLongitude()) );
 			vias.add( marker );
-			String label = String.format("%s/%s", garmin.wpts.get(1).getName(), garmin.wpts.get(1).getDesc() );
+			String label = String.format("%s/%s", day.wpts.get(1).getName(), day.wpts.get(1).getDesc() );
 			end.setUserLabel(label);
 		}
 		end.setMappedPosition(mappedPosition);
@@ -346,12 +348,12 @@ public class BaseCamp {
 //				garmin.trackPoints.get(garmin.trackPoints.size()-1), "fastest;truck;traffic:disabled" );
 //		System.out.println( hereRoute );
 //		route = Here2.computeRouteBase(hereRoute.route);
-		System.out.println( turns.size() + " ? " + viaPoints.size() + " " + vias.size() );
-		System.out.println( garmin.trackPoints.get(0) );
-		System.out.println( garmin.trackPoints.get(1) );
-		System.out.println( turns.get(0) );
-		System.out.println( turns.get(1) );
-		System.out.println( viaPoints.get(0) );
+//		System.out.println( turns.size() + " ? " + viaPoints.size() + " " + vias.size() );
+//		System.out.println( day.trackPoints.get(0) );
+//		System.out.println( day.trackPoints.get(1) );
+//		System.out.println( turns.get(0) );
+//		System.out.println( turns.get(1) );
+//		System.out.println( viaPoints.get(0) );
 		
 		Here2.reportRoute(route);
 
@@ -451,78 +453,78 @@ public class BaseCamp {
 	 * @param args
 	 */
 	
-	protected static JFrame frame;
-	protected static BaseCamp baseCamp;
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					frame = new JFrame();
-					frame.setTitle("Robauto - Garmin");
-					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-					Image icon = ImageIO.read(
-							new File("images/icon-travel.jpg"))
-							.getScaledInstance((int) 64, (int) 64,
-									Image.SCALE_SMOOTH);
-					frame.setIconImage(icon);
-
-					String pdfPath = "/Users/lintondf/basecamp.pdf";
-					baseCamp = new BaseCamp(pdfPath);
-
-					frame.setContentPane(baseCamp.garmin);
-					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-					SwingUtilities.updateComponentTreeUI(frame);
-					frame.pack();
-					frame.setVisible(true);
-					frame.addWindowListener(new WindowAdapter() {
-						@Override
-						public void windowClosing(WindowEvent e) {
-						}
-					});
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		
-//		System.out.println(durationPattern);
-//		String pdfPath = "/Users/lintondf/basecamp.pdf";
-//		BaseCamp baseCamp = new BaseCamp(pdfPath);
-//		String[] test = {
-////				"Start at Maine Home 0 ft 0 seconds",
-////				"Get on Manor Ln and drive south 0 ft 200° true 0 seconds 0 ft 0 seconds",
-////				"Take exit 103 to the right onto I-295 S towards Me-9/Me-126/Gardiner/Brunswick 79.2 mi 213° true 1 hour(s), 11 minutes 119 mi 2 hour(s), 5 minutes",
-////				"Arrive at 700 Lafayette Rd1 0.2 mi 211° true 2 minutes 231 mi 3 hour(s), 55 minutes"
-//		};
-//		for (String text : test) {
-//			//System.out.println("IN: {" + text +"}");
-//			Matcher matcher = durationPattern.matcher(text);
-//			if (matcher.find()) {
-//				System.out.print(matcher.groupCount() + "  Start index: " + matcher.start());
-//	            System.out.print(" End index: " + matcher.end() + " : ");
-//	            System.out.println(matcher.group());
-//	            text = text.substring(0, matcher.start()).trim();
+//	protected static JFrame frame;
+//	protected static BaseCamp baseCamp;
+//	
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					frame = new JFrame();
+//					frame.setTitle("Robauto - Garmin");
+//					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//					Image icon = ImageIO.read(
+//							new File("images/icon-travel.jpg"))
+//							.getScaledInstance((int) 64, (int) 64,
+//									Image.SCALE_SMOOTH);
+//					frame.setIconImage(icon);
+//
+//					String pdfPath = "/Users/lintondf/basecamp.pdf";
+//					baseCamp = new BaseCamp(pdfPath);
+//
+//					frame.setContentPane(baseCamp.garmin);
+//					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//					SwingUtilities.updateComponentTreeUI(frame);
+//					frame.pack();
+//					frame.setVisible(true);
+//					frame.addWindowListener(new WindowAdapter() {
+//						@Override
+//						public void windowClosing(WindowEvent e) {
+//						}
+//					});
+//
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
 //			}
-//			//System.out.println("-T: {" + text +"}");
-//			matcher = distancePattern.matcher(text);
-//			if (matcher.find()) {
-//				System.out.print("  Start index: " + matcher.start());
-//	            System.out.print(" End index: " + matcher.end() + " : ");
-//	            System.out.println(matcher.group());
-//	            text = text.substring(0, matcher.start()).trim();
-//			}
-//			//System.out.println("-D: {" + text +"}");
-//			matcher = interiorDistancePattern.matcher(text);
-//			if (matcher.find()) {
-//				System.out.print("  Start index: " + matcher.start());
-//	            System.out.print(" End index: " + matcher.end() + " : ");
-//	            System.out.println(matcher.group());
-//	            text = text.substring(0, matcher.start()).trim();
-//			}
-//			System.out.println("-d: {" + text +"}");
-//		}
-	}
+//		});
+//		
+////		System.out.println(durationPattern);
+////		String pdfPath = "/Users/lintondf/basecamp.pdf";
+////		BaseCamp baseCamp = new BaseCamp(pdfPath);
+////		String[] test = {
+//////				"Start at Maine Home 0 ft 0 seconds",
+//////				"Get on Manor Ln and drive south 0 ft 200° true 0 seconds 0 ft 0 seconds",
+//////				"Take exit 103 to the right onto I-295 S towards Me-9/Me-126/Gardiner/Brunswick 79.2 mi 213° true 1 hour(s), 11 minutes 119 mi 2 hour(s), 5 minutes",
+//////				"Arrive at 700 Lafayette Rd1 0.2 mi 211° true 2 minutes 231 mi 3 hour(s), 55 minutes"
+////		};
+////		for (String text : test) {
+////			//System.out.println("IN: {" + text +"}");
+////			Matcher matcher = durationPattern.matcher(text);
+////			if (matcher.find()) {
+////				System.out.print(matcher.groupCount() + "  Start index: " + matcher.start());
+////	            System.out.print(" End index: " + matcher.end() + " : ");
+////	            System.out.println(matcher.group());
+////	            text = text.substring(0, matcher.start()).trim();
+////			}
+////			//System.out.println("-T: {" + text +"}");
+////			matcher = distancePattern.matcher(text);
+////			if (matcher.find()) {
+////				System.out.print("  Start index: " + matcher.start());
+////	            System.out.print(" End index: " + matcher.end() + " : ");
+////	            System.out.println(matcher.group());
+////	            text = text.substring(0, matcher.start()).trim();
+////			}
+////			//System.out.println("-D: {" + text +"}");
+////			matcher = interiorDistancePattern.matcher(text);
+////			if (matcher.find()) {
+////				System.out.print("  Start index: " + matcher.start());
+////	            System.out.print(" End index: " + matcher.end() + " : ");
+////	            System.out.println(matcher.group());
+////	            text = text.substring(0, matcher.start()).trim();
+////			}
+////			System.out.println("-d: {" + text +"}");
+////		}
+//	}
 
 }

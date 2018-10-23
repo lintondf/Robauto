@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import javax.imageio.ImageIO;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -32,6 +33,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import org.slf4j.Logger;
@@ -356,70 +358,7 @@ public class PlannerMode extends JPanel {
 			RobautoMain.logger.info((pf) ? "  Stops written"  : "  Stop write failed");
 		}
 		
-		private ArrayList<ButtonWaypoint> mergeVias( List<BaseCamp> baseCamps) {
-			ArrayList<ButtonWaypoint> vias = new ArrayList<>();
-			for (BaseCamp baseCamp : baseCamps) {
-				vias.addAll( baseCamp.vias);
-				StopMarker marker = (StopMarker) vias.get( vias.size()-1 );
-				marker.setKind( StopMarker.OVERNIGHT);
-			}
-			StopMarker marker = (StopMarker) vias.get( vias.size()-1 );
-			marker.setKind( StopMarker.TERMINUS);
-			return vias;
-		}
-		
-		
-		private Route mergeRoutes( List<BaseCamp> baseCamps) {
-			Route route = new Route();
-			List<Object> routeShape = new ArrayList<>();
-			List<TrackPoint> routeTrackPoints = new ArrayList<>();
-			TreeSet<Leg> legs = new TreeSet<>();
-			double firstPoint = 0;
-			double lastPoint = 0;
-			for (BaseCamp baseCamp : baseCamps) {
-				Leg leg = baseCamp.route.getLeg().iterator().next();
-				lastPoint += leg.getShape().size();
-				leg.setFirstPoint(firstPoint);
-				leg.setLastPoint(lastPoint);
-				legs.add( leg );
-				firstPoint += leg.getShape().size();
-				routeTrackPoints.addAll(baseCamp.garmin.trackPoints);
-				for (TrackPoint point : baseCamp.garmin.trackPoints) {
-					routeShape.add( String.format("%15.8f, %15.8f", point.getLatitude(), point.getLongitude()) );
-				}
-			}
-			route.setLeg(legs);
-			route.setShape(routeShape);
-			if (! baseCamps.isEmpty())
-				route.setBoundingBox( baseCamps.get(0).generateBoundingBox(routeTrackPoints) );
-			return route;
-		}
-		
 		private void importBasecampRoute() {
-			RobautoMain.logger.info("Importing Basecamp route...");
-			List<VisitedPlace> places = routePanel.getWaypointsModel().getData();
-			ArrayList<BaseCamp> days = new ArrayList<>();
-			for (int i = 0; i < places.size()-1; i++) {
-				String path = String.format("/Users/lintondf/day%d.pdf", i+1);
-				BaseCamp baseCamp = new BaseCamp( path );
-				days.add(baseCamp);
-			}
-			RobautoMain.logger.info(String.format("  %d days loaded", days.size()));
-			ArrayList< List<GeoPosition> > tracks = new ArrayList<>();
-			Route route = mergeRoutes( days );
-			route.setBoundingBox( (new BaseCamp()).generateBoundingBox( route.getShape() ) );
-			Here2.reportRoute(route);
-			tracks.add(route.getShape());
-			map.show(tracks, mergeVias( days ) );
-			int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
-			mainPanel.getRightTabbedPane().setSelectedIndex(index);
-			RobautoMain.logger.info("  Route shown on map");
-			RobautoMain.tripPlan.setRoute(route);
-			RobautoMain.tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
-			RobautoMain.logger.info("  Route points saved");
-			RobautoMain.tripPlan.save(tripPlanFile);
-			RobautoMain.tripPlan.tripPlanUpdated( tripPlanFile.getAbsolutePath() );
-			RobautoMain.logger.info("  Trip plan saved");
 		}
 
 		
@@ -740,6 +679,43 @@ public class PlannerMode extends JPanel {
 		} catch (Exception x) {
 			RobautoMain.logger.trace(x.getMessage());
 		}
+		
+		//Create a file chooser
+		final JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setFileFilter( new FileFilter() {
+
+			@Override
+			public boolean accept(File f) {
+				String name = f.getName().toLowerCase();
+				if (name.endsWith(".gpx"))
+					return true;
+				if (name.endsWith(".robauto"))
+					return true;
+				return false;
+			}
+
+			@Override
+			public String getDescription() {
+				return "Robauto TripPlans and BaseCamp routes";
+			}
+			
+		});
+		//In response to a button click:
+		int returnVal = fileChooser.showOpenDialog(frame);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            //This is where a real application would open the file.
+            RobautoMain.logger.trace("Opening: " + file.getName() + ".");
+            if (file.exists() && file.isFile()) {
+            	if (file.getName().toUpperCase().endsWith(".GPX")) {
+            		tripPlanFile = createTripPlanFromBaseCamp( file );
+            	} else {
+            		tripPlanFile = file;  // new trip plan file
+            	}
+            }
+        } else {
+        	RobautoMain.logger.trace("Open command cancelled by user.");
+        }
 
 		RobautoMain.logger.info("Loading previous trip plan");
 		RobautoMain.tripPlan = TripPlan.load(tripPlanFile, frame);
@@ -754,9 +730,81 @@ public class PlannerMode extends JPanel {
 		if (report != null) {
 			String html = report.toHtml();
 			resultsPane.setText(html);
+			Here2.reportRoute( RobautoMain.tripPlan.getRoute() );
 		}
 	}
 
+	private File createTripPlanFromBaseCamp(File file) {
+		Garmin garmin = new Garmin( file );
+		RobautoMain.logger.info("Importing Basecamp route...");
+		ArrayList<BaseCamp> days = new ArrayList<>();
+		String basePath = file.getAbsolutePath();
+		basePath = basePath.substring(0, basePath.length()-4);  // drop extension
+		for (int i = 0; i < garmin.days.size(); i++) {
+			String path = String.format("%s_Day_%d.pdf", basePath, i+1);
+			BaseCamp baseCamp = new BaseCamp( garmin.days.get(i), path );
+			days.add(baseCamp);
+		}
+		RobautoMain.logger.info(String.format("  %d days loaded", days.size()));
+		ArrayList< List<GeoPosition> > tracks = new ArrayList<>();
+		Route route = mergeRoutes( days );
+		//route.setBoundingBox( days.get(0).generateBoundingBox( route.getShape() ) );
+		Here2.reportRoute(route);
+		tracks.add(route.getShape());
+		map.show(tracks, mergeVias( days ) );
+		int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
+		mainPanel.getRightTabbedPane().setSelectedIndex(index);
+		tripPlanFile = new File( String.format("%s.robauto", basePath) );
+		RobautoMain.tripPlan = new TripPlan();
+		RobautoMain.logger.info("  Route shown on map");
+		RobautoMain.tripPlan.setRoute(route);
+		RobautoMain.tripPlan.setPlaces(new ArrayList<VisitedPlace>(garmin.places));
+		RobautoMain.logger.info("  Route points saved");
+		RobautoMain.tripPlan.save(tripPlanFile);
+		RobautoMain.tripPlan.tripPlanUpdated( tripPlanFile.getAbsolutePath() );
+		RobautoMain.logger.info("  Trip plan saved");
+		return tripPlanFile;
+	}
+
+	private Route mergeRoutes( List<BaseCamp> baseCamps) {
+		Route route = new Route();
+		List<Object> routeShape = new ArrayList<>();
+		List<TrackPoint> routeTrackPoints = new ArrayList<>();
+		TreeSet<Leg> legs = new TreeSet<>();
+		double firstPoint = 0;
+		double lastPoint = 0;
+		for (BaseCamp baseCamp : baseCamps) {
+			Leg leg = baseCamp.route.getLeg().iterator().next();
+			lastPoint += leg.getShape().size();
+			leg.setFirstPoint(firstPoint);
+			leg.setLastPoint(lastPoint);
+			legs.add( leg );
+			firstPoint += leg.getShape().size();
+			routeTrackPoints.addAll(baseCamp.day.trackPoints);
+			for (TrackPoint point : baseCamp.day.trackPoints) {
+				routeShape.add( String.format("%15.8f, %15.8f", point.getLatitude(), point.getLongitude()) );
+			}
+		}
+		route.setLeg(legs);
+		route.setShape(routeShape);
+		if (! baseCamps.isEmpty())
+			route.setBoundingBox( baseCamps.get(0).generateBoundingBox(routeTrackPoints) );
+		return route;
+	}
+	
+	private ArrayList<ButtonWaypoint> mergeVias( List<BaseCamp> baseCamps) {
+		ArrayList<ButtonWaypoint> vias = new ArrayList<>();
+		for (BaseCamp baseCamp : baseCamps) {
+			vias.addAll( baseCamp.vias);
+			StopMarker marker = (StopMarker) vias.get( vias.size()-1 );
+			marker.setKind( StopMarker.OVERNIGHT);
+		}
+		StopMarker marker = (StopMarker) vias.get( vias.size()-1 );
+		marker.setKind( StopMarker.TERMINUS);
+		return vias;
+	}
+	
+	
 	private void outputToCopilot(ArrayList<ArrayList<VisitedPlace>> finalizedPlaces) {
 		CoPilot13Format format = new CoPilot13Format();
 		int iDay = 1;
@@ -859,9 +907,11 @@ public class PlannerMode extends JPanel {
 					frame.addWindowListener(new WindowAdapter() {
 						@Override
 						public void windowClosing(WindowEvent e) {
-							RobautoMain.tripPlan.setPlaces(plannerMode.routePanel.getWaypointsModel().getData());
-							RobautoMain.tripPlan.save(plannerMode.tripPlanFile);
-							RobautoMain.tripPlan.tripPlanUpdated( plannerMode.tripPlanFile.getAbsolutePath() );
+							if (plannerMode.tripPlanFile != null) {
+								RobautoMain.tripPlan.setPlaces(plannerMode.routePanel.getWaypointsModel().getData());
+								RobautoMain.tripPlan.save(plannerMode.tripPlanFile);
+								RobautoMain.tripPlan.tripPlanUpdated( plannerMode.tripPlanFile.getAbsolutePath() );
+							}
 						}
 					});
 					frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

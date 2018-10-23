@@ -433,13 +433,22 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		placesChanged = false;
 	}
 
+	
+	private String toString( List list ) {
+		if (list == null)
+			return "NULL";
+		return (list.isEmpty()) ? "Empty" : Integer.toString(list.size());
+	}
+	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("Robauto TripPlan: ");
 		sb.append(lastModified.toString());
 		sb.append('\n');
-		sb.append(String.format("  Places: %d\n", places.size()));
-		sb.append(String.format("  Legs: %d\n", tripLegs.size()));
+		sb.append("  Places: " + toString(places) + '\n');
+		sb.append("  Legs Data:   " + toString(legDataList) + '\n');
+		sb.append("  Legs Summary:   " + toString(legSummary) + '\n');
+		sb.append("  Trip Legs:   " + toString(tripLegs) + '\n');
 		return sb.toString();
 	}
 
@@ -472,6 +481,8 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		log();
 		placesChanged = false;
 		lastModified = new Date();
+		if (file == null)
+			return;
 
 		try {
 			int step = 1;
@@ -528,6 +539,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 			tripPlan.placesChanged = false;
 			tripPlan.setRoute(tripPlan.getRoute());
+			RobautoMain.logger.info(tripPlan.toString());
 			RobautoMain.logger.info("Load complete");
 			tripPlan.log();
 			return tripPlan;
@@ -699,7 +711,10 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			for (int iLeg = 0; itLeg.hasNext(); iLeg++) {
 				Leg leg = itLeg.next();
 				LegPoint next = new LegPoint(current);
-				next.fuelAvailability = POIBase.toFuelString(it.next().getFuelAvailable());
+				if (it.hasNext())
+					next.fuelAvailability = POIBase.toFuelString(it.next().getFuelAvailable());
+				else
+					next.fuelAvailability = "None";
 				next.plus(leg);
 				LegSummary summary = new LegSummary(leg, current, next);
 				legSummary.add(summary);

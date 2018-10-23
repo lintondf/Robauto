@@ -644,7 +644,7 @@ public class Maneuver implements Serializable, Comparable<Maneuver>, PostProcess
 				System.out.println("adjustSpeeds:  No speed limit for " + getLength()+ "m : " + link );
 			}
 		} else if (getLength() > 1e3) {
-			System.out.println("adjustSpeeds:  No link for " + getLength()+ "m : " + link );
+			//System.out.println("adjustSpeeds:  No link for " + getLength()+ "m : " + link );
 		}
     }
     

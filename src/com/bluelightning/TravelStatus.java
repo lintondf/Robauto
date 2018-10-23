@@ -11,9 +11,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.gavaghan.geodesy.Ellipsoid;
+import org.gavaghan.geodesy.GeodeticCalculator;
+import org.gavaghan.geodesy.GeodeticCurve;
+import org.gavaghan.geodesy.GlobalCoordinates;
+import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.LoggerFactory;
 import org.tools4j.meanvar.MeanVarianceSampler;
 
+import com.bluelightning.GPS.Fix;
 import com.bluelightning.Report.Day;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.TripLeg;
@@ -42,6 +48,8 @@ public class TravelStatus {
 		return String.format("%s%2d:%02d", prefix, h, m );
 	}
 	
+	protected static GeodeticCalculator geoCalc = new GeodeticCalculator();
+	protected static Ellipsoid wgs84 = Ellipsoid.WGS84;
 
 
 	protected class Tracker {
@@ -128,6 +136,8 @@ public class TravelStatus {
 	
 	protected double  speed;
 	protected Maneuver maneuver = null;
+	
+	protected GeoPosition maneuverFinish = null;
 	protected MeanVarianceSampler meanSpeed = null;
 	
 	protected TimeTracker  drivingTime;
@@ -139,6 +149,8 @@ public class TravelStatus {
 	protected List<UpcomingStop> availableStops;
 	
 	protected TripLeg            tripLeg;
+	protected String             nextManeuver;
+	protected double             distanceToManeuver;
 	
 	public TravelStatus(TripPlan.TripLeg tripLeg) {
 		this.tripLeg = tripLeg;
@@ -159,11 +171,15 @@ public class TravelStatus {
 		
 	}
 	
-	public void update( double speed, Maneuver maneuver ) {
+	public void update( double speed, Maneuver maneuver, Maneuver nextManeuver ) {
 		this.speed = speed;
 		if (this.maneuver == null || this.maneuver != maneuver) {
 			this.maneuver = maneuver;
+			int n = maneuver.getShape().size();
+			this.maneuverFinish = (n == 0) ? null : maneuver.getShape().get(n-1);
 			meanSpeed = new MeanVarianceSampler();
+			this.nextManeuver = (nextManeuver == null) ? "" : nextManeuver.getInstruction();
+			this.nextManeuver += "<br/>" + maneuver.getInstruction();
 		}
 		if (meanSpeed != null) {
 			meanSpeed.add(speed);
@@ -196,6 +212,14 @@ public class TravelStatus {
 		}
 	}
 	
+	public void update(Fix fix) {
+		if (maneuverFinish != null) {
+			GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84,
+				new GlobalCoordinates(maneuverFinish), new GlobalCoordinates(fix.getLatitude(), fix.getLongitude()));
+			distanceToManeuver = curve.getEllipsoidalDistance();
+		}
+	}
+
 	
 	public String toHtml() {
 		if (theme == null) {
@@ -213,6 +237,13 @@ public class TravelStatus {
 		if (maneuver != null && maneuver.getLength() > 0 && maneuver.getTrafficTime() > 0) {
 			double expectedSpeed = maneuver.getLength() / maneuver.getTrafficTime() * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR;
 			t.set("legExpectedSpeed", String.format("%3.0f", expectedSpeed) );
+		}
+		if (nextManeuver != null) {
+			t.set("nextManeuver", nextManeuver );
+			t.set("distanceToNext", String.format("%5.1f mi", distanceToManeuver * Here2.METERS_TO_MILES ));
+		} else {
+			t.set("nextManeuver", "");
+			t.set("distanceToNext", "" );
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append( String.format("<TR>%s</TR>\n", drivingTime.toHtmlRow()) );

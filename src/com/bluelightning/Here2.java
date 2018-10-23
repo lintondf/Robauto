@@ -165,6 +165,7 @@ public class Here2 {
 		nvps.add( new BasicNameValuePair("prox", 
 				String.format("%f,%f,100", where.getLatitude(), where.getLongitude())));
 		nvps.add( new BasicNameValuePair("mode", "retrieveAddresses")); 
+		nvps.add( new BasicNameValuePair("locationattributes","linkInfo"));
 		String response = getRestResponse( reverseGeocodeUrl, nvps );
 	    JsonElement jelement = new JsonParser().parse(response);
 	    Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -438,6 +439,8 @@ public class Here2 {
 						maneuver.getShape().size(),
 						maneuver.getRoadName(), maneuver.getRoadNumber(), linkDetails,
 						maneuver.getInstruction() );
+				if ( maneuver.getShape().size() > 0)
+					System.out.printf("   %12.6f, %12.6f\n", maneuver.getShape().get(0).getLatitude(), maneuver.getShape().get(0).getLongitude());
 			}
 		} // for leg
 	}
@@ -466,6 +469,20 @@ public class Here2 {
 			return route;
 		} // for route
 		return null;
+	}
+	
+	public static void main( String[] args ) {
+		/*
+M1   :   0.0 mi /  0:00;     0.0 mi /  0:00; Infinity; 1 [MANOR LN/MANOR LN/] Get on Manor Ln and drive south
+      44.522825,   -68.208898
+M2   :   0.0 mi /  0:01;     0.0 mi /  0:00;     1; 1 [US1/US1/] Turn right onto Us1
+      44.522826,   -68.208910
+M3   :  10.5 mi /  0:16;     0.0 mi /  0:01;    39; 130 [DOWNEAST HWY/DOWNEAST HWY/] Keep right onto Downeast Hwy
+      44.522588,   -68.208983
+M4   :  24.1 mi /  0:33;    10.5 mi /  0:17;    44; 229 [I-395 W RAMP/I-395 W RAMP/] Take the I-395 W ramp to the right
+      44.531643,   -68.406179		 
+		 */
+		System.out.println( Here2.geocodeReverseLookup( new GeoPosition(44.522588,   -68.208983) ));
 	}
 
 }

@@ -3,7 +3,9 @@ package seedu.addressbook.data.place;
 import java.io.Serializable;
 
 import com.bluelightning.data.TripPlan;
+import com.bluelightning.map.StopMarker;
 import com.bluelightning.poi.POI;
+import com.bluelightning.poi.POI.FuelAvailable;
 import com.bluelightning.poi.POIBase;
 
 import seedu.addressbook.data.exception.IllegalValueException;
@@ -50,6 +52,15 @@ public class VisitedPlace extends Place implements Serializable {
 		visitOrder = new Integer(1);
 	}
 	
+	public VisitedPlace(StopMarker stopMarker) throws IllegalValueException {
+		super (new Name(stopMarker.getName()),
+				stopMarker.getPosition().getLatitude(),
+				stopMarker.getPosition().getLongitude(),
+				new Address(),
+				new UniqueTagList() );
+		visitOrder = new Integer(1);
+	}
+
 	public String toString() {
 		String label = String.format("%s/%s", getName().fullName, getAddress().value );
 		return String.format("%10.6f, %10.6f  %s", getLatitude(), getLongitude(), label);

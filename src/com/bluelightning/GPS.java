@@ -3,6 +3,7 @@ package com.bluelightning;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -203,7 +204,8 @@ public class GPS {
 	
 	Thread debugThread = null;
 	
-	public void debugSetup(final Iterator<GeoPosition> it) {
+	protected void debugClear() {
+		lastFix = null;
 		if (debugThread != null) {
 			debugThread.interrupt();
 			try {
@@ -211,9 +213,47 @@ public class GPS {
 			} catch (Exception x) {
 				debugThread.destroy();
 			}
+		}		
+	}
+	
+	
+	
+	public void debugSetup(final ObjectInputStream ois) {
+		debugClear();
+		try {
+			lastFix = (GPS.Fix) ois.readObject();
+		} catch (Exception x) {
+			x.printStackTrace();
+			return;
 		}
-		lastFix = null;
-		Thread debugThread = new Thread( new Runnable() {
+		debugThread = new Thread( new Runnable() {
+			@Override
+			public void run() {
+				System.out.println("Starting: " + lastFix.date);
+				while (!Thread.interrupted()) {
+					try {
+						GPS.Fix nextFix = (GPS.Fix) ois.readObject();
+						long msRemaining = nextFix.date.getTime() - lastFix.date.getTime();
+						//System.out.println("Waiting: " + nextFix + " / delay = " + msRemaining );
+						if (msRemaining > 0) {
+							Thread.sleep(msRemaining/2);
+						}
+						addObservation( nextFix );
+						lastFix = nextFix;
+					} catch (Exception x) {
+						break;
+					}
+				}
+				System.out.println("Exiting: " +this);
+			}
+		} );
+		debugThread.start();
+	}
+	
+	public void debugSetup(final Iterator<GeoPosition> it) {
+		debugClear();
+		
+		debugThread = new Thread( new Runnable() {
 			@Override
 			public void run() {
 				System.out.println("Starting: " +this);
@@ -236,8 +276,8 @@ public class GPS {
 	
 	public static void main(String[] args) {
 		GPS gps = new GPS();
-		GPS.Fix fix = GPS.Fix.readGpsDataFile();
-		System.out.println( fix.toString() );
+//		GPS.Fix fix = GPS.Fix.readGpsDataFile();
+//		System.out.println( fix.toString() );
 	}
 
 }

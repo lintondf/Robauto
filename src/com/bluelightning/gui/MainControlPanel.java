@@ -126,18 +126,18 @@ public class MainControlPanel extends JPanel {
 		});
 		panel.add(chckbxRestAreas);
 		
-		JButton bthStopsToBasecamp = new JButton("Stops to Basecamp");
-		GridBagConstraints gbc_bthStopsToBasecamp = new GridBagConstraints();
-		gbc_bthStopsToBasecamp.fill = GridBagConstraints.HORIZONTAL;
-		gbc_bthStopsToBasecamp.insets = new Insets(0, 0, 5, 0);
-		gbc_bthStopsToBasecamp.gridx = 0;
-		gbc_bthStopsToBasecamp.gridy = 1;
-		bthStopsToBasecamp.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				Events.eventBus.post( new Events.UiEvent("ControlPanel.StopsToBasecamp", event));
-			}
-		});
-		add(bthStopsToBasecamp, gbc_bthStopsToBasecamp);
+//		JButton bthStopsToBasecamp = new JButton("Stops to Basecamp");
+//		GridBagConstraints gbc_bthStopsToBasecamp = new GridBagConstraints();
+//		gbc_bthStopsToBasecamp.fill = GridBagConstraints.HORIZONTAL;
+//		gbc_bthStopsToBasecamp.insets = new Insets(0, 0, 5, 0);
+//		gbc_bthStopsToBasecamp.gridx = 0;
+//		gbc_bthStopsToBasecamp.gridy = 1;
+//		bthStopsToBasecamp.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent event) {
+//				Events.eventBus.post( new Events.UiEvent("ControlPanel.StopsToBasecamp", event));
+//			}
+//		});
+//		add(bthStopsToBasecamp, gbc_bthStopsToBasecamp);
 		
 		JButton bthPlanRoute = new JButton("Import Basecamp Route");
 		GridBagConstraints gbc_bthPlanRoute = new GridBagConstraints();
