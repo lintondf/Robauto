@@ -251,10 +251,10 @@ public class Garmin extends JPanel {
 					day.add(where);
 					text = rtept.getCmt();
 					if (stopMarker == null) {
-						stopMarker = new StopMarker(StopMarker.ORIGIN, rtept.getName(), text, where);
+						stopMarker = new StopMarker(StopMarker.OVERNIGHT, rtept.getName(), text, where);
 						addPlace( new VisitedPlace( stopMarker ) );
 					} else {
-						stopMarker = new StopMarker(StopMarker.TERMINUS, rtept.getName(), text, where);						
+						stopMarker = new StopMarker(StopMarker.OVERNIGHT, rtept.getName(), text, where);						
 					}
 					
 					ExtensionsType extensions = rtept.getExtensions();
