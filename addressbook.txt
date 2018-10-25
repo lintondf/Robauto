@@ -82,6 +82,12 @@
         <longitude>-81.40743</longitude>
     </persons>
     <persons>
+        <name>Portland International Jetport</name>
+        <address></address>
+        <latitude>43.647308349609375</latitude>
+        <longitude>-70.31044006347656</longitude>
+    </persons>
+    <persons>
         <name>Presnick</name>
         <address>96 Willard Street, Cocoa, FL</address>
         <latitude>28.35648</latitude>
