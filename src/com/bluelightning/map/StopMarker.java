@@ -57,7 +57,7 @@ public class StopMarker extends ButtonWaypoint {
 			images.add(image);
 		try {
 			image = ImageIO.read(new File("images/starting_waypoint.png"))
-					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
+					.getScaledInstance(8, 8, Image.SCALE_SMOOTH);
 		} catch (Exception x) {}
 		images.set( ORIGIN, image);
 		try {
@@ -93,16 +93,19 @@ public class StopMarker extends ButtonWaypoint {
 		images.set( OVERNIGHT, image);
 		try {
 			image = ImageIO.read(new File("images/ending_waypoint.png"))
-					.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), Image.SCALE_SMOOTH);
+					.getScaledInstance(8, 8, Image.SCALE_SMOOTH);
 		} catch (Exception x) {}
 		images.set( TERMINUS, image);
 	}
 	
 	protected String text;
+	protected int    kind;
+	protected int    dayNumber = 0;
 
 	public StopMarker(int kind, String text, GeoPosition geoPosition) {
 		super( new ImageIcon(images.get(kind)), 
 			  geoPosition);
+		this.kind = kind;
 		this.text = text;
 		this.setToolTipText(text);
 		this.addMouseListener(new StopMarkerMouseListener());
@@ -112,6 +115,7 @@ public class StopMarker extends ButtonWaypoint {
 	public StopMarker(int kind, String name, String text, GeoPosition geoPosition) {
 		super( new ImageIcon(images.get(kind)), 
 			  geoPosition);
+		this.kind = kind;
 		this.setName(name);
 		this.text = text;
 		this.setToolTipText(text);
@@ -119,10 +123,29 @@ public class StopMarker extends ButtonWaypoint {
 		//RobautoMain.logger.debug(String.format("StopMarker %o %s", kind, geoPosition.toString() ) );
 	}
 	
+	public String toString() {
+		return String.format("%d/%d, %s %s %s", kind, dayNumber, this.getName(), text, super.toString() ).replaceAll("\n", "; ");
+	}
+
 	public void setKind( int kind ) {
+		this.kind = kind;
 		this.setIcon( new ImageIcon(images.get(kind)) );
 	}
 	
+	/**
+	 * @return the dayNumber
+	 */
+	public int getDayNumber() {
+		return dayNumber;
+	}
+
+	/**
+	 * @param dayNumber the dayNumber to set
+	 */
+	public void setDayNumber(int dayNumber) {
+		this.dayNumber = dayNumber;
+	}
+
 	private class StopMarkerMouseListener implements MouseListener {
 
 		@Override

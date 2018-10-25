@@ -37,6 +37,8 @@ import org.jxmapviewer.viewer.LocalResponseCache;
 import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.jxmapviewer.viewer.WaypointPainter;
 
+import seedu.addressbook.data.place.VisitedPlace;
+
 import com.bluelightning.Garmin.TrackPoint;
 import com.bluelightning.gui.MainControlPanel;
 import com.bluelightning.gui.MainPanel;
@@ -203,6 +205,8 @@ public class Map {
 			text = leg.getEnd().getUserLabel();
 		}
 		waylist.add(new StopMarker(StopMarker.TERMINUS, text, track.get(track.size() - 1)));
+		
+		waylist.forEach(System.out::println);
 
 		markerPainter = new ButtonWaypointOverlayPainter();
 		markerPainter.setWaypoints( new HashSet<ButtonWaypoint>(waylist));
@@ -245,8 +249,16 @@ public class Map {
 	
 	protected ButtonWaypoint  youAreHere = null;
 
-	public List<ButtonWaypoint> showRoute(ArrayList<Route> days, ArrayList<Integer> markers, int whichDay) {
-		Iterator<Integer> iMarker = markers.iterator();
+	public List<ButtonWaypoint> showRoute(ArrayList<Route> days, ArrayList<Integer> markers, ArrayList<ArrayList<VisitedPlace>> allPlaces, int whichDay) {
+		ArrayList<VisitedPlace> flatPlaces = new ArrayList<>();
+		for (ArrayList<VisitedPlace> dayPlaces : allPlaces) {
+			flatPlaces.addAll(dayPlaces);
+		}
+		RobautoMain.logger.info(String.format("showRoute %d %d, %d", allPlaces.size(), flatPlaces.size(), markers.size() ));
+		for (int i = 0; i < flatPlaces.size(); i++) {
+			System.out.printf("showRoute %d %s\n", markers.get(i), flatPlaces.get(i) );
+		}
+		
 		ArrayList<GeoPosition> track = new ArrayList<>(); 
 		for (int i = 0; i < days.size(); i++) {
 			if (whichDay == ALL_DAYS || i == whichDay) {
@@ -259,20 +271,28 @@ public class Map {
 		ArrayList<ButtonWaypoint> waylist = new ArrayList<>();
 		if (youAreHere != null)
 			waylist.add(youAreHere);
-		String text = "";
-		for (int i = 0; i < days.size(); i++) {
-			Route route = days.get(i);
-			for (Leg leg : route.getLeg()) {
-				text = leg.getStart().getUserLabel();
-				if (whichDay == ALL_DAYS || i == whichDay) {
-					waylist.add(new StopMarker(iMarker.next(), text, new LatLon(leg.getStart().getMappedPosition())));
-				} else {
-					iMarker.next();
-				}
-				text = leg.getEnd().getUserLabel();
+		
+		for (int i = 0; i < flatPlaces.size(); i++) {
+			VisitedPlace place = flatPlaces.get(i);
+			if (whichDay == ALL_DAYS || place.getVisitOrder() == (whichDay+1)) {
+				StopMarker marker = new StopMarker( markers.get(i), place.toString(), new LatLon(place.getLatitude(), place.getLongitude()) );
+				waylist.add(marker);
 			}
 		}
-		waylist.add(new StopMarker(iMarker.next(), text, track.get(track.size() - 1)));
+//		String text = "";
+//		for (int i = 0; i < days.size(); i++) {
+//			Route route = days.get(i);
+//			for (Leg leg : route.getLeg()) {
+//				text = leg.getStart().getUserLabel();
+//				if (whichDay == ALL_DAYS || i == whichDay) {
+//					waylist.add(new StopMarker(iMarker.next(), text, new LatLon(leg.getStart().getMappedPosition())));
+//				} else {
+//					iMarker.next();
+//				}
+//				text = leg.getEnd().getUserLabel();
+//			}
+//		}
+//		waylist.add(new StopMarker(iMarker.next(), text, track.get(track.size() - 1)));
 
 		markerPainter = new ButtonWaypointOverlayPainter();
 		HashSet<ButtonWaypoint> buttonWaypointSet = new HashSet<>(waylist);

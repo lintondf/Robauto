@@ -3,6 +3,7 @@ package com.bluelightning;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
@@ -31,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
@@ -70,6 +72,7 @@ import com.bluelightning.map.POIMarker;
 import com.bluelightning.map.StopMarker;
 import com.bluelightning.poi.MurphyPOI;
 import com.bluelightning.poi.POI;
+import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;
 import com.bluelightning.poi.RestAreaPOI;
@@ -86,9 +89,12 @@ import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.Layout;
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.place.Place;
 import seedu.addressbook.data.place.ReadOnlyPlace;
+import seedu.addressbook.data.place.UniquePlaceList.DuplicatePlaceException;
 import seedu.addressbook.data.place.VisitedPlace;
 import seedu.addressbook.logic.Logic;
+import seedu.addressbook.storage.StorageFile.StorageOperationException;
 
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
 
@@ -114,7 +120,7 @@ public class PlannerMode extends JPanel {
 	protected ch.qos.logback.classic.Logger rootLogger;
 
 	protected TextAreaAppender textAreaAppender;
-	
+
 	public class POIClickHandler {
 		@Subscribe
 		protected void handle(POIClickEvent event) {
@@ -133,8 +139,7 @@ public class PlannerMode extends JPanel {
 
 	public static BufferedImage getScreenShot(Component component) {
 
-		BufferedImage image = new BufferedImage(component.getWidth(), component.getHeight(),
-				BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = new BufferedImage(component.getWidth(), component.getHeight(), BufferedImage.TYPE_INT_RGB);
 		// call the Component's paint method, using
 		// the Graphics object of the image.
 		component.paint(image.getGraphics()); // alternately use .printAll(..)
@@ -149,7 +154,7 @@ public class PlannerMode extends JPanel {
 
 		@Subscribe
 		protected void handle(UiEvent event) {
-			//System.out.println(event.source + " " + event.awtEvent);
+			RobautoMain.logger.info("handle(UIEvent) " + event.source);
 			switch (event.source) {
 			case "RoutePanel.AddAfter":
 				RobautoMain.tripPlan.setPlacesChanged(true);
@@ -204,11 +209,69 @@ public class PlannerMode extends JPanel {
 					}
 				});
 				break;
+			/*
+			 * initialize() -> fires RouteFromBaseCamp routeFromBaseCamp() fires
+			 * RouteLoad fires RouteLoad routeLoad() fires Finalize*
+			 * finalizeRoute() fires RouteReport fires Route* route() fires
+			 * RouteReport
+			 */
+			case "ControlPanel.RouteOpen":
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						routeOpen();
+					}
+				});
+				break;
+			case "ControlPanel.RouteFromBaseCamp":
+				Thread t = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						routeFromBaseCamp();
+					}
+				});
+				t.start();
+				break;
+			case "ControlPanel.RouteLoad":
+				t = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						routeLoad();
+					}
+				});
+				t.start();
+				break;
+			case "ControlPanel.RouteDisplay":
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						routeDisplay();
+					}
+				});
+				break;
 			case "ControlPanel.Route":
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						route();
+					}
+				});
+				break;
+			case "ControlPanel.Finalize":
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						if (RobautoMain.tripPlan.getRoute() != null) {
+							routeFinalize();
+						}
+					}
+				});
+				break;
+			case "ControlPanel.RouteReport":
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						routeReport();
 					}
 				});
 				break;
@@ -219,17 +282,6 @@ public class PlannerMode extends JPanel {
 					public void run() {
 						if (RobautoMain.tripPlan.getRoute() != null) {
 							optimizeStops();
-						}
-					}
-				});
-				break;
-				
-			case "ControlPanel.Finalize":
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						if (RobautoMain.tripPlan.getRoute() != null) {
-							finalizeRoute();
 						}
 					}
 				});
@@ -259,17 +311,17 @@ public class PlannerMode extends JPanel {
 				break;
 
 			case "ControlPanel.CoPilotOutput":
-				if (! RobautoMain.tripPlan.getFinalizedPlaces().isEmpty()) {
+				if (!RobautoMain.tripPlan.getFinalizedPlaces().isEmpty()) {
 					try {
-						outputToCopilot( RobautoMain.tripPlan.getFinalizedPlaces() );
+						outputToCopilot(RobautoMain.tripPlan.getFinalizedPlaces());
 					} catch (Exception x) {
 						x.printStackTrace();
 					}
 				}
-				BufferedImage i = getScreenShot( mapViewer );
+				BufferedImage i = getScreenShot(mapViewer);
 				try {
-				    File outputfile = new File("saved.png");
-				    ImageIO.write(i, "png", outputfile);
+					File outputfile = new File("saved.png");
+					ImageIO.write(i, "png", outputfile);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -281,89 +333,159 @@ public class PlannerMode extends JPanel {
 				} catch (Exception x) {
 					x.printStackTrace();
 				}
-				
+
 				break;
-				
+
 			case "ControlPanel.ClearActions":
 				System.out.println(event.source + " " + event.awtEvent);
 				JComboBox box = (JComboBox) event.awtEvent.getSource();
 				String action = (String) box.getSelectedItem();
-				System.out.println( action );
-				RobautoMain.tripPlan.clear( action );
+				System.out.println(action);
+				RobautoMain.tripPlan.clear(action);
 				break;
-				
+
 			default:
 				break;
 			}
 		}
 
-		private void finalizeRoute() {
+		private void routeFinalize() {
 			RobautoMain.logger.info("Finalizing route...");
-			if (RobautoMain.tripPlan.getPlacesChanged()) {
-				RobautoMain.tripPlan.setRoute(null);
-				RobautoMain.tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
-				RobautoMain.logger.info("  Route points saved");
-			}
+			RobautoMain.tripPlan.log();
+			// if (RobautoMain.tripPlan.getPlacesChanged()) {
+			// RobautoMain.tripPlan.setRoute(null);
+			// RobautoMain.tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
+			// RobautoMain.logger.info("  Route points saved");
+			// }
 			map.clearRoute();
-			ArrayList<Route> days = RobautoMain.tripPlan.getFinalizedDays();
-			ArrayList<Integer> markers = RobautoMain.tripPlan.getFinalizedMarkers();
-			if (days.isEmpty()) {
-				ArrayList<ArrayList<VisitedPlace>> allPlaces = new ArrayList<>();
-				markers.add(StopMarker.ORIGIN);
-				for (TripPlan.TripLeg tripLeg : RobautoMain.tripPlan.getTripLegs()) {
-					ArrayList<VisitedPlace> places = new ArrayList<>();
-					String[] fields = tripLeg.legData.startLabel.split("/");
-					if (fields.length < 2) {
-						RobautoMain.logger.error("Invalid VisitedPlace label: " + tripLeg.legData.startLabel);
-						return;
-					}
-					List<ReadOnlyPlace> startMatches = addressBook.getPlacesWithAddress(fields[1]);
-					if (startMatches.isEmpty()) {
-						RobautoMain.logger.error("No matching address book entry for: " + tripLeg.legData.startLabel);
-						return;
-					}
-					VisitedPlace start = new VisitedPlace(startMatches.get(0));
-					places.add(start);
-					int refuel = 0;
-					System.out.println(tripLeg.legData.startLabel);
-					tripLeg.stopDataList.forEach(System.out::println);
-					for (TripPlan.StopData stopData : tripLeg.stopDataList) {
-						if (stopData.use) {
-							try {
-								places.add(new VisitedPlace(stopData));
-								refuel = (stopData.refuel) ? StopMarker.FUEL : 0;
-								markers.add(StopMarker.DRIVERS + refuel);
-							} catch (IllegalValueException e) {
-								e.printStackTrace();
-							}
+			ArrayList<Route> days = new ArrayList<>();
+			ArrayList<Integer> markers = new ArrayList<>();
+			ArrayList<ArrayList<VisitedPlace>> allPlaces = new ArrayList<>();
+			Iterator<Route> rit = extractDays(RobautoMain.tripPlan.getRoute()).iterator();
+			ArrayList<VisitedPlace> routePlaces = RobautoMain.tripPlan.getPlaces();
+			int pi = 0;
+			int iDay = 0;
+			markers.add(StopMarker.ORIGIN);
+			for (TripPlan.TripLeg tripLeg : RobautoMain.tripPlan.getTripLegs()) {
+				iDay++;  // count days from 1
+				ArrayList<VisitedPlace> places = new ArrayList<>();
+				VisitedPlace start = new VisitedPlace(routePlaces.get(pi++));
+				start.setVisitOrder(iDay);
+				places.add(start);
+				int refuel = 0;
+				System.out.println(tripLeg.legData.startLabel);
+				tripLeg.stopDataList.forEach(System.out::println);
+				for (TripPlan.StopData stopData : tripLeg.stopDataList) {
+					if (stopData.use) {
+						try {
+							VisitedPlace stopPlace = new VisitedPlace(stopData);
+							stopPlace.setVisitOrder(iDay);
+							places.add(stopPlace);
+							refuel = (stopData.refuel) ? StopMarker.FUEL : 0;
+							markers.add(StopMarker.DRIVERS + refuel);
+						} catch (IllegalValueException e) {
+							e.printStackTrace();
 						}
-					} // for stopData
-					markers.set(markers.size() - 1, StopMarker.OVERNIGHT + refuel);
-					// places.forEach( place -> {
-					// Main.logger.debug(place.toString());
-					// });
-					days.add(Here2.computeRoute(places));
-					allPlaces.add(places);
-				} // tripLeg
-				markers.set(markers.size() - 1, StopMarker.TERMINUS);
-				RobautoMain.tripPlan.setFinalizedRoute(days, markers, allPlaces);
-			}
-			waypoints = map.showRoute(days, markers, Map.ALL_DAYS);
+					}
+				} // for stopData
+				//markers.set(markers.size() - 1, StopMarker.OVERNIGHT + refuel);
+				markers.add( StopMarker.OVERNIGHT + refuel );
+				days.add(rit.next());
+				allPlaces.add(places);
+			} // tripLeg
+			markers.set(markers.size() - 1, StopMarker.TERMINUS);
+			RobautoMain.logger.info( String.format("Finalized %d, %d, %d", days.size(), markers.size(), allPlaces.size()) );
+			RobautoMain.tripPlan.setFinalizedRoute(days, markers, allPlaces);
+			waypoints = map.showRoute(days, markers, allPlaces, Map.ALL_DAYS);
 			int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 			mainPanel.getRightTabbedPane().setSelectedIndex(index);
 			RobautoMain.logger.info("  Route shown on map");
+			RobautoMain.tripPlan.save(tripPlanFile);
+			RobautoMain.tripPlan.tripPlanUpdated(tripPlanFile.getAbsolutePath());
+			RobautoMain.logger.info("  Trip plan saved");
+			RobautoMain.tripPlan.log();
+			Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteReport", null));
 		}
-		
+
 		private void stopsToBasecamp() {
 			RobautoMain.logger.info("Writing stops.GPX...");
 			boolean pf = Garmin.writeToGPX(routePanel.getWaypointsModel().getData(), "/Users/lintondf/stops.GPX");
-			RobautoMain.logger.info((pf) ? "  Stops written"  : "  Stop write failed");
-		}
-		
-		private void importBasecampRoute() {
+			RobautoMain.logger.info((pf) ? "  Stops written" : "  Stop write failed");
 		}
 
-		
+		private void routeFromBaseCamp() {
+			tripPlanFile = createTripPlanFromBaseCamp(tripPlanFile);
+			Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteLoad", null));
+		}
+
+		private void routeOpen() {
+			// Create a file chooser
+			final JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setFileFilter(new FileFilter() {
+				@Override
+				public boolean accept(File f) {
+					String name = f.getName().toLowerCase();
+					if (name.endsWith(".gpx"))
+						return true;
+					if (name.endsWith(".robauto"))
+						return true;
+					return false;
+				}
+
+				@Override
+				public String getDescription() {
+					return "Robauto TripPlans and BaseCamp routes";
+				}
+			});
+			// In response to a button click:
+			int returnVal = fileChooser.showOpenDialog(frame);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fileChooser.getSelectedFile();
+				// This is where a real application would open the file.
+				RobautoMain.logger.trace("Opening: " + file.getName() + ".");
+				if (file.exists() && file.isFile()) {
+					if (file.getName().toUpperCase().endsWith(".GPX")) {
+						tripPlanFile = file;
+						Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteFromBaseCamp", null));
+					} else {
+						tripPlanFile = file; // new trip plan file
+						Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteLoad", null));
+					}
+				}
+			} else {
+				RobautoMain.logger.trace("Open command cancelled by user.");
+				RobautoMain.logger.info("Loading previous trip plan: " + tripPlanFile.getName());
+				Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteLoad", null));
+			}
+		}
+
+		private void routeLoad() {
+			RobautoMain.tripPlan = TripPlan.load(tripPlanFile, frame);
+			Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteDisplay", null));
+		}
+
+		private void routeDisplay() {
+			routePanel.getWaypointsModel().setData(RobautoMain.tripPlan.getPlaces());
+			if (!RobautoMain.tripPlan.getFinalizedDays().isEmpty()) {
+				RobautoMain.logger.info("Displaying finalized route.");
+				Events.eventBus.post(new Events.UiEvent("ControlPanel.Finalize", null));
+				reportDetails(RobautoMain.tripPlan.getFinalizedDays());
+			} else if (RobautoMain.tripPlan.getRoute() != null) {
+				RobautoMain.logger.info("Displaying unfinalized route");
+				Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
+			} else {
+				RobautoMain.logger.info("No route loaded");
+			}
+		}
+
+		private void routeReport() {
+			Report report = RobautoMain.tripPlan.getTripReport();
+			if (report != null) {
+				String html = report.toHtml();
+				resultsPane.setText(html);
+				// Here2.reportRoute( RobautoMain.tripPlan.getRoute() );
+			}
+		}
 
 		private void route() {
 			RobautoMain.tripPlan.setFinalizedRoute(null, null, null);
@@ -375,12 +497,13 @@ public class PlannerMode extends JPanel {
 					RobautoMain.tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
 					RobautoMain.logger.info("  Route points saved");
 				}
-				route = Here2.computeRoute(RobautoMain.tripPlan); // will reload from
-															// routeJson if not
-															// empty
+				route = Here2.computeRoute(RobautoMain.tripPlan); // will reload
+																	// from
+				// routeJson if not
+				// empty
 				RobautoMain.logger.info("  Route planned");
 				RobautoMain.tripPlan.save(tripPlanFile);
-				RobautoMain.tripPlan.tripPlanUpdated( tripPlanFile.getAbsolutePath() );
+				RobautoMain.tripPlan.tripPlanUpdated(tripPlanFile.getAbsolutePath());
 				RobautoMain.logger.info("  Trip plan saved");
 			}
 			if (route != null) {
@@ -390,6 +513,7 @@ public class PlannerMode extends JPanel {
 				RobautoMain.logger.info("  Route shown on map");
 				RobautoMain.tripPlan.setRoute(route);
 			}
+			Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteReport", null));
 		}
 
 		private void optimizeStops() {
@@ -426,14 +550,14 @@ public class PlannerMode extends JPanel {
 			} catch (Exception x) {
 				x.printStackTrace();
 			}
-			
+
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					resultsPane.setText(html);
 				}
 			});
-			
+
 		}
 
 		private CallbackHandler handler = null;
@@ -662,7 +786,7 @@ public class PlannerMode extends JPanel {
 		JScrollPane scroll = new JScrollPane(resultsPane);
 		mainPanel.getRightTabbedPane().addTab("Results", null, scroll, null);
 	}
-	
+
 	public void initialize() {
 		// browserCanvas.initialize(frame);
 
@@ -684,91 +808,93 @@ public class PlannerMode extends JPanel {
 		} catch (Exception x) {
 			RobautoMain.logger.trace(x.getMessage());
 		}
-		
-		//Create a file chooser
-		final JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setFileFilter( new FileFilter() {
-			@Override
-			public boolean accept(File f) {
-				String name = f.getName().toLowerCase();
-				if (name.endsWith(".gpx"))
-					return true;
-				if (name.endsWith(".robauto"))
-					return true;
-				return false;
-			}
-			@Override
-			public String getDescription() {
-				return "Robauto TripPlans and BaseCamp routes";
-			}
-		});
-		//In response to a button click:
-		int returnVal = fileChooser.showOpenDialog(frame);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            //This is where a real application would open the file.
-            RobautoMain.logger.trace("Opening: " + file.getName() + ".");
-            if (file.exists() && file.isFile()) {
-            	if (file.getName().toUpperCase().endsWith(".GPX")) {
-            		tripPlanFile = createTripPlanFromBaseCamp( file );
-            	} else {
-            		tripPlanFile = file;  // new trip plan file
-            	}
-            }
-        } else {
-        	RobautoMain.logger.trace("Open command cancelled by user.");
-    		RobautoMain.logger.info("Loading previous trip plan: " + tripPlanFile.getName() );
-        }
-
-		RobautoMain.tripPlan = TripPlan.load(tripPlanFile, frame);
-		routePanel.getWaypointsModel().setData(RobautoMain.tripPlan.getPlaces());
-		if (!RobautoMain.tripPlan.getFinalizedDays().isEmpty()) {
-			RobautoMain.logger.info("Displaying finalized route.");
-			Events.eventBus.post(new Events.UiEvent("ControlPanel.Finalize", null));
-			reportDetails(RobautoMain.tripPlan.getFinalizedDays());
-		} else if (RobautoMain.tripPlan.getRoute() != null) {
-			RobautoMain.logger.info("Displaying unfinalized route");
-			Events.eventBus.post(new Events.UiEvent("ControlPanel.Route", null));
-		} else {
-			RobautoMain.logger.info("No route loaded");
-		}
-		Report report = RobautoMain.tripPlan.getTripReport();
-		if (report != null) {
-			String html = report.toHtml();
-			resultsPane.setText(html);
-			//Here2.reportRoute( RobautoMain.tripPlan.getRoute() );
-		}
+		Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteOpen", null));
 	}
 
 	private File createTripPlanFromBaseCamp(File file) {
-		Garmin garmin = new Garmin( file );
+		Garmin garmin = new Garmin(file);
 		RobautoMain.logger.info("Importing Basecamp route...");
 		ArrayList<BaseCamp> days = new ArrayList<>();
 		String basePath = file.getAbsolutePath();
-		basePath = basePath.substring(0, basePath.length()-4);  // drop extension
+		basePath = basePath.substring(0, basePath.length() - 4); // drop
+																	// extension
 		for (int i = 0; i < garmin.days.size(); i++) {
-			String path = String.format("%s_Day_%d.pdf", basePath, i+1);
-			RobautoMain.logger.info("  Loading BaseCamp details from: " + path );
-			BaseCamp baseCamp = new BaseCamp( garmin.days.get(i), path );
+			String path = String.format("%s_Day_%d.pdf", basePath, i + 1);
+			RobautoMain.logger.info("  Loading BaseCamp details from: " + path);
+			BaseCamp baseCamp = new BaseCamp(garmin.days.get(i), path);
 			days.add(baseCamp);
 		}
 		RobautoMain.logger.info(String.format("  %d days loaded", days.size()));
-		ArrayList< List<GeoPosition> > tracks = new ArrayList<>();
-		Route route = mergeRoutes( days );
-		route.setBoundingBox( generateBoundingBox( route.getShape() ) );
-		//Here2.reportRoute(route);
+		ArrayList<List<GeoPosition>> tracks = new ArrayList<>();
+		Route route = mergeRoutes(days);
+		route.setBoundingBox(generateBoundingBox(route.getShape()));
 		tracks.add(route.getShape());
-//		map.show(tracks, mergeVias( days ) );
-//		int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
-//		mainPanel.getRightTabbedPane().setSelectedIndex(index);
-		File outputFile = new File( String.format("%s.robauto", basePath) );
+
+		final double MATCH_DISTANCE = 500.0;
+
+		ArrayList<VisitedPlace> places = new ArrayList<>(garmin.places);
+		for (int i = 0; i < places.size(); i++) {
+			VisitedPlace place = places.get(i);
+			System.out.println(place);
+			// compare to address book entries
+			Iterator<Place> pit = addressBook.getAllPlaces().iterator();
+			boolean matched = false;
+			while (pit.hasNext()) {
+				Place bookPlace = pit.next();
+				double d = POIBase.distanceBetween(bookPlace.getLatitude(), bookPlace.getLongitude(), place.getLatitude(),
+						place.getLongitude());
+				if (d < MATCH_DISTANCE) {
+					System.out.println(" -> Book: " + bookPlace);
+					places.set(i, new VisitedPlace(bookPlace));
+					matched = true;
+					break;
+				}
+			}
+			GeoPosition position = new GeoPosition(place.getLatitude(), place.getLongitude());
+			if (!matched)
+				for (POISet pset : poiMap.values()) {
+					java.util.Map<POI, POIResult> nearBy = pset.nearBy(position, 0, MATCH_DISTANCE);
+					if (!nearBy.isEmpty()) {
+						POI poi = nearBy.keySet().iterator().next();
+						try {
+							System.out.println(" -> POI: " + poi);
+							places.set(i, new VisitedPlace(poi));
+							matched = true;
+						} catch (IllegalValueException e) {
+							RobautoMain.logger.error("Place from POI Exception", e);
+						}
+						break;
+					}
+				}
+			if (!matched) {
+				try {
+					addressBook.add(place);
+					controller.getStorage().save(addressBook);
+					RobautoMain.logger.info("Adding place: " + place.toString());
+				} catch (DuplicatePlaceException | StorageOperationException e) {
+					RobautoMain.logger.error("Add Place to AddressBook Exception", e);
+				}
+			}
+			if (i > 0 && i < places.size() - 1) {
+				places.get(i).setOvernight(true);
+			}
+			System.out.println(places.get(i).toGeo() + " " + places.get(i).isOvernight() + " "
+					+ places.get(i).getFuelAvailable().get());
+		}
+
+		for (VisitedPlace place : places) {
+			List<ReadOnlyPlace> startMatches = addressBook.getPlacesWithAddress(place.getAddress().toString());
+			System.out.println(place + " " + startMatches.isEmpty());
+		}
+
+		File outputFile = new File(String.format("%s.robauto", basePath));
 		RobautoMain.tripPlan = new TripPlan();
 		RobautoMain.logger.info("  Route shown on map");
 		RobautoMain.tripPlan.setRoute(route);
-		RobautoMain.tripPlan.setPlaces(new ArrayList<VisitedPlace>(garmin.places));
+		RobautoMain.tripPlan.setPlaces(places);
 		RobautoMain.logger.info("  Route points saved");
 		RobautoMain.tripPlan.save(outputFile);
-		RobautoMain.tripPlan.tripPlanUpdated( outputFile.getAbsolutePath() );
+		RobautoMain.tripPlan.tripPlanUpdated(outputFile.getAbsolutePath());
 		RobautoMain.logger.info("  Trip plan saved to " + outputFile.getAbsolutePath());
 		return outputFile;
 	}
@@ -778,15 +904,15 @@ public class PlannerMode extends JPanel {
 		BottomRight br = new BottomRight();
 		TopLeft tl = new TopLeft();
 		if (position.size() > 0) {
-			br.setLatitude( position.get(0).getLatitude());
-			tl.setLatitude( position.get(0).getLatitude());
-			br.setLongitude( position.get(0).getLongitude());
-			tl.setLongitude( position.get(0).getLongitude());
+			br.setLatitude(position.get(0).getLatitude());
+			tl.setLatitude(position.get(0).getLatitude());
+			br.setLongitude(position.get(0).getLongitude());
+			tl.setLongitude(position.get(0).getLongitude());
 			for (int i = 1; i < position.size(); i++) {
 				double latitude = position.get(i).getLatitude();
 				double longitude = position.get(i).getLongitude();
 				if (latitude > tl.getLatitude()) {
-					tl.setLatitude( latitude );
+					tl.setLatitude(latitude);
 				}
 				if (latitude < br.getLatitude()) {
 					br.setLatitude(latitude);
@@ -801,11 +927,13 @@ public class PlannerMode extends JPanel {
 		}
 		box.setBottomRight(br);
 		box.setTopLeft(tl);
-		//System.out.printf( "BB %10.6f %10.6f  %10.6f %10.6f\n", tl.getLatitude(), br.getLatitude(), tl.getLongitude(), br.getLongitude() );
+		// System.out.printf( "BB %10.6f %10.6f  %10.6f %10.6f\n",
+		// tl.getLatitude(), br.getLatitude(), tl.getLongitude(),
+		// br.getLongitude() );
 		return box;
 	}
 
-	private Route mergeRoutes( List<BaseCamp> baseCamps) {
+	private Route mergeRoutes(List<BaseCamp> baseCamps) {
 		Route route = new Route();
 		List<Object> routeShape = new ArrayList<>();
 		List<TrackPoint> routeTrackPoints = new ArrayList<>();
@@ -814,38 +942,69 @@ public class PlannerMode extends JPanel {
 		double lastPoint = 0;
 		for (BaseCamp baseCamp : baseCamps) {
 			Leg leg = baseCamp.route.getLeg().iterator().next();
+			System.out.printf("Legs %d; %10.6f,%10.6f : %10.6f,%10.6f\n", baseCamp.route.getLeg().size(), leg.getStart()
+					.getMappedPosition().getLatitude(), leg.getStart().getMappedPosition().getLongitude(), leg.getEnd()
+					.getMappedPosition().getLatitude(), leg.getEnd().getMappedPosition().getLongitude());
 			lastPoint += leg.getShape().size();
 			leg.setFirstPoint(firstPoint);
 			leg.setLastPoint(lastPoint);
-			leg.setBoundingBox( generateBoundingBox( baseCamp.day.trackPoints ) );
-			legs.add( leg );
+			leg.setBoundingBox(generateBoundingBox(baseCamp.day.trackPoints));
+			legs.add(leg);
 			firstPoint += leg.getShape().size();
 			routeTrackPoints.addAll(baseCamp.day.trackPoints);
 			for (TrackPoint point : baseCamp.day.trackPoints) {
-				routeShape.add( String.format("%15.8f, %15.8f", point.getLatitude(), point.getLongitude()) );
+				routeShape.add(String.format("%15.8f, %15.8f", point.getLatitude(), point.getLongitude()));
 			}
-			
+
 		}
 		route.setLeg(legs);
 		route.setShape(routeShape);
-		if (! baseCamps.isEmpty())
-			route.setBoundingBox( generateBoundingBox(routeTrackPoints) );
+		if (!baseCamps.isEmpty())
+			route.setBoundingBox(generateBoundingBox(routeTrackPoints));
 		return route;
 	}
-	
-	private ArrayList<ButtonWaypoint> mergeVias( List<BaseCamp> baseCamps) {
+
+	private List<Route> extractDays(Route route) {
+		ArrayList<Route> days = new ArrayList<>();
+		Iterator<Leg> lit = route.getLeg().iterator();
+		while (lit.hasNext()) {
+			Route day = new Route();
+			Leg leg = lit.next();
+			Leg one = new Leg();
+			one.setBaseTime(leg.getBaseTime());
+			one.setBoundingBox(leg.getBoundingBox());
+			one.setEnd(leg.getEnd());
+			one.setFirstPoint(0.0);
+			one.setLastPoint(leg.getLastPoint() - leg.getFirstPoint());
+			one.setLength(leg.getLength());
+			one.setManeuver(leg.getManeuver());
+			one.setShape(leg.getShape());
+			one.setStart(leg.getStart());
+			one.setSummary(leg.getSummary());
+			one.setTrafficTime(leg.getTrafficTime());
+			one.setTravelTime(leg.getTravelTime());
+			TreeSet<Leg> legs = new TreeSet<>();
+			legs.add(one);
+			day.setLeg(legs);
+			day.setShape(leg.getShape());
+			day.setBoundingBox(leg.getBoundingBox());
+			days.add(day);
+		}
+		return days;
+	}
+
+	private ArrayList<ButtonWaypoint> mergeVias(List<BaseCamp> baseCamps) {
 		ArrayList<ButtonWaypoint> vias = new ArrayList<>();
 		for (BaseCamp baseCamp : baseCamps) {
-			vias.addAll( baseCamp.vias);
-			StopMarker marker = (StopMarker) vias.get( vias.size()-1 );
-			marker.setKind( StopMarker.OVERNIGHT);
+			vias.addAll(baseCamp.vias);
+			StopMarker marker = (StopMarker) vias.get(vias.size() - 1);
+			marker.setKind(StopMarker.OVERNIGHT);
 		}
-		StopMarker marker = (StopMarker) vias.get( vias.size()-1 );
-		marker.setKind( StopMarker.TERMINUS);
+		StopMarker marker = (StopMarker) vias.get(vias.size() - 1);
+		marker.setKind(StopMarker.TERMINUS);
 		return vias;
 	}
-	
-	
+
 	private void outputToCopilot(ArrayList<ArrayList<VisitedPlace>> finalizedPlaces) {
 		CoPilot13Format format = new CoPilot13Format();
 		int iDay = 1;
@@ -880,13 +1039,11 @@ public class PlannerMode extends JPanel {
 					dayDistance += maneuver.getLength();
 					legTime += maneuver.getTrafficTime();
 					legDistance += maneuver.getLength();
-					double speed = maneuver.getLength() / maneuver.getTrafficTime(); 
-					System.out.printf("    %6.1f %-6s  %6.1f %-6s %6.1f %-6s %6.1f: %s\n",
-							dayDistance * Here2.METERS_TO_MILES, Here2.toPeriod(dayTime),
-							legDistance * Here2.METERS_TO_MILES, Here2.toPeriod(legTime),
-							maneuver.getLength() * Here2.METERS_TO_MILES, Here2.toPeriod(maneuver.getTrafficTime()),
-							speed * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR,
-							maneuver.getInstruction());
+					double speed = maneuver.getLength() / maneuver.getTrafficTime();
+					System.out.printf("    %6.1f %-6s  %6.1f %-6s %6.1f %-6s %6.1f: %s\n", dayDistance * Here2.METERS_TO_MILES,
+							Here2.toPeriod(dayTime), legDistance * Here2.METERS_TO_MILES, Here2.toPeriod(legTime),
+							maneuver.getLength() * Here2.METERS_TO_MILES, Here2.toPeriod(maneuver.getTrafficTime()), speed
+									* Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR, maneuver.getInstruction());
 				}
 			}
 		}
@@ -896,26 +1053,29 @@ public class PlannerMode extends JPanel {
 
 	private static void initLookAndFeel(double textSizeInPixels, double fontSize) {
 		try {
-			System.out.println( Toolkit.getDefaultToolkit().getScreenSize() );
-			//double fontSize = 0.8 * textSizeInPixels * Toolkit.getDefaultToolkit().getScreenResolution() / 72.0;
+			System.out.println(Toolkit.getDefaultToolkit().getScreenSize());
+			// double fontSize = 0.8 * textSizeInPixels *
+			// Toolkit.getDefaultToolkit().getScreenResolution() / 72.0;
 			System.out.printf("%f %d %f\n", textSizeInPixels, Toolkit.getDefaultToolkit().getScreenResolution(), fontSize);
-		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-		        if ("Nimbus".equals(info.getName())) {
-		            UIManager.setLookAndFeel(info.getClassName());
-		            NimbusLookAndFeel laf = (NimbusLookAndFeel) UIManager.getLookAndFeel();
-		            //laf.getDefaults().entrySet().forEach(System.out::println);
-		            Font font = new Font("Tahoma", Font.BOLD, (int) fontSize );
-		            System.out.println(font);
-		            laf.getDefaults().put("defaultFont", font );
-		            laf.getDefaults().put("ScrollBar.thumbHeight", (int) textSizeInPixels);
-		            laf.getDefaults().put("Table.rowHeight", (int) textSizeInPixels); 
-		            break;
-		        }
-		    }
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					NimbusLookAndFeel laf = (NimbusLookAndFeel) UIManager.getLookAndFeel();
+					// laf.getDefaults().entrySet().forEach(System.out::println);
+					Font font = new Font("Tahoma", Font.BOLD, (int) fontSize);
+					System.out.println(font);
+					laf.getDefaults().put("defaultFont", font);
+					laf.getDefaults().put("ScrollBar.thumbHeight", (int) textSizeInPixels);
+					laf.getDefaults().put("Table.rowHeight", (int) textSizeInPixels);
+					break;
+				}
+			}
 		} catch (Exception e) {
-		    // If Nimbus is not available, you can set the GUI to another look and feel.
+			// If Nimbus is not available, you can set the GUI to another look
+			// and feel.
 		}
 	}
+
 	public static void main(String[] args) {
 		java.net.InetAddress localMachine = null;
 		try {
@@ -928,18 +1088,21 @@ public class PlannerMode extends JPanel {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					if ( hostName.toUpperCase().startsWith("SURFACE") )
-						initLookAndFeel( 30, 24 );
+					if (hostName.toUpperCase().startsWith("SURFACE")) {
+						initLookAndFeel(30, 24);
+						ButtonWaypoint.setDefaultPreferredSize(new Dimension(48, 48));
+					} else {
+						ButtonWaypoint.setDefaultPreferredSize(new Dimension(24, 24));
+					}
 					frame = new JFrame();
 					frame.setTitle("Robauto - Planner Mode");
 					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-					Image icon = ImageIO.read(new File("images/icon-planner.jpg"))
-							.getScaledInstance((int)64, (int)64, Image.SCALE_SMOOTH);
+					Image icon = ImageIO.read(new File("images/icon-planner.jpg")).getScaledInstance((int) 64, (int) 64,
+							Image.SCALE_SMOOTH);
 					frame.setIconImage(icon);
 
-					
 					PlannerMode plannerMode = new PlannerMode();
-					
+
 					frame.setContentPane(plannerMode);
 					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 					SwingUtilities.updateComponentTreeUI(frame);
@@ -951,7 +1114,7 @@ public class PlannerMode extends JPanel {
 							if (plannerMode.tripPlanFile != null) {
 								RobautoMain.tripPlan.setPlaces(plannerMode.routePanel.getWaypointsModel().getData());
 								RobautoMain.tripPlan.save(plannerMode.tripPlanFile);
-								RobautoMain.tripPlan.tripPlanUpdated( plannerMode.tripPlanFile.getAbsolutePath() );
+								RobautoMain.tripPlan.tripPlanUpdated(plannerMode.tripPlanFile.getAbsolutePath());
 							}
 						}
 					});
@@ -960,7 +1123,7 @@ public class PlannerMode extends JPanel {
 
 				} catch (Exception e) {
 					e.printStackTrace();
-				} finally {					
+				} finally {
 					frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				}
 			}

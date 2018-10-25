@@ -17,13 +17,20 @@ import org.jxmapviewer.viewer.Waypoint;
  */
 public class ButtonWaypoint extends JButton implements Waypoint {
 	
+	private static final long serialVersionUID = 1L;
 	GeoPosition geoPosition;
-	protected static final Dimension preferredSize = new Dimension(48,48);
+	protected static Dimension preferredSize = new Dimension(48,48);
+	/**
+	 * @param preferredSize the preferredSize to set
+	 */
+	public static void setDefaultPreferredSize(Dimension preferredSize) {
+		ButtonWaypoint.preferredSize = preferredSize;
+	}
+
 	protected Dimension size = preferredSize;
 	
 	public ButtonWaypoint(Icon icon, GeoPosition geoPosition) {
 		super(icon);
-		//size = new Dimension( icon.getIconWidth(), icon.getIconHeight() );
 		init(geoPosition);
 	}
 	
@@ -40,6 +47,10 @@ public class ButtonWaypoint extends JButton implements Waypoint {
 		this.setOpaque(false);
 		this.setBorderPainted(false);
 		this.setVisible(true);
+	}
+	
+	public String toString() {
+		return String.format("%10.6f, %10.6f", this.geoPosition.getLatitude(), this.geoPosition.getLongitude() );
 	}
 	
 

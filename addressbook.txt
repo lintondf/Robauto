@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <AddressBook>
     <persons>
+        <name>3560 Kendal Crossing Ter</name>
+        <address></address>
+        <latitude>37.54811089485884</latitude>
+        <longitude>-77.64058009721339</longitude>
+    </persons>
+    <persons>
         <name>Cabelas</name>
         <address>100 Cabelas Blvd, Scarborough, ME</address>
         <latitude>43.60265</latitude>

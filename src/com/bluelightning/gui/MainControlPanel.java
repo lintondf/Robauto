@@ -139,7 +139,7 @@ public class MainControlPanel extends JPanel {
 //		});
 //		add(bthStopsToBasecamp, gbc_bthStopsToBasecamp);
 		
-		JButton bthPlanRoute = new JButton("Import Basecamp Route");
+		JButton bthPlanRoute = new JButton("Open...");
 		GridBagConstraints gbc_bthPlanRoute = new GridBagConstraints();
 		gbc_bthPlanRoute.fill = GridBagConstraints.HORIZONTAL;
 		gbc_bthPlanRoute.insets = new Insets(0, 0, 5, 0);
@@ -147,7 +147,7 @@ public class MainControlPanel extends JPanel {
 		gbc_bthPlanRoute.gridy = 2;
 		bthPlanRoute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				Events.eventBus.post( new Events.UiEvent("ControlPanel.Route", event));
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.RouteOpen", event));
 			}
 		});
 		add(bthPlanRoute, gbc_bthPlanRoute);

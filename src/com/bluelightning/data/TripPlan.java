@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -442,13 +443,22 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("Robauto TripPlan: ");
-		sb.append(lastModified.toString());
+		sb.append("\nRobauto TripPlan: \n");
+		sb.append(lastModified.toString() + '\n');
+		sb.append("Places changed: " + placesChanged + '\n' );
+		if (route == null) {
+			sb.append( "No route" + '\n');
+		} else {
+			sb.append("  Route with legs:  " + route.getLeg().size() + '\n' );
+		}
 		sb.append('\n');
 		sb.append("  Places: " + toString(places) + '\n');
 		sb.append("  Legs Data:   " + toString(legDataList) + '\n');
 		sb.append("  Legs Summary:   " + toString(legSummary) + '\n');
 		sb.append("  Trip Legs:   " + toString(tripLegs) + '\n');
+		sb.append("  Finalized Days:   " + toString(finalizedDays) + '\n');
+		sb.append("  Finalized Markers:   " + toString(finalizedMarkers) + '\n');
+		sb.append("  Finalized Places:   " + toString(finalizedPlaces) + '\n');
 		return sb.toString();
 	}
 
@@ -508,11 +518,12 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	@SuppressWarnings("unchecked")
 	public static TripPlan load(File file, JFrame frame ) {
+		ProgressMonitorInputStream pmis = null;
 		try {
 			RobautoMain.logger.info("Load started " + file.getName());
 			InputStream fis = new FileInputStream(file);
 			if (frame != null) {
-				ProgressMonitorInputStream pmis = new ProgressMonitorInputStream( frame, "Loading trip plan...", fis);
+				pmis = new ProgressMonitorInputStream( frame, "Loading trip plan...", fis);
 				pmis.getProgressMonitor().setMillisToPopup(100);
 				fis = pmis;
 			}
@@ -549,6 +560,12 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		} catch (Exception x) {
 			RobautoMain.logger.error("Error loading prior trip plan ", x);
 			return new TripPlan();
+		} finally {
+			if (pmis != null)
+				try {
+					pmis.close();
+				} catch (IOException e) {
+				}
 		}
 	}
 

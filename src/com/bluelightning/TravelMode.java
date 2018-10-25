@@ -290,6 +290,7 @@ public class TravelMode extends JPanel {
 		final Report.Day day = report.getDays().get(currentDay);
 		final ArrayList<Route> days = tripPlan.getFinalizedDays();
 		final ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
+		final ArrayList<ArrayList<VisitedPlace>> allPlaces = tripPlan.getFinalizedPlaces();
 		Drive drive = day.steps.get(0).drive;
 		currentFuel = Double.parseDouble(drive.fuelRemaining) + Double.parseDouble(drive.fuelUsed);
 		distanceTraveled = 0.0;
@@ -320,7 +321,7 @@ public class TravelMode extends JPanel {
 				} catch (Exception x) {
 				}
 				map.clearRoute();
-				List<ButtonWaypoint> waypoints = map.showRoute(days, markers, currentDay);
+				List<ButtonWaypoint> waypoints = map.showRoute(days, markers, allPlaces, currentDay);
 				activePanel.getSplitPane().setDividerLocation(0.4);
 				activePanel.getTextPane().setText(travelStatus.toHtml());
 				activePanel.getTextPane().setCaretPosition( 0 );
@@ -516,7 +517,11 @@ public class TravelMode extends JPanel {
 		localHostAddress = localMachine.getHostAddress();
 		File file = new File("gps-trace.obj");
 
-		final File tripPlanFile = new File("RobautoTripPlan.obj");
+		String path = "RobautoTripPlan.obj";
+		if (args.length > 0)
+			path = args[0];
+		System.out.println(path);
+		final File tripPlanFile = new File(path);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {

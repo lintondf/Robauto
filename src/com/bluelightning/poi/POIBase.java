@@ -139,6 +139,13 @@ public abstract class POIBase implements POI, Serializable {
 		double d = curve.getEllipsoidalDistance();
 		return d;
 	}
+	
+	public static double distanceBetween( double lat1, double lon1, double lat2, double lon2 ) {
+		GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84,
+				new GlobalCoordinates(lat1, lon1), new GlobalCoordinates(lat2, lon2));
+		double d = curve.getEllipsoidalDistance();
+		return d;		
+	}
 
 	/**
 	 * Wrapper function to accept the same arguments as the other examples

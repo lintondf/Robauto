@@ -1,6 +1,7 @@
 package seedu.addressbook.data.place;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.map.StopMarker;
@@ -9,6 +10,7 @@ import com.bluelightning.poi.POI.FuelAvailable;
 import com.bluelightning.poi.POIBase;
 
 import seedu.addressbook.data.exception.IllegalValueException;
+import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
 
 public class VisitedPlace extends Place implements Serializable {
@@ -30,6 +32,17 @@ public class VisitedPlace extends Place implements Serializable {
 	public VisitedPlace(ReadOnlyPlace source) {
 		super(source);
 		visitOrder = new Integer(1);
+		Iterator<Tag> it = source.getTags().iterator();
+		this.fuelAvailable = new POI.FuelAvailable();
+		while (it.hasNext()) {
+			Tag tag = it.next();
+			if (tag.tagName.equalsIgnoreCase("Gas")) {
+				this.fuelAvailable.set( this.fuelAvailable.get() + POI.FuelAvailable.HAS_GAS );
+			}
+			if (tag.tagName.equalsIgnoreCase("Diesel")) {
+				this.fuelAvailable.set( this.fuelAvailable.get() + POI.FuelAvailable.HAS_DIESEL );
+			}
+		}
 	}
 	
 	public VisitedPlace( POI poi ) throws IllegalValueException {
@@ -56,14 +69,14 @@ public class VisitedPlace extends Place implements Serializable {
 		super (new Name(stopMarker.getName()),
 				stopMarker.getPosition().getLatitude(),
 				stopMarker.getPosition().getLongitude(),
-				new Address(),
+				new Address(stopMarker.getText()),
 				new UniqueTagList() );
 		visitOrder = new Integer(1);
 	}
 
 	public String toString() {
 		String label = String.format("%s/%s", getName().fullName, getAddress().value );
-		return String.format("%10.6f, %10.6f  %s", getLatitude(), getLongitude(), label);
+		return String.format("%10.6f, %10.6f  %d  %s", getLatitude(), getLongitude(), visitOrder, label).replaceAll("\n", "; ");
 	}
 	
 	public String toGeo() {

@@ -98,9 +98,9 @@ public class RoutePanel extends JPanel {
 			case 1:
 				return place.isPassThru();
 			case 2: 
-				return place.getName().fullName;
+				return place.getName().fullName.replaceAll("\n", "; ");
 			case 3:
-				return place.getAddress().value;
+				return place.getAddress().value.replaceAll("\n", "; ");
 			case 4:
 				return String.format("%12.6f", place.getLatitude() );
 			case 5:

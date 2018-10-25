@@ -322,6 +322,7 @@ public class BaseCamp {
 		}
 		start.setMappedPosition(mappedPosition);
 		leg.setStart(start);
+		mappedPosition = new MappedPosition();
 		mappedPosition.setLatitude( day.trackPoints.get(day.trackPoints.size()-1).getLatitude());
 		mappedPosition.setLongitude( day.trackPoints.get(day.trackPoints.size()-1).getLongitude());
 		End end = new End();
@@ -355,7 +356,7 @@ public class BaseCamp {
 //		System.out.println( turns.get(1) );
 //		System.out.println( viaPoints.get(0) );
 		
-		Here2.reportRoute(route);
+//		Here2.reportRoute(route);
 
 		
 //		if (!garmin.track.isEmpty()) {

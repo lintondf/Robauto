@@ -26,9 +26,9 @@ public class Address implements Serializable {
      */
     public Address(String address) throws IllegalValueException {
         this.isPrivate = false;
-        if (!isValidAddress(address)) {
-            throw new IllegalValueException(MESSAGE_ADDRESS_CONSTRAINTS);
-        }
+//        if (!isValidAddress(address)) {
+//            throw new IllegalValueException(MESSAGE_ADDRESS_CONSTRAINTS);
+//        }
         this.value = address;
     }
 
