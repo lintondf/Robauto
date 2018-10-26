@@ -88,7 +88,7 @@ public class TravelMode extends JPanel {
 
 	public static String hostName = "localhost";
 	public static boolean isSurface = true;
-	public static boolean gpsNormal = false;
+	public static boolean gpsNormal = true;
 
 	public TripPlan tripPlan = null;
 	public Report report = null;
@@ -513,7 +513,7 @@ public class TravelMode extends JPanel {
 			e1.printStackTrace();
 			return;
 		}
-		System.out.println("Hostname of local machine: " + localMachine.getHostName() + " " + localMachine);
+		System.out.println("Hostname of local machine: " + isSurface + " " + localMachine);
 		localHostAddress = localMachine.getHostAddress();
 		File file = new File("gps-trace.obj");
 
@@ -548,7 +548,7 @@ public class TravelMode extends JPanel {
 							FileInputStream fis = new FileInputStream(file);
 							travelMode.gpsOis = new ObjectInputStream( fis );
 						} catch (IOException e) {
-							e.printStackTrace();
+							//e.printStackTrace();
 							travelMode.gpsOis = null;
 						}
 						
