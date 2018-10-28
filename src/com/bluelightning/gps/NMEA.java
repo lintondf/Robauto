@@ -1,5 +1,9 @@
 package com.bluelightning.gps;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -83,7 +87,6 @@ public class NMEA {
         return med;
     }
 
-    @SuppressWarnings("WeakerAccess")
     public class GpsState {
     	public float date = 0.0f;
         public float time = 0.0f;
@@ -122,8 +125,15 @@ public class NMEA {
     private GpsState position = new GpsState();
 
     private static final Map<String, SentenceParser> sentenceParsers = new HashMap<>();
+    
+    private static File nemaLog = new File("nemalog.txt");
+    private static PrintStream logout = null;
 
     NMEA() {
+    	try {
+			logout = new PrintStream( nemaLog );
+		} catch (IOException e) {
+		}
         sentenceParsers.put("GPGGA", new GPGGA());
         sentenceParsers.put("GPGGL", new GPGGL());
         sentenceParsers.put("GPRMC", new GPRMC());
@@ -143,8 +153,9 @@ public class NMEA {
                     sentenceParsers.get(type).parse(tokens, position);
                 } catch (Exception e) {}
             }
-
             position.updatefix();
+            logout.println( line );
+            logout.println( position );
         }
 
         return position;

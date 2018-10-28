@@ -88,7 +88,7 @@ public class TravelMode extends JPanel {
 
 	public static String hostName = "localhost";
 	public static boolean isSurface = true;
-	public static boolean gpsNormal = true;
+	public static boolean gpsNormal = false;
 
 	public TripPlan tripPlan = null;
 	public Report report = null;
@@ -515,7 +515,7 @@ public class TravelMode extends JPanel {
 		}
 		System.out.println("Hostname of local machine: " + isSurface + " " + localMachine);
 		localHostAddress = localMachine.getHostAddress();
-		File file = new File("gps-trace.obj");
+		File file = new File("pwm-trace.obj");
 
 		String path = "RobautoTripPlan.obj";
 		if (args.length > 0)

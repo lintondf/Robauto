@@ -136,7 +136,7 @@ public class GPS {
 	
 	protected Fix lastFix = null;
 	
-	protected void addObservation( Fix fix ) {
+	protected boolean addObservation( Fix fix ) {
 		if (lastFix != null) {
 			GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84, 
 					new GlobalCoordinates(lastFix), new GlobalCoordinates(fix));
@@ -145,12 +145,20 @@ public class GPS {
 				fix.heading = 0.0;
 			double dt = 1e-3 * (double)(fix.date.getTime() - lastFix.date.getTime());
 			if (dt > 0.0 && Double.isFinite(curve.getEllipsoidalDistance())) {
-				fix.movement = curve.getEllipsoidalDistance();
-				fix.speed = fix.movement / dt;
-				Events.eventBus.post( new Events.GpsEvent(fix) );
+				double movement = curve.getEllipsoidalDistance();
+				double speed = fix.movement / dt;
+				if (speed < 120.0 / Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR) {
+					fix.movement = movement;
+					fix.speed = speed;
+					Events.eventBus.post( new Events.GpsEvent(fix) );
+				} else {
+					System.out.printf("EDITED: %s %10.1f %10.0f\n",fix.toString(), speed, movement );
+					return false;
+				}
 			}
 		}
 		lastFix = fix;
+		return true;
 	}
 	
 	Thread readerThread = null;
@@ -162,7 +170,9 @@ public class GPS {
 			System.out.println( state.toString() );
 			if (state.quality > 0) {
 				Fix fix = new Fix( state );
-				addObservation(fix);
+				if (! addObservation(fix) ) {
+					System.out.println( fix.toString() + " / " + state.toString() );
+				}
 			}
 		} );
 		serialGps.start();
@@ -226,6 +236,7 @@ public class GPS {
 			x.printStackTrace();
 			return;
 		}
+		long SPEED_UP = 10;
 		debugThread = new Thread( new Runnable() {
 			@Override
 			public void run() {
@@ -236,10 +247,13 @@ public class GPS {
 						long msRemaining = nextFix.date.getTime() - lastFix.date.getTime();
 						//System.out.println("Waiting: " + nextFix + " / delay = " + msRemaining );
 						if (msRemaining > 0) {
-							Thread.sleep(msRemaining/2);
+							Thread.sleep(msRemaining/SPEED_UP);
 						}
-						addObservation( nextFix );
-						lastFix = nextFix;
+						if (addObservation( nextFix )) {
+							lastFix = nextFix;
+						} else {
+							System.out.println(nextFix.toString() );
+						}
 					} catch (Exception x) {
 						break;
 					}
@@ -276,8 +290,18 @@ public class GPS {
 	
 	public static void main(String[] args) {
 		GPS gps = new GPS();
-//		GPS.Fix fix = GPS.Fix.readGpsDataFile();
-//		System.out.println( fix.toString() );
+		File file = new File("pwm-trace.obj");
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			ObjectInputStream gpsOis = new ObjectInputStream( fis );
+			//gps.debugSetup(gpsOis);
+			while (gpsOis != null) {
+				GPS.Fix nextFix = (GPS.Fix) gpsOis.readObject();
+				System.out.println(nextFix );
+			}
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
