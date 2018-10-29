@@ -54,10 +54,7 @@ import javax.swing.ListSelectionModel;
 
 import java.awt.Font;
 import java.awt.Image;
-import java.rmi.registry.Registry;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -464,6 +461,7 @@ public class TravelMode extends JPanel {
 
 	public static JFrame frame;
 
+	@SuppressWarnings("unused")
 	private static String localHostAddress;
 	protected JScrollPane dayListScrollPane;
 
