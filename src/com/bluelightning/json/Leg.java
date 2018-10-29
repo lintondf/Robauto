@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.bluelightning.PostProcessingEnabler;
-import com.bluelightning.json.Leg.CumulativeTravel;
 import com.bluelightning.poi.POIResult;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -264,6 +263,10 @@ public class Leg implements Serializable, PostProcessingEnabler.PostProcessable,
     }
     
     public static class CumulativeTravel implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		public double  heading;
     	public double  distance;
     	public double  travelTime;

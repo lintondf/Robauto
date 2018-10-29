@@ -2,9 +2,8 @@ package com.bluelightning;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.tools4j.meanvar.MeanVarianceSampler;
 
 import com.bluelightning.GPS.Fix;
-import com.bluelightning.Report.Day;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.TripLeg;
 import com.bluelightning.json.Maneuver;
@@ -86,8 +84,8 @@ public class TravelStatus {
 		public String toHtmlRow() {
 			return String.format("%s%s%s%s%.1f%s%s%.1f%s%s%.1f%s", 
 					oblTD, title, cTD,
-					orTD, Here2.METERS_TO_MILES*planned, cTD,
 					orTD, Here2.METERS_TO_MILES*actual, cTD, 
+					orTD, Here2.METERS_TO_MILES*planned, cTD,
 					orTD, Here2.METERS_TO_MILES*(actual-planned), cTD );
 		}
 	}
@@ -101,8 +99,8 @@ public class TravelStatus {
 		public String toHtmlRow() {
 			return String.format("%s%s%s%s%s%s%s%s%s%s%s%s", 
 					oblTD, title, cTD,
-					orTD, Here2.toPeriod(planned), cTD,
 					orTD, Here2.toPeriod(actual), cTD,
+					orTD, Here2.toPeriod(planned), cTD,
 					orTD, toDeltaPeriod(actual-planned), cTD );
 		}
 	}
@@ -220,13 +218,18 @@ public class TravelStatus {
 		}
 	}
 
+	final static SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss  EEE, MMM dd");
 	
+	@SuppressWarnings("deprecation")
 	public String toHtml() {
 		if (theme == null) {
 			theme = new Theme();
 		}
 		Chunk c = theme.makeChunk("report#report");
 		Chunk t = theme.makeChunk("report#travel");
+		
+		Date now = new Date();
+		t.set("time", format.format(now) );
 		
 		t.set("currentSpeed", String.format("%3.0f", speed * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR ));
 		t.set("legAverageSpeed", "   ");
@@ -270,22 +273,23 @@ public class TravelStatus {
 	}
 
 	
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		File tripLegsFile = new File("TripLegs.obj");
 		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.TravelStatus");
 		ArrayList<TripLeg> tripLegs = null;
-		if (false) {
-			TripPlan tripPlan = TripPlan.load( new File("RobautoTripPlan.obj"), null );
-			tripLegs = tripPlan.getTripLegs();
-			try {
-				FileOutputStream fos = new FileOutputStream(tripLegsFile);
-				ObjectOutputStream out = new ObjectOutputStream(fos);
-				out.writeObject(tripLegs);
-				out.close();
-			} catch (Exception x) {
-				x.printStackTrace();
-			}
-		}
+//		if (false) {
+//			TripPlan tripPlan = TripPlan.load( new File("RobautoTripPlan.obj"), null );
+//			tripLegs = tripPlan.getTripLegs();
+//			try {
+//				FileOutputStream fos = new FileOutputStream(tripLegsFile);
+//				ObjectOutputStream out = new ObjectOutputStream(fos);
+//				out.writeObject(tripLegs);
+//				out.close();
+//			} catch (Exception x) {
+//				x.printStackTrace();
+//			}
+//		}
 
 		try {
 			FileInputStream fis = new FileInputStream(tripLegsFile);

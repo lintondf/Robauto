@@ -21,6 +21,10 @@ import com.google.gson.annotations.SerializedName;
  */
 public class GeoPosition implements Serializable, GeodeticPosition {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@SerializedName(value="latitude", alternate={"Latitude"})
 	protected double latitude;
 	@SerializedName(value="longitude", alternate={"Longitude"})

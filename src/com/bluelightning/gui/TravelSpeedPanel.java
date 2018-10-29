@@ -1,6 +1,5 @@
 package com.bluelightning.gui;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import java.awt.GridBagLayout;
@@ -14,6 +13,10 @@ import java.awt.Insets;
 import javax.swing.JTextField;
 
 public class TravelSpeedPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JTextField expectedSpeed;
 	private JTextField averageSpeed;
 	private JTextField currentSpeed;

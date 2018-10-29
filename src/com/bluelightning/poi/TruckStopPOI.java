@@ -12,7 +12,6 @@ import java.util.TreeSet;
 import javax.imageio.ImageIO;
 
 import com.bluelightning.map.ButtonWaypoint;
-import com.bluelightning.poi.POI.FuelAvailable;
 import com.opencsv.CSVReader;
 
 import seedu.addressbook.data.exception.IllegalValueException;
@@ -21,6 +20,10 @@ import seedu.addressbook.data.tag.UniqueTagList;
 
 public class TruckStopPOI extends POIBase {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected String locationId;
 	protected ArrayList<String> attributes = new ArrayList<String>();
 	protected String address;

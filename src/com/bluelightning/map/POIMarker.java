@@ -8,16 +8,9 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-
 import org.jxmapviewer.viewer.GeoPosition;
-import org.jxmapviewer.viewer.Waypoint;
-
 import com.bluelightning.Events;
-import com.bluelightning.LatLon;
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIResult;
 
@@ -27,6 +20,10 @@ import com.bluelightning.poi.POIResult;
  */
 public class POIMarker extends ButtonWaypoint {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	POIResult result;
 	
 	public POIMarker(POIResult result) {

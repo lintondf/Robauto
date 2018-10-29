@@ -47,7 +47,7 @@ public class CoPilot13Format  {
     private static final String STATE = "State";
     private static final String ZIP = "Zip";
     private static final String CITY = "City";
-    private static final String COUNTY = "County";
+    //private static final String COUNTY = "County";
     private static final String ADDRESS = "Address"; // houseNumber<space>street
     private static final String SHOW = "Show";
     private static final String SEQUENCE = "Sequence";
@@ -139,7 +139,7 @@ public class CoPilot13Format  {
         List<VisitedPlace> positions = new ArrayList<>();
         
         Map<String, String> map = null;
-        String routeName = null;
+        //String routeName = null;
 
     	reader.mark(4);
     	int first = reader.read();
@@ -156,7 +156,7 @@ public class CoPilot13Format  {
             //noinspection StatementWithEmptyBody
             if (isDataVersion(line) || line.startsWith(END_TRIP) || line.startsWith(END_STOP_OPT)) {
             } else if (line.startsWith(START_TRIP)) {
-                routeName = trim(parseValue(line));
+                //routeName = trim(parseValue(line));
                 map = tripMap;
             } else if (line.startsWith(START_STOP) || line.startsWith(START_STOP_OPT)) {
                 map = new HashMap<>();
@@ -210,12 +210,12 @@ public class CoPilot13Format  {
         String state = safeTrim(map.get(STATE));
         String zip = safeTrim(map.get(ZIP));
         String city = safeTrim(map.get(CITY));
-        String county = safeTrim(map.get(COUNTY));
+//        String county = safeTrim(map.get(COUNTY));
         String streetAddress = safeTrim(map.get(ADDRESS));
         String address = String.format("%s, %s, %s, %s", streetAddress, city, state, zip );
-        String description = (state != null ? state + (zip != null ? "-" : " ") : "") +
-                (zip != null ? zip + " " : "") + (city != null ? city : "") +
-                (county != null ? ", " + county : "") + (streetAddress != null ? ", " + streetAddress : "");
+//        String description = (state != null ? state + (zip != null ? "-" : " ") : "") +
+//                (zip != null ? zip + " " : "") + (city != null ? city : "") +
+//                (county != null ? ", " + county : "") + (streetAddress != null ? ", " + streetAddress : "");
         VisitedPlace place = new VisitedPlace();
         try {
 			place.setName( new Name(name) );

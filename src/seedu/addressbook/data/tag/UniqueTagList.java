@@ -15,10 +15,20 @@ import java.util.*;
 public class UniqueTagList implements Iterable<Tag>, Serializable {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Signals that an operation would have violated the 'no duplicates' property of the list.
      */
     public static class DuplicateTagException extends DuplicateDataException {
-        protected DuplicateTagException() {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		protected DuplicateTagException() {
             super("Operation would result in duplicate tags");
         }
     }
@@ -27,7 +37,12 @@ public class UniqueTagList implements Iterable<Tag>, Serializable {
      * Signals that an operation targeting a specified Tag in the list would fail because
      * there is no such matching Tag in the list.
      */
-    public static class TagNotFoundException extends Exception {}
+    public static class TagNotFoundException extends Exception {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;}
 
     private final List<Tag> internalList = new ArrayList<>();
 

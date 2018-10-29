@@ -9,16 +9,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.EnumMap;
-
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import org.jxmapviewer.viewer.GeoPosition;
-
-import com.bluelightning.RobautoMain;
 
 /**
  * @author NOOK
@@ -26,6 +21,10 @@ import com.bluelightning.RobautoMain;
  */
 public class StopMarker extends ButtonWaypoint {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final int ORIGIN    = 0;
 	public static final int DRIVERS   = 1;
 	public static final int FUEL      = 2;

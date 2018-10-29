@@ -1,6 +1,5 @@
 package seedu.addressbook.data.place;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 import seedu.addressbook.data.exception.IllegalValueException;

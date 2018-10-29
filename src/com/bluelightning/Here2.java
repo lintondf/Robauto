@@ -1,21 +1,14 @@
 package com.bluelightning;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -26,19 +19,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.json.*;
 import com.bluelightning.json.Leg.CumulativeTravel;
-import com.bluelightning.map.POIMarker;
-import com.bluelightning.poi.POI;
-import com.bluelightning.poi.POIBase;
-import com.bluelightning.poi.POISet;
-import com.bluelightning.poi.SamsClubPOI;
-import com.bluelightning.poi.TruckStopPOI;
-import com.bluelightning.poi.WalmartPOI;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -131,6 +116,7 @@ public class Here2 {
 		return nvps;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static String getRestResponse(String urlBase, List<BasicNameValuePair> parameters) {
 		String response = null;
 		CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -315,36 +301,36 @@ public class Here2 {
 //		LatLon lee = Here.geocodeLookup("Lee Service Plaza Eastbound");
 //		System.out.println( lee  );
 	
-	public static Route computeRoute() {
-		HereRoutePlus plus = null;
-		//try { new File("route.json").delete(); } catch (Exception x) {}
-		String[] pointAddresses = {
-				"3533 Carambola Cir, Melbourne, FL",
-				"2110 Bells Hwy, Walterboro, SC 29488",
-				"125 Riverside Dr, Banner Elk, NC",
-				"2350 So Pleasant Valley Rd, Winchester, VA 22601",
-				"10654 Breezewood Dr, Woodstock, MD 21163-1317",
-				"1365 Boston Post Road, Milford, CT",
-				"836 Palmer Avenue, Falmouth, MA" ,
-				"100 Cabelas Blvd, Scarborough, ME",
-				"7 Manor Lane, Sullivan, ME"			
-		};
-		try {
-			String json = IOUtils.toString(new FileInputStream("route.json"), "UTF-8");
-			HereRoute hereRoute = (HereRoute) Here2.gson.fromJson(json, HereRoute.class);
-			if (hereRoute == null || hereRoute.getResponse() == null)
-				throw new NullPointerException();
-			plus.route = hereRoute;
-			plus.json = json;
-		} catch (Exception x) {
-			ArrayList<LatLon> points = new ArrayList<>();
-			for (String address : pointAddresses) {
-				points.add(geocodeLookup(address));
-			}
-			plus = getRoute( points, routeOptions );
-		}
-		return computeRouteBase( plus.route );
-	}
+//	public static Route computeRoute() {
+//		HereRoutePlus plus = null;
+//		//try { new File("route.json").delete(); } catch (Exception x) {}
+//		String[] pointAddresses = {
+//				"3533 Carambola Cir, Melbourne, FL",
+//				"2110 Bells Hwy, Walterboro, SC 29488",
+//				"125 Riverside Dr, Banner Elk, NC",
+//				"2350 So Pleasant Valley Rd, Winchester, VA 22601",
+//				"10654 Breezewood Dr, Woodstock, MD 21163-1317",
+//				"1365 Boston Post Road, Milford, CT",
+//				"836 Palmer Avenue, Falmouth, MA" ,
+//				"100 Cabelas Blvd, Scarborough, ME",
+//				"7 Manor Lane, Sullivan, ME"			
+//		};
+//		try {
+//			String json = IOUtils.toString(new FileInputStream("route.json"), "UTF-8");
+//			HereRoute hereRoute = (HereRoute) Here2.gson.fromJson(json, HereRoute.class);
+//			if (hereRoute == null || hereRoute.getResponse() == null)
+//				throw new NullPointerException();
+//			plus.route = hereRoute;
+//			plus.json = json;
+//		} catch (Exception x) {
+//			ArrayList<LatLon> points = new ArrayList<>();
+//			for (String address : pointAddresses) {
+//				points.add(geocodeLookup(address));
+//			}
+//			plus = getRoute( points, routeOptions );
+//		}
+//		return computeRouteBase( plus.route );
+//	}
 	
 	
 	public static Route computeRoute(TripPlan tripPlan) {
@@ -413,8 +399,8 @@ public class Here2 {
 			System.out.println( waypoint );
 		}
 		System.out.printf("%d legs\n", route.getLeg().size() );
-		List<GeoPosition> routeShape = route.getShape();
-		int pointIndex = 1;
+		//List<GeoPosition> routeShape = route.getShape();
+		//int pointIndex = 1;
 		for (Leg leg : route.getLeg()) {
 			System.out.println( leg.getSummary() );
 			System.out.printf("%d links\n", leg.getLink().size() );

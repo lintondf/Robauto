@@ -9,7 +9,6 @@ import seedu.addressbook.storage.StorageFile;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Represents the main Logic of the AddressBook.
@@ -97,11 +96,11 @@ public class Logic {
         return result;
     }
 
-    /** Updates the {@link #lastShownList} if the result contains a list of Persons. */
-    private void recordResult(CommandResult result) {
-        final Optional<List<? extends ReadOnlyPlace>> personList = result.getRelevantPersons();
-        if (personList.isPresent()) {
-            lastShownList = personList.get();
-        }
-    }
+//    /** Updates the {@link #lastShownList} if the result contains a list of Persons. */
+//    private void recordResult(CommandResult result) {
+//        final Optional<List<? extends ReadOnlyPlace>> personList = result.getRelevantPersons();
+//        if (personList.isPresent()) {
+//            lastShownList = personList.get();
+//        }
+//    }
 }

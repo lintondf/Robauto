@@ -10,7 +10,11 @@ import seedu.addressbook.data.exception.IllegalValueException;
  */
 public class Tag implements Serializable {
 
-    public static final String MESSAGE_TAG_CONSTRAINTS = "Tags names should be alphanumeric";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public static final String MESSAGE_TAG_CONSTRAINTS = "Tags names should be alphanumeric";
     public static final String TAG_VALIDATION_REGEX = "\\p{Alnum}+";
 
     public final String tagName;

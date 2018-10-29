@@ -5,121 +5,70 @@ package com.bluelightning.googlemaps;
  */
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.security.cert.CertificateException;
-import javax.security.cert.X509Certificate;
-import javax.swing.event.ListSelectionEvent;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
 import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.maps.DirectionsApi;
-import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
-import com.google.maps.GeocodingApi;
-import com.google.maps.PendingResult;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.PlacesApi;
 import com.google.maps.RoadsApi;
 import com.google.maps.errors.ApiException;
-import com.google.maps.model.DirectionsLeg;
-import com.google.maps.model.DirectionsResult;
-import com.google.maps.model.DirectionsRoute;
-import com.google.maps.model.DirectionsStep;
-import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlaceType;
 import com.google.maps.model.PlacesSearchResponse;
 import com.google.maps.model.PlacesSearchResult;
 import com.google.maps.model.SnappedPoint;
-import com.google.maps.model.TransitMode;
-import com.google.maps.model.TransitRoutingPreference;
-import com.google.maps.model.TravelMode;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.x5.util.Base64;
 
 import ch.qos.logback.classic.LoggerContext;
 
+@SuppressWarnings("deprecation")
 public class GoogleMaps {
 	
 	static final String apiKey = "AIzaSyCA9cRJXpWLwxM4IccF9o3BCp2varIqm24";
 	
 	
-	@SuppressWarnings("deprecation")
 	public static CloseableHttpClient createHttpClient() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 	    HttpClientBuilder b = HttpClientBuilder.create();
 	 
 	    // setup a Trust Strategy that allows all certificates.
 	    //
 	    SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
-	        public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-	            return true;
-	        }
+	    	
+//	        public boolean isTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+//	            return true;
+//	        }
 
 			@Override
 			public boolean isTrusted(java.security.cert.X509Certificate[] arg0, String arg1)
@@ -202,81 +151,82 @@ public class GoogleMaps {
 	}
 	
 	
-	private static String mapToJson( String mapUrl ) {
-		String base = "https://mapstogpx.com/load.php" + 
-				"?d=default" + 
-				"&lang=en" + 
-				"&elev=off" + 
-				"&tmode=off" + 
-				"&pttype=route" + 
-				"&o=json" + 
-				"&cmt=on" + 
-				"&desc=on" + 
-				"&descasname=off" + 
-				"&w=on" + 
-				"&dtstr=20170411_083945" + 
-				"&gdata=";
-		mapUrl = mapUrl.replace("https://www.google.com/maps/dir/", "");
-		try {
-			URL url = new URL(base + URLEncoder.encode(mapUrl) );
-			System.out.println(url);
-//			url = new URL("https://mapstogpx.com/load.php?d=default&lang=en&elev=on&tmode=off&pttype=route&o=json&cmt=on&desc=on&descasname=off&w=on&dtstr=20170411_091225&gdata=3533%2BCarambola%2BCir%2C%2BMelbourne%2C%2BFL%2B32940%2FNew%2BBaltimore%2BTravel%2BPlaza%2C%2B127%2BNew%2BYork%2BState%2BThruway%2C%2BHannacroix%2C%2BNY%2B12087%2F7%2BManor%2BLn%2C%2BSullivan%2C%2BME%2B04664%2F%4036.1938353%2C-83.9469478%2C5z%2Fam%3Dt%2Fdata%3D!3m1!4b1!4m25!4m24!1m10!1m1!1s0x88de06ef0ba04fe1%3A0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!3m4!1m2!1d-77.2875753!2d37.4965621!3s0x89b11b7c8ac52005%3A0x8afb4d10805f3f31!1m5!1m1!1s0x89dde9a4a6faef3d%3A0xac1113996de4a061!2m2!1d-73.8055448!2d42.4279567!1m5!1m1!1s0x4caee844875d1295%3A0xd2bc1dd5aaaf365d!2m2!1d-68.2087797!2d44.523031!3e0%3Fhl%3Den-US");
+//	@SuppressWarnings("deprecation")
+//	private static String mapToJson( String mapUrl ) {
+//		String base = "https://mapstogpx.com/load.php" + 
+//				"?d=default" + 
+//				"&lang=en" + 
+//				"&elev=off" + 
+//				"&tmode=off" + 
+//				"&pttype=route" + 
+//				"&o=json" + 
+//				"&cmt=on" + 
+//				"&desc=on" + 
+//				"&descasname=off" + 
+//				"&w=on" + 
+//				"&dtstr=20170411_083945" + 
+//				"&gdata=";
+//		mapUrl = mapUrl.replace("https://www.google.com/maps/dir/", "");
+//		try {
+//			URL url = new URL(base + URLEncoder.encode(mapUrl) );
 //			System.out.println(url);
-			CloseableHttpClient httpClient = createHttpClient();
-			
-			HttpGet  conn = new HttpGet(url.toString());
-			CloseableHttpResponse response = httpClient.execute(conn);
-			int responseCode = response.getStatusLine().getStatusCode();
-			if (responseCode == 200) {
-				if ( response.getEntity().isStreaming() ) {
-					StringBuffer sb = new StringBuffer();
-					BufferedReader rd = new BufferedReader( new InputStreamReader(response.getEntity().getContent()));
-					String line;
-					while ((line = rd.readLine()) != null) {
-					   sb.append(line);
-					}
-					rd.close();	
-					JsonParser parser = new JsonParser();
-					JsonElement element = parser.parse(sb.toString());
-
-					Gson gson = new GsonBuilder().setPrettyPrinting().create();
-					String json = gson.toJson(element);
-					return json;
-				}
-				System.err.println( response.getEntity().toString() );
-			}
-			System.err.println("updateUser Response: " + response);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (KeyManagementException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+////			url = new URL("https://mapstogpx.com/load.php?d=default&lang=en&elev=on&tmode=off&pttype=route&o=json&cmt=on&desc=on&descasname=off&w=on&dtstr=20170411_091225&gdata=3533%2BCarambola%2BCir%2C%2BMelbourne%2C%2BFL%2B32940%2FNew%2BBaltimore%2BTravel%2BPlaza%2C%2B127%2BNew%2BYork%2BState%2BThruway%2C%2BHannacroix%2C%2BNY%2B12087%2F7%2BManor%2BLn%2C%2BSullivan%2C%2BME%2B04664%2F%4036.1938353%2C-83.9469478%2C5z%2Fam%3Dt%2Fdata%3D!3m1!4b1!4m25!4m24!1m10!1m1!1s0x88de06ef0ba04fe1%3A0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!3m4!1m2!1d-77.2875753!2d37.4965621!3s0x89b11b7c8ac52005%3A0x8afb4d10805f3f31!1m5!1m1!1s0x89dde9a4a6faef3d%3A0xac1113996de4a061!2m2!1d-73.8055448!2d42.4279567!1m5!1m1!1s0x4caee844875d1295%3A0xd2bc1dd5aaaf365d!2m2!1d-68.2087797!2d44.523031!3e0%3Fhl%3Den-US");
+////			System.out.println(url);
+//			CloseableHttpClient httpClient = createHttpClient();
+//			
+//			HttpGet  conn = new HttpGet(url.toString());
+//			CloseableHttpResponse response = httpClient.execute(conn);
+//			int responseCode = response.getStatusLine().getStatusCode();
+//			if (responseCode == 200) {
+//				if ( response.getEntity().isStreaming() ) {
+//					StringBuffer sb = new StringBuffer();
+//					BufferedReader rd = new BufferedReader( new InputStreamReader(response.getEntity().getContent()));
+//					String line;
+//					while ((line = rd.readLine()) != null) {
+//					   sb.append(line);
+//					}
+//					rd.close();	
+//					JsonParser parser = new JsonParser();
+//					JsonElement element = parser.parse(sb.toString());
+//
+//					Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//					String json = gson.toJson(element);
+//					return json;
+//				}
+//				System.err.println( response.getEntity().toString() );
+//			}
+//			System.err.println("updateUser Response: " + response);
+//		} catch (MalformedURLException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (KeyManagementException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (NoSuchAlgorithmException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (KeyStoreException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
 	
-	private static List<SnappedPoint> snapToRoads(GeoApiContext context, List<LatLng> pathList ) throws ApiException, InterruptedException, IOException {
-		List<SnappedPoint> path = new ArrayList<SnappedPoint>();
-		int j = 0;
-		LatLng[] empty = new LatLng[100];
-		for (int i = 0; (i+100) < pathList.size(); i += 100) {
-			j = i + 100;
-			path.addAll( Arrays.asList(
-					RoadsApi.snapToRoads(context, pathList.subList(i, j).toArray(empty) ).await() ) );
-		}
-		empty = new LatLng[pathList.size() - j];
-		path.addAll( Arrays.asList(
-				RoadsApi.snapToRoads(context, pathList.subList(j, pathList.size()).toArray(empty) ).await() ) );
-		return path;
-	}
+//	private static List<SnappedPoint> snapToRoads(GeoApiContext context, List<LatLng> pathList ) throws ApiException, InterruptedException, IOException {
+//		List<SnappedPoint> path = new ArrayList<SnappedPoint>();
+//		int j = 0;
+//		LatLng[] empty = new LatLng[100];
+//		for (int i = 0; (i+100) < pathList.size(); i += 100) {
+//			j = i + 100;
+//			path.addAll( Arrays.asList(
+//					RoadsApi.snapToRoads(context, pathList.subList(i, j).toArray(empty) ).await() ) );
+//		}
+//		empty = new LatLng[pathList.size() - j];
+//		path.addAll( Arrays.asList(
+//				RoadsApi.snapToRoads(context, pathList.subList(j, pathList.size()).toArray(empty) ).await() ) );
+//		return path;
+//	}
 	/*
 <step maneuver="DEPART" meters="526">
 	Head 
@@ -365,10 +315,11 @@ public class GoogleMaps {
 	
 	protected static boolean roadsFromPoints(GeoApiContext context) {
 		ArrayList<GlobalCoordinates> points = new ArrayList<GlobalCoordinates>();
+		BufferedReader b = null;
 		try {
             File f = new File("../RobautoFX/Directions from mymaps.kml");
 
-            BufferedReader b = new BufferedReader(new FileReader(f));
+            b = new BufferedReader(new FileReader(f));
 
             String line = "";
             while ((line = b.readLine()) != null) {
@@ -386,6 +337,12 @@ public class GoogleMaps {
             }
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (b != null)
+				try {
+					b.close();
+				} catch (IOException e) {
+				}
 		}
 		
 		double cumd = 0.0;
@@ -424,7 +381,7 @@ public class GoogleMaps {
 			angle = -angle;
 		}
 		sb.append( String.format("%d", (int) Math.floor(angle)) );
-		sb.append("°");
+		sb.append("ï¿½");
 		angle = 60.0 * (angle - Math.floor(angle));
 		sb.append( String.format("%d", (int) Math.floor(angle)) );
 		sb.append("'");
@@ -440,7 +397,7 @@ public class GoogleMaps {
 				toDms(29.697742, "NS"), toDms(-81.326182, "EW")) );
 		
 		//Google Maps to Lat/Lng: -81.326182	29.697742
- 		//https://www.google.com/maps/place/29°41'51.9"N+81°19'34.3"W
+ 		//https://www.google.com/maps/place/29ï¿½41'51.9"N+81ï¿½19'34.3"W
 		LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		loggerContext.stop();
 //		String mapUrl = "https://www.google.com/maps/dir/3533+Carambola+Cir,+Melbourne,+FL+32940,+USA/Jekyll+Island+Campground,+Riverview+Drive,+Brunswick,+GA/Walmart+Vision+%26+Glasses,+Smithfield,+NC/38.67118,-77.17452/Patapsco+Valley+State+Park,+8020+Baltimore+National+Pike,+Ellicott+City,+MD+21043/@33.6805702,-83.7376603,6z/am=t/data=!4m27!4m26!1m5!1m1!1s0x88de06ef0ba04fe1:0x387686b6146acca3!2m2!1d-80.7531311!2d28.23448!1m5!1m1!1s0x88e4dbc92d7c68d7:0x29d0308d10819d72!2m2!1d-81.4128!2d31.1072326!1m5!1m1!1s0x89ac6d5928ae5d0f:0x6cd3177e217eabf7!2m2!1d-78.3093638!2d35.5232034!1m0!1m5!1m1!1s0x89c81f7c74c6818d:0xbb46cc34aae2e03f!2m2!1d-76.7828076!2d39.2885596!3e0"; 
@@ -499,6 +456,7 @@ public class GoogleMaps {
 		     while ((nextLine = reader.readNext()) != null) {
 		        places.add(nextLine[0]);
 		     }
+		     reader.close();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -542,7 +500,7 @@ public class GoogleMaps {
 //		}
 		if (start2 != null) return;
 		
-		GeocodingResult[] results;
+		//GeocodingResult[] results;
 		try {
 ////			results = GeocodingApi.geocode(context,
 ////			    "1600 Amphitheatre Parkway Mountain View, CA 94043").await();
@@ -584,7 +542,7 @@ public class GoogleMaps {
 					.radius(1000)
 					.awaitIgnoreError();
 			
-			final String poi = "NEW BALTIMORE SERVICE PLAZA";
+			//final String poi = "NEW BALTIMORE SERVICE PLAZA";
 			
 			for (PlacesSearchResult placeResult : placeResponse.results) {
 				System.out.println( placeResult.name + " | " + placeResult.vicinity + " | " + placeResult.formattedAddress );

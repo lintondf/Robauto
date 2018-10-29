@@ -1,7 +1,5 @@
 package com.bluelightning.poi;
 
-import java.awt.geom.Point2D;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,13 +10,11 @@ import java.util.Map.Entry;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
-import com.bluelightning.PlannerMode;
 import com.bluelightning.json.BoundingBox;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.Route;
 import com.bluelightning.json.Leg.CumulativeTravel;
-import com.opencsv.CSVReader;
 
 public class POISet extends ArrayList<POI> {
 

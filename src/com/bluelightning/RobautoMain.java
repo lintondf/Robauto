@@ -1,51 +1,8 @@
 package com.bluelightning;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Toolkit;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.rmi.RMISecurityManager;
-import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
-import java.text.ParseException;
-import java.util.Arrays;
-
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.LookAndFeel;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.plaf.ColorUIResource;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
-import javax.swing.plaf.nimbus.NimbusStyle;
-import javax.swing.plaf.synth.ColorType;
-import javax.swing.plaf.synth.SynthContext;
-import javax.swing.plaf.synth.SynthLookAndFeel;
-import javax.swing.plaf.synth.SynthStyle;
-import javax.swing.plaf.synth.SynthStyleFactory;
-
 import org.slf4j.Logger;
 
-import com.bluelightning.Events.StopsCommitEvent;
-import com.bluelightning.Events.UiEvent;
-import com.bluelightning.PlannerMode.UiHandler;
 import com.bluelightning.data.TripPlan;
-import com.google.common.eventbus.Subscribe;
-
-import javafx.scene.layout.Region;
-//import sun.net.www.ParseUtil;
-//import sun.rmi.registry.RegistryImpl;
 
 public class RobautoMain {
 	

@@ -3,22 +3,12 @@
  */
 package com.bluelightning;
 
-import java.awt.BorderLayout;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
@@ -39,18 +29,12 @@ import org.jxmapviewer.viewer.WaypointPainter;
 
 import seedu.addressbook.data.place.VisitedPlace;
 
-import com.bluelightning.Garmin.TrackPoint;
-import com.bluelightning.gui.MainControlPanel;
-import com.bluelightning.gui.MainPanel;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Route;
-import com.bluelightning.map.POIMarker;
 import com.bluelightning.map.RoutePainter;
 import com.bluelightning.map.StopMarker;
-import com.bluelightning.map.SwingMarker;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.ButtonWaypointOverlayPainter;
-import com.sun.prism.paint.Color;
 
 
 /**

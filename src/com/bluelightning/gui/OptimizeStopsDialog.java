@@ -2,13 +2,7 @@ package com.bluelightning.gui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.io.FileInputStream;
-import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -19,7 +13,6 @@ import java.util.TreeSet;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -28,40 +21,24 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import org.apache.commons.io.IOUtils;
-import org.jxmapviewer.viewer.GeoPosition;
-
-import com.bluelightning.DouglasPeuckerReducer;
 import com.bluelightning.Events;
-import com.bluelightning.GeodeticPosition;
 import com.bluelightning.Here2;
 import com.bluelightning.PlannerMode;
 import com.bluelightning.OptimizeStops;
 import com.bluelightning.Permutations;
 import com.bluelightning.Report;
 import com.bluelightning.RobautoMain;
-import com.bluelightning.TripPlanUpdate;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.DriverAssignments;
-import com.bluelightning.data.TripPlan.DriverAssignments.Turn;
-import com.bluelightning.data.TripPlan.LegData;
 import com.bluelightning.data.TripPlan.LegSummary;
 import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.data.TripPlan.TripLeg;
 import com.bluelightning.Events.AddAddressStopEvent;
 import com.bluelightning.Events.AddManualStopEvent;
-import com.bluelightning.Events.UiEvent;
-import com.bluelightning.PlannerMode.MarkerKinds;
-import com.bluelightning.json.HereRoute;
 import com.bluelightning.json.Leg;
-import com.bluelightning.json.Route;
-import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POIResult;
-import com.bluelightning.poi.POISet;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
-
-import sun.swing.DefaultLookup;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JSplitPane;
@@ -71,8 +48,6 @@ import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -399,7 +374,7 @@ public class OptimizeStopsDialog extends JDialog {
 			System.out.println(event);
 			if (!event.getValueIsAdjusting()) {
 				System.out.println(event);
-				int which = stopsTable.getSelectedRow();
+				/*int which =*/stopsTable.getSelectedRow();
 			}
 		}
 
@@ -582,6 +557,10 @@ public class OptimizeStopsDialog extends JDialog {
 
 	protected static class TriStateBooleanRenderer extends JCheckBox implements TableCellRenderer {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		static Color unselectedBackground;
 
 		public TriStateBooleanRenderer() {
@@ -835,6 +814,11 @@ public class OptimizeStopsDialog extends JDialog {
 					{
 						triStateRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 						stopsTable = new JTable(stopsTableModel) {
+							/**
+							 * 
+							 */
+							private static final long serialVersionUID = 1L;
+
 							@Override
 							public TableCellRenderer getCellRenderer(int row, int column) {
 								if (column == 1) {

@@ -23,7 +23,7 @@ public class Copilot {
 	public static void main(String[] args) {
 		CoPilot13Format format = new CoPilot13Format();
 		String path = "\\\\Surfacepro3\\na\\save\\gpstrip.trp";
-		String opath = "/Users/lintondf/GIT/RobautoFX/adb/NA_save/gpstrip2.trp";
+		//String opath = "/Users/lintondf/GIT/RobautoFX/adb/NA_save/gpstrip2.trp";
 		try {
 			List<VisitedPlace> positions = format.read( new BufferedReader(new InputStreamReader( new FileInputStream(path), CoPilot13Format.UTF16LE_ENCODING)));//, );
 			positions.forEach(System.out::println);

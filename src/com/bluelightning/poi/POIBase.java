@@ -4,11 +4,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.FileReader;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.imageio.ImageIO;
 
 import org.gavaghan.geodesy.Ellipsoid;
@@ -18,10 +14,6 @@ import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.map.ButtonWaypoint;
-import com.bluelightning.map.SwingMarker;
-import com.bluelightning.poi.POI.FuelAvailable;
-import com.opencsv.CSVReader;
-
 import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
 

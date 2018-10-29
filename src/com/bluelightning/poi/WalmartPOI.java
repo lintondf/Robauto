@@ -6,15 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-
-import org.jxmapviewer.viewer.GeoPosition;
-
 import com.bluelightning.map.ButtonWaypoint;
-import com.bluelightning.map.SwingMarker;
-import com.bluelightning.poi.POI.FuelAvailable;
 import com.opencsv.CSVReader;
 
 import seedu.addressbook.data.exception.IllegalValueException;
@@ -24,6 +16,10 @@ import seedu.addressbook.data.tag.UniqueTagList;
 
 public class WalmartPOI extends POIBase {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected String  storeId;
 	protected boolean hasGas;
 	protected boolean hasDiesel;

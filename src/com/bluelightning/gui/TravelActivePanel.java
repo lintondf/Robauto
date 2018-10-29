@@ -4,16 +4,18 @@ import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
 
-import javax.swing.JButton;
 import javax.swing.JSplitPane;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.text.DefaultCaret;
 
 public class TravelActivePanel extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected JPanel leftPanel;
 	protected JProgressBar progressBar;
 	protected JTextPane textPane;

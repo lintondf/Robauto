@@ -6,7 +6,6 @@ import seedu.addressbook.data.place.*;
 import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlValue;
 import java.util.ArrayList;

@@ -5,9 +5,6 @@ package com.bluelightning.poi;
 
 import java.io.FileReader;
 
-import com.bluelightning.Here2;
-import com.bluelightning.LatLon;
-import com.bluelightning.poi.POI.FuelAvailable;
 import com.opencsv.CSVReader;
 
 import seedu.addressbook.data.exception.IllegalValueException;
@@ -20,6 +17,10 @@ import seedu.addressbook.data.tag.UniqueTagList;
  */
 public class RestAreaPOI extends POIBase {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected String  address;
 	protected String  state;
 	protected String  highway;

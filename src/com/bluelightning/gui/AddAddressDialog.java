@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -19,9 +18,6 @@ import com.bluelightning.Events;
 import com.bluelightning.Here2;
 import com.bluelightning.LatLon;
 import com.bluelightning.RobautoMain;
-import com.bluelightning.data.TripPlan.StopData;
-import com.bluelightning.Events.AddWaypointEvent;
-
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.place.Address;
 import seedu.addressbook.data.place.Name;
@@ -40,6 +36,10 @@ import javax.swing.JTextField;
 
 public class AddAddressDialog extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	protected JTable addressesTable;
 

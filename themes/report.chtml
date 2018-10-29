@@ -19,6 +19,14 @@
 	<table class="bpTable">
 	<thead>
 	<TR>
+		<TD colspan="4" style='font-size:48pt;font-weight:bolder;text-align:center'>{$time}</TD>
+	</TR>
+	</thead>
+	</table>
+<br/>	
+	<table class="bpTable">
+	<thead>
+	<TR>
 		<TD style='font-size:48pt;font-weight:bolder;text-align:center'>Speed [mph]</TD>
 		<TD style='font-size:48pt;font-weight:bolder;text-align:center'>{$currentSpeed}</TD>
 		<TD style='font-size:48pt;font-weight:bolder;text-align:center'>{$legAverageSpeed}</TD>
@@ -38,7 +46,7 @@
 <br/>	
 	<table class="bpTable">
 	<thead>
-	<TR><TD style='font-size:48pt;font-weight:bolder;text-align:center'></TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Total</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>So Far</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Delta</TD></TR>
+	<TR><TD style='font-size:48pt;font-weight:bolder;text-align:center'></TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>So Far</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Total</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Delta</TD></TR>
 	</thead>
 		<tbody>
 			{$trackerRows}

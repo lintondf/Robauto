@@ -18,7 +18,11 @@ import com.bluelightning.LatLon;
  */
 public class Place implements ReadOnlyPlace, Serializable, Comparable<Place> {
 
-    private Name name;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Name name;
     private Double latitude;
     private Double longitude;
     private Address address;

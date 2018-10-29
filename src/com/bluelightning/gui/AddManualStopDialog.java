@@ -18,9 +18,6 @@ import javax.swing.table.TableColumn;
 import com.bluelightning.Events;
 import com.bluelightning.Here2;
 import com.bluelightning.RobautoMain;
-import com.bluelightning.data.TripPlan.StopData;
-import com.bluelightning.Events.AddManualStopEvent;
-import com.bluelightning.poi.POI.FuelAvailable;
 import com.bluelightning.poi.POIBase;
 import com.bluelightning.poi.POIResult;
 
@@ -132,6 +129,10 @@ public class AddManualStopDialog extends JDialog {
 	
 	protected class AddressPOI extends POIBase {
 		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		public String address;
 		public ReadOnlyPlace place;
 		public FuelAvailable fuelAvailable = new FuelAvailable();

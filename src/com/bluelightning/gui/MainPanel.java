@@ -6,7 +6,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import java.awt.BorderLayout;
-import javax.swing.JLayeredPane;
 import javax.swing.JTextArea;
 
 public class MainPanel extends JPanel {

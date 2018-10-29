@@ -12,7 +12,12 @@ import java.util.List;
  */
 public class Name implements Serializable {
 
-    public static final String EXAMPLE = "John Doe";
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public static final String EXAMPLE = "John Doe";
     //public static final String MESSAGE_NAME_CONSTRAINTS = "Person names should be spaces or alphanumeric characters";
     //public static final String NAME_VALIDATION_REGEX = "[\\p{Alnum} ]+";
 

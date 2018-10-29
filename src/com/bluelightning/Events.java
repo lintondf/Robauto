@@ -5,8 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.concurrent.ForkJoinPool;
 
-import javax.swing.JFrame;
-
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIResult;
 import com.google.common.eventbus.AsyncEventBus;

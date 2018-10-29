@@ -2,11 +2,6 @@ package com.bluelightning.poi;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.gavaghan.geodesy.GlobalCoordinates;
 
 import com.bluelightning.Here2;

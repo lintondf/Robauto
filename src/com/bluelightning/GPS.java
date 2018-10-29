@@ -18,7 +18,6 @@ import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
-import com.bluelightning.gps.NMEA;
 import com.bluelightning.gps.SerialGps;
 import com.bluelightning.gps.NMEA.GpsState;
 
@@ -32,6 +31,10 @@ public class GPS {
 	
 	public static class Fix extends GeoPosition implements Serializable {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		double speed;
 		double heading;
 		double movement;  // [m] distance traveled since last fix
@@ -59,6 +62,7 @@ public class GPS {
 					heading, Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR*speed,  Here2.METERS_TO_MILES*movement );
 		}
 		
+		@SuppressWarnings("deprecation")
 		protected static Fix readGpsDataFile() {
 			Fix fix = new Fix();
 			try {
@@ -176,30 +180,9 @@ public class GPS {
 			}
 		} );
 		serialGps.start();
-//		readerThread = new Thread(new Runnable(){
-//			@Override
-//			public void run() {
-//				System.out.println("Starting normal: " +this);
-//				while (!Thread.interrupted()) {
-//					try { 
-//						Thread.sleep(10000L);  // file updates every 60 seconds
-//						Fix fix = Fix.readGpsDataFile();
-//						if (fix != null) {
-//							addObservation( fix );
-//						}
-//					} catch (InterruptedException ix) {
-//						break;
-//					} catch (Exception x) {
-//						x.printStackTrace();
-//						break;
-//					}
-//				}
-//				System.out.println("Exiting normal: " +this);
-//			}
-//		});
-//		readerThread.start();
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void shutdown() {
 		if (readerThread != null) {
 			readerThread.interrupt();
@@ -214,6 +197,7 @@ public class GPS {
 	
 	Thread debugThread = null;
 	
+	@SuppressWarnings("deprecation")
 	protected void debugClear() {
 		lastFix = null;
 		if (debugThread != null) {
@@ -264,43 +248,53 @@ public class GPS {
 		debugThread.start();
 	}
 	
-	public void debugSetup(final Iterator<GeoPosition> it) {
-		debugClear();
-		
-		debugThread = new Thread( new Runnable() {
-			@Override
-			public void run() {
-				System.out.println("Starting: " +this);
-				Date date = new Date();
-				while (!Thread.interrupted() && it.hasNext()) {
-					final GeoPosition position = it.next();
-					try { 
-						Thread.sleep(100); 
-						date = new Date( date.getTime() + 10000L );
-						addObservation( new Fix( date, position ) ); 
-					} catch (Exception x) {
-						break;
-					}
-				}
-				System.out.println("Exiting: " +this);
-			}
-		} );
-		debugThread.start();
-	}
+//	public void debugSetup(final Iterator<GeoPosition> it) {
+//		debugClear();
+//		
+//		debugThread = new Thread( new Runnable() {
+//			@Override
+//			public void run() {
+//				System.out.println("Starting: " +this);
+//				Date date = new Date();
+//				while (!Thread.interrupted() && it.hasNext()) {
+//					final GeoPosition position = it.next();
+//					try { 
+//						Thread.sleep(100); 
+//						date = new Date( date.getTime() + 10000L );
+//						addObservation( new Fix( date, position ) ); 
+//					} catch (Exception x) {
+//						break;
+//					}
+//				}
+//				System.out.println("Exiting: " +this);
+//			}
+//		} );
+//		debugThread.start();
+//	}
 	
 	public static void main(String[] args) {
-		GPS gps = new GPS();
+		//GPS gps = new GPS();
 		File file = new File("pwm-trace.obj");
+		ObjectInputStream gpsOis = null;
 		try {
 			FileInputStream fis = new FileInputStream(file);
-			ObjectInputStream gpsOis = new ObjectInputStream( fis );
+			gpsOis = new ObjectInputStream( fis );
 			//gps.debugSetup(gpsOis);
-			while (gpsOis != null) {
+			while (true) {
 				GPS.Fix nextFix = (GPS.Fix) gpsOis.readObject();
 				System.out.println(nextFix );
 			}
+			
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
+		} finally {
+			if (gpsOis != null)
+				try {
+					gpsOis.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 	}
 

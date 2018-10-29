@@ -1,8 +1,10 @@
 package com.bluelightning.gui;
 
 import javax.swing.JPanel;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+
 import javax.swing.JButton;
 import javax.swing.border.TitledBorder;
 
@@ -10,19 +12,25 @@ import com.bluelightning.Events;
 import com.bluelightning.PlannerMode;
 
 import javax.swing.border.LineBorder;
+
 import java.awt.Color;
+
 import javax.swing.JCheckBox;
+
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.EnumMap;
 import java.awt.GridLayout;
+
 import javax.swing.JComboBox;
 
 public class MainControlPanel extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected EnumMap<PlannerMode.MarkerKinds, Boolean> markerStatus = new EnumMap<PlannerMode.MarkerKinds, Boolean>(PlannerMode.MarkerKinds.class);
 	
 	public boolean getMarkerStatus( PlannerMode.MarkerKinds kind ) {
@@ -191,7 +199,7 @@ public class MainControlPanel extends JPanel {
 		});
 		
 		String[] actions = {"Normal", "Clear Route", "Clear Places"};
-		JComboBox clearActionsBox = new JComboBox(actions);
+		JComboBox<?> clearActionsBox = new JComboBox<Object>(actions);
 		GridBagConstraints gbc_clearActionsBox = new GridBagConstraints();
 		gbc_clearActionsBox.insets = new Insets(0, 0, 5, 0);
 		gbc_clearActionsBox.fill = GridBagConstraints.HORIZONTAL;

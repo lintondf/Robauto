@@ -1,7 +1,6 @@
 package com.bluelightning.gps;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Calendar;
@@ -117,7 +116,8 @@ public class NMEA {
         	return calendar.getTime();
         }
 
-        public String toString() {
+        @SuppressWarnings("deprecation")
+		public String toString() {
             return String.format("POSITION: lat: %f, lon: %f, time: %s, Q: %d, dir: %f, alt: %f, vel: %f", lat, lon, toDate().toGMTString(), quality, dir, altitude, velocity);
         }
     }

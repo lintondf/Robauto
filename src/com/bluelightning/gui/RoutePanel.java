@@ -4,53 +4,23 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import com.bluelightning.data.TripPlan;
-import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIBase;
 
-import seedu.addressbook.commands.AddCommand;
-import seedu.addressbook.commands.CommandResult;
-import seedu.addressbook.commands.ListCommand;
-import seedu.addressbook.commands.ViewCommand;
-import seedu.addressbook.data.AddressBook;
-import seedu.addressbook.data.place.Address;
-import seedu.addressbook.data.place.Name;
-import seedu.addressbook.data.place.Place;
-import seedu.addressbook.data.place.ReadOnlyPlace;
-import seedu.addressbook.data.place.UniquePlaceList;
 import seedu.addressbook.data.place.VisitedPlace;
-import seedu.addressbook.data.tag.UniqueTagList;
-import seedu.addressbook.logic.Logic;
-
 import javax.swing.JTable;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JTabbedPane;
-import java.awt.GridLayout;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultCellEditor;
-
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.Button;
 import java.awt.Dimension;
 
 public class RoutePanel extends JPanel {
@@ -315,73 +285,73 @@ public class RoutePanel extends JPanel {
 		return waypointsTable;
 	}
 
-	public static void main(String[] args) {
-		CommandResult result;
-		try {
-			Logic controller = new Logic();
-			AddressBook addressBook = controller.getAddressBook();
-			if (false) {
-				Place place = Place.factory("Sams Club", "15 Mill Creek Circle, Pooler, GA");
-				place.geocode();
-				addressBook.add(place);
-				place = Place.factory("Grandfather Campground", "125 Riverside Dr, Banner Elk, NC");
-				place.geocode();
-				addressBook.add(place);
-				place = Place.factory("Walmart", "2350 So Pleasant Valley Rd, Winchester, VA 22601");
-				place.geocode();
-				addressBook.add(place);
-				place = Place.factory("Megan Mudge", "10654 Breezewood Dr, Woodstock, MD 21163-1317");
-				place.geocode();
-				addressBook.add(place);
-				place = Place.factory("Walmart", "1365 Boston Post Road, Milford, CT");
-				place.geocode();
-				addressBook.add(place);
-				place = Place.factory("Sippewissett Campground", "836 Palmer Avenue, Falmouth, MA");
-				place.geocode();
-				addressBook.add(place);
-				place = Place.factory("Cabelas", "100 Cabelas Blvd, Scarborough, ME");
-				place.geocode();
-				addressBook.add(place);
-				place = Place.factory("Home Maine", "7 Manor Lane, Sullivan, ME 40664");
-				place.geocode();
-				addressBook.add(place);
-				place = Place.factory("Home Florida", "3533 Carambola Cir, Melbourne, FL");
-				place.geocode();
-				addressBook.add(place);
-				controller.getStorage().save(addressBook);
-			}
-			SortedSet<VisitedPlace> visiting = Collections.synchronizedSortedSet(new TreeSet<VisitedPlace>());
-//			Place place = Place.factory("Maine Home", "7 Manor Lane, Sullivan, ME 40664");
-//			addressBook.add(place);
-//			UniquePlaceList placeList = addressBook.getAllPlaces();
-//			for (ReadOnlyPlace p : placeList) {
-//				System.out.println(p);
+//	public static void main(String[] args) {
+//		CommandResult result;
+//		try {
+//			Logic controller = new Logic();
+//			AddressBook addressBook = controller.getAddressBook();
+//			if (false) {
+//				Place place = Place.factory("Sams Club", "15 Mill Creek Circle, Pooler, GA");
+//				place.geocode();
+//				addressBook.add(place);
+//				place = Place.factory("Grandfather Campground", "125 Riverside Dr, Banner Elk, NC");
+//				place.geocode();
+//				addressBook.add(place);
+//				place = Place.factory("Walmart", "2350 So Pleasant Valley Rd, Winchester, VA 22601");
+//				place.geocode();
+//				addressBook.add(place);
+//				place = Place.factory("Megan Mudge", "10654 Breezewood Dr, Woodstock, MD 21163-1317");
+//				place.geocode();
+//				addressBook.add(place);
+//				place = Place.factory("Walmart", "1365 Boston Post Road, Milford, CT");
+//				place.geocode();
+//				addressBook.add(place);
+//				place = Place.factory("Sippewissett Campground", "836 Palmer Avenue, Falmouth, MA");
+//				place.geocode();
+//				addressBook.add(place);
+//				place = Place.factory("Cabelas", "100 Cabelas Blvd, Scarborough, ME");
+//				place.geocode();
+//				addressBook.add(place);
+//				place = Place.factory("Home Maine", "7 Manor Lane, Sullivan, ME 40664");
+//				place.geocode();
+//				addressBook.add(place);
+//				place = Place.factory("Home Florida", "3533 Carambola Cir, Melbourne, FL");
+//				place.geocode();
+//				addressBook.add(place);
+//				controller.getStorage().save(addressBook);
 //			}
-//			AddCommand addCommand = new AddCommand("Home",
-//					0.0, 
-//					0.0, 
-//					"3533 Carambola Circle, Melbourne, FL 32940", 
-//					new TreeSet<String>() );
-//			System.out.println(addCommand);
-//			result = addressBookController.execute(addCommand);
-//			result = addressBookController.execute(new ListCommand());
-//			Optional<List<? extends ReadOnlyPlace>> allPersons = result.getRelevantPersons();
-//			System.out.println(result.feedbackToUser);
-//			for (ReadOnlyPlace rop : allPersons.get()) {
-//				System.out.println(rop);
-//			}
-//			result = addressBookController.execute( new ViewCommand(1) );
-//			System.out.println(result.feedbackToUser);
-//			allPersons = result.getRelevantPersons();
-//			for (ReadOnlyPlace rop : allPersons.get()) {
-//				System.out.println(rop);
-//			}
-			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//			SortedSet<VisitedPlace> visiting = Collections.synchronizedSortedSet(new TreeSet<VisitedPlace>());
+////			Place place = Place.factory("Maine Home", "7 Manor Lane, Sullivan, ME 40664");
+////			addressBook.add(place);
+////			UniquePlaceList placeList = addressBook.getAllPlaces();
+////			for (ReadOnlyPlace p : placeList) {
+////				System.out.println(p);
+////			}
+////			AddCommand addCommand = new AddCommand("Home",
+////					0.0, 
+////					0.0, 
+////					"3533 Carambola Circle, Melbourne, FL 32940", 
+////					new TreeSet<String>() );
+////			System.out.println(addCommand);
+////			result = addressBookController.execute(addCommand);
+////			result = addressBookController.execute(new ListCommand());
+////			Optional<List<? extends ReadOnlyPlace>> allPersons = result.getRelevantPersons();
+////			System.out.println(result.feedbackToUser);
+////			for (ReadOnlyPlace rop : allPersons.get()) {
+////				System.out.println(rop);
+////			}
+////			result = addressBookController.execute( new ViewCommand(1) );
+////			System.out.println(result.feedbackToUser);
+////			allPersons = result.getRelevantPersons();
+////			for (ReadOnlyPlace rop : allPersons.get()) {
+////				System.out.println(rop);
+////			}
+//			
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 
 }

@@ -5,7 +5,6 @@ package seedu.addressbook.commands;
 
 import seedu.addressbook.common.Messages;
 import seedu.addressbook.data.place.Place;
-import seedu.addressbook.data.place.ReadOnlyPlace;
 import seedu.addressbook.data.place.UniquePlaceList.PlaceNotFoundException;
 
 

@@ -3,7 +3,6 @@
  */
 package com.bluelightning.poi;
 
-import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -13,14 +12,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import com.opencsv.CSVReader;
-
 /**
  * @author NOOK
  *
  */
 public class WalmartNoParkUpdater extends WalmartPOI {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected static TreeMap<String, ArrayList<WalmartPOI>> byState = new TreeMap<>();
 
 	/**

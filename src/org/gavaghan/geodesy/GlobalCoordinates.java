@@ -46,6 +46,11 @@ import org.jxmapviewer.viewer.GeoPosition;
 public class GlobalCoordinates extends GeoPosition implements Comparable<GlobalCoordinates>, Serializable
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Canonicalize the current latitude and longitude values such that:
 	 * 
 	 * <pre>

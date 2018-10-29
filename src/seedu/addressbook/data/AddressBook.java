@@ -4,8 +4,6 @@ import seedu.addressbook.data.place.*;
 import seedu.addressbook.data.place.UniquePlaceList.*;
 import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
-import seedu.addressbook.data.tag.UniqueTagList.*;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

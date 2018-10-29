@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings({"unused"})
 public class SerialGps {
 
     public interface StateListener {
@@ -32,7 +32,7 @@ public class SerialGps {
         stateListeners.add(stateListener);
     }
 
-    public void start() {
+    public boolean start() {
         NMEA nmea = new NMEA();
 
         SerialPort[] serialPorts = SerialPort.getCommPorts();
@@ -50,7 +50,7 @@ public class SerialGps {
         if (gpsPort == null) {
             System.out.println("failed to find gps serial port");
 
-            return;
+            return false;
         }
 
         System.out.println("using serial port: " + gpsPort.getDescriptivePortName());
@@ -62,7 +62,7 @@ public class SerialGps {
         if (inStream == null) {
             System.out.println("opening port " + gpsPort.getDescriptivePortName() + " failed");
 
-            return;
+            return false;
         }
         
         while (true) {
@@ -103,6 +103,7 @@ public class SerialGps {
         });
 
         thread.start();
+        return true;
     }
 
     public void stop() throws InterruptedException {

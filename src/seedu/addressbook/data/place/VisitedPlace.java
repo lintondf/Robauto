@@ -6,7 +6,6 @@ import java.util.Iterator;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.map.StopMarker;
 import com.bluelightning.poi.POI;
-import com.bluelightning.poi.POI.FuelAvailable;
 import com.bluelightning.poi.POIBase;
 
 import seedu.addressbook.data.exception.IllegalValueException;

@@ -3,11 +3,6 @@
  */
 package com.bluelightning;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.Image;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,11 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -30,11 +20,9 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.BaseCampDirectionsParser.ParsedDirections;
 import com.bluelightning.Garmin.TrackPoint;
-import com.bluelightning.Here2.HereRoutePlus;
 import com.bluelightning.json.BottomRight;
 import com.bluelightning.json.BoundingBox;
 import com.bluelightning.json.End;
-import com.bluelightning.json.HereRoute;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.MappedPosition;
@@ -223,14 +211,14 @@ public class BaseCamp {
 					pit.next();  // skip column header
 					pit.next();  // title 
 					pit.next();  // page n of m
-					Turn last = null;
+					//Turn last = null;
 					while (pit.hasNext()) {
 						Element p = pit.next();
 						Turn turn = new Turn(p.text());
 //						if (last != null) {
 //							turn.totalDistance = last.totalDistance + turn.distance;
 //						}
-						last = turn;
+						//last = turn;
 						//System.out.println( turn );
 						turns.add(turn);
 					}
@@ -304,7 +292,7 @@ public class BaseCamp {
 			if (iTrack < day.trackPoints.size()) {
 				TrackPoint trackPoint = day.trackPoints.get(iTrack);
 				System.out.println( iTrack + " : " +  trackPoint);
-				StopMarker wp = new StopMarker(StopMarker.DRIVERS, Integer.toString(iTrack) + ":" + current.toString(), trackPoint);
+				//StopMarker wp = new StopMarker(StopMarker.DRIVERS, Integer.toString(iTrack) + ":" + current.toString(), trackPoint);
 				//vias.add(wp);
 				viaPoints.add(trackPoint);
 			}
@@ -389,26 +377,26 @@ public class BaseCamp {
 	}
 
 
-	private int addMidpointToViaPoints(double midway, ArrayList<LatLon> viaPoints,
-			List<TrackPoint> trackPoints, int iTrack) {
-		while (iTrack < trackPoints.size()) {
-			if (trackPoints.get(iTrack).distanceStartToHere > midway) {
-				double priorToMidway = 0.0;
-				if (iTrack > 0) {
-					priorToMidway = midway - trackPoints.get(iTrack-1).distanceStartToHere;
-				}
-				double midwayToCurrent = trackPoints.get(iTrack).distanceStartToHere - midway;
-				if (midwayToCurrent > priorToMidway) {
-					viaPoints.add(trackPoints.get(iTrack-1));
-				} else {
-					viaPoints.add(trackPoints.get(iTrack));
-				}
-				break;
-			}
-			iTrack++;
-		}
-		return iTrack;
-	}
+//	private int addMidpointToViaPoints(double midway, ArrayList<LatLon> viaPoints,
+//			List<TrackPoint> trackPoints, int iTrack) {
+//		while (iTrack < trackPoints.size()) {
+//			if (trackPoints.get(iTrack).distanceStartToHere > midway) {
+//				double priorToMidway = 0.0;
+//				if (iTrack > 0) {
+//					priorToMidway = midway - trackPoints.get(iTrack-1).distanceStartToHere;
+//				}
+//				double midwayToCurrent = trackPoints.get(iTrack).distanceStartToHere - midway;
+//				if (midwayToCurrent > priorToMidway) {
+//					viaPoints.add(trackPoints.get(iTrack-1));
+//				} else {
+//					viaPoints.add(trackPoints.get(iTrack));
+//				}
+//				break;
+//			}
+//			iTrack++;
+//		}
+//		return iTrack;
+//	}
 
 	public <A extends GeodeticPosition> BoundingBox generateBoundingBox(List<A> position) {
 		BoundingBox box = new BoundingBox();

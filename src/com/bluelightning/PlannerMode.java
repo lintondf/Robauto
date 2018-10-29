@@ -15,11 +15,9 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map.Entry;
 
@@ -32,7 +30,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
@@ -49,18 +46,12 @@ import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.Garmin.TrackPoint;
 import com.bluelightning.data.TripPlan;
-import com.bluelightning.data.TripPlan.DriverAssignments;
-import com.bluelightning.data.TripPlan.LegData;
-import com.bluelightning.data.TripPlan.RoadDirectionData;
-import com.bluelightning.data.TripPlan.StopData;
 import com.bluelightning.gui.AddAddressDialog;
 import com.bluelightning.gui.MainControlPanel;
 import com.bluelightning.gui.MainPanel;
 import com.bluelightning.gui.OptimizeStopsDialog;
 import com.bluelightning.gui.RoutePanel;
 import com.bluelightning.gui.AddAddressDialog.AddAddressActionListener;
-import com.bluelightning.gui.OptimizeStopsDialog.OptimizeActionListener;
-import com.bluelightning.gui.OptimizeStopsDialog.OptimizeLegSelectionListener;
 import com.bluelightning.json.BottomRight;
 import com.bluelightning.json.BoundingBox;
 import com.bluelightning.json.Leg;
@@ -99,6 +90,11 @@ import seedu.addressbook.storage.StorageFile.StorageOperationException;
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
 
 public class PlannerMode extends JPanel {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	protected static final String INITIAL_RESULTS_TEXT = "<html><center>Run Optimize Stops to populate this panel</center></html>";
 
@@ -338,7 +334,7 @@ public class PlannerMode extends JPanel {
 
 			case "ControlPanel.ClearActions":
 				System.out.println(event.source + " " + event.awtEvent);
-				JComboBox box = (JComboBox) event.awtEvent.getSource();
+				JComboBox<?> box = (JComboBox<?>) event.awtEvent.getSource();
 				String action = (String) box.getSelectedItem();
 				System.out.println(action);
 				RobautoMain.tripPlan.clear(action);
@@ -560,6 +556,7 @@ public class PlannerMode extends JPanel {
 
 		}
 
+		@SuppressWarnings("unused") // used in CallbackHandler::handle actually
 		private CallbackHandler handler = null;
 		protected OptimizeStopsDialog dialog = null;
 
@@ -649,7 +646,7 @@ public class PlannerMode extends JPanel {
 			if (selectedWaypointRow < 0)
 				return; // nothing selected
 			// swap this and prior
-			VisitedPlace place = places.get(selectedWaypointRow);
+			//VisitedPlace place = places.get(selectedWaypointRow);
 			places.remove(selectedWaypointRow);
 			routePanel.getWaypointsModel().setData(places);
 			RobautoMain.tripPlan.setPlaces(places);
@@ -759,13 +756,15 @@ public class PlannerMode extends JPanel {
 	}
 
 	public PlannerMode() {
-		setLayout(new BorderLayout());
+		// configured via resources/logback.xml
 		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoPlanner");
+		// add an appender to feed the text area
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
 		textAreaAppender = new TextAreaAppender(lc);
 		textAreaAppender.start();
 
+		setLayout(new BorderLayout());
 		mainPanel = new MainPanel();
 		mainPanel.getLeftPanel().setLayout(new BorderLayout());
 		routePanel = new RoutePanel(new Events.EventActionListener());
@@ -993,17 +992,17 @@ public class PlannerMode extends JPanel {
 		return days;
 	}
 
-	private ArrayList<ButtonWaypoint> mergeVias(List<BaseCamp> baseCamps) {
-		ArrayList<ButtonWaypoint> vias = new ArrayList<>();
-		for (BaseCamp baseCamp : baseCamps) {
-			vias.addAll(baseCamp.vias);
-			StopMarker marker = (StopMarker) vias.get(vias.size() - 1);
-			marker.setKind(StopMarker.OVERNIGHT);
-		}
-		StopMarker marker = (StopMarker) vias.get(vias.size() - 1);
-		marker.setKind(StopMarker.TERMINUS);
-		return vias;
-	}
+//	private ArrayList<ButtonWaypoint> mergeVias(List<BaseCamp> baseCamps) {
+//		ArrayList<ButtonWaypoint> vias = new ArrayList<>();
+//		for (BaseCamp baseCamp : baseCamps) {
+//			vias.addAll(baseCamp.vias);
+//			StopMarker marker = (StopMarker) vias.get(vias.size() - 1);
+//			marker.setKind(StopMarker.OVERNIGHT);
+//		}
+//		StopMarker marker = (StopMarker) vias.get(vias.size() - 1);
+//		marker.setKind(StopMarker.TERMINUS);
+//		return vias;
+//	}
 
 	private void outputToCopilot(ArrayList<ArrayList<VisitedPlace>> finalizedPlaces) {
 		CoPilot13Format format = new CoPilot13Format();

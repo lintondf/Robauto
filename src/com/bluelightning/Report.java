@@ -1,7 +1,5 @@
 package com.bluelightning;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,10 +8,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.apache.commons.io.IOUtils;
 
@@ -25,7 +21,6 @@ import com.google.maps.model.LatLng;
 //import com.graphhopper.util.shapes.GHPoint3D;
 import com.x5.template.Chunk;
 import com.x5.template.Theme;
-import com.x5.util.Base64;
 
 public class Report implements Serializable {
 
@@ -310,6 +305,7 @@ public class Report implements Serializable {
 	}
 	
 
+	@SuppressWarnings("deprecation")
 	public String toHtml() {
 		if (theme == null) {
 			theme = new Theme();
@@ -327,6 +323,7 @@ public class Report implements Serializable {
 		return c.toString();
 	}
 
+	@SuppressWarnings("deprecation")
 	public String toHtml(Day day) {
 		if (theme == null) {
 			theme = new Theme();

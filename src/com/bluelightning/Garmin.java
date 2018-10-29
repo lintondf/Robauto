@@ -6,24 +6,14 @@ package com.bluelightning;
 import static slash.common.helpers.JAXBHelper.newContext;
 import static slash.common.helpers.JAXBHelper.newMarshaller;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.Image;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
@@ -34,30 +24,18 @@ import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
-import org.w3c.dom.Element;
-
-import com.bluelightning.json.Leg;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.StopMarker;
-import com.bluelightning.poi.POI;
-
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.place.Place;
 import seedu.addressbook.data.place.VisitedPlace;
-import seedu.addressbook.logic.Logic;
 import slash.navigation.gpx.GpxUtil;
-import slash.navigation.gpx.binding10.Gpx.Wpt;
 import slash.navigation.gpx.binding11.ExtensionsType;
 import slash.navigation.gpx.binding11.GpxType;
 import slash.navigation.gpx.binding11.RteType;
-import slash.navigation.gpx.binding11.TrkType;
 import slash.navigation.gpx.binding11.WptType;
-import slash.navigation.gpx.garmin3.AddressT;
 import slash.navigation.gpx.garmin3.AutoroutePointT;
-import slash.navigation.gpx.garmin3.DisplayModeT;
-import slash.navigation.gpx.garmin3.ExtensionsT;
 import slash.navigation.gpx.garmin3.RoutePointExtensionT;
-import slash.navigation.gpx.garmin3.WaypointExtensionT;
 
 /**
  * @author lintondf 1. Use Basecamp to plan day-by-day route. Export to GPX 2.
@@ -65,6 +43,10 @@ import slash.navigation.gpx.garmin3.WaypointExtensionT;
  */
 public class Garmin extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	// min_lon,min_lat,max_lon,max_lat.
 	// https://api.openstreetmap.org/api/0.6/map?bbox=-68.20,44.00,-68.00,44.20
 	protected static JFrame frame;
@@ -77,6 +59,10 @@ public class Garmin extends JPanel {
 //	protected int nearby = 0;
 
 	public static class TrackPoint extends LatLon {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		public double distancePriorToHere;
 		public double distanceStartToHere;
 		public double heading;
@@ -261,7 +247,7 @@ public class Garmin extends JPanel {
 					List<Object> any = extensions.getAny();
 					for (Object ext : any) {
 						if (ext instanceof JAXBElement) {
-							JAXBElement element = (JAXBElement) ext;
+							JAXBElement<?> element = (JAXBElement<?>) ext;
 							switch (element.getName().toString()) {
 							case "{http://www.garmin.com/xmlschemas/GpxExtensions/v3}RoutePointExtension":
 								RoutePointExtensionT rpext = (RoutePointExtensionT) element
@@ -391,21 +377,21 @@ public class Garmin extends JPanel {
 //		}
 //	}
 
-	private void validateTrack(List<GeoPosition> track) {
-		for (GeoPosition where : track) {
-			if (where.getLatitude() < 30.0 || where.getLatitude() > 50.0
-					|| where.getLongitude() < -80.0
-					|| where.getLongitude() > -60) {
-				System.out.println(where);
-			}
-		}
-	}
+//	private void validateTrack(List<GeoPosition> track) {
+//		for (GeoPosition where : track) {
+//			if (where.getLatitude() < 30.0 || where.getLatitude() > 50.0
+//					|| where.getLongitude() < -80.0
+//					|| where.getLongitude() > -60) {
+//				System.out.println(where);
+//			}
+//		}
+//	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Garmin garmin = new Garmin( "/Users/lintondf/ME2FL_2018.GPX" ); 
+		//Garmin garmin = new Garmin( "/Users/lintondf/ME2FL_2018.GPX" ); 
 //		Logic controller;
 //		AddressBook addressBook;
 //

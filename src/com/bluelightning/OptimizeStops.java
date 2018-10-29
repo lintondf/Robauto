@@ -4,14 +4,12 @@
 package com.bluelightning;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 
 import com.bluelightning.PlannerMode.MarkerKinds;
 import com.bluelightning.data.TripPlan;
-import com.bluelightning.json.Leg;
 import com.bluelightning.json.Route;
 import com.bluelightning.poi.POIResult;
 import com.bluelightning.poi.POISet;

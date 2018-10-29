@@ -633,7 +633,7 @@ public class Maneuver implements Serializable, Comparable<Maneuver>, PostProcess
     public void adjustSpeeds(Leg leg) {
     	double trafficDelay = getTrafficTime().doubleValue() / getTravelTime().doubleValue();
 		Link link = leg.getLinkMap().get(getId());
-		double speed = (getLength() / getTrafficTime());
+		//double speed = (getLength() / getTrafficTime());
 		if (link != null) {
 			if (link.getSpeedLimit() != null && link.getSpeedLimit() > 0) {
 				double speedLimit = link.getSpeedLimit();

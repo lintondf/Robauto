@@ -28,7 +28,12 @@ public class StorageFile {
      * Signals that the given file path does not fulfill the storage filepath constraints.
      */
     public static class InvalidStorageFilePathException extends IllegalValueException {
-        public InvalidStorageFilePathException(String message) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public InvalidStorageFilePathException(String message) {
             super(message);
         }
     }
@@ -38,7 +43,12 @@ public class StorageFile {
      * and the storage file.
      */
     public static class StorageOperationException extends Exception {
-        public StorageOperationException(String message) {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public StorageOperationException(String message) {
             super(message);
         }
     }

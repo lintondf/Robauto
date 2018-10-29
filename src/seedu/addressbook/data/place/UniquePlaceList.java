@@ -17,7 +17,12 @@ public class UniquePlaceList implements Iterable<Place> {
      * Signals that an operation would have violated the 'no duplicates' property of the list.
      */
     public static class DuplicatePlaceException extends DuplicateDataException {
-        protected DuplicatePlaceException() {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		protected DuplicatePlaceException() {
             super("Operation would result in duplicate places");
         }
     }
@@ -26,7 +31,12 @@ public class UniquePlaceList implements Iterable<Place> {
      * Signals that an operation targeting a specified place in the list would fail because
      * there is no such matching place in the list.
      */
-    public static class PlaceNotFoundException extends Exception {}
+    public static class PlaceNotFoundException extends Exception {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;}
 
     private final List<Place> internalList = new ArrayList<>();
 

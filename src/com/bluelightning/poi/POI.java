@@ -2,14 +2,9 @@ package com.bluelightning.poi;
 
 import java.awt.Image;
 import java.io.Serializable;
-import java.util.List;
-
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
-import com.bluelightning.map.SwingMarker;
-
-import seedu.addressbook.data.tag.Tag;
 import seedu.addressbook.data.tag.UniqueTagList;
 
 public interface POI {

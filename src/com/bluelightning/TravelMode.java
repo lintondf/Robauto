@@ -1,7 +1,6 @@
 package com.bluelightning;
 
 import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -9,22 +8,17 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
-import org.gavaghan.geodesy.GeodeticCurve;
-import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 import org.slf4j.LoggerFactory;
 
-import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
-import com.bluelightning.PlannerMode.UiHandler;
 import com.bluelightning.Report.Drive;
 import com.bluelightning.data.TripPlan;
 import com.google.common.eventbus.Subscribe;
@@ -32,16 +26,12 @@ import com.google.common.eventbus.Subscribe;
 import seedu.addressbook.data.place.Address;
 import seedu.addressbook.data.place.VisitedPlace;
 
-import javax.swing.JSplitPane;
-import javax.swing.ListModel;
-
 import java.awt.FlowLayout;
 
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -52,7 +42,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -80,15 +69,19 @@ import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
-import com.bluelightning.poi.POIBase;
 
 public class TravelMode extends JPanel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static final int ICON_SCALE = 1;
 
 	public static String hostName = "localhost";
 	public static boolean isSurface = true;
-	public static boolean gpsNormal = false;
+	public static boolean gpsNormal = true;
 
 	public TripPlan tripPlan = null;
 	public Report report = null;
@@ -289,8 +282,8 @@ public class TravelMode extends JPanel {
 	protected void setDay() {
 		final Report.Day day = report.getDays().get(currentDay);
 		final ArrayList<Route> days = tripPlan.getFinalizedDays();
-		final ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
-		final ArrayList<ArrayList<VisitedPlace>> allPlaces = tripPlan.getFinalizedPlaces();
+		//final ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
+		//final ArrayList<ArrayList<VisitedPlace>> allPlaces = tripPlan.getFinalizedPlaces();
 		Drive drive = day.steps.get(0).drive;
 		currentFuel = Double.parseDouble(drive.fuelRemaining) + Double.parseDouble(drive.fuelUsed);
 		distanceTraveled = 0.0;
@@ -321,7 +314,7 @@ public class TravelMode extends JPanel {
 				} catch (Exception x) {
 				}
 				map.clearRoute();
-				List<ButtonWaypoint> waypoints = map.showRoute(days, markers, allPlaces, currentDay);
+				//List<ButtonWaypoint> waypoints = map.showRoute(days, markers, allPlaces, currentDay);
 				activePanel.getSplitPane().setDividerLocation(0.4);
 				activePanel.getTextPane().setText(travelStatus.toHtml());
 				activePanel.getTextPane().setCaretPosition( 0 );
@@ -348,8 +341,6 @@ public class TravelMode extends JPanel {
 	 * Create the frame.
 	 */
 	public TravelMode() {
-		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
-
 		setLayout(new BorderLayout());
 
 		JPanel buttonPanel = new JPanel();
@@ -414,18 +405,18 @@ public class TravelMode extends JPanel {
 		// Bind event handlers
 		Events.eventBus.register(new UiHandler());
 
-		try {
-			HandleTripPlanUpdate obj = new HandleTripPlanUpdate();
-			TripPlanUpdate stub = (TripPlanUpdate) UnicastRemoteObject.exportObject(obj, 0);
-			if (isSurface) {
-				// Bind the remote object's stub in the registry
-				Registry registry = LocateRegistry.getRegistry(localHostAddress.toString(), RobautoMain.REGISTRY_PORT);
-				registry.bind("Update", stub);
-			}
-			System.out.println("Server ready");
-		} catch (Exception e) {
-			System.err.println("Server exception: " + e.toString());
-		}
+//		try {
+//			HandleTripPlanUpdate obj = new HandleTripPlanUpdate();
+//			TripPlanUpdate stub = (TripPlanUpdate) UnicastRemoteObject.exportObject(obj, 0);
+//			if (isSurface) {
+//				// Bind the remote object's stub in the registry
+//				Registry registry = LocateRegistry.getRegistry(localHostAddress.toString(), RobautoMain.REGISTRY_PORT);
+//				registry.bind("Update", stub);
+//			}
+//			System.out.println("Server ready");
+//		} catch (Exception e) {
+//			System.err.println("Server exception: " + e.toString());
+//		}
 	}
 
 	protected void initialize(File tripPlanFile) {
@@ -503,6 +494,9 @@ public class TravelMode extends JPanel {
 	}
 
 	public static void main(String[] args) {
+		// configured via resources/logback.xml
+		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
+
 		java.net.InetAddress localMachine = null;
 		try {
 			localMachine = java.net.InetAddress.getLocalHost();
@@ -513,7 +507,7 @@ public class TravelMode extends JPanel {
 			e1.printStackTrace();
 			return;
 		}
-		System.out.println("Hostname of local machine: " + isSurface + " " + localMachine);
+		RobautoMain.logger.info("Hostname of local machine: " + isSurface + " " + localMachine);
 		localHostAddress = localMachine.getHostAddress();
 		File file = new File("pwm-trace.obj");
 

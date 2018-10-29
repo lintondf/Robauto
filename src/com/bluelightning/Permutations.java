@@ -1,25 +1,10 @@
 package com.bluelightning;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.Array;
+
 
 // https://stackoverflow.com/questions/2920315/permutation-of-array
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.TreeMap;
-
-import com.bluelightning.data.TripPlan;
 
 public class Permutations {
 
