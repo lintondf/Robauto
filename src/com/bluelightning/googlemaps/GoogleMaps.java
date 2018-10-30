@@ -354,10 +354,10 @@ public class GoogleMaps {
 			double d = curve.getEllipsoidalDistance();
 			double az = curve.getAzimuth();
 			cumd += d;
-			System.out.println(String.format("%10.3f mi %3.0f deg  %10.3f mi ", 
+			RobautoMain.logger.debug(String.format("%10.3f mi %3.0f deg  %10.3f mi ", 
 					d/0.3048/5280.0, az, cumd/0.3048/5280.0));
 		}	
-		System.out.println( points.size() + " " + cumd / (double) points.size() );
+		RobautoMain.logger.debug( points.size() + " " + cumd / (double) points.size() );
 		
 		ArrayList<LatLng> subset = new ArrayList<LatLng>();
 		for (int i = 360; i < 5*120+0*points.size(); i += 120) {
@@ -369,7 +369,7 @@ public class GoogleMaps {
 		for (SnappedPoint snap : snaps) {
 			PlaceDetails details = new PlaceDetailsRequest(context)
 				.placeId(snap.placeId).awaitIgnoreError();
-			System.out.println(details.name + " " + details.vicinity );
+			RobautoMain.logger.debug(details.name + " " + details.vicinity );
 		}
 		return true;
 	}

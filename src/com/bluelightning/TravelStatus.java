@@ -152,7 +152,7 @@ public class TravelStatus {
 	
 	public TravelStatus(TripPlan.TripLeg tripLeg) {
 		this.tripLeg = tripLeg;
-		System.out.println( tripLeg.toString() );
+		RobautoMain.logger.debug( tripLeg.toString() );
 		drivingTime = new TimeTracker( "Driving [hh:mm]", tripLeg.legData.trafficTime );
 		stoppedTime = new TimeTracker( "Stopped [hh:mm]", 0.0 );
 		distanceDriven = new DistanceTracker( "Driving [miles]", tripLeg.legData.distance );
@@ -303,7 +303,7 @@ public class TravelStatus {
 		TravelStatus travelStatus = new TravelStatus( tripLegs.get(0) );
 		travelStatus.update( 3600.0, 75e3);
 		travelStatus.stopped( 300.0 );
-		System.out.println( travelStatus.toHtml() );
+		RobautoMain.logger.debug( travelStatus.toHtml() );
 	}
 
 }

@@ -143,7 +143,7 @@ public class OptimizeStopsDialog extends JDialog {
 					ArrayList<TripPlan.StopData> dataList = OptimizeStopsDialog.this.stopsTableModel.getData();
 					POIResult result = POIResult
 							.factory(OptimizeStopsDialog.this.optimizeStops.getTripPlan().getRoute(), event.poi);
-					System.out.println(dataList.size() + " " + result);
+					RobautoMain.logger.debug(dataList.size() + " " + result);
 					if (result != null) {
 						for (Leg leg : OptimizeStopsDialog.this.optimizeStops.getTripPlan().getRoute().getLeg()) {
 							if (leg == result.leg) {
@@ -159,7 +159,7 @@ public class OptimizeStopsDialog extends JDialog {
 									dataList.add(new StopData(result));
 								}
 								stopsTableModel.setData(dataList);
-								System.out.println(dataList.size());
+								RobautoMain.logger.debug(""+dataList.size());
 								OptimizeStopsDialog.this.optimizeStops.getTripPlan()
 										.getTripLeg(currentLeg).stopDataList = dataList;
 								generateLegStopChoices();
@@ -260,7 +260,7 @@ public class OptimizeStopsDialog extends JDialog {
 
 	protected void chooseCurrentTab() {
 		int selected = choicesTabbedPane.getSelectedIndex();
-		System.out.println("cCT " + selected);
+		RobautoMain.logger.debug("cCT " + selected);
 		if (selected >= 0) {
 			optimizeStops.getTripPlan().getTripLeg(currentLeg).driverAssignments = presentedChoices.get(selected);
 			while (getChoicesTabbedPane().getComponentCount() > 0) {
@@ -276,7 +276,7 @@ public class OptimizeStopsDialog extends JDialog {
 				stop.use = false;
 				stop.drivers = false;
 				stop.refuel = false;
-				System.out.println("cCT ignoring " + stop);
+				RobautoMain.logger.debug("cCT ignoring " + stop);
 			});
 			stopsTableModel.fireTableDataChanged();
 			updateTripData();
@@ -295,7 +295,7 @@ public class OptimizeStopsDialog extends JDialog {
 
 		@Override
 		public void actionPerformed(ActionEvent event) {
-			System.out.println(event);
+			RobautoMain.logger.debug(event.toString());
 			switch (event.getActionCommand()) {
 			case "Cancel":
 				if (handler != null) {
@@ -371,9 +371,9 @@ public class OptimizeStopsDialog extends JDialog {
 
 		@Override
 		public void valueChanged(ListSelectionEvent event) {
-			System.out.println(event);
+			RobautoMain.logger.debug(event.toString());
 			if (!event.getValueIsAdjusting()) {
-				System.out.println(event);
+				RobautoMain.logger.debug(event.toString());
 				/*int which =*/stopsTable.getSelectedRow();
 			}
 		}
@@ -412,7 +412,7 @@ public class OptimizeStopsDialog extends JDialog {
 			public void tableChanged(TableModelEvent event) {
 				if (event.getColumn() >= 0 && event.getColumn() <= 2) {
 					if (event.getFirstRow() == event.getLastRow()) {
-						System.out.println(event);
+						RobautoMain.logger.debug(event.toString());
 						updateTripReport();
 						optimizeStops.getTripPlan().getTripLeg(currentLeg).stopDataList = stopsTableModel.getData();
 						generateLegStopChoices(currentLeg);
@@ -737,7 +737,7 @@ public class OptimizeStopsDialog extends JDialog {
 				sublist.add(stopDataList.get(i));
 			}
 		}
-		System.out.println("uTR " + stopDataList.size() + " -> " + sublist.size());
+		RobautoMain.logger.debug("uTR " + stopDataList.size() + " -> " + sublist.size());
 		sublist.forEach(System.out::println);
 		DriverAssignments driverAssignments = TripPlan.generateDriverAssignments(TripPlan.N_DRIVERS,
 				optimizeStops.getTripPlan().getTripLeg(currentLeg).legData, sublist);

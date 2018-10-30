@@ -126,13 +126,13 @@ public class Here2 {
 			HttpGet httpGet = new HttpGet(url);
 			CloseableHttpResponse response2 = httpclient.execute(httpGet);
 			if (response2.getStatusLine().getStatusCode() != 200) {
-				System.out.println( url );
-				System.out.println( response2.getStatusLine() );
-				System.out.println( response2.getStatusLine().getReasonPhrase() );
-				System.out.println( response2.getEntity() );
-				System.out.println( response2.getEntity().getContent() );
+				RobautoMain.logger.debug( url );
+				RobautoMain.logger.debug( response2.getStatusLine().toString() );
+				RobautoMain.logger.debug( response2.getStatusLine().getReasonPhrase() );
+				RobautoMain.logger.debug( response2.getEntity().toString() );
+				RobautoMain.logger.debug( response2.getEntity().getContent().toString() );
 			    response = IOUtils.toString(response2.getEntity().getContent());
-			    System.out.println(response);
+			    RobautoMain.logger.debug(response);
 			    EntityUtils.consume(response2.getEntity());
 				return null;
 			}
@@ -168,7 +168,7 @@ public class Here2 {
 		String response = getRestResponse( geocodeUrl, nvps );
 	    JsonElement jelement = new JsonParser().parse(response);
 	    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	    if (verbose) System.out.println( gson.toJson(jelement).toString() );
+	    if (verbose) RobautoMain.logger.debug( gson.toJson(jelement).toString() );
 	    JsonArray view = getNestedJsonArray(jelement, Arrays.asList("Response", "View"));
 	    if (view != null && view.size() > 0) {
 	    	JsonArray result = getNestedJsonArray(view.get(0), Arrays.asList("Result"));
@@ -215,7 +215,7 @@ public class Here2 {
 		String json = getRestResponse( routingUrl, nvps );
 		if (json == null)
 			return null;
-		System.out.println("REST bytes: " + json.length() );
+		RobautoMain.logger.debug("REST bytes: " + json.length() );
 	    JsonElement jelement = new JsonParser().parse(json);
 	    try {
 	    	PrintStream out = new PrintStream("route.json");
@@ -299,7 +299,7 @@ public class Here2 {
 
 //	public static void main(String[] args) {
 //		LatLon lee = Here.geocodeLookup("Lee Service Plaza Eastbound");
-//		System.out.println( lee  );
+//		RobautoMain.logger.debug( lee  );
 	
 //	public static Route computeRoute() {
 //		HereRoutePlus plus = null;
@@ -386,23 +386,23 @@ public class Here2 {
 	public static void reportRoute( Route route ) {
 		System.out.printf("%d indicents\n", route.getIncident().size() );
 		for (Incident incident : route.getIncident() ) {
-			System.out.println(incident);
+			RobautoMain.logger.debug(incident.toString());
 		}
 		System.out.printf("%d maneuvergroups\n", route.getManeuverGroup().size() );
 		for (ManeuverGroup group : route.getManeuverGroup()) {
-			System.out.println( group );
+			RobautoMain.logger.debug( group.toString() );
 		}
 		System.out.printf("%d shapes\n", route.getShape().size() );
 		//writeKml( "shape.kml", route.getShape() );
 		System.out.printf("%d waypoints\n", route.getWaypoint().size() );
 		for (Waypoint waypoint : route.getWaypoint()) {
-			System.out.println( waypoint );
+			RobautoMain.logger.debug( waypoint.toString() );
 		}
 		System.out.printf("%d legs\n", route.getLeg().size() );
 		//List<GeoPosition> routeShape = route.getShape();
 		//int pointIndex = 1;
 		for (Leg leg : route.getLeg()) {
-			System.out.println( leg.getSummary() );
+			RobautoMain.logger.debug( leg.getSummary().toString() );
 			System.out.printf("%d links\n", leg.getLink().size() );
 			System.out.printf("%d Maneuvers\n", leg.getManeuver().size() );
 			for (Maneuver maneuver : leg.getManeuver()) {
@@ -433,7 +433,7 @@ public class Here2 {
 	
 	public static Route computeRouteBase( HereRoute hereRoute ) {
 		//HereRoute hereRoute = plus.route;
-		System.out.println(hereRoute.getResponse().getMetaInfo());
+		RobautoMain.logger.debug(hereRoute.getResponse().getMetaInfo().toString());
 		Set<Route> routes = hereRoute.getResponse().getRoute();
 		System.out.printf("%d routes\n", routes.size() );
 		Iterator<Route> it = routes.iterator();
@@ -441,7 +441,7 @@ public class Here2 {
 		// find shortest after adjusting speeds
 		while (it.hasNext()) {
 			Route r = it.next();
-			System.out.println( r.getSummary().getText() +  "  " + r.getSummary().getDistance() + " " + r.getSummary().getTrafficTime() );
+			RobautoMain.logger.debug( r.getSummary().getText() +  "  " + r.getSummary().getDistance() + " " + r.getSummary().getTrafficTime() );
 			if (route == null) {
 				route = r;
 			} else {
@@ -468,7 +468,7 @@ M3   :  10.5 mi /  0:16;     0.0 mi /  0:01;    39; 130 [DOWNEAST HWY/DOWNEAST H
 M4   :  24.1 mi /  0:33;    10.5 mi /  0:17;    44; 229 [I-395 W RAMP/I-395 W RAMP/] Take the I-395 W ramp to the right
       44.531643,   -68.406179		 
 		 */
-		System.out.println( Here2.geocodeReverseLookup( new GeoPosition(44.522588,   -68.208983) ));
+		RobautoMain.logger.debug( Here2.geocodeReverseLookup( new GeoPosition(44.522588,   -68.208983) ));
 	}
 
 }

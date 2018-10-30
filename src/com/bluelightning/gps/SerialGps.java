@@ -1,5 +1,6 @@
 package com.bluelightning.gps;
 
+import com.bluelightning.RobautoMain;
 import com.fazecast.jSerialComm.SerialPort;
 
 import java.io.IOException;
@@ -38,9 +39,9 @@ public class SerialGps {
         SerialPort[] serialPorts = SerialPort.getCommPorts();
         SerialPort gpsPort = null;
 
-        System.out.println(portName);
+        RobautoMain.logger.debug(portName);
         for (SerialPort serialPort : serialPorts) {
-        	System.out.println("Serial Port: " +  serialPort.getDescriptivePortName() + " " + serialPort.toString() );
+        	RobautoMain.logger.debug("Serial Port: " +  serialPort.getDescriptivePortName() + " " + serialPort.toString() );
             if (serialPort.getDescriptivePortName().equalsIgnoreCase(portName) ||
             	serialPort.getDescriptivePortName().contains(portName)) {
                 gpsPort = serialPort;
@@ -48,30 +49,30 @@ public class SerialGps {
         }
 
         if (gpsPort == null) {
-            System.out.println("failed to find gps serial port");
+            RobautoMain.logger.warn("failed to find gps serial port");
 
             return false;
         }
 
-        System.out.println("using serial port: " + gpsPort.getDescriptivePortName());
+        RobautoMain.logger.info("using serial port: " + gpsPort.getDescriptivePortName());
 
         gpsPort.setBaudRate(4800);
         gpsPort.openPort();
         InputStream inStream = gpsPort.getInputStream();
 
         if (inStream == null) {
-            System.out.println("opening port " + gpsPort.getDescriptivePortName() + " failed");
+            RobautoMain.logger.error("opening port " + gpsPort.getDescriptivePortName() + " failed");
 
             return false;
         }
         
         while (true) {
-        	System.out.println( "Waiting for GPS input...");
+        	RobautoMain.logger.info( "Waiting for GPS input...");
         	try {
 				if (inStream.available() > 0)
 					break;
 			} catch (IOException e) {
-				System.out.println("  " + e.getMessage() );
+				RobautoMain.logger.warn("  " + e.getMessage() );
 			}
         	try { Thread.sleep(1000); } catch (Exception x) {};
         }

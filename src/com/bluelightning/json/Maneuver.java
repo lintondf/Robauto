@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.bluelightning.LatLon;
 import com.bluelightning.PostProcessingEnabler;
+import com.bluelightning.RobautoMain;
 import com.bluelightning.poi.POIBase;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -641,7 +642,7 @@ public class Maneuver implements Serializable, Comparable<Maneuver>, PostProcess
 				this.travelTime = this.baseTime;
 				this.trafficTime = trafficDelay * this.travelTime;
 			} else if (getLength() > 1e3) {
-				System.out.println("adjustSpeeds:  No speed limit for " + getLength()+ "m : " + link );
+				RobautoMain.logger.info("adjustSpeeds:  No speed limit for " + getLength()+ "m : " + link );
 			}
 		} else if (getLength() > 1e3) {
 			//System.out.println("adjustSpeeds:  No link for " + getLength()+ "m : " + link );

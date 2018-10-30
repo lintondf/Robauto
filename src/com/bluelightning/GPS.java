@@ -170,11 +170,11 @@ public class GPS {
 	public void initialize(boolean isSurface) {
 		serialGps = new SerialGps((isSurface) ? "COM4" : "XGPS10M-4269F2-SPPDev");
 		serialGps.addStateListener(state -> {
-			System.out.println( state.toString() );
+			RobautoMain.logger.debug( state.toString() );
 			if (state.quality > 0) {
 				Fix fix = new Fix( state );
 				if (! addObservation(fix) ) {
-					System.out.println( fix.toString() + " / " + state.toString() );
+					RobautoMain.logger.debug( fix.toString() + " / " + state.toString() );
 				}
 			}
 		} );
@@ -223,25 +223,25 @@ public class GPS {
 		debugThread = new Thread( new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("Starting: " + lastFix.date);
+				RobautoMain.logger.debug("Starting: " + lastFix.date);
 				while (!Thread.interrupted()) {
 					try {
 						GPS.Fix nextFix = (GPS.Fix) ois.readObject();
 						long msRemaining = nextFix.date.getTime() - lastFix.date.getTime();
-						//System.out.println("Waiting: " + nextFix + " / delay = " + msRemaining );
+						//RobautoMain.logger.debug("Waiting: " + nextFix + " / delay = " + msRemaining );
 						if (msRemaining > 0) {
 							Thread.sleep(msRemaining/SPEED_UP);
 						}
 						if (addObservation( nextFix )) {
 							lastFix = nextFix;
 						} else {
-							System.out.println(nextFix.toString() );
+							RobautoMain.logger.debug(nextFix.toString() );
 						}
 					} catch (Exception x) {
 						break;
 					}
 				}
-				System.out.println("Exiting: " +this);
+				RobautoMain.logger.debug("Exiting: " +this);
 			}
 		} );
 		debugThread.start();

@@ -112,7 +112,7 @@ public class TravelMode extends JPanel {
 	public class HandleTripPlanUpdate implements TripPlanUpdate {
 		@Override
 		public String update(final String tripPlanPath) throws RemoteException {
-			System.out.println(tripPlanPath);
+			RobautoMain.logger.debug(tripPlanPath);
 			final File tripPlanFile = new File(tripPlanPath);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
@@ -134,7 +134,7 @@ public class TravelMode extends JPanel {
 	public class UiHandler {
 		@Subscribe
 		protected void handle(UiEvent event) {
-			// System.out.println(event.source + " " + event.awtEvent);
+			// RobautoMain.logger.debug(event.source + " " + event.awtEvent);
 			switch (event.source) {
 			case "SelectDay":
 				dayListScrollPane.setVisible(true);
@@ -191,7 +191,7 @@ public class TravelMode extends JPanel {
 				}
 			}
 		}
-		//System.out.println( closest );
+		//RobautoMain.logger.debug( closest );
 		return closest;
 	}
 	
@@ -410,7 +410,7 @@ public class TravelMode extends JPanel {
 //				Registry registry = LocateRegistry.getRegistry(localHostAddress.toString(), RobautoMain.REGISTRY_PORT);
 //				registry.bind("Update", stub);
 //			}
-//			System.out.println("Server ready");
+//			RobautoMain.logger.debug("Server ready");
 //		} catch (Exception e) {
 //			System.err.println("Server exception: " + e.toString());
 //		}
@@ -431,12 +431,12 @@ public class TravelMode extends JPanel {
 				for (ArrayList<VisitedPlace> stops : placesByDay) {
 					int iLast = stops.size() - 1;
 					Address from = stops.get(0).getAddress();
-					System.out.println(from.toString());
+					RobautoMain.logger.debug(from.toString());
 					Address to = stops.get(iLast).getAddress();
-					System.out.println(to.toString());
+					RobautoMain.logger.debug(to.toString());
 					String entry = String.format("Day %02d: %s, %s to %s, %s", dayNo++, from.getCity(), from.getState(),
 							to.getCity(), to.getState());
-					System.out.println(entry);
+					RobautoMain.logger.debug(entry);
 					model.addElement(entry);
 				}
 				if (model.isEmpty()) {
@@ -467,7 +467,7 @@ public class TravelMode extends JPanel {
 
 	private static void initLookAndFeel(double textSizeInPixels, double fontSize) {
 		try {
-			System.out.println(Toolkit.getDefaultToolkit().getScreenSize());
+			RobautoMain.logger.debug(Toolkit.getDefaultToolkit().getScreenSize().toString());
 			// double fontSize = 0.8 * textSizeInPixels *
 			// Toolkit.getDefaultToolkit().getScreenResolution() / 72.0;
 			System.out.printf("%f %d %f\n", textSizeInPixels, Toolkit.getDefaultToolkit().getScreenResolution(),
@@ -478,7 +478,7 @@ public class TravelMode extends JPanel {
 					NimbusLookAndFeel laf = (NimbusLookAndFeel) UIManager.getLookAndFeel();
 					// laf.getDefaults().entrySet().forEach(System.out::println);
 					Font font = new Font("Tahoma", Font.BOLD, (int) fontSize);
-					System.out.println(font);
+					RobautoMain.logger.debug(font.toString());
 					laf.getDefaults().put("defaultFont", font);
 					laf.getDefaults().put("ScrollBar.thumbHeight", (int) textSizeInPixels);
 					laf.getDefaults().put("Table.rowHeight", (int) textSizeInPixels);
@@ -512,7 +512,7 @@ public class TravelMode extends JPanel {
 		String path = "RobautoTripPlan.obj";
 		if (args.length > 0)
 			path = args[0];
-		System.out.println(path);
+		RobautoMain.logger.debug(path);
 		final File tripPlanFile = new File(path);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -557,7 +557,7 @@ public class TravelMode extends JPanel {
 //							try {
 //								Thread.sleep(10*1000);
 //							} catch (Exception x) {}
-//							System.out.println("toBack");
+//							RobautoMain.logger.debug("toBack");
 //							frame.toBack();
 //						}
 						@Override

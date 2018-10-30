@@ -179,7 +179,7 @@ public class AddManualStopDialog extends JDialog {
 
 		@Override
 		public void actionPerformed(ActionEvent event) {
-			System.out.println("AASSA::action " + event);
+			RobautoMain.logger.debug("AASSA::action " + event);
 			switch (event.getActionCommand()) {
 			case "Cancel":
 				RobautoMain.logger.info("dispose() on Cancel");

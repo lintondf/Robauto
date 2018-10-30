@@ -120,7 +120,7 @@ public class PlannerMode extends JPanel {
 	public class POIClickHandler {
 		@Subscribe
 		protected void handle(POIClickEvent event) {
-			System.out.println(event.toString());
+			RobautoMain.logger.debug(event.toString());
 			// browserCanvas.moveTo(event.poi.getLatitude(),
 			// event.poi.getLongitude());
 			// int index =
@@ -298,11 +298,11 @@ public class PlannerMode extends JPanel {
 				}
 				for (Entry<PlannerMode.MarkerKinds, ArrayList<POIResult>> entry : nearbyMap.entrySet()) {
 					if (controlPanel.getMarkerStatus(entry.getKey())) {
-						System.out.println("Adding " + entry.getValue().size() + " " + entry.getKey().toString());
+						RobautoMain.logger.debug("Adding " + entry.getValue().size() + " " + entry.getKey().toString());
 						nearby.addAll(POIMarker.factory(entry.getValue()));
 					}
 				}
-				System.out.println(nearby.size() + " total markers");
+				RobautoMain.logger.debug(nearby.size() + " total markers");
 				map.updateWaypoints(nearby);
 				break;
 
@@ -333,10 +333,10 @@ public class PlannerMode extends JPanel {
 				break;
 
 			case "ControlPanel.ClearActions":
-				System.out.println(event.source + " " + event.awtEvent);
+				RobautoMain.logger.debug(event.source + " " + event.awtEvent);
 				JComboBox<?> box = (JComboBox<?>) event.awtEvent.getSource();
 				String action = (String) box.getSelectedItem();
-				System.out.println(action);
+				RobautoMain.logger.debug(action);
 				RobautoMain.tripPlan.clear(action);
 				break;
 
@@ -369,7 +369,7 @@ public class PlannerMode extends JPanel {
 				start.setVisitOrder(iDay);
 				places.add(start);
 				int refuel = 0;
-				System.out.println(tripLeg.legData.startLabel);
+				RobautoMain.logger.debug(tripLeg.legData.startLabel);
 				tripLeg.stopDataList.forEach(System.out::println);
 				for (TripPlan.StopData stopData : tripLeg.stopDataList) {
 					if (stopData.use) {
@@ -569,7 +569,7 @@ public class PlannerMode extends JPanel {
 
 			@Subscribe
 			protected void handle(AddWaypointEvent event) {
-				System.out.println(event + " " + event.place);
+				RobautoMain.logger.debug(event + " " + event.place);
 				Events.eventBus.unregister(this); // one shot
 				handler = null;
 				map.clearRoute();
@@ -729,7 +729,7 @@ public class PlannerMode extends JPanel {
 
 		@Override
 		protected void append(ILoggingEvent event) {
-			// System.out.println("TAE: " + event.toString() + " " + layout);
+			// RobautoMain.logger.debug("TAE: " + event.toString() + " " + layout);
 			final String message = layout.doLayout(event);
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
@@ -834,7 +834,7 @@ public class PlannerMode extends JPanel {
 		ArrayList<VisitedPlace> places = new ArrayList<>(garmin.places);
 		for (int i = 0; i < places.size(); i++) {
 			VisitedPlace place = places.get(i);
-			System.out.println(place);
+			RobautoMain.logger.debug(place.toString());
 			// compare to address book entries
 			Iterator<Place> pit = addressBook.getAllPlaces().iterator();
 			boolean matched = false;
@@ -843,7 +843,7 @@ public class PlannerMode extends JPanel {
 				double d = POIBase.distanceBetween(bookPlace.getLatitude(), bookPlace.getLongitude(), place.getLatitude(),
 						place.getLongitude());
 				if (d < MATCH_DISTANCE) {
-					System.out.println(" -> Book: " + bookPlace);
+					RobautoMain.logger.debug(" -> Book: " + bookPlace);
 					places.set(i, new VisitedPlace(bookPlace));
 					matched = true;
 					break;
@@ -856,7 +856,7 @@ public class PlannerMode extends JPanel {
 					if (!nearBy.isEmpty()) {
 						POI poi = nearBy.keySet().iterator().next();
 						try {
-							System.out.println(" -> POI: " + poi);
+							RobautoMain.logger.debug(" -> POI: " + poi);
 							places.set(i, new VisitedPlace(poi));
 							matched = true;
 						} catch (IllegalValueException e) {
@@ -877,13 +877,13 @@ public class PlannerMode extends JPanel {
 			if (i > 0 && i < places.size() - 1) {
 				places.get(i).setOvernight(true);
 			}
-			System.out.println(places.get(i).toGeo() + " " + places.get(i).isOvernight() + " "
+			RobautoMain.logger.debug(places.get(i).toGeo() + " " + places.get(i).isOvernight() + " "
 					+ places.get(i).getFuelAvailable().get());
 		}
 
 		for (VisitedPlace place : places) {
 			List<ReadOnlyPlace> startMatches = addressBook.getPlacesWithAddress(place.getAddress().toString());
-			System.out.println(place + " " + startMatches.isEmpty());
+			RobautoMain.logger.debug(place + " " + startMatches.isEmpty());
 		}
 
 		File outputFile = new File(String.format("%s.robauto", basePath));
@@ -1052,7 +1052,7 @@ public class PlannerMode extends JPanel {
 
 	private static void initLookAndFeel(double textSizeInPixels, double fontSize) {
 		try {
-			System.out.println(Toolkit.getDefaultToolkit().getScreenSize());
+			RobautoMain.logger.debug(Toolkit.getDefaultToolkit().getScreenSize().toString());
 			// double fontSize = 0.8 * textSizeInPixels *
 			// Toolkit.getDefaultToolkit().getScreenResolution() / 72.0;
 			System.out.printf("%f %d %f\n", textSizeInPixels, Toolkit.getDefaultToolkit().getScreenResolution(), fontSize);
@@ -1062,7 +1062,7 @@ public class PlannerMode extends JPanel {
 					NimbusLookAndFeel laf = (NimbusLookAndFeel) UIManager.getLookAndFeel();
 					// laf.getDefaults().entrySet().forEach(System.out::println);
 					Font font = new Font("Tahoma", Font.BOLD, (int) fontSize);
-					System.out.println(font);
+					RobautoMain.logger.debug(font.toString());
 					laf.getDefaults().put("defaultFont", font);
 					laf.getDefaults().put("ScrollBar.thumbHeight", (int) textSizeInPixels);
 					laf.getDefaults().put("Table.rowHeight", (int) textSizeInPixels);

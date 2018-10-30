@@ -164,7 +164,7 @@ public class Garmin extends JPanel {
 				int index = (place.getFuel() > 0.0) ? 1 : 0;
 				index += (place.isDriverSwitch()) ? 2 : 0;
 				index += (place.isOvernight()) ? 4 : 0;
-				System.out.println( index + " " + syms[index]);
+				RobautoMain.logger.debug( index + " " + syms[index]);
 				w.setSym(syms[index]);
 				w.setType("user");
 //				ExtensionsType extensions = new ExtensionsType();
@@ -222,14 +222,14 @@ public class Garmin extends JPanel {
 			for (RteType rte : rtes) {
 				Day day = new Day();
 				days.add(day);
-				System.out.println("RTE: " + rte.getName());
+				RobautoMain.logger.debug("RTE: " + rte.getName());
 				List<WptType> rtepts = rte.getRtept();
 				if (! rtepts.isEmpty()) {
 					day.wpts.add( rtepts.get(0) ); // from first waypoint to last waypoint
 					day.wpts.add( rtepts.get(rtepts.size()-1) );
 				}
 				for (WptType rtept : rtepts) {
-					System.out.println("RTEPT: " + rtept.getName() + " "
+					RobautoMain.logger.debug("RTEPT: " + rtept.getName() + " "
 							+ rtept.getCmt() + " " + rtept.getLat() + ","
 							+ rtept.getLon());
 					LatLon where = new LatLon(rtept.getLat().doubleValue(),
@@ -252,7 +252,7 @@ public class Garmin extends JPanel {
 							case "{http://www.garmin.com/xmlschemas/GpxExtensions/v3}RoutePointExtension":
 								RoutePointExtensionT rpext = (RoutePointExtensionT) element
 										.getValue();
-								System.out.println("AutoroutePointT #"
+								RobautoMain.logger.debug("AutoroutePointT #"
 										+ rpext.getRpt().size());
 								List<AutoroutePointT> points = rpext.getRpt();
 								for (AutoroutePointT point : points) {
@@ -266,7 +266,7 @@ public class Garmin extends JPanel {
 								break;
 							}
 						} else {
-							System.out.println("UNKNOWN: " + ext);
+							RobautoMain.logger.debug("UNKNOWN: " + ext);
 						}
 					} // for ext
 				} // for wpt

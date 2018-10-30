@@ -183,7 +183,7 @@ public class BaseCamp {
 	
 	public BaseCamp( Garmin.Day day, String pdfPath ) {
 		this.day = day;
-		System.out.println("BASECAMP: " + pdfPath);
+		RobautoMain.logger.info("BASECAMP: " + pdfPath);
 		String htmlPath = pdfPath.replace(".pdf", ".html");
 		//String gpxPath = pdfPath.replace(".pdf", ".GPX");
 		File htmlFile = new File(htmlPath);
@@ -261,7 +261,7 @@ public class BaseCamp {
 			Turn current = tit.next();
 			if (current.distance <= 0.0)
 				continue;
-			System.out.println("T" + iTurn + " : " + current);
+			RobautoMain.logger.debug("T" + iTurn + " : " + current);
 			
 			Maneuver maneuver = new Maneuver();
 			leg.getManeuver().add(maneuver);
@@ -291,7 +291,7 @@ public class BaseCamp {
 			iTurn++;
 			if (iTrack < day.trackPoints.size()) {
 				TrackPoint trackPoint = day.trackPoints.get(iTrack);
-				System.out.println( iTrack + " : " +  trackPoint);
+				RobautoMain.logger.debug( iTrack + " : " +  trackPoint);
 				//StopMarker wp = new StopMarker(StopMarker.DRIVERS, Integer.toString(iTrack) + ":" + current.toString(), trackPoint);
 				//vias.add(wp);
 				viaPoints.add(trackPoint);
