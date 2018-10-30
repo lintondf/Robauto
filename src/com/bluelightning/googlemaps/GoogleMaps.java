@@ -36,6 +36,7 @@ import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.slf4j.LoggerFactory;
 
+import com.bluelightning.RobautoMain;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.PlacesApi;
@@ -256,13 +257,13 @@ public class GoogleMaps {
 					.type(PlaceType.GAS_STATION)
 					.await();
 		} catch (ApiException e) {
-			System.err.println(e);
+			RobautoMain.logger.error("Exception: ", e);
 			return null;
 		} catch (InterruptedException e) {
-			System.err.println(e);
+			RobautoMain.logger.error("Exception: ", e);
 			return null;
 		} catch (IOException e) {
-			System.err.println(e);
+			RobautoMain.logger.error("Exception: ", e);
 			return null;
 		}
 		if (placeResponse == null) return null;

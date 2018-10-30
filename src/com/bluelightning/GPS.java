@@ -155,7 +155,7 @@ public class GPS {
 					fix.speed = speed;
 					Events.eventBus.post( new Events.GpsEvent(fix) );
 				} else {
-					System.out.printf("EDITED: %s %10.1f %10.0f\n",fix.toString(), speed, movement );
+					RobautoMain.logger.warn( String.format("EDITED: %s %10.1f %10.0f\n",fix.toString(), speed, movement ) );
 					return false;
 				}
 			}

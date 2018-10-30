@@ -82,7 +82,7 @@ public class BaseCampDirectionsParser {
 		}
 		
 		public ParsedDirections parse(String[] words) {
-			System.err.println("NIY: " + words[0]);
+			RobautoMain.logger.error("NIY: " + words[0]);
 			return new ParsedDirections();
 		}
 	}
