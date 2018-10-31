@@ -78,7 +78,6 @@ public class TravelMode extends JPanel {
 
 	public static String hostName = "localhost";
 	public static boolean isSurface = true;
-	public static boolean gpsNormal = true;
 
 	public TripPlan tripPlan = null;
 	public Report report = null;
@@ -134,7 +133,7 @@ public class TravelMode extends JPanel {
 	public class UiHandler {
 		@Subscribe
 		protected void handle(UiEvent event) {
-			// RobautoMain.logger.debug(event.source + " " + event.awtEvent);
+			RobautoMain.logger.debug("UIEvent: " + event.source + " " + event.awtEvent);
 			switch (event.source) {
 			case "SelectDay":
 				dayListScrollPane.setVisible(true);
@@ -196,27 +195,18 @@ public class TravelMode extends JPanel {
 	}
 	
 	protected GPS gps = new GPS();
-	protected ObjectInputStream gpsOis;
-	protected ObjectOutputStream gpsOos;
 
 	public class GpsHandler {
 		Date  startTime = null;
 		
 		@Subscribe
 		public void handle(final Events.GpsEvent event) {
-			RobautoMain.logger.info( event.fix.toString() );
-			if (gpsOos != null) {
-				try {
-					gpsOos.writeObject( event.fix );
-				} catch (IOException e) {
-				}
-			}
 			if (startTime == null)
 				startTime = event.fix.date;
 			if (event.fix.movement == 0.0)
 				startTime = event.fix.date;
 			RobautoMain.logger.debug(
-					String.format("%s %5.1f %6.4f\n", event.fix.toString(), Here2.METERS_TO_MILES * distanceTraveled, 
+					String.format("%s %5.1f %6.4f", event.fix.toString(), Here2.METERS_TO_MILES * distanceTraveled, 
 							Here2.METERS_TO_MILES * event.fix.movement / Report.MPG) );
 			distanceTraveled += event.fix.movement;
 			Maneuver currentManeuver = findCurrentManeuver( event.fix );
@@ -269,18 +259,14 @@ public class TravelMode extends JPanel {
 		final ButtonWaypoint buttonWaypoint = new ButtonWaypoint(new ImageIcon(image), it.next());
 		map.setYouAreHere(buttonWaypoint);
 		Events.eventBus.register(new GpsHandler());
-		if (gpsNormal)
-			gps.initialize(isSurface);
-		else {
-			gps.debugSetup(gpsOis);
-		}
+		gps.initialize(frame, isSurface);
 	}
 
 	protected void setDay() {
 		final Report.Day day = report.getDays().get(currentDay);
 		final ArrayList<Route> days = tripPlan.getFinalizedDays();
-		//final ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
-		//final ArrayList<ArrayList<VisitedPlace>> allPlaces = tripPlan.getFinalizedPlaces();
+		final ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
+		final ArrayList<ArrayList<VisitedPlace>> allPlaces = tripPlan.getFinalizedPlaces();
 		Drive drive = day.steps.get(0).drive;
 		currentFuel = Double.parseDouble(drive.fuelRemaining) + Double.parseDouble(drive.fuelUsed);
 		distanceTraveled = 0.0;
@@ -311,7 +297,7 @@ public class TravelMode extends JPanel {
 				} catch (Exception x) {
 				}
 				map.clearRoute();
-				//List<ButtonWaypoint> waypoints = map.showRoute(days, markers, allPlaces, currentDay);
+				/*List<ButtonWaypoint> waypoints = */ map.showRoute(days, markers, allPlaces, currentDay);
 				activePanel.getSplitPane().setDividerLocation(0.4);
 				activePanel.getTextPane().setText(travelStatus.toHtml());
 				activePanel.getTextPane().setCaretPosition( 0 );
@@ -527,24 +513,6 @@ public class TravelMode extends JPanel {
 					frame.setIconImage(icon);
 
 					TravelMode travelMode = new TravelMode();
-					if (gpsNormal) {
-						try {
-							FileOutputStream fos = new FileOutputStream(file);
-							travelMode.gpsOos = new ObjectOutputStream( fos );
-						} catch (IOException e) {
-							e.printStackTrace();
-							travelMode.gpsOos = null;
-						}
-					} else {
-						try {
-							FileInputStream fis = new FileInputStream(file);
-							travelMode.gpsOis = new ObjectInputStream( fis );
-						} catch (IOException e) {
-							//e.printStackTrace();
-							travelMode.gpsOis = null;
-						}
-						
-					}
 
 					frame.setContentPane(travelMode);
 					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -564,12 +532,6 @@ public class TravelMode extends JPanel {
 						public void windowClosing(WindowEvent e) {
 							if (travelMode.gps != null) {
 								travelMode.gps.shutdown();
-							}
-							if (travelMode.gpsOos != null) {
-								try {
-									travelMode.gpsOos.close();
-								} catch (IOException x) {
-								}
 							}
 						}
 					});

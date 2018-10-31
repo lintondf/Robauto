@@ -50,7 +50,6 @@ public class SerialGps {
 
         if (gpsPort == null) {
             RobautoMain.logger.warn("failed to find gps serial port");
-
             return false;
         }
 
@@ -62,7 +61,6 @@ public class SerialGps {
 
         if (inStream == null) {
             RobautoMain.logger.error("opening port " + gpsPort.getDescriptivePortName() + " failed");
-
             return false;
         }
         

@@ -2,13 +2,19 @@ package com.bluelightning;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.io.IOUtils;
 import org.gavaghan.geodesy.Ellipsoid;
@@ -21,13 +27,15 @@ import com.bluelightning.gps.SerialGps;
 import com.bluelightning.gps.NMEA.GpsState;
 
 public class GPS {
-	
+
 	protected static File gpsDat = new File("//SurfacePro3/NA/save/gpssave.dat");
 	protected static Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 	protected static GeodeticCalculator geoCalc = new GeodeticCalculator();
 	protected static Ellipsoid wgs84 = Ellipsoid.WGS84;
-	
-	
+
+	protected ObjectInputStream gpsOis;
+	protected ObjectOutputStream gpsOos;
+
 	public static class Fix extends GeoPosition implements Serializable {
 
 		/**
@@ -36,46 +44,47 @@ public class GPS {
 		private static final long serialVersionUID = 1L;
 		double speed;
 		double heading;
-		double movement;  // [m] distance traveled since last fix
-		Date   date;
-		
-		public Fix() {}
-		
-		public Fix(GpsState state ) {
-			super( state.lat, state.lon);
+		double movement; // [m] distance traveled since last fix
+		Date date;
+
+		public Fix() {
+		}
+
+		public Fix(GpsState state) {
+			super(state.lat, state.lon);
 			date = state.toDate();
 			speed = state.velocity * 0.514444; // knots -> m/s
 			heading = state.dir;
 		}
-		
-		public Fix( Date when, GeoPosition position ) {
+
+		public Fix(Date when, GeoPosition position) {
 			this.date = when;
 			this.latitude = position.getLatitude();
 			this.longitude = position.getLongitude();
 			this.speed = 0.0;
 			this.heading = 0.0;
 		}
-		
+
 		public String toString() {
-			return String.format("%s, %12.8f, %12.8f, %5.0f, %6.1f %6.1f", date.toString(), latitude, longitude, 
-					heading, Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR*speed,  Here2.METERS_TO_MILES*movement );
+			return String.format("%s, %12.8f, %12.8f, %5.0f, %6.1f %6.1f", date.toString(), latitude, longitude, heading,
+					Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR * speed, Here2.METERS_TO_MILES * movement);
 		}
-		
+
 		@SuppressWarnings("deprecation")
 		protected static Fix readGpsDataFile() {
 			Fix fix = new Fix();
 			try {
-				List<String> lines = IOUtils.readLines( new FileInputStream(gpsDat) );
+				List<String> lines = IOUtils.readLines(new FileInputStream(gpsDat));
 				StringBuffer contents = new StringBuffer();
-				lines.forEach( line -> {
+				lines.forEach(line -> {
 					contents.append("[");
 					contents.append(line);
 					contents.append("],");
 				});
-				//lines.forEach(System.out::println);
+				// lines.forEach(System.out::println);
 				String[] fields = lines.get(0).split("=");
 				if (fields[0].equalsIgnoreCase("Latitude")) {
-					double value = Double.parseDouble( fields[1].substring(1));
+					double value = Double.parseDouble(fields[1].substring(1));
 					if (fields[1].startsWith("S"))
 						value *= -1.0;
 					fix.latitude = value;
@@ -85,7 +94,7 @@ public class GPS {
 				}
 				fields = lines.get(1).split("=");
 				if (fields[0].equalsIgnoreCase("Longitude")) {
-					double value = Double.parseDouble( fields[1].substring(1));
+					double value = Double.parseDouble(fields[1].substring(1));
 					if (fields[1].startsWith("W"))
 						value *= -1.0;
 					fix.longitude = value;
@@ -96,7 +105,7 @@ public class GPS {
 				fields = lines.get(2).split("=");
 				if (fields[0].equalsIgnoreCase("UTCDate")) {
 					if (fields[1].length() < 6)
-						fields[1] = "0"+fields[1];
+						fields[1] = "0" + fields[1];
 					int year = Integer.parseInt(fields[1].substring(0, 2));
 					int month = Integer.parseInt(fields[1].substring(2, 4));
 					int day = Integer.parseInt(fields[1].substring(4, 6));
@@ -108,7 +117,7 @@ public class GPS {
 				fields = lines.get(3).split("=");
 				if (fields[0].equalsIgnoreCase("UTCTime")) {
 					if (fields[1].length() < 6)
-						fields[1] = "0"+fields[1];
+						fields[1] = "0" + fields[1];
 					int hour = Integer.parseInt(fields[1].substring(0, 2));
 					int minutes = Integer.parseInt(fields[1].substring(2, 4));
 					int seconds = Integer.parseInt(fields[1].substring(4, 6));
@@ -130,32 +139,40 @@ public class GPS {
 				}
 				return fix;
 			} catch (IOException e) {
-				RobautoMain.logger.error("Bad gpssave.dat: ", e );
+				RobautoMain.logger.error("Bad gpssave.dat: ", e);
 				e.printStackTrace();
 				return null;
 			}
 		}
 	}
-	
+
 	protected Fix lastFix = null;
-	
-	protected boolean addObservation( Fix fix ) {
+
+	protected boolean addObservation(Fix fix) {
 		if (lastFix != null) {
-			GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84, 
-					new GlobalCoordinates(lastFix), new GlobalCoordinates(fix));
+			GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84, new GlobalCoordinates(lastFix),
+					new GlobalCoordinates(fix));
 			fix.heading = curve.getAzimuth();
 			if (Double.isNaN(fix.heading))
 				fix.heading = 0.0;
-			double dt = 1e-3 * (double)(fix.date.getTime() - lastFix.date.getTime());
+			double dt = 1e-3 * (double) (fix.date.getTime() - lastFix.date.getTime());
 			if (dt > 0.0 && Double.isFinite(curve.getEllipsoidalDistance())) {
 				double movement = curve.getEllipsoidalDistance();
 				double speed = fix.movement / dt;
 				if (speed < 120.0 / Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR) {
 					fix.movement = movement;
 					fix.speed = speed;
-					Events.eventBus.post( new Events.GpsEvent(fix) );
+					Events.GpsEvent event = new Events.GpsEvent(fix);
+					if (gpsOos != null) {
+						try {
+							gpsOos.writeObject( fix );
+						} catch (IOException e) {
+						}
+					}
+					
+					Events.eventBus.post(event);
 				} else {
-					RobautoMain.logger.warn( String.format("EDITED: %s %10.1f %10.0f\n",fix.toString(), speed, movement ) );
+					RobautoMain.logger.warn(String.format("EDITED: %s %10.1f %10.0f", fix.toString(), speed, movement));
 					return false;
 				}
 			}
@@ -163,24 +180,69 @@ public class GPS {
 		lastFix = fix;
 		return true;
 	}
-	
+
 	Thread readerThread = null;
 	SerialGps serialGps = null;
-	
-	public void initialize(boolean isSurface) {
+
+	public void initialize(JFrame frame, boolean isSurface) {
 		serialGps = new SerialGps((isSurface) ? "COM4" : "XGPS10M-4269F2-SPPDev");
 		serialGps.addStateListener(state -> {
-			RobautoMain.logger.debug( state.toString() );
+			RobautoMain.logger.debug(state.toString());
 			if (state.quality > 0) {
-				Fix fix = new Fix( state );
-				if (! addObservation(fix) ) {
-					RobautoMain.logger.debug( fix.toString() + " / " + state.toString() );
+				Fix fix = new Fix(state);
+				if (!addObservation(fix)) {
+					RobautoMain.logger.debug(fix.toString() + " / " + state.toString());
 				}
 			}
-		} );
-		serialGps.start();
+		});
+		if (serialGps.start()) {
+			try {
+				File file = new File("robauto-gps.obj");
+				FileOutputStream fos = new FileOutputStream(file);
+				gpsOos = new ObjectOutputStream( fos );
+			} catch (IOException e) {
+				e.printStackTrace();
+				gpsOos = null;
+			}
+			return;
+		}
+
+		// Create a file chooser
+		final JFileChooser fileChooser = new JFileChooser( new File(".") );
+		fileChooser.setDialogTitle("No GPS Detected; Select Playback File");
+		fileChooser.setFileFilter(new FileFilter() {
+			@Override
+			public boolean accept(File f) {
+				String name = f.getName().toLowerCase();
+				if (name.endsWith(".obj"))
+					return true;
+				return false;
+			}
+
+			@Override
+			public String getDescription() {
+				return "Robauto GPS capture";
+			}
+		});
+		// In response to a button click:
+		int returnVal = fileChooser.showOpenDialog(frame);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = fileChooser.getSelectedFile();
+			try {
+				FileInputStream fis = new FileInputStream(file);
+				gpsOis = new OpenObjectInputStream(fis);
+				debugSetup(gpsOis);
+			} catch (IOException e) {
+				System.err.println("No GPS detected; selected playback invalid; exiting..");
+				e.printStackTrace();
+				System.exit(0);
+			}
+		} else {
+			System.out.println("No GPS detected; no playback selected; exiting..");
+			System.exit(0);
+		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public void shutdown() {
 		if (readerThread != null) {
@@ -193,9 +255,8 @@ public class GPS {
 		}
 	}
 
-	
 	Thread debugThread = null;
-	
+
 	@SuppressWarnings("deprecation")
 	protected void debugClear() {
 		lastFix = null;
@@ -206,11 +267,9 @@ public class GPS {
 			} catch (Exception x) {
 				debugThread.destroy();
 			}
-		}		
+		}
 	}
-	
-	
-	
+
 	public void debugSetup(final ObjectInputStream ois) {
 		debugClear();
 		try {
@@ -220,7 +279,7 @@ public class GPS {
 			return;
 		}
 		long SPEED_UP = 10;
-		debugThread = new Thread( new Runnable() {
+		debugThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				RobautoMain.logger.debug("Starting: " + lastFix.date);
@@ -228,62 +287,63 @@ public class GPS {
 					try {
 						GPS.Fix nextFix = (GPS.Fix) ois.readObject();
 						long msRemaining = nextFix.date.getTime() - lastFix.date.getTime();
-						//RobautoMain.logger.debug("Waiting: " + nextFix + " / delay = " + msRemaining );
+						// RobautoMain.logger.debug("Waiting: " + nextFix +
+						// " / delay = " + msRemaining );
 						if (msRemaining > 0) {
-							Thread.sleep(msRemaining/SPEED_UP);
+							Thread.sleep(msRemaining / SPEED_UP);
 						}
-						if (addObservation( nextFix )) {
+						if (addObservation(nextFix)) {
 							lastFix = nextFix;
 						} else {
-							RobautoMain.logger.debug(nextFix.toString() );
+							RobautoMain.logger.debug(nextFix.toString());
 						}
 					} catch (Exception x) {
 						break;
 					}
 				}
-				RobautoMain.logger.debug("Exiting: " +this);
+				RobautoMain.logger.debug("Exiting: " + this);
 			}
-		} );
+		});
 		debugThread.start();
 	}
-	
-//	public void debugSetup(final Iterator<GeoPosition> it) {
-//		debugClear();
-//		
-//		debugThread = new Thread( new Runnable() {
-//			@Override
-//			public void run() {
-//				System.out.println("Starting: " +this);
-//				Date date = new Date();
-//				while (!Thread.interrupted() && it.hasNext()) {
-//					final GeoPosition position = it.next();
-//					try { 
-//						Thread.sleep(100); 
-//						date = new Date( date.getTime() + 10000L );
-//						addObservation( new Fix( date, position ) ); 
-//					} catch (Exception x) {
-//						break;
-//					}
-//				}
-//				System.out.println("Exiting: " +this);
-//			}
-//		} );
-//		debugThread.start();
-//	}
-	
+
+	// public void debugSetup(final Iterator<GeoPosition> it) {
+	// debugClear();
+	//
+	// debugThread = new Thread( new Runnable() {
+	// @Override
+	// public void run() {
+	// System.out.println("Starting: " +this);
+	// Date date = new Date();
+	// while (!Thread.interrupted() && it.hasNext()) {
+	// final GeoPosition position = it.next();
+	// try {
+	// Thread.sleep(100);
+	// date = new Date( date.getTime() + 10000L );
+	// addObservation( new Fix( date, position ) );
+	// } catch (Exception x) {
+	// break;
+	// }
+	// }
+	// System.out.println("Exiting: " +this);
+	// }
+	// } );
+	// debugThread.start();
+	// }
+
 	public static void main(String[] args) {
-		//GPS gps = new GPS();
+		// GPS gps = new GPS();
 		File file = new File("pwm-trace.obj");
 		ObjectInputStream gpsOis = null;
 		try {
 			FileInputStream fis = new FileInputStream(file);
-			gpsOis = new ObjectInputStream( fis );
-			//gps.debugSetup(gpsOis);
+			gpsOis = new ObjectInputStream(fis);
+			// gps.debugSetup(gpsOis);
 			while (true) {
 				GPS.Fix nextFix = (GPS.Fix) gpsOis.readObject();
-				System.out.println(nextFix );
+				System.out.println(nextFix);
 			}
-			
+
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {

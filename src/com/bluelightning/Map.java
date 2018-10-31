@@ -190,7 +190,7 @@ public class Map {
 		}
 		waylist.add(new StopMarker(StopMarker.TERMINUS, text, track.get(track.size() - 1)));
 		
-		waylist.forEach(System.out::println);
+		//waylist.forEach(System.out::println);
 
 		markerPainter = new ButtonWaypointOverlayPainter();
 		markerPainter.setWaypoints( new HashSet<ButtonWaypoint>(waylist));

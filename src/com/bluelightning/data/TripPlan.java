@@ -6,10 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,6 +23,7 @@ import javax.swing.ProgressMonitorInputStream;
 
 import com.bluelightning.GeodeticPosition;
 import com.bluelightning.Here2;
+import com.bluelightning.OpenObjectInputStream;
 import com.bluelightning.OptimizeStops;
 import com.bluelightning.json.Leg;
 import com.bluelightning.json.Maneuver;
@@ -64,43 +63,6 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	protected ArrayList<ArrayList<VisitedPlace>> finalizedPlaces;
 	
-	
-	protected static class MyObjectInputStream extends ObjectInputStream {
-
-	    public MyObjectInputStream(InputStream in) throws IOException {
-	        super(in);
-	    }
-
-	    protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
-	        ObjectStreamClass resultClassDescriptor = super.readClassDescriptor(); // initially streams descriptor
-	        @SuppressWarnings("rawtypes")
-			Class localClass; // the class in the local JVM that this descriptor represents.
-	        try {
-	            localClass = Class.forName(resultClassDescriptor.getName()); 
-	        } catch (ClassNotFoundException e) {
-	            RobautoMain.logger.error("No local class for " + resultClassDescriptor.getName(), e);
-	            return resultClassDescriptor;
-	        }
-	        ObjectStreamClass localClassDescriptor = ObjectStreamClass.lookup(localClass);
-	        if (localClassDescriptor != null) { // only if class implements serializable
-	            final long localSUID = localClassDescriptor.getSerialVersionUID();
-	            final long streamSUID = resultClassDescriptor.getSerialVersionUID();
-	            if (streamSUID != localSUID) { // check for serialVersionUID mismatch.
-	                final StringBuffer s = new StringBuffer("Overriding serialized class version mismatch: ");
-	                s.append("local serialVersionUID = ").append(localSUID);
-	                s.append(" stream serialVersionUID = ").append(streamSUID);
-	                if (localSUID == 1L && (streamSUID < 0L || streamSUID > 10L)) {
-	                	RobautoMain.logger.info( s.toString() );
-	                } else {
-		                Exception e = new InvalidClassException(s.toString());
-		                RobautoMain.logger.error("Potentially Fatal Deserialization Operation.", e);
-	                }
-	                resultClassDescriptor = localClassDescriptor; // Use local class descriptor for deserialization
-	            }
-	        }
-	        return resultClassDescriptor;
-	    }
-	}
 	
 	public void tripPlanUpdated(String savePath) {
 //		try {
@@ -556,7 +518,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 				pmis.getProgressMonitor().setMillisToPopup(100);
 				fis = pmis;
 			}
-			ObjectInputStream in = new MyObjectInputStream(fis);
+			ObjectInputStream in = new OpenObjectInputStream(fis);
 			TripPlan tripPlan = new TripPlan();
 			tripPlan.lastModified = (Date) in.readObject();
 			tripPlan.placesChanged = (Boolean) in.readObject();
