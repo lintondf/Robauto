@@ -19,7 +19,7 @@
 	<table class="bpTable">
 	<thead>
 	<TR>
-		<TD colspan="4" style='font-size:48pt;font-weight:bolder;text-align:center'>{$time}</TD>
+		<TD colspan="4" style='font-size:96pt;font-weight:bolder;text-align:center'>{$time}</TD>
 	</TR>
 	</thead>
 	</table>

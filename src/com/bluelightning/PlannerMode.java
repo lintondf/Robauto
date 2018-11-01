@@ -89,6 +89,8 @@ import seedu.addressbook.storage.StorageFile.StorageOperationException;
 
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
 
+// TODO:  Need to be able to stop for gas and not switch drivers
+
 public class PlannerMode extends JPanel {
 
 	/**

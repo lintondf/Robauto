@@ -179,6 +179,12 @@
         <latitude>38.23681</latitude>
         <longitude>-77.5068299</longitude>
     </persons>
+    <persons>
+        <name>Walmart Seabrook</name>
+        <address></address>
+        <latitude>42.89538860321045</latitude>
+        <longitude>-70.87100028991699</longitude>
+    </persons>
     <tags>Gas</tags>
     <tags>Fuel</tags>
 </AddressBook>
