@@ -13,8 +13,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/lintondf/GIT/RouteConverter/RouteConverterCmdLine/target/RouteConverterCmdLine.jar"/>
-	<classpathentry kind="lib" path="/Users/lintondf/GIT/Robauto/pdfbox-app-2.0.9.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="pdfbox-app-2.0.9.jar"/>
+	<classpathentry kind="lib" path="RouteConverterCmdLine.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
