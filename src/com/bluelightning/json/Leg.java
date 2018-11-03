@@ -279,6 +279,10 @@ public class Leg implements Serializable, PostProcessingEnabler.PostProcessable,
 			t.trafficTime = trafficTime + legProgress.trafficTime;
 			return t;
 		}
+		
+		public String toString() {
+			return String.format("%3.0f %10.0f %6.3f", heading, distance, travelTime );
+		}
     }
     
     protected Map<String, CumulativeTravel> progressMap = new HashMap<>();

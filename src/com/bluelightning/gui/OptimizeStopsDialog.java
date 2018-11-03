@@ -973,16 +973,22 @@ public class OptimizeStopsDialog extends JDialog {
 	}
 
 	public void generateLegStopChoices(int iLeg) {
-		RobautoMain.logger.info("Generating leg stop choices...");
+		RobautoMain.logger.info("Generating leg stop choices..." + iLeg);
 		while (getChoicesTabbedPane().getComponentCount() > 0) {
 			getChoicesTabbedPane().removeTabAt(0);
 		}
 		// generate all possible permutations of driver assignments
 		// do not permute stopping at the arrival point (last in
 		// stopDataList)
+		RobautoMain.logger.debug( String.format("Leg %d; %s", iLeg, optimizeStops.getTripPlan().getTripLeg(iLeg).legData.startLabel ) );
+//		for (StopData stop : optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList) {
+//			RobautoMain.logger.debug( stop.toString() );
+//		}
 		ArrayList<TripPlan.StopData> reduced = limitTotalStops(
 				optimizeStops.getTripPlan().getTripLeg(iLeg).stopDataList);
-		// reduced.forEach(System.out::println);
+		for (StopData stop : reduced) {
+			RobautoMain.logger.debug( stop.toString() );
+		}
 
 		Permutations perm = new Permutations(reduced.size() - 1);
 		ArrayList<Integer[]> unique = perm.monotonic();

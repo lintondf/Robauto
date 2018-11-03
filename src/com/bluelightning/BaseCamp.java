@@ -31,6 +31,7 @@ import com.bluelightning.json.Start;
 import com.bluelightning.json.TopLeft;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.StopMarker;
+import com.bluelightning.poi.POIBase;
 
 /**
  * @author lintondf
@@ -168,6 +169,7 @@ public class BaseCamp {
 			}
 			this.directions = text;
 			this.parsed = parser.parse(text);
+			//System.out.println(this);
 		}
 	}
 	
@@ -244,6 +246,35 @@ public class BaseCamp {
 			routeShape.add( String.format("%15.8f, %15.8f", point.getLatitude(), point.getLongitude()) );
 		}
 		route.setShape( routeShape );
+		double dayLength = computeShapeLength( route.getShape() );
+		
+//		System.out.printf("%10.4f %10.0f %10.0f\n", dayLength / turns.get(turns.size()-1).totalDistance, dayLength, turns.get(turns.size()-1).totalDistance);
+//		System.out.println( turns.get(0) );
+//		System.out.println( turns.get(turns.size()-1) );
+//		System.out.println( day.wpts.get(0).getName() );
+//		System.out.println( day.wpts.get(day.wpts.size()-1).getName() );
+		
+		String turnsStart = turns.get(0).directions.replace("Start at ", "").split(",")[0];
+		String turnsFinish = turns.get(turns.size()-1).directions.replace("Arrive at ", "").split(",")[0];
+		String dayStart = day.wpts.get(0).getName().split(",")[0];
+		String dayFinish = day.wpts.get(day.wpts.size()-1).getName().split(",")[0];
+//		System.out.println( turnsStart.equals( dayStart ) + " " + turnsFinish.equals( dayFinish ) );
+		
+		double lengthRatio = dayLength / turns.get(turns.size()-1).totalDistance;
+		if (lengthRatio < 0.995 || lengthRatio > 1.005) {
+			RobautoMain.logger.error(String.format("Length mismatch: %.0f vs %.0f on %s",
+					dayLength * Here2.METERS_TO_MILES, 
+					turns.get(turns.size()-1).totalDistance * Here2.METERS_TO_MILES,
+					pdfPath ));
+		}
+		if (! turnsStart.equals( dayStart )) {
+			RobautoMain.logger.error(String.format("Start mismatch: %s vs %s on %s", dayStart, turnsStart, pdfPath ));
+		}
+		if (! turnsFinish.equals( dayFinish )) {
+			RobautoMain.logger.error(String.format("Finish mismatch: %s vs %s on %s", dayFinish, turnsFinish, pdfPath ));
+		}
+		
+		
 		route.setBoundingBox( generateBoundingBox(day.trackPoints) );
 		Leg leg = new Leg();
 		leg.setShape( routeShape );
@@ -265,10 +296,13 @@ public class BaseCamp {
 			
 			Maneuver maneuver = new Maneuver();
 			leg.getManeuver().add(maneuver);
-			iTrack = findNearestTrackPoint( current, iTrack, day.trackPoints );
+			iTrack = findMatchingTrackPoint( current, iTrack, day.trackPoints );
 			List<Object> maneuverShape = new ArrayList<Object>();
-			if (startTrack < iTrack && iTrack < leg.getShape().size()) {
+			if (startTrack < iTrack && startTrack < leg.getShape().size()) {
 				maneuverShape.addAll( leg.getShape().subList(startTrack, iTrack) );
+			}
+			if (maneuverShape.isEmpty()) {
+				RobautoMain.logger.debug("Empty maneuver");
 			}
 			maneuver.setShape( maneuverShape );
 			maneuver.setLength( current.distance );
@@ -281,7 +315,10 @@ public class BaseCamp {
 				maneuver.setRoadNumber( current.parsed.road );
 			}
 			maneuver.postProcess();
-			System.out.printf(" M%d %d %d %d %d\n", iTurn, startTrack, iTrack, leg.getShape().size(), maneuver.getShape().size() );
+//			System.out.printf(" M%2d %5d %5d %5d %10.0f %10.0f %8.0f  %s\n", iTurn, startTrack, iTrack, maneuver.getShape().size(), 
+//					maneuver.getLength(), computeShapeLength(maneuver.getShape()),
+//					maneuver.getLength()-computeShapeLength(maneuver.getShape()),
+//					current.directions );
 			
 			legLength += maneuver.getLength();
 			legDuration += maneuver.getTrafficTime();
@@ -364,15 +401,29 @@ public class BaseCamp {
 	}
 	
 
-	private int findNearestTrackPoint(Turn current, int iTrack,
+	private double computeShapeLength(List<GeoPosition> shape) {
+		double length = 0.0;
+		for (int i = 1; i < shape.size(); i++) {
+			length += POIBase.distanceBetween( shape.get(i-1).getLatitude(), shape.get(i-1).getLongitude(), 
+					shape.get(i).getLatitude(), shape.get(i).getLongitude() );
+		}
+		return length;
+	}
+
+	private int findMatchingTrackPoint(Turn current, int iTrack,
 			List<TrackPoint> trackPoints) {
+//		int start = iTrack;
 		while (iTrack < trackPoints.size()) {
 			TrackPoint point = trackPoints.get(iTrack);
 			if (point.distanceStartToHere > current.totalDistance) {
+//				System.out.printf("fMTP %5d %10.0f %10.0f %8.0f\n", iTrack, point.distanceStartToHere, current.totalDistance, point.distanceStartToHere-current.totalDistance);
 				return iTrack; // Math.max(0,  iTrack-1);
 			}
 			iTrack++;
 		}
+//		System.out.printf("fMTP runoff %10.0f\n", current.totalDistance);
+//		for (int i = start; i < trackPoints.size(); i++) 
+//			System.out.printf("  %5d %10.0f\n",  i, trackPoints.get(i).distanceStartToHere );
 		return iTrack;
 	}
 

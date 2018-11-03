@@ -640,6 +640,10 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	public static ArrayList<TripPlan.StopData> getStopData(List<TripPlan.LegSummary> legSummary, int nDrivers,
 			LegSummary summary, boolean includeTruckAreas, List<TripPlan.RoadDirectionData> roadDirections) {
+		RobautoMain.logger.debug(String.format("getStopData %d %s", summary.nearby.size(), summary.startUserLabel ) );
+		for (POIResult near : summary.nearby) {
+			RobautoMain.logger.debug( near.toString() );
+		}
 		ArrayList<TripPlan.StopData> dataList = new ArrayList<>();
 		for (POIResult r : summary.nearby) {
 			TripPlan.StopData data = new TripPlan.StopData(r);

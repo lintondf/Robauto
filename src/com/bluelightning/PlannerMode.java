@@ -72,6 +72,7 @@ import com.bluelightning.poi.TruckStopPOI;
 import com.bluelightning.poi.WalmartPOI;
 import com.bluelightning.poi.POI.FuelAvailable;
 import com.google.common.eventbus.Subscribe;
+import com.sun.glass.ui.Window.Level;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.PatternLayout;
@@ -524,8 +525,15 @@ public class PlannerMode extends JPanel {
 			PlannerMode.loadPOIMap(poiMap);
 			nearbyMap.clear();
 			poiMap.forEach((kind, set) -> {
+				POISet.contains("optimizeStops1", set);
 				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(RobautoMain.tripPlan.getRoute(), 2e3));
 			});
+//			for (ArrayList<POIResult> near : nearbyMap.values()) {
+//				for (POIResult poi : near) {
+//					RobautoMain.logger.debug(poi.toString());
+//				}
+//			}
+			POISet.contains1("optimizeStops2", nearbyMap.values());
 
 			OptimizeStops optimizeStops = new OptimizeStops(RobautoMain.tripPlan, controller, addressBook, poiMap, nearbyMap);
 
@@ -706,7 +714,7 @@ public class PlannerMode extends JPanel {
 			setContext(lc);
 			setName("robauto");
 			PatternLayout layout = new PatternLayout();
-			layout.setPattern("%d{HH:mm:ss.SSS} [%thread] %-5level: %msg%n");
+			layout.setPattern("%d{HH:mm:ss.SSS} %-5level - %msg%n");
 			layout.setContext(lc);
 			layout.start();
 			setLayout(layout);
@@ -728,19 +736,32 @@ public class PlannerMode extends JPanel {
 			}
 			super.start();
 		}
+		
+		private boolean filterEvent( ILoggingEvent event ) {
+			ch.qos.logback.classic.Level level = event.getLevel();
+			if (level == ch.qos.logback.classic.Level.ERROR)
+				return true;
+			if (level == ch.qos.logback.classic.Level.WARN)
+				return true;
+			if (level == ch.qos.logback.classic.Level.INFO)
+				return true;
+			return false;
+		}
 
 		@Override
 		protected void append(ILoggingEvent event) {
 			// RobautoMain.logger.debug("TAE: " + event.toString() + " " + layout);
-			final String message = layout.doLayout(event);
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					StringBuffer sb = new StringBuffer(mainPanel.getLowerTextArea().getText());
-					sb.append(message);
-					mainPanel.getLowerTextArea().setText(sb.toString());
-				}
-			});
+			if (filterEvent(event)) {
+				final String message = layout.doLayout(event);
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						StringBuffer sb = new StringBuffer(mainPanel.getLowerTextArea().getText());
+						sb.append(message);
+						mainPanel.getLowerTextArea().setText(sb.toString());
+					}
+				});
+			}
 		}
 
 	}
