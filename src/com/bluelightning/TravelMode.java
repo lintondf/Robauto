@@ -83,6 +83,8 @@ public class TravelMode extends JPanel {
 	public Report report = null;
 	protected Map map;
 	protected JXMapViewer mapViewer;
+	private boolean displayRunning = true;
+
 	
 	public TravelStatus travelStatus = null;
 	
@@ -222,24 +224,17 @@ public class TravelMode extends JPanel {
 			travelStatus.update(timeSoFar, distanceTraveled);
 			travelStatus.update( event.fix );
 			SwingUtilities.invokeLater(new Runnable() {
+
 				@Override
 				public void run() {
-					setFuelLevel();
-					map.moveYouAreHere(event.fix);
-					activePanel.getTextPane().setText(travelStatus.toHtml());
-					activePanel.getTextPane().setCaretPosition( 0 );
-//					if (event.fix.speed > 0.1 && nearManeuver(event.fix)) {
-//						RobautoMain.logger.info("toBack");
-//						frame.toBack();
-//					}
+					if (displayRunning) {
+						setFuelLevel();
+						map.moveYouAreHere(event.fix);
+						activePanel.getTextPane().setText(travelStatus.toHtml());
+						activePanel.getTextPane().setCaretPosition( 0 );
+					}
 				}
 			});
-//			SwingUtilities.invokeLater(new Runnable() {
-//				@Override
-//				public void run() {
-//					activePanel.getScroll().getVerticalScrollBar().setValue(0);
-//				}
-//			});
 		}
 	}
 
@@ -329,6 +324,21 @@ public class TravelMode extends JPanel {
 		JPanel buttonPanel = new JPanel();
 		this.add(buttonPanel, BorderLayout.SOUTH);
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+
+		JButton btnPauseResume = new JButton("Pause");
+		buttonPanel.add(btnPauseResume);
+		btnPauseResume.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (btnPauseResume.getText().equals("Pause")) {
+					displayRunning = false;
+					btnPauseResume.setText("Resume");
+				} else {
+					displayRunning = true;
+					btnPauseResume.setText("Pause");					
+				}
+			}
+		});
 
 		JButton btnPriorDay = new JButton("Prior Day");
 		buttonPanel.add(btnPriorDay);
