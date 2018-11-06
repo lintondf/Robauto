@@ -203,9 +203,7 @@ public class TravelMode extends JPanel {
 		
 		@Subscribe
 		public void handle(final Events.GpsEvent event) {
-			if (startTime == null)
-				startTime = event.fix.date;
-			if (event.fix.movement == 0.0)
+			if (startTime == null && event.fix.movement > 0.1)
 				startTime = event.fix.date;
 			RobautoMain.logger.debug(
 					String.format("%s %5.1f %6.4f", event.fix.toString(), Here2.METERS_TO_MILES * distanceTraveled, 

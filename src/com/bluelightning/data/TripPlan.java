@@ -694,7 +694,9 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			driverAssignments.totalDriveTimes[driver] += dTime;
 			score += OptimizeStops.scoreTime(dTime);
 			lastTime = stopData.trafficTime;
-			driver = (driver + 1) % nDrivers;
+			if (stopData.drivers) {
+				driver = (driver + 1) % nDrivers;
+			}
 			driverAssignments.turns.add(turn);
 		}
 		driverAssignments.driveImbalance = Math

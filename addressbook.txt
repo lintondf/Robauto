@@ -27,6 +27,12 @@
         <tagged>Fuel</tagged>
     </persons>
     <persons>
+        <name>Fort Clinch State Park</name>
+        <address></address>
+        <latitude>30.670158863067627</latitude>
+        <longitude>-81.43465518951416</longitude>
+    </persons>
+    <persons>
         <name>Grandfather Campground</name>
         <address>125 Riverside Dr, Banner Elk, NC</address>
         <latitude>36.1440102</latitude>
