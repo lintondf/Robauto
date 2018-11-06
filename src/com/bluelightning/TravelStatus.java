@@ -154,7 +154,7 @@ public class TravelStatus {
 		this.tripLeg = tripLeg;
 		RobautoMain.logger.debug( tripLeg.toString() );
 		drivingTime = new TimeTracker( "Driving [hh:mm]", tripLeg.legData.trafficTime );
-		stoppedTime = new TimeTracker( "Stopped [hh:mm]", 0.0 );
+		stoppedTime = new TimeTracker( "Stopped [mm:ss]", 0.0 );
 		distanceDriven = new DistanceTracker( "Driving [miles]", tripLeg.legData.distance );
 		upcomingStops = new ArrayList<>();
 		availableStops = new ArrayList<>();
