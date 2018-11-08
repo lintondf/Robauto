@@ -158,7 +158,7 @@ public class Map {
 			painters.add(routePainter);
         }
 		// Set the focus
-		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(tracks.get(0)), 0.9);	
+		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(tracks.get(0)), 0.95);	
 		painters.add(markerPainter);
 
 		CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
@@ -176,7 +176,7 @@ public class Map {
 		List<GeoPosition> track = route.getShape();
 		routePainter = new RoutePainter(track);
 		// Set the focus
-		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(track), 0.9);	
+		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(track), 0.95);	
 		
 		// Create waypoints from the geo-positions
 		ArrayList<ButtonWaypoint> waylist = new ArrayList<>();
@@ -296,7 +296,7 @@ public class Map {
 		}
 		
 		// Set the focus
-		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(track), 0.9);	
+		mapViewer.zoomToBestFit(new HashSet<GeoPosition>(track), 0.95);	
 		mapViewer.calculateZoomFrom( new HashSet<GeoPosition>(track) );
 		return waylist;
 	}

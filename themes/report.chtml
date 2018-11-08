@@ -19,7 +19,8 @@
 	<table class="bpTable">
 	<thead>
 	<TR>
-		<TD colspan="4" style='font-size:96pt;font-weight:bolder;text-align:center'>{$time}</TD>
+		<TD colspan="3" style='font-size:96pt;font-weight:bolder;text-align:center'>{$time}</TD>
+		<TD colspan="1" style='font-size:48pt;font-weight:bolder;text-align:center'>{$where}</TD>
 	</TR>
 	</thead>
 	</table>

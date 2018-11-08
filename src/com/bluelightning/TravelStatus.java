@@ -133,6 +133,7 @@ public class TravelStatus {
 	}
 	
 	protected double  speed;
+	protected GPS.Fix lastFix;
 	protected Maneuver maneuver = null;
 	
 	protected GeoPosition maneuverFinish = null;
@@ -211,6 +212,7 @@ public class TravelStatus {
 	}
 	
 	public void update(Fix fix) {
+		lastFix = fix;
 		if (maneuverFinish != null) {
 			GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84,
 				new GlobalCoordinates(maneuverFinish), new GlobalCoordinates(fix.getLatitude(), fix.getLongitude()));
@@ -218,7 +220,7 @@ public class TravelStatus {
 		}
 	}
 
-	final static SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss  EEE, MMM dd");
+	final static SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss EEE");
 	
 	@SuppressWarnings("deprecation")
 	public String toHtml() {
@@ -229,6 +231,10 @@ public class TravelStatus {
 		Chunk t = theme.makeChunk("report#travel");
 		
 		Date now = new Date();
+		if (lastFix != null) {
+			now = lastFix.date;
+			t.set("where", String.format("%10.6f %10.6f", lastFix.getLatitude(), lastFix.getLongitude()));
+		}
 		t.set("time", format.format(now) );
 		
 		t.set("currentSpeed", String.format("%3.0f", speed * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR ));

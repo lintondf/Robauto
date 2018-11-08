@@ -1,13 +1,18 @@
 package com.bluelightning.gps;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+
+import org.apache.commons.io.IOUtils;
 
 public class NMEA {
 
@@ -159,5 +164,17 @@ public class NMEA {
         }
 
         return position;
+    }
+    
+    public static void main( String[] args ) throws FileNotFoundException, IOException {
+    	File playback = new File("/Volumes/Multimedia/Samples/nemalog.txt");
+    	nemaLog = new File("/dev/null");
+    	NMEA nmea = new NMEA();
+    	List<String> lines = IOUtils.readLines(new FileReader( playback ) );
+    	for (String line : lines) {
+    		GpsState state = nmea.getUpdatedStatus(line);
+    		if (state.velocity > 0)
+    			System.out.println( state );
+    	}
     }
 }
