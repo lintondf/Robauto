@@ -112,8 +112,11 @@ public class TravelStatus {
 		double   timeRemaining;
 		double   distanceRemaining;
 		
-		public UpcomingStop( String name, double totalTime, double totalDistance ) {
+		public UpcomingStop( String name, double totalTime, double totalDistance, String fuelAvailable ) {
 			this.name = name;
+			if (! fuelAvailable.equals("None")) {
+				this.name = "<b>" + this.name + "</b>";
+			}
 			this.totalTime = totalTime;
 			this.totalDistance = totalDistance;
 			update(0, 0);
@@ -160,7 +163,7 @@ public class TravelStatus {
 		upcomingStops = new ArrayList<>();
 		availableStops = new ArrayList<>();
 		for (TripPlan.StopData stopData : tripLeg.stopDataList) {
-			UpcomingStop upcomingStop = new UpcomingStop( stopData.name, stopData.trafficTime, stopData.distance );
+			UpcomingStop upcomingStop = new UpcomingStop( stopData.name, stopData.trafficTime, stopData.distance, stopData.fuelAvailable );
 			if (stopData.use) {
 				upcomingStops.add( upcomingStop );
 			} else {

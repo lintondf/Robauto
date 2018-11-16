@@ -187,8 +187,8 @@ public class GPS {
 	public void initialize(JFrame frame, boolean isSurface) {
 		serialGps = new SerialGps((isSurface) ? "COM4" : "XGPS10M-4269F2-SPPDev");
 		serialGps.addStateListener(state -> {
-			RobautoMain.logger.debug(state.toString());
-			if (state.quality > 0) {
+			//RobautoMain.logger.debug(state.toString());
+			if (state.hasFix && state.quality > 0) {
 				Fix fix = new Fix(state);
 				if (!addObservation(fix)) {
 					RobautoMain.logger.debug(fix.toString() + " / " + state.toString());
@@ -287,8 +287,9 @@ public class GPS {
 					try {
 						GPS.Fix nextFix = (GPS.Fix) ois.readObject();
 						long msRemaining = nextFix.date.getTime() - lastFix.date.getTime();
-						// RobautoMain.logger.debug("Waiting: " + nextFix +
-						// " / delay = " + msRemaining );
+						msRemaining = Math.min(5000L, msRemaining);
+//						 RobautoMain.logger.debug("Waiting: " + nextFix +
+//						 " / delay = " + msRemaining );
 						if (msRemaining > 0) {
 							Thread.sleep(msRemaining / SPEED_UP);
 						}

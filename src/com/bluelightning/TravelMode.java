@@ -1,4 +1,13 @@
 package com.bluelightning;
+/**TODO
+SEVERE: Exception thrown by subscriber method handle(com.bluelightning.Events$GpsEvent) on subscriber com.bluelightning.TravelMode$GpsHandler@7526fda5 when dispatching event: com.bluelightning.Events$GpsEvent@7389587b
+java.util.ConcurrentModificationException
+	at java.util.ArrayList$Itr.checkForComodification(Unknown Source)
+	at java.util.ArrayList$Itr.next(Unknown Source)
+	at com.bluelightning.TravelMode.findCurrentManeuver(TravelMode.java:188)
+	at com.bluelightning.TravelMode$GpsHandler.handle(TravelMode.java:216)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+ */
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -68,7 +77,7 @@ import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 
 public class TravelMode extends JPanel {
-	
+
 	/**
 	 * 
 	 */
@@ -85,24 +94,25 @@ public class TravelMode extends JPanel {
 	protected JXMapViewer mapViewer;
 	private boolean displayRunning = true;
 
-	
 	public TravelStatus travelStatus = null;
-	
+
 	public static class ManeuverMetrics {
-		
+
 		Maneuver maneuver;
 		ArrayList<LineSegment> segments = new ArrayList<>();
-		
-		public ManeuverMetrics( Maneuver maneuver) {
+
+		public ManeuverMetrics(Maneuver maneuver) {
 			this.maneuver = maneuver;
 			for (int i = 1; i < maneuver.getShape().size(); i++) {
-				Coordinate p1 = new Coordinate( maneuver.getShape().get(i-1).getLongitude(), maneuver.getShape().get(i-1).getLatitude() );
-				Coordinate p2 = new Coordinate( maneuver.getShape().get(i-1).getLongitude(), maneuver.getShape().get(i-1).getLatitude() );
-				segments.add( new LineSegment(p1, p2 ) );
+				Coordinate p1 = new Coordinate(maneuver.getShape().get(i - 1).getLongitude(),
+						maneuver.getShape().get(i - 1).getLatitude());
+				Coordinate p2 = new Coordinate(maneuver.getShape().get(i - 1).getLongitude(),
+						maneuver.getShape().get(i - 1).getLatitude());
+				segments.add(new LineSegment(p1, p2));
 			}
 		}
 	}
-	
+
 	public List<ManeuverMetrics> maneuverMetrics = null;
 	public HashMap<Maneuver, Maneuver> nextManeuverMap = null;
 
@@ -159,9 +169,10 @@ public class TravelMode extends JPanel {
 		setDay();
 	}
 
-	protected double distanceTraveled;  // [m]
-	protected double currentFuel;  // [gallons]
-	protected double timeStopped;    // [s]
+	protected double distanceTraveled; // [m]
+	protected double currentFuel; // [gallons]
+	protected double timeStopped; // [s]
+	protected double timeSoFar;   // [s]
 
 	protected void setFuelLevel() {
 		activePanel.getProgressBar().setMaximum((int) Report.FUEL_CAPACITY);
@@ -174,11 +185,11 @@ public class TravelMode extends JPanel {
 		String report = String.format("%s (%.0f gallons; %.0f MTE)", fraction, currentFuel, Report.MPG * currentFuel);
 		activePanel.getProgressBar().setString(report);
 	}
-	
-	//protected double
 
-	protected Maneuver findCurrentManeuver( GPS.Fix fix ) {
-		Coordinate where = new Coordinate( fix.getLongitude(), fix.getLatitude() );
+	// protected double
+
+	protected Maneuver findCurrentManeuver(GPS.Fix fix) {
+		Coordinate where = new Coordinate(fix.getLongitude(), fix.getLatitude());
 		double closestDistance = 7e6;
 		Maneuver closest = null;
 		if (maneuverMetrics == null)
@@ -192,35 +203,38 @@ public class TravelMode extends JPanel {
 				}
 			}
 		}
-		//RobautoMain.logger.debug( closest );
+		// RobautoMain.logger.debug( closest );
 		return closest;
 	}
-	
+
 	protected GPS gps = new GPS();
 
 	public class GpsHandler {
-		Date  startTime = null;
-		
+		Date startTime = null;
+
 		@Subscribe
 		public void handle(final Events.GpsEvent event) {
-			if (startTime == null && event.fix.movement > 0.1)
+			if (startTime == null)
 				startTime = event.fix.date;
-			RobautoMain.logger.debug(
-					String.format("%s %5.1f %6.4f", event.fix.toString(), Here2.METERS_TO_MILES * distanceTraveled, 
-							Here2.METERS_TO_MILES * event.fix.movement / Report.MPG) );
+			RobautoMain.logger.debug(String.format("%s %5.1f %6.4f", event.fix.toString(),
+					Here2.METERS_TO_MILES * distanceTraveled, Here2.METERS_TO_MILES * event.fix.movement / Report.MPG));
+			if (travelStatus == null)
+				return;
+			travelStatus.update(event.fix);
 			distanceTraveled += event.fix.movement;
-			Maneuver currentManeuver = findCurrentManeuver( event.fix );
+			Maneuver currentManeuver = findCurrentManeuver(event.fix);
 			if (currentManeuver != null) {
 				travelStatus.update(event.fix.speed, currentManeuver, nextManeuverMap.get(currentManeuver));
 			}
 			if (travelStatus != null && event.fix.speed < 0.1) {
 				timeStopped += 60;
 				travelStatus.stopped(timeStopped);
+			} else {
+				timeSoFar += 60;
 			}
 			currentFuel -= Here2.METERS_TO_MILES * event.fix.movement / Report.MPG;
-			double timeSoFar = 0.001 * (double) (event.fix.date.getTime() - startTime.getTime());
 			travelStatus.update(timeSoFar, distanceTraveled);
-			travelStatus.update( event.fix );
+
 			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override
@@ -229,7 +243,8 @@ public class TravelMode extends JPanel {
 						setFuelLevel();
 						map.moveYouAreHere(event.fix);
 						activePanel.getTextPane().setText(travelStatus.toHtml());
-						activePanel.getTextPane().setCaretPosition( 0 );
+						activePanel.getTextPane().setCaretPosition(0);
+						RobautoMain.logger.debug("GUI updated");
 					}
 				}
 			});
@@ -241,9 +256,7 @@ public class TravelMode extends JPanel {
 		Image image = null;
 		try {
 			image = ImageIO.read(new File("images/youarehere.png")).getScaledInstance(
-					ICON_SCALE * (int) size.getWidth(),
-					ICON_SCALE * (int) size.getHeight(), 
-					Image.SCALE_SMOOTH);
+					ICON_SCALE * (int) size.getWidth(), ICON_SCALE * (int) size.getHeight(), Image.SCALE_SMOOTH);
 		} catch (Exception x) {
 		}
 
@@ -264,20 +277,20 @@ public class TravelMode extends JPanel {
 		currentFuel = Double.parseDouble(drive.fuelRemaining) + Double.parseDouble(drive.fuelUsed);
 		distanceTraveled = 0.0;
 		setupGps(days.get(currentDay));
-		travelStatus = new TravelStatus( tripPlan.getTripLeg(currentDay) );
+		travelStatus = new TravelStatus(tripPlan.getTripLeg(currentDay));
 		activePanel.getTextPane().setContentType("text/html");
 		activePanel.getTextPane().setEditable(false);
 		maneuverMetrics = new ArrayList<>();
 		nextManeuverMap = new HashMap<>();
 		Maneuver lastManeuver = null;
-		for (Leg leg : days.get(currentDay).getLeg() ) {
-			for (Maneuver maneuver : leg.getManeuver() ) {
+		for (Leg leg : days.get(currentDay).getLeg()) {
+			for (Maneuver maneuver : leg.getManeuver()) {
 				List<GeoPosition> points = maneuver.getShape();
-				if (! points.isEmpty()) {
-					maneuverMetrics.add( new ManeuverMetrics(maneuver) );
+				if (!points.isEmpty()) {
+					maneuverMetrics.add(new ManeuverMetrics(maneuver));
 				}
 				if (lastManeuver != null) {
-					nextManeuverMap.put( lastManeuver, maneuver);
+					nextManeuverMap.put(lastManeuver, maneuver);
 				}
 				lastManeuver = maneuver;
 			}
@@ -290,10 +303,10 @@ public class TravelMode extends JPanel {
 				} catch (Exception x) {
 				}
 				map.clearRoute();
-				/*List<ButtonWaypoint> waypoints = */ map.showRoute(days, markers, allPlaces, currentDay);
+				/* List<ButtonWaypoint> waypoints = */ map.showRoute(days, markers, allPlaces, currentDay);
 				activePanel.getSplitPane().setDividerLocation(0.4);
 				activePanel.getTextPane().setText(travelStatus.toHtml());
-				activePanel.getTextPane().setCaretPosition( 0 );
+				activePanel.getTextPane().setCaretPosition(0);
 				activePanel.getScroll().getVerticalScrollBar().setValue(0);
 			}
 		});
@@ -333,7 +346,7 @@ public class TravelMode extends JPanel {
 					btnPauseResume.setText("Resume");
 				} else {
 					displayRunning = true;
-					btnPauseResume.setText("Pause");					
+					btnPauseResume.setText("Pause");
 				}
 			}
 		});
@@ -396,27 +409,30 @@ public class TravelMode extends JPanel {
 		// Bind event handlers
 		Events.eventBus.register(new UiHandler());
 
-//		try {
-//			HandleTripPlanUpdate obj = new HandleTripPlanUpdate();
-//			TripPlanUpdate stub = (TripPlanUpdate) UnicastRemoteObject.exportObject(obj, 0);
-//			if (isSurface) {
-//				// Bind the remote object's stub in the registry
-//				Registry registry = LocateRegistry.getRegistry(localHostAddress.toString(), RobautoMain.REGISTRY_PORT);
-//				registry.bind("Update", stub);
-//			}
-//			RobautoMain.logger.debug("Server ready");
-//		} catch (Exception e) {
-//			System.err.println("Server exception: " + e.toString());
-//		}
+		// try {
+		// HandleTripPlanUpdate obj = new HandleTripPlanUpdate();
+		// TripPlanUpdate stub = (TripPlanUpdate)
+		// UnicastRemoteObject.exportObject(obj, 0);
+		// if (isSurface) {
+		// // Bind the remote object's stub in the registry
+		// Registry registry =
+		// LocateRegistry.getRegistry(localHostAddress.toString(),
+		// RobautoMain.REGISTRY_PORT);
+		// registry.bind("Update", stub);
+		// }
+		// RobautoMain.logger.debug("Server ready");
+		// } catch (Exception e) {
+		// System.err.println("Server exception: " + e.toString());
+		// }
 	}
 
 	protected void initialize(File tripPlanFile) {
 		activePanel.getProgressBar().setValue(-1);
-		Thread t = new Thread( new Runnable() {
+		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				tripPlan = TripPlan.load(tripPlanFile, frame);
-				//Here2.reportRoute(tripPlan.getRoute());
+				// Here2.reportRoute(tripPlan.getRoute());
 				report = tripPlan.getTripReport();
 
 				ArrayList<ArrayList<VisitedPlace>> placesByDay = tripPlan.getFinalizedPlaces();
@@ -436,16 +452,16 @@ public class TravelMode extends JPanel {
 				if (model.isEmpty()) {
 					model.addElement("No Finalized Route Stops Found");
 				}
-				SwingUtilities.invokeLater( new Runnable() {
+				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						if ( model.size() > 0 )
+						if (model.size() > 0)
 							listOfDays.setModel(model);
 						map.clearRoute();
 					}
 				});
 			}
-		} );
+		});
 		t.start();
 	}
 
@@ -528,14 +544,14 @@ public class TravelMode extends JPanel {
 					frame.pack();
 					frame.setVisible(true);
 					frame.addWindowListener(new WindowAdapter() {
-//						@Override
-//						public void windowActivated(WindowEvent e) {
-//							try {
-//								Thread.sleep(10*1000);
-//							} catch (Exception x) {}
-//							RobautoMain.logger.debug("toBack");
-//							frame.toBack();
-//						}
+						// @Override
+						// public void windowActivated(WindowEvent e) {
+						// try {
+						// Thread.sleep(10*1000);
+						// } catch (Exception x) {}
+						// RobautoMain.logger.debug("toBack");
+						// frame.toBack();
+						// }
 						@Override
 						public void windowClosing(WindowEvent e) {
 							if (travelMode.gps != null) {
