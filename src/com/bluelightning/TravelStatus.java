@@ -29,7 +29,9 @@ public class TravelStatus {
 	
 	static Theme theme;
 	
-	protected static final String oTD = "<TD style='font-size:48pt'>";
+	protected static final String oTD = "<TD>";
+	protected static final String oTDs = "<TD colspan='2'>";
+	protected static final String oTDf = "<TD style='font-size:48pt'>";
 	protected static final String obcTD = "<TD style='font-size:48pt;font-weight:bolder;text-align:center'>";
 	protected static final String oblTD = "<TD style='font-size:48pt;font-weight:bolder;text-align:left'>";
 	protected static final String orTD = "<TD style='font-size:48pt;text-align:right'>";
@@ -70,7 +72,7 @@ public class TravelStatus {
 		public String toHtmlRow() {
 			return String.format("%s%s%s%s%.1f%s%s%.1f%s%s%.1f%s", 
 					oblTD, title, cTD,
-					orTD, planned, cTD, orTD, actual, cTD, oTD, (actual-planned), cTD );
+					orTD, planned, cTD, orTD, actual, cTD, oTDf, (actual-planned), cTD );
 		}
 	}
 	
@@ -111,11 +113,18 @@ public class TravelStatus {
 		double   totalDistance;
 		double   timeRemaining;
 		double   distanceRemaining;
+		boolean  hasGas;
+		
+		final static String onDeckRow1Style = "<TD colspan='2' style='font-size:48pt;font-weight:bolder;text-align:left'>";
+		final static String onDeckRow2Style = "<TD style='font-size:96pt;font-weight:bolder;text-align:right'>";
+
 		
 		public UpcomingStop( String name, double totalTime, double totalDistance, String fuelAvailable ) {
 			this.name = name;
+			this.hasGas = false;
 			if (! fuelAvailable.equals("None")) {
 				this.name = "<b>" + this.name + "</b>";
+				this.hasGas = true;
 			}
 			this.totalTime = totalTime;
 			this.totalDistance = totalDistance;
@@ -125,6 +134,17 @@ public class TravelStatus {
 		void update( double timeSoFar, double distanceSoFar) {
 			timeRemaining = totalTime - timeSoFar;
 			distanceRemaining = totalDistance - distanceSoFar;
+		}
+		
+		public String[] toHtmlCells() {
+			return new String[] {
+				String.format("%s%s%s", 
+						onDeckRow1Style, name, cTD),
+				String.format("%s%s%s", 
+						onDeckRow2Style, Here2.toPeriod(timeRemaining), cTD),
+				String.format("%s%.1f%s", 
+						onDeckRow2Style, Here2.METERS_TO_MILES*distanceRemaining, cTD)
+			};
 		}
 		
 		public String toHtmlRow() {
@@ -223,10 +243,64 @@ public class TravelStatus {
 		}
 	}
 
-	final static SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss EEE");
+	final static SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss EEE MM/dd");
+	
+	public String toHtml() {
+		if (theme == null) {
+			theme = new Theme();
+		}
+		Chunk c = theme.makeChunk("report#report");
+		Chunk t = theme.makeChunk("report#driving");
+		
+		Date now = new Date();
+		if (lastFix != null) {
+			now = lastFix.date;
+			t.set("where", String.format("%10.6f %10.6f", lastFix.getLatitude(), lastFix.getLongitude()));
+		}
+		t.set("time", format.format(now) );
+		UpcomingStop nextStop = null;
+		UpcomingStop nextGas = null;
+		
+		StringBuffer sb = new StringBuffer();
+		for (UpcomingStop upcomingStop : upcomingStops) {
+			if (nextStop == null)
+				nextStop = upcomingStop;
+			if (nextGas == null && upcomingStop.hasGas)
+				nextGas = upcomingStop;
+			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
+		}
+		t.set("upcomingRows", sb.toString() );
+		sb = new StringBuffer();
+		for (UpcomingStop upcomingStop : availableStops) {
+			if (nextGas == null && upcomingStop.hasGas)
+				nextGas = upcomingStop;
+			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
+		}
+		t.set("availableRows", sb.toString() );
+		
+		sb = new StringBuffer();
+		if (nextStop != null) {
+			String[] cells = nextStop.toHtmlCells();
+			String rows = String.format("<TR>%s</TR>\n<TR>%s%s</TR>\n", cells[0], cells[1], cells[2] );
+			sb.append(rows);
+			if (nextGas != null && nextGas != nextStop) {
+				cells = nextGas.toHtmlCells();
+				rows = String.format("<TR>%s</TR>\n<TR>%s%s</TR>\n", cells[0], cells[1], cells[2] );
+				sb.append(rows);				
+			}
+		}
+		t.set("onDeck", sb.toString());
+		
+		c.set("body", t.toString());
+		try {
+			String css = IOUtils.toString(new FileInputStream("themes/style.css"));
+			c.set("styles", css);
+		} catch (Exception x) {}
+		return c.toString();
+	}
 	
 	@SuppressWarnings("deprecation")
-	public String toHtml() {
+	public String toOldHtml() {
 		if (theme == null) {
 			theme = new Theme();
 		}

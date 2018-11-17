@@ -9,11 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings({ "unused" })
-public class SerialGps {
-
-	public interface StateListener {
-		void onGpsStateUpdated(NMEA.GpsState state);
-	}
+public class SerialGps implements ISerialGps {
 
 	private String portName;
 	private int baudRate;

@@ -24,6 +24,8 @@ import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.gps.SerialGps;
+import com.bluelightning.gps.GpsComplete;
+import com.bluelightning.gps.ISerialGps;
 import com.bluelightning.gps.NMEA.GpsState;
 
 public class GPS {
@@ -182,10 +184,13 @@ public class GPS {
 	}
 
 	Thread readerThread = null;
-	SerialGps serialGps = null;
+	ISerialGps serialGps = null;
 
 	public void initialize(JFrame frame, boolean isSurface) {
-		serialGps = new SerialGps((isSurface) ? "COM4" : "XGPS10M-4269F2-SPPDev");
+		String port = (isSurface) ? "COM4" : "XGPS10M-4269F2-SPPDev";
+		
+		//serialGps = new SerialGps(port);
+		serialGps = new GpsComplete("COM5");
 		serialGps.addStateListener(state -> {
 			//RobautoMain.logger.debug(state.toString());
 			if (state.hasFix && state.quality > 0) {
