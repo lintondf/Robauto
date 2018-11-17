@@ -14,6 +14,35 @@
 </body>
 </html>
 {#}
+{#driving}
+	<table class="bpTable">
+	<thead>
+	<TR>
+		<TD colspan="4" style='font-size:96pt;font-weight:bolder;text-align:center'>{$time}</TD>
+	</TR>
+	<TR>
+		<TD colspan="4" style='font-size:48pt;font-weight:bolder;text-align:center'>{$where}</TD>
+	</TR>
+	</thead>
+	</table>
+<br/>	
+	<table class="bpTable">
+	{$onDeck}
+	</table>
+<br/>	
+	<table class="bpTable">
+		<tbody>
+			{$upcomingRows}
+		</tbody>
+	</table>
+<br/>	
+	<table class="bpTable">
+		<tbody>
+			{$availableRows}
+		</tbody>
+	</table>
+<br/>	
+{#}
 {#travel}
 	<table class="bpTable">
 	<thead>
