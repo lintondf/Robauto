@@ -44,6 +44,7 @@ public class TravelActivePanel extends JPanel {
 		
 		progressBar = new JProgressBar();
 		rightPanel.add(progressBar, BorderLayout.SOUTH);
+		progressBar.setVisible(false);
 		
 //		componentsPanel = new TravelSpeedPanel();
 //		rightPanel.add(componentsPanel, BorderLayout.NORTH);

@@ -15,6 +15,7 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ListSelectionEvent;
@@ -211,13 +212,21 @@ public class TravelMode extends JPanel {
 
 	public class GpsHandler {
 		Date startTime = null;
+		Date lastTime = null;
+		double lastLat = 0;
+		double lastLon = 0;
 
 		@Subscribe
 		public void handle(final Events.GpsEvent event) {
-			if (startTime == null)
+			if (startTime == null) {
 				startTime = event.fix.date;
-			RobautoMain.logger.debug(String.format("%s %5.1f %6.4f", event.fix.toString(),
+				lastTime = startTime;
+			}
+			if (event.fix.getLatitude() != lastLat || event.fix.getLongitude() != lastLon) 
+				RobautoMain.logger.debug(String.format("%s %5.1f %6.4f", event.fix.toString(),
 					Here2.METERS_TO_MILES * distanceTraveled, Here2.METERS_TO_MILES * event.fix.movement / Report.MPG));
+			lastLat = event.fix.getLatitude();
+			lastLon = event.fix.getLongitude();
 			if (travelStatus == null)
 				return;
 			travelStatus.update(event.fix);
@@ -226,12 +235,14 @@ public class TravelMode extends JPanel {
 			if (currentManeuver != null) {
 				travelStatus.update(event.fix.speed, currentManeuver, nextManeuverMap.get(currentManeuver));
 			}
+			double dt = 0.001 * (event.fix.date.getTime() - lastTime.getTime());
 			if (travelStatus != null && event.fix.speed < 0.1) {
-				timeStopped += 60;
+				timeStopped += dt;
 				travelStatus.stopped(timeStopped);
 			} else {
-				timeSoFar += 60;
+				timeSoFar += dt;
 			}
+			lastTime = event.fix.date;
 			currentFuel -= Here2.METERS_TO_MILES * event.fix.movement / Report.MPG;
 			travelStatus.update(timeSoFar, distanceTraveled);
 
@@ -244,7 +255,7 @@ public class TravelMode extends JPanel {
 						map.moveYouAreHere(event.fix);
 						activePanel.getTextPane().setText(travelStatus.toHtml());
 						activePanel.getTextPane().setCaretPosition(0);
-						RobautoMain.logger.debug("GUI updated");
+						//RobautoMain.logger.debug("GUI updated");
 					}
 				}
 			});
@@ -331,12 +342,31 @@ public class TravelMode extends JPanel {
 	 */
 	public TravelMode() {
 		setLayout(new BorderLayout());
-
+		
+		Font buttonFont = new Font("Arial", Font.BOLD, 72 );
+        JPanel buttonArea = new JPanel(); 
+		this.add(buttonArea, BorderLayout.SOUTH);
+        JPanel modePanel = new JPanel();
+        buttonArea.add(modePanel, new FlowLayout(FlowLayout.LEFT, 5, 5));
+        modePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        JButton drivingButton = new JButton("Driving");
+        drivingButton.setFont(buttonFont);
+        modePanel.add( drivingButton );
+        
+        JButton fuelButton = new JButton("Fuel");
+        fuelButton.setFont(buttonFont);
+        modePanel.add( fuelButton );
+        
+        JButton detailsButton = new JButton("Details");
+        detailsButton.setFont(buttonFont);
+        modePanel.add( detailsButton );
+        
 		JPanel buttonPanel = new JPanel();
-		this.add(buttonPanel, BorderLayout.SOUTH);
+		buttonArea.add(buttonPanel, new FlowLayout(FlowLayout.RIGHT, 5, 5)); //BorderLayout.WEST);
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
-
+		
 		JButton btnPauseResume = new JButton("Pause");
+		btnPauseResume.setFont(buttonFont);
 		buttonPanel.add(btnPauseResume);
 		btnPauseResume.addActionListener(new ActionListener() {
 			@Override
@@ -352,6 +382,7 @@ public class TravelMode extends JPanel {
 		});
 
 		JButton btnPriorDay = new JButton("Prior Day");
+		btnPriorDay.setFont(buttonFont);
 		buttonPanel.add(btnPriorDay);
 		btnPriorDay.addActionListener(new ActionListener() {
 			@Override
@@ -361,6 +392,7 @@ public class TravelMode extends JPanel {
 		});
 
 		JButton btnNextDay = new JButton("Next Day");
+		btnNextDay.setFont(buttonFont);
 		buttonPanel.add(btnNextDay);
 		btnNextDay.addActionListener(new ActionListener() {
 			@Override
@@ -370,6 +402,7 @@ public class TravelMode extends JPanel {
 		});
 
 		JButton btnSelectDay = new JButton("Select Day");
+		btnSelectDay.setFont(buttonFont);
 		btnSelectDay.setActionCommand("SelectDay");
 		btnSelectDay.addActionListener(new ActionListener() {
 			@Override

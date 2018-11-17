@@ -82,6 +82,10 @@ public class TravelStatus {
 			super(title, planned);
 		}
 		
+		public String value() {
+			return String.format("%.1f", Here2.METERS_TO_MILES*actual);
+		}
+		
 		@Override
 		public String toHtmlRow() {
 			return String.format("%s%s%s%s%.1f%s%s%.1f%s%s%.1f%s", 
@@ -95,6 +99,10 @@ public class TravelStatus {
 	protected class TimeTracker extends Tracker {
 		public TimeTracker( String title, double planned ) {
 			super(title, planned);
+		}
+		
+		public String value() {
+			return Here2.toPeriod(actual);
 		}
 		
 		@Override
@@ -115,7 +123,7 @@ public class TravelStatus {
 		double   distanceRemaining;
 		boolean  hasGas;
 		
-		final static String onDeckRow1Style = "<TD colspan='2' style='font-size:48pt;font-weight:bolder;text-align:left'>";
+		final static String onDeckRow1Style = "<TD colspan='2' style='font-size:72pt;font-weight:bolder;text-align:left'>";
 		final static String onDeckRow2Style = "<TD style='font-size:96pt;font-weight:bolder;text-align:right'>";
 
 		
@@ -255,9 +263,11 @@ public class TravelStatus {
 		Date now = new Date();
 		if (lastFix != null) {
 			now = lastFix.date;
-			t.set("where", String.format("%10.6f %10.6f", lastFix.getLatitude(), lastFix.getLongitude()));
+			//t.set("where", String.format("%10.6f %10.6f", lastFix.getLatitude(), lastFix.getLongitude()));
 		}
 		t.set("time", format.format(now) );
+		t.set("drivingTime", drivingTime.value() );
+		t.set("drivingDistance", distanceDriven.value() );
 		UpcomingStop nextStop = null;
 		UpcomingStop nextGas = null;
 		

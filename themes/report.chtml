@@ -21,7 +21,8 @@
 		<TD colspan="4" style='font-size:96pt;font-weight:bolder;text-align:center'>{$time}</TD>
 	</TR>
 	<TR>
-		<TD colspan="4" style='font-size:48pt;font-weight:bolder;text-align:center'>{$where}</TD>
+		<TD colspan = '2' style='font-size:64pt;font-weight:bolder;text-align:center'>{$drivingTime}</TD>
+		<TD colspan = '2' style='font-size:64pt;font-weight:bolder;text-align:center'>{$drivingDistance}</TD>
 	</TR>
 	</thead>
 	</table>

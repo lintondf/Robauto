@@ -177,6 +177,9 @@ public class GPS {
 					RobautoMain.logger.warn(String.format("EDITED: %s %10.1f %10.0f", fix.toString(), speed, movement));
 					return false;
 				}
+			} else {
+				RobautoMain.logger.warn(String.format("BAD TIME: %s %10.1f", dt));
+				return false;
 			}
 		}
 		lastFix = fix;
@@ -288,9 +291,15 @@ public class GPS {
 			@Override
 			public void run() {
 				RobautoMain.logger.debug("Starting: " + lastFix.date);
+				double lastLat = 0;
+				double lastLon = 0;
 				while (!Thread.interrupted()) {
 					try {
 						GPS.Fix nextFix = (GPS.Fix) ois.readObject();
+						if (nextFix.getLatitude() == lastLat && nextFix.getLongitude() == lastLon)
+							continue;
+						lastLat = nextFix.getLatitude();
+						lastLon = nextFix.getLongitude();
 						long msRemaining = nextFix.date.getTime() - lastFix.date.getTime();
 						msRemaining = Math.min(5000L, msRemaining);
 //						 RobautoMain.logger.debug("Waiting: " + nextFix +
