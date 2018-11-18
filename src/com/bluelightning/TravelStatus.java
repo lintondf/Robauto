@@ -123,8 +123,8 @@ public class TravelStatus {
 		double   distanceRemaining;
 		boolean  hasGas;
 		
-		final static String onDeckRow1Style = "<TD colspan='2' style='font-size:72pt;font-weight:bolder;text-align:left'>";
-		final static String onDeckRow2Style = "<TD style='font-size:96pt;font-weight:bolder;text-align:right'>";
+		final static String onDeckRow1Style = "<TD colspan='2' style='font-size:48pt;font-weight:bolder;text-align:left;background-color:cyan'>";
+		final static String onDeckRow2Style = "<TD style='font-size:96pt;font-weight:bolder;text-align:right;background-color:cyan'>";
 
 		
 		public UpcomingStop( String name, double totalTime, double totalDistance, String fuelAvailable ) {
@@ -253,7 +253,7 @@ public class TravelStatus {
 
 	final static SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss EEE MM/dd");
 	
-	public String toHtml() {
+	public String toDrivingHtml() {
 		if (theme == null) {
 			theme = new Theme();
 		}
@@ -268,27 +268,48 @@ public class TravelStatus {
 		t.set("time", format.format(now) );
 		t.set("drivingTime", drivingTime.value() );
 		t.set("drivingDistance", distanceDriven.value() );
-		UpcomingStop nextStop = null;
-		UpcomingStop nextGas = null;
 		
 		StringBuffer sb = new StringBuffer();
 		for (UpcomingStop upcomingStop : upcomingStops) {
-			if (nextStop == null)
-				nextStop = upcomingStop;
-			if (nextGas == null && upcomingStop.hasGas)
-				nextGas = upcomingStop;
 			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
 		}
 		t.set("upcomingRows", sb.toString() );
 		sb = new StringBuffer();
 		for (UpcomingStop upcomingStop : availableStops) {
-			if (nextGas == null && upcomingStop.hasGas)
-				nextGas = upcomingStop;
 			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
 		}
 		t.set("availableRows", sb.toString() );
+				
+		c.set("body", t.toString());
+		try {
+			String css = IOUtils.toString(new FileInputStream("themes/style.css"));
+			c.set("styles", css);
+		} catch (Exception x) {}
+		return c.toString();
+	}
+	
+	public String toNextUpHtml() {
+		if (theme == null) {
+			theme = new Theme();
+		}
+		Chunk c = theme.makeChunk("report#report");
+		Chunk t = theme.makeChunk("report#next");
 		
-		sb = new StringBuffer();
+		UpcomingStop nextStop = null;
+		UpcomingStop nextGas = null;
+		
+		for (UpcomingStop upcomingStop : upcomingStops) {
+			if (nextStop == null)
+				nextStop = upcomingStop;
+			if (nextGas == null && upcomingStop.hasGas)
+				nextGas = upcomingStop;
+		}
+		for (UpcomingStop upcomingStop : availableStops) {
+			if (nextGas == null && upcomingStop.hasGas)
+				nextGas = upcomingStop;
+		}
+		
+		StringBuffer sb = new StringBuffer();
 		if (nextStop != null) {
 			String[] cells = nextStop.toHtmlCells();
 			String rows = String.format("<TR>%s</TR>\n<TR>%s%s</TR>\n", cells[0], cells[1], cells[2] );
@@ -396,7 +417,7 @@ public class TravelStatus {
 		TravelStatus travelStatus = new TravelStatus( tripLegs.get(0) );
 		travelStatus.update( 3600.0, 75e3);
 		travelStatus.stopped( 300.0 );
-		RobautoMain.logger.debug( travelStatus.toHtml() );
+		RobautoMain.logger.debug( travelStatus.toDrivingHtml() );
 	}
 
 }

@@ -3,6 +3,7 @@ package com.bluelightning.gui;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 
 import javax.swing.JSplitPane;
 import javax.swing.JProgressBar;
@@ -22,6 +23,10 @@ public class TravelActivePanel extends JPanel {
 	protected TravelSpeedPanel componentsPanel;
 	protected JSplitPane splitPane;
 	protected JScrollPane scroll;
+	
+	protected JPanel mapPanel;
+	protected JPanel nextPanel;
+	protected JTextPane nextText;
 
 	/**
 	 * Create the panel.
@@ -45,22 +50,39 @@ public class TravelActivePanel extends JPanel {
 		progressBar = new JProgressBar();
 		rightPanel.add(progressBar, BorderLayout.SOUTH);
 		progressBar.setVisible(false);
-		
-//		componentsPanel = new TravelSpeedPanel();
-//		rightPanel.add(componentsPanel, BorderLayout.NORTH);
 
 		textPane = new JTextPane();
 		scroll = new JScrollPane(textPane);
 		rightPanel.add(scroll, BorderLayout.CENTER);
 		DefaultCaret caret = (DefaultCaret) textPane.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-
+		
+		JSplitPane leftSplit = new JSplitPane();
+		leftSplit.setOrientation( JSplitPane.VERTICAL_SPLIT );
+		leftSplit.setResizeWeight(0.7);
+		leftPanel.add(leftSplit, BorderLayout.CENTER);
+		
+        mapPanel = new JPanel();
+        leftSplit.setLeftComponent(mapPanel);
+        mapPanel.setLayout(new BorderLayout(0, 0));
+        
+        nextPanel = new JPanel();
+        leftSplit.setRightComponent(nextPanel);
+        nextPanel.setLayout(new BorderLayout(0, 0));
+        
+        nextText = new JTextPane();
+        nextText.setBackground( Color.CYAN );
+        nextPanel.add( nextText, BorderLayout.CENTER);
 	}
 
-	public JPanel getLeftPanel() {
-		return leftPanel;
+	public JPanel getMapPanel() {
+		return mapPanel;
 	}
-
+	
+	public JTextPane getNextTextPane() {
+		return nextText;
+	}
+	
 	public void setLeftPanel(JPanel leftPanel) {
 		this.leftPanel = leftPanel;
 	}

@@ -253,8 +253,11 @@ public class TravelMode extends JPanel {
 					if (displayRunning) {
 						setFuelLevel();
 						map.moveYouAreHere(event.fix);
-						activePanel.getTextPane().setText(travelStatus.toHtml());
+						activePanel.getTextPane().setContentType("text/html");
+						activePanel.getTextPane().setText(travelStatus.toDrivingHtml());
 						activePanel.getTextPane().setCaretPosition(0);
+						activePanel.getNextTextPane().setContentType("text/html");
+						activePanel.getNextTextPane().setText(travelStatus.toNextUpHtml());
 						//RobautoMain.logger.debug("GUI updated");
 					}
 				}
@@ -316,9 +319,12 @@ public class TravelMode extends JPanel {
 				map.clearRoute();
 				/* List<ButtonWaypoint> waypoints = */ map.showRoute(days, markers, allPlaces, currentDay);
 				activePanel.getSplitPane().setDividerLocation(0.4);
-				activePanel.getTextPane().setText(travelStatus.toHtml());
+				activePanel.getTextPane().setContentType("text/html");
+				activePanel.getTextPane().setText(travelStatus.toDrivingHtml());
 				activePanel.getTextPane().setCaretPosition(0);
 				activePanel.getScroll().getVerticalScrollBar().setValue(0);
+				activePanel.getNextTextPane().setContentType("text/html");
+				activePanel.getNextTextPane().setText(travelStatus.toNextUpHtml());
 			}
 		});
 		setFuelLevel();
@@ -346,25 +352,20 @@ public class TravelMode extends JPanel {
 		Font buttonFont = new Font("Arial", Font.BOLD, 72 );
         JPanel buttonArea = new JPanel(); 
 		this.add(buttonArea, BorderLayout.SOUTH);
-        JPanel modePanel = new JPanel();
-        buttonArea.add(modePanel, new FlowLayout(FlowLayout.LEFT, 5, 5));
-        modePanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+		JPanel buttonPanel = new JPanel();
+        buttonArea.add(buttonPanel, new FlowLayout(FlowLayout.LEFT, 5, 5));
         JButton drivingButton = new JButton("Driving");
         drivingButton.setFont(buttonFont);
-        modePanel.add( drivingButton );
+        buttonPanel.add( drivingButton );
         
         JButton fuelButton = new JButton("Fuel");
         fuelButton.setFont(buttonFont);
-        modePanel.add( fuelButton );
+        buttonPanel.add( fuelButton );
         
         JButton detailsButton = new JButton("Details");
         detailsButton.setFont(buttonFont);
-        modePanel.add( detailsButton );
+        buttonPanel.add( detailsButton );
         
-		JPanel buttonPanel = new JPanel();
-		buttonArea.add(buttonPanel, new FlowLayout(FlowLayout.RIGHT, 5, 5)); //BorderLayout.WEST);
-		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
-		
 		JButton btnPauseResume = new JButton("Pause");
 		btnPauseResume.setFont(buttonFont);
 		buttonPanel.add(btnPauseResume);
@@ -429,7 +430,8 @@ public class TravelMode extends JPanel {
 
 		map = new com.bluelightning.Map();
 		mapViewer = map.getMapViewer();
-		activePanel.getLeftPanel().add(mapViewer, BorderLayout.CENTER);
+		activePanel.getMapPanel().add(mapViewer, BorderLayout.CENTER);
+		activePanel.getNextTextPane().setText("Hello");
 
 		// try {
 		// Image image = ImageIO.read(new File("images/compass.jpg"));
