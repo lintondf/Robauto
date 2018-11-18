@@ -268,6 +268,7 @@ public class TravelStatus {
 		t.set("time", format.format(now) );
 		t.set("drivingTime", drivingTime.value() );
 		t.set("drivingDistance", distanceDriven.value() );
+		t.set("stoppedTime", stoppedTime.value() );
 		
 		StringBuffer sb = new StringBuffer();
 		for (UpcomingStop upcomingStop : upcomingStops) {

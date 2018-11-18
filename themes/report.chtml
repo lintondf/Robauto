@@ -24,11 +24,12 @@
 	<table class="bpTable">
 	<thead>
 	<TR>
-		<TD colspan="4" style='font-size:96pt;font-weight:bolder;text-align:center'>{$time}</TD>
+		<TD colspan="3" style='font-size:96pt;font-weight:bolder;text-align:center'>{$time}</TD>
 	</TR>
 	<TR>
-		<TD colspan = '2' style='font-size:64pt;font-weight:bolder;text-align:center'>{$drivingTime}</TD>
-		<TD colspan = '2' style='font-size:64pt;font-weight:bolder;text-align:center'>{$drivingDistance}</TD>
+		<TD colspan = '1' style='font-size:64pt;font-weight:bolder;text-align:center'>{$drivingTime}</TD>
+		<TD colspan = '1' style='font-size:64pt;font-weight:bolder;text-align:center'>{$drivingDistance}</TD>
+		<TD colspan = '1' style='font-size:64pt;font-weight:bolder;text-align:center'>{$stoppedTime}</TD>
 	</TR>
 	</thead>
 	</table>

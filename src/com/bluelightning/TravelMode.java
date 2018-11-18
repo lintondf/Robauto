@@ -362,11 +362,7 @@ public class TravelMode extends JPanel {
         fuelButton.setFont(buttonFont);
         buttonPanel.add( fuelButton );
         
-        JButton detailsButton = new JButton("Details");
-        detailsButton.setFont(buttonFont);
-        buttonPanel.add( detailsButton );
-        
-		JButton btnPauseResume = new JButton("Pause");
+ 		JButton btnPauseResume = new JButton("Pause");
 		btnPauseResume.setFont(buttonFont);
 		buttonPanel.add(btnPauseResume);
 		btnPauseResume.addActionListener(new ActionListener() {
