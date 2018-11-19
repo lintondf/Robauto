@@ -24,8 +24,6 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineSegment;
 import org.slf4j.LoggerFactory;
 
 import com.bluelightning.Events.UiEvent;
@@ -67,13 +65,10 @@ import java.awt.Image;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import com.bluelightning.gui.TravelActivePanel;
-import com.bluelightning.json.Leg;
-import com.bluelightning.json.Maneuver;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 
@@ -96,26 +91,6 @@ public class TravelMode extends JPanel {
 	private boolean displayRunning = true;
 
 	public TravelStatus travelStatus = null;
-
-	public static class ManeuverMetrics {
-
-		Maneuver maneuver;
-		ArrayList<LineSegment> segments = new ArrayList<>();
-
-		public ManeuverMetrics(Maneuver maneuver) {
-			this.maneuver = maneuver;
-			for (int i = 1; i < maneuver.getShape().size(); i++) {
-				Coordinate p1 = new Coordinate(maneuver.getShape().get(i - 1).getLongitude(),
-						maneuver.getShape().get(i - 1).getLatitude());
-				Coordinate p2 = new Coordinate(maneuver.getShape().get(i - 1).getLongitude(),
-						maneuver.getShape().get(i - 1).getLatitude());
-				segments.add(new LineSegment(p1, p2));
-			}
-		}
-	}
-
-	public List<ManeuverMetrics> maneuverMetrics = null;
-	public HashMap<Maneuver, Maneuver> nextManeuverMap = null;
 
 	/**
 	 * HandleTripPlanUpdate - respond to RMI update() calls when PlannerMode
@@ -187,27 +162,6 @@ public class TravelMode extends JPanel {
 		activePanel.getProgressBar().setString(report);
 	}
 
-	// protected double
-
-	protected Maneuver findCurrentManeuver(GPS.Fix fix) {
-		Coordinate where = new Coordinate(fix.getLongitude(), fix.getLatitude());
-		double closestDistance = 7e6;
-		Maneuver closest = null;
-		if (maneuverMetrics == null)
-			return null;
-		for (ManeuverMetrics metrics : maneuverMetrics) {
-			for (LineSegment segment : metrics.segments) {
-				double d = segment.distance(where);
-				if (d < closestDistance) {
-					closestDistance = d;
-					closest = metrics.maneuver;
-				}
-			}
-		}
-		// RobautoMain.logger.debug( closest );
-		return closest;
-	}
-
 	protected GPS gps = new GPS();
 
 	public class GpsHandler {
@@ -215,6 +169,7 @@ public class TravelMode extends JPanel {
 		Date lastTime = null;
 		double lastLat = 0;
 		double lastLon = 0;
+		boolean firstMotion = false;
 
 		@Subscribe
 		public void handle(final Events.GpsEvent event) {
@@ -231,20 +186,23 @@ public class TravelMode extends JPanel {
 				return;
 			travelStatus.update(event.fix);
 			distanceTraveled += event.fix.movement;
-			Maneuver currentManeuver = findCurrentManeuver(event.fix);
+			ManeuverMetrics.ClosestManeuver currentManeuver = ManeuverMetrics.findCurrentManeuver(event.fix);
 			if (currentManeuver != null) {
-				travelStatus.update(event.fix.speed, currentManeuver, nextManeuverMap.get(currentManeuver));
+				travelStatus.update(event.fix.speed, currentManeuver.metrics.maneuver, ManeuverMetrics.nextManeuverMap.get(currentManeuver.metrics.maneuver));
 			}
 			double dt = 0.001 * (event.fix.date.getTime() - lastTime.getTime());
-			if (travelStatus != null && event.fix.speed < 0.1) {
-				timeStopped += dt;
-				travelStatus.stopped(timeStopped);
+			if (event.fix.speed < 0.1) {
+				if (firstMotion) {
+					timeStopped += dt;
+					travelStatus.stopped(timeStopped);
+				}
 			} else {
+				firstMotion = true;
 				timeSoFar += dt;
 			}
 			lastTime = event.fix.date;
 			currentFuel -= Here2.METERS_TO_MILES * event.fix.movement / Report.MPG;
-			travelStatus.update(timeSoFar, distanceTraveled);
+			travelStatus.update(timeSoFar, distanceTraveled, currentManeuver, ManeuverMetrics.maneuverMetrics);
 
 			SwingUtilities.invokeLater(new Runnable() {
 
@@ -281,7 +239,7 @@ public class TravelMode extends JPanel {
 		Events.eventBus.register(new GpsHandler());
 		gps.initialize(frame, isSurface);
 	}
-
+	
 	protected void setDay() {
 		final Report.Day day = report.getDays().get(currentDay);
 		final ArrayList<Route> days = tripPlan.getFinalizedDays();
@@ -290,25 +248,11 @@ public class TravelMode extends JPanel {
 		Drive drive = day.steps.get(0).drive;
 		currentFuel = Double.parseDouble(drive.fuelRemaining) + Double.parseDouble(drive.fuelUsed);
 		distanceTraveled = 0.0;
+		ManeuverMetrics.initializeMetrics( currentDay, days );
 		setupGps(days.get(currentDay));
 		travelStatus = new TravelStatus(tripPlan.getTripLeg(currentDay));
 		activePanel.getTextPane().setContentType("text/html");
 		activePanel.getTextPane().setEditable(false);
-		maneuverMetrics = new ArrayList<>();
-		nextManeuverMap = new HashMap<>();
-		Maneuver lastManeuver = null;
-		for (Leg leg : days.get(currentDay).getLeg()) {
-			for (Maneuver maneuver : leg.getManeuver()) {
-				List<GeoPosition> points = maneuver.getShape();
-				if (!points.isEmpty()) {
-					maneuverMetrics.add(new ManeuverMetrics(maneuver));
-				}
-				if (lastManeuver != null) {
-					nextManeuverMap.put(lastManeuver, maneuver);
-				}
-				lastManeuver = maneuver;
-			}
-		}
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

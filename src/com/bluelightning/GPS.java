@@ -174,7 +174,7 @@ public class GPS {
 					
 					Events.eventBus.post(event);
 				} else {
-					RobautoMain.logger.warn(String.format("EDITED: %s %10.1f %10.0f", fix.toString(), speed, movement));
+					RobautoMain.logger.warn(String.format("EDITED: %s %10.1f %10.0f", fix.toString(), speed*Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR, movement));
 					return false;
 				}
 			} else {

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.tools4j.meanvar.MeanVarianceSampler;
 
 import com.bluelightning.GPS.Fix;
+import com.bluelightning.ManeuverMetrics.ClosestManeuver;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.TripLeg;
 import com.bluelightning.json.Maneuver;
@@ -116,6 +117,8 @@ public class TravelStatus {
 	}
 	
 	protected class UpcomingStop {
+		GeoPosition where;
+		ClosestManeuver closest;
 		String   name;
 		double   totalTime;
 		double   totalDistance;
@@ -127,7 +130,11 @@ public class TravelStatus {
 		final static String onDeckRow2Style = "<TD style='font-size:96pt;font-weight:bolder;text-align:right;background-color:cyan'>";
 
 		
-		public UpcomingStop( String name, double totalTime, double totalDistance, String fuelAvailable ) {
+		public UpcomingStop( double latitude, double longitude, String name, double totalTime, double totalDistance, String fuelAvailable ) {
+			this.where = new GeoPosition( latitude, longitude );
+			this.closest = ManeuverMetrics.findCurrentManeuver( this.where );
+//			System.out.printf("%10.7f,%10.7f,%10.7f,%10.7f,%s\n", latitude, longitude, 
+//					closest.closestPoint.y, closest.closestPoint.x, name );
 			this.name = name;
 			this.hasGas = false;
 			if (! fuelAvailable.equals("None")) {
@@ -136,12 +143,12 @@ public class TravelStatus {
 			}
 			this.totalTime = totalTime;
 			this.totalDistance = totalDistance;
-			update(0, 0);
+			update(totalTime, totalDistance);
 		}
 		
-		void update( double timeSoFar, double distanceSoFar) {
-			timeRemaining = totalTime - timeSoFar;
-			distanceRemaining = totalDistance - distanceSoFar;
+		void update( double timeRemaining, double distanceRemaining) {
+			this.timeRemaining = timeRemaining;
+			this.distanceRemaining = distanceRemaining;
 		}
 		
 		public String[] toHtmlCells() {
@@ -191,7 +198,7 @@ public class TravelStatus {
 		upcomingStops = new ArrayList<>();
 		availableStops = new ArrayList<>();
 		for (TripPlan.StopData stopData : tripLeg.stopDataList) {
-			UpcomingStop upcomingStop = new UpcomingStop( stopData.name, stopData.trafficTime, stopData.distance, stopData.fuelAvailable );
+			UpcomingStop upcomingStop = new UpcomingStop( stopData.latitude, stopData.longitude, stopData.name, stopData.trafficTime, stopData.distance, stopData.fuelAvailable );
 			if (stopData.use) {
 				upcomingStops.add( upcomingStop );
 			} else {
@@ -220,24 +227,46 @@ public class TravelStatus {
 		stoppedTime.update(timeStopped);
 	}
 	
-	public void update( double timeSoFar, double distanceSoFar) {
+	public void update( double timeSoFar, double distanceSoFar, 
+			ManeuverMetrics.ClosestManeuver currentManeuver, List<ManeuverMetrics> maneuverMetrics) {
 		drivingTime.update(timeSoFar);
 		distanceDriven.update(distanceSoFar);
-		update(upcomingStops, timeSoFar, distanceSoFar );
-		update(availableStops, timeSoFar, distanceSoFar );
+		update(upcomingStops, currentManeuver, maneuverMetrics );
+		update(availableStops, currentManeuver, maneuverMetrics );
 	}
 	
-	protected void update(List<UpcomingStop> stops, double timeSoFar, double distanceSoFar ) {
-		Iterator<UpcomingStop> it = stops.iterator();
-		distanceToNext = 0.0;
-		if (!stops.isEmpty()) {
-			distanceToNext = stops.get(0).distanceRemaining;
-		}
-		while (it.hasNext()) {
-			UpcomingStop upcomingStop = it.next();
-			upcomingStop.update(timeSoFar, distanceSoFar);
-			if (upcomingStop.distanceRemaining < 0) {
-				it.remove();
+	protected void update(List<UpcomingStop> stops, ManeuverMetrics.ClosestManeuver currentManeuver, List<ManeuverMetrics> maneuverMetrics ) {
+//		for (int i = 0; i < maneuverMetrics.size(); i++ ) {
+//			ManeuverMetrics metrics = maneuverMetrics.get(i);
+//			System.out.printf("%d, %10.0f, %s\n", i, metrics.maneuver.getLength(), metrics.maneuver.getInstruction() );
+//		}
+		int iNow = maneuverMetrics.indexOf(currentManeuver.metrics);
+		double nowSpeed = currentManeuver.metrics.maneuver.getLength() / currentManeuver.metrics.maneuver.getTravelTime();
+		if (iNow >= 0) {
+			Iterator<UpcomingStop> it = stops.iterator();
+			while (it.hasNext()) {
+				UpcomingStop upcomingStop = it.next();
+				double timeToStop = currentManeuver.distanceToEnd / nowSpeed;
+				double distanceToStop = currentManeuver.distanceToEnd;
+				int iStop = maneuverMetrics.indexOf( upcomingStop.closest.metrics );
+//				System.out.printf("%d,%d,%s\n",iNow, iStop, upcomingStop.name );
+				if (iStop == iNow) {
+					timeToStop -= upcomingStop.closest.distanceToEnd / nowSpeed;
+					distanceToStop -= upcomingStop.closest.distanceToEnd;
+				} else if (iStop > iNow) {
+					for (int i = iNow+1; i < iStop; i++) {
+						ManeuverMetrics metrics = maneuverMetrics.get(i);
+						timeToStop += metrics.maneuver.getTravelTime();
+						distanceToStop += metrics.maneuver.getLength();
+					}
+					double stopSpeed = upcomingStop.closest.metrics.maneuver.getLength() / upcomingStop.closest.metrics.maneuver.getTravelTime();
+					timeToStop += upcomingStop.closest.distanceFromStart / stopSpeed;
+					distanceToStop += upcomingStop.closest.distanceFromStart;
+				}
+				upcomingStop.update(timeToStop, distanceToStop);
+				if (upcomingStop.distanceRemaining < 0) {
+					it.remove();
+				}
 			}
 		}
 	}
@@ -385,40 +414,6 @@ public class TravelStatus {
 			c.set("styles", css);
 		} catch (Exception x) {}
 		return c.toString();
-	}
-
-	
-	@SuppressWarnings("unchecked")
-	public static void main(String[] args) {
-		File tripLegsFile = new File("TripLegs.obj");
-		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.TravelStatus");
-		ArrayList<TripLeg> tripLegs = null;
-//		if (false) {
-//			TripPlan tripPlan = TripPlan.load( new File("RobautoTripPlan.obj"), null );
-//			tripLegs = tripPlan.getTripLegs();
-//			try {
-//				FileOutputStream fos = new FileOutputStream(tripLegsFile);
-//				ObjectOutputStream out = new ObjectOutputStream(fos);
-//				out.writeObject(tripLegs);
-//				out.close();
-//			} catch (Exception x) {
-//				x.printStackTrace();
-//			}
-//		}
-
-		try {
-			FileInputStream fis = new FileInputStream(tripLegsFile);
-			ObjectInputStream in = new ObjectInputStream(fis);
-			tripLegs = (ArrayList<TripLeg>) in.readObject();
-			in.close();
-			
-		} catch (Exception x) {
-			x.printStackTrace();
-		}
-		TravelStatus travelStatus = new TravelStatus( tripLegs.get(0) );
-		travelStatus.update( 3600.0, 75e3);
-		travelStatus.stopped( 300.0 );
-		RobautoMain.logger.debug( travelStatus.toDrivingHtml() );
 	}
 
 }

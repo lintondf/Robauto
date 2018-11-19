@@ -48,7 +48,7 @@ public class GpsComplete implements ISerialGps {
 	        thread.start();
 	        return true;
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("GPS Error: " + e.getMessage());
 		}
 		return false;
 	}

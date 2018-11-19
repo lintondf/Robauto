@@ -239,9 +239,9 @@ public class Map {
 			flatPlaces.addAll(dayPlaces);
 		}
 		RobautoMain.logger.info(String.format("showRoute %d %d, %d", allPlaces.size(), flatPlaces.size(), markers.size() ));
-		for (int i = 0; i < flatPlaces.size(); i++) {
-			System.out.printf("showRoute %d %s\n", markers.get(i), flatPlaces.get(i) );
-		}
+//		for (int i = 0; i < flatPlaces.size(); i++) {
+//			System.out.printf("showRoute %d %s\n", markers.get(i), flatPlaces.get(i) );
+//		}
 		
 		ArrayList<GeoPosition> track = new ArrayList<>(); 
 		for (int i = 0; i < days.size(); i++) {
