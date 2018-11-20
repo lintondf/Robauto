@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
 
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
@@ -247,7 +248,7 @@ public class Garmin extends JPanel {
 					List<Object> any = extensions.getAny();
 					for (Object ext : any) {
 						if (ext instanceof JAXBElement) {
-							JAXBElement<?> element = (JAXBElement<?>) ext;
+							JAXBElement element = (JAXBElement) ext;
 							switch (element.getName().toString()) {
 							case "{http://www.garmin.com/xmlschemas/GpxExtensions/v3}RoutePointExtension":
 								RoutePointExtensionT rpext = (RoutePointExtensionT) element

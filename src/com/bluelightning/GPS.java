@@ -258,7 +258,7 @@ public class GPS {
 			try {
 				readerThread.join(1000);
 			} catch (Exception x) {
-				readerThread.destroy();
+				//readerThread.destroy();
 			}
 		}
 	}
@@ -273,7 +273,7 @@ public class GPS {
 			try {
 				debugThread.join(1000);
 			} catch (Exception x) {
-				debugThread.destroy();
+				//debugThread.destroy();
 			}
 		}
 	}

@@ -72,7 +72,7 @@ import com.bluelightning.poi.TruckStopPOI;
 import com.bluelightning.poi.WalmartPOI;
 import com.bluelightning.poi.POI.FuelAvailable;
 import com.google.common.eventbus.Subscribe;
-import com.sun.glass.ui.Window.Level;
+//import com.sun.glass.ui.Window.Level;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.PatternLayout;
@@ -589,7 +589,7 @@ public class PlannerMode extends JPanel {
 						int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
 						VisitedPlace place = new VisitedPlace(event.place);
 						if (place.getFuelAvailable().get() == FuelAvailable.NO_FUEL)
-							place.setFuelAvailable(getNearByFuel(place.getLatitude(), place.getLongitude(), 2e3));
+							place.setFuelAvailable(getNearByFuel(place.getLatitude(), place.getLongitude(), 200));
 						ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
 						if (places == null)
 							places = new ArrayList<>();
