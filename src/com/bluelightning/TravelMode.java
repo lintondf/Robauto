@@ -27,6 +27,7 @@ import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.LoggerFactory;
 
 import com.bluelightning.Events.UiEvent;
+import com.bluelightning.GPS.Fix;
 import com.bluelightning.Report.Drive;
 import com.bluelightning.TravelStatus.UpcomingStop;
 import com.bluelightning.data.TripPlan;
@@ -66,8 +67,11 @@ import java.awt.Image;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.bluelightning.gui.TravelActivePanel;
 import com.bluelightning.json.Route;
@@ -204,6 +208,8 @@ public class TravelMode extends JPanel {
 			lastTime = event.fix.date;
 			currentFuel -= Here2.METERS_TO_MILES * event.fix.movement / Report.MPG;
 			UpcomingStop nextStop = travelStatus.update(timeSoFar, distanceTraveled, currentManeuver, ManeuverMetrics.maneuverMetrics);
+			
+			rotateMapView( event.fix, nextStop );
 
 			SwingUtilities.invokeLater(new Runnable() {
 
@@ -235,12 +241,39 @@ public class TravelMode extends JPanel {
 
 		List<GeoPosition> path = route.getShape();
 		final Iterator<GeoPosition> it = path.iterator();
-		final ButtonWaypoint buttonWaypoint = new ButtonWaypoint(new ImageIcon(image), it.next());
+		final ButtonWaypoint buttonWaypoint = new ButtonWaypoint("You Are Here", new ImageIcon(image), it.next());
 		map.setYouAreHere(buttonWaypoint);
 		Events.eventBus.register(new GpsHandler());
 		gps.initialize(frame, isSurface);
 	}
 	
+	@SuppressWarnings("deprecation")
+	public void rotateMapView(Fix fix, UpcomingStop nextStop) {
+		if (nextStop !=null && waypoints != null && !waypoints.isEmpty() &&
+				(fix.date.getSeconds() % 10) == 0) {
+			Set<GeoPosition> positions = new HashSet<GeoPosition>();
+			positions.add(new GeoPosition(fix.getLatitude(), fix.getLongitude()));
+			int n = waypoints.size()-1;
+			if ((fix.date.getSeconds() % 20) == 0) {
+				String match = nextStop.name.toLowerCase();
+				for (n = 0; n < waypoints.size()-1; n++) {
+					//System.out.println(n + ": " + match + " / " + waypoints.get(n).getName().toLowerCase());
+					if (waypoints.get(n).getName().toLowerCase().startsWith(match)) {
+						break;
+					}
+				}
+			}
+			positions.add(waypoints.get(n).getPosition());
+			SwingUtilities.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					map.mapViewer.zoomToBestFit(positions, 0.95);
+				}
+			});
+		}
+	}
+
 	protected void setDay() {
 		final Report.Day day = report.getDays().get(currentDay);
 		final ArrayList<Route> days = tripPlan.getFinalizedDays();
@@ -262,8 +295,7 @@ public class TravelMode extends JPanel {
 				} catch (Exception x) {
 				}
 				map.clearRoute();
-				List<ButtonWaypoint> waypoints = map.showRoute(days, markers, allPlaces, currentDay);
-				waypoints.forEach(System.out::println);
+				waypoints = map.showRoute(days, markers, allPlaces, currentDay);
 				activePanel.getSplitPane().setDividerLocation(0.4);
 				activePanel.getTextPane().setContentType("text/html");
 				activePanel.getTextPane().setText(travelStatus.toDrivingHtml());
@@ -451,6 +483,8 @@ public class TravelMode extends JPanel {
 	@SuppressWarnings("unused")
 	private static String localHostAddress;
 	protected JScrollPane dayListScrollPane;
+	
+	protected List<ButtonWaypoint> waypoints;
 
 	private static void initLookAndFeel(double textSizeInPixels, double fontSize) {
 		try {

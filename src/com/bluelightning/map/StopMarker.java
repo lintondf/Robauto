@@ -102,7 +102,7 @@ public class StopMarker extends ButtonWaypoint {
 	protected int    dayNumber = 0;
 
 	public StopMarker(int kind, String text, GeoPosition geoPosition) {
-		super( new ImageIcon(images.get(kind)), 
+		super( text, new ImageIcon(images.get(kind)), 
 			  geoPosition);
 		this.kind = kind;
 		this.text = text;
@@ -112,7 +112,7 @@ public class StopMarker extends ButtonWaypoint {
 	}
 	
 	public StopMarker(int kind, String name, String text, GeoPosition geoPosition) {
-		super( new ImageIcon(images.get(kind)), 
+		super( name, new ImageIcon(images.get(kind)), 
 			  geoPosition);
 		this.kind = kind;
 		this.setName(name);

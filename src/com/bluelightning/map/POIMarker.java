@@ -27,7 +27,7 @@ public class POIMarker extends ButtonWaypoint {
 	POIResult result;
 	
 	public POIMarker(POIResult result) {
-		super( new ImageIcon(result.poi.getImage()), 
+		super( result.poi.getName(), new ImageIcon(result.poi.getImage()), 
 				new GeoPosition(result.poi.getLatitude(), result.poi.getLongitude() ));
 		this.result = result;
 		setToolTipText(result.toReport());
