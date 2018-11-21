@@ -120,6 +120,7 @@ public class TravelStatus {
 		GeoPosition where;
 		ClosestManeuver closest;
 		String   name;
+		String   markedUpName;
 		double   totalTime;
 		double   totalDistance;
 		double   timeRemaining;
@@ -136,14 +137,19 @@ public class TravelStatus {
 //			System.out.printf("%10.7f,%10.7f,%10.7f,%10.7f,%s\n", latitude, longitude, 
 //					closest.closestPoint.y, closest.closestPoint.x, name );
 			this.name = name;
+			this.markedUpName = name;
 			this.hasGas = false;
 			if (! fuelAvailable.equals("None")) {
-				this.name = "<b>" + this.name + "</b>";
+				this.markedUpName = "<b>" + this.markedUpName + "</b>";
 				this.hasGas = true;
 			}
 			this.totalTime = totalTime;
 			this.totalDistance = totalDistance;
 			update(totalTime, totalDistance);
+		}
+		
+		public String toString() {
+			return String.format("%s", name );
 		}
 		
 		void update( double timeRemaining, double distanceRemaining) {
@@ -154,7 +160,7 @@ public class TravelStatus {
 		public String[] toHtmlCells() {
 			return new String[] {
 				String.format("%s%s%s", 
-						onDeckRow1Style, name, cTD),
+						onDeckRow1Style, markedUpName, cTD),
 				String.format("%s%s%s", 
 						onDeckRow2Style, Here2.toPeriod(timeRemaining), cTD),
 				String.format("%s%.1f%s", 
@@ -164,7 +170,7 @@ public class TravelStatus {
 		
 		public String toHtmlRow() {
 			return String.format("%s%s%s%s%s%s%s%.1f%s", 
-					oblTD, name, cTD,
+					oblTD, markedUpName, cTD,
 					orTD, Here2.toPeriod(timeRemaining), cTD,
 					orTD, Here2.METERS_TO_MILES*distanceRemaining, cTD);
 		}
@@ -227,12 +233,23 @@ public class TravelStatus {
 		stoppedTime.update(timeStopped);
 	}
 	
-	public void update( double timeSoFar, double distanceSoFar, 
+	UpcomingStop nextStop = null;
+	
+	public UpcomingStop update( double timeSoFar, double distanceSoFar, 
 			ManeuverMetrics.ClosestManeuver currentManeuver, List<ManeuverMetrics> maneuverMetrics) {
 		drivingTime.update(timeSoFar);
 		distanceDriven.update(distanceSoFar);
 		update(upcomingStops, currentManeuver, maneuverMetrics );
+		if (! upcomingStops.isEmpty() ) {
+			if (nextStop == null) {
+				nextStop = upcomingStops.get(0);
+			}
+			if (!nextStop.equals(upcomingStops.get(0))) {
+				nextStop = upcomingStops.get(0);
+			}
+		}
 		update(availableStops, currentManeuver, maneuverMetrics );
+		return nextStop;
 	}
 	
 	protected void update(List<UpcomingStop> stops, ManeuverMetrics.ClosestManeuver currentManeuver, List<ManeuverMetrics> maneuverMetrics ) {

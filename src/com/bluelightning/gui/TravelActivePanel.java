@@ -9,6 +9,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.UIDefaults;
 import javax.swing.text.DefaultCaret;
 
 public class TravelActivePanel extends JPanel {
@@ -71,8 +72,23 @@ public class TravelActivePanel extends JPanel {
         nextPanel.setLayout(new BorderLayout(0, 0));
         
         nextText = new JTextPane();
-        nextText.setBackground( Color.CYAN );
         nextPanel.add( nextText, BorderLayout.CENTER);
+        
+        nextText.setEnabled(false);
+        Color fgColor = Color.BLACK;
+        Color bgColor = Color.CYAN;
+        UIDefaults defaults = new UIDefaults();
+        defaults.put("TextPane[Disabled].backgroundPainter", bgColor);
+        //defaults.put("TextPane[Disabled].textForeground", Color.BLACK );
+        //defaults.put("TextPane.disabledText", Color.BLACK );
+        //defaults.put("TextPane.foreground", Color.BLACK );
+        //defaults.put("TextPane[Enabled].textForeground", Color.BLACK );
+        nextText.putClientProperty("Nimbus.Overrides", defaults);
+        //nextText.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
+        nextText.setBackground(bgColor);
+        nextText.setForeground( fgColor );
+        nextText.setSelectedTextColor(fgColor);
+        nextText.setDisabledTextColor(fgColor);
 	}
 
 	public JPanel getMapPanel() {

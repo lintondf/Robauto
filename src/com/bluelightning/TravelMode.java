@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.Report.Drive;
+import com.bluelightning.TravelStatus.UpcomingStop;
 import com.bluelightning.data.TripPlan;
 import com.google.common.eventbus.Subscribe;
 
@@ -202,7 +203,7 @@ public class TravelMode extends JPanel {
 			}
 			lastTime = event.fix.date;
 			currentFuel -= Here2.METERS_TO_MILES * event.fix.movement / Report.MPG;
-			travelStatus.update(timeSoFar, distanceTraveled, currentManeuver, ManeuverMetrics.maneuverMetrics);
+			UpcomingStop nextStop = travelStatus.update(timeSoFar, distanceTraveled, currentManeuver, ManeuverMetrics.maneuverMetrics);
 
 			SwingUtilities.invokeLater(new Runnable() {
 
@@ -261,7 +262,8 @@ public class TravelMode extends JPanel {
 				} catch (Exception x) {
 				}
 				map.clearRoute();
-				/* List<ButtonWaypoint> waypoints = */ map.showRoute(days, markers, allPlaces, currentDay);
+				List<ButtonWaypoint> waypoints = map.showRoute(days, markers, allPlaces, currentDay);
+				waypoints.forEach(System.out::println);
 				activePanel.getSplitPane().setDividerLocation(0.4);
 				activePanel.getTextPane().setContentType("text/html");
 				activePanel.getTextPane().setText(travelStatus.toDrivingHtml());
