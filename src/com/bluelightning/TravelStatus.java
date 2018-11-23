@@ -22,6 +22,7 @@ import com.bluelightning.GPS.Fix;
 import com.bluelightning.ManeuverMetrics.ClosestManeuver;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.TripLeg;
+import com.bluelightning.gui.FuelPanel;
 import com.bluelightning.json.Maneuver;
 import com.x5.template.Chunk;
 import com.x5.template.Theme;

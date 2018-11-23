@@ -45,6 +45,7 @@ import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
 import com.bluelightning.Garmin.TrackPoint;
+import com.bluelightning.data.FuelStop;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.gui.AddAddressDialog;
 import com.bluelightning.gui.MainControlPanel;
@@ -398,6 +399,22 @@ public class PlannerMode extends JPanel {
 			waypoints = map.showRoute(days, markers, allPlaces, Map.ALL_DAYS);
 			int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
 			mainPanel.getRightTabbedPane().setSelectedIndex(index);
+			
+			ArrayList<POIResult> allPOI = new ArrayList<>();
+			poiMap.forEach((kind, pset) -> {
+				allPOI.addAll(pset.getPointsOfInterestAlongRoute(RobautoMain.tripPlan.getRoute(), 2000));
+			});
+			Iterator<POIResult> it = allPOI.iterator();
+			TreeSet<FuelStop> gasStops = new TreeSet<>();
+			while (it.hasNext()) {
+				POIResult r = it.next();
+				if (r.poi.getFuelAvailable().has(FuelAvailable.HAS_GAS)) {
+					gasStops.add( new FuelStop(r));
+				}
+			}
+			gasStops.forEach(System.out::println);
+			RobautoMain.tripPlan.setFuelStops( new ArrayList<FuelStop>( gasStops ) );
+
 			RobautoMain.logger.info("  Route shown on map");
 			RobautoMain.tripPlan.save(tripPlanFile);
 			RobautoMain.tripPlan.tripPlanUpdated(tripPlanFile.getAbsolutePath());
@@ -423,6 +440,8 @@ public class PlannerMode extends JPanel {
 			fileChooser.setFileFilter(new FileFilter() {
 				@Override
 				public boolean accept(File f) {
+					if (f.isDirectory())
+						return true;
 					String name = f.getName().toLowerCase();
 					if (name.endsWith(".gpx"))
 						return true;
@@ -588,8 +607,8 @@ public class PlannerMode extends JPanel {
 					public void run() {
 						int selectedWaypointRow = routePanel.getWaypointTable().getSelectedRow();
 						VisitedPlace place = new VisitedPlace(event.place);
-						if (place.getFuelAvailable().get() == FuelAvailable.NO_FUEL)
-							place.setFuelAvailable(getNearByFuel(place.getLatitude(), place.getLongitude(), 200));
+//						if (place.getFuelAvailable().get() == FuelAvailable.NO_FUEL)
+//							place.setFuelAvailable(getNearByFuel(place.getLatitude(), place.getLongitude(), 200));
 						ArrayList<VisitedPlace> places = routePanel.getWaypointsModel().getData();
 						if (places == null)
 							places = new ArrayList<>();

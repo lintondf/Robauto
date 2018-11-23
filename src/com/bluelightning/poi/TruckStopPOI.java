@@ -149,7 +149,7 @@ public class TruckStopPOI extends POIBase {
 
 	@Override
 	public String getAddress() {
-		return String.format("%s, %s, %s", address, city, state );
+		return String.format("%s, %s, %s; %s", address, city, state, exit );
 	}
 
 	@Override

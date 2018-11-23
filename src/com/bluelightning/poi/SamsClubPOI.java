@@ -186,7 +186,7 @@ public class SamsClubPOI extends POIBase {
 	
 	@Override
 	public String getAddress() {
-		return address;
+		return formatAddress();
 	}
 
 	@Override
@@ -206,9 +206,14 @@ public class SamsClubPOI extends POIBase {
 	
 	
 	public static void main(String[] args) {
-    	POISet pset = SamsClubPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Walmart_United States & Canada.csv");
-    	for (int i = 0; i < 15; i++)
-    		System.out.println( pset.get(i).toString() );
+		String[] fields = {"-77.2966","38.647307",
+				"Sam's Club; #6371,  Gas,",
+				"14050 Worth Ave; I-95 Exit 156,Woodbridge,VA,22192,(703) 491-2662,"
+		};
+		SamsClubPOI poi = new SamsClubPOI( fields );
+//    	POISet pset = SamsClubPOI.factory("C:\\Users\\NOOK\\GIT\\default\\RobautoFX\\POI\\Walmart_United States & Canada.csv");
+//    	for (int i = 0; i < 15; i++)
+//    		System.out.println( pset.get(i).toString() );
 	}
 
 }

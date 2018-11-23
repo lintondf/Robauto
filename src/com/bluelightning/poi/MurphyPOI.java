@@ -178,7 +178,7 @@ public class MurphyPOI extends POIBase {
 	
 	@Override
 	public String getAddress() {
-		return address;
+		return formatAddress();
 	}
 
 	@Override

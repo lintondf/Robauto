@@ -18,14 +18,14 @@ import com.bluelightning.json.Route;
 
 public class ManeuverMetrics {
 
-	protected static class ClosestManeuver {
-		ManeuverMetrics metrics;
-		double   distanceFrom;
-		double   distanceFromStart;
-		double   distanceToEnd;
-		LineSegment segment;
-		double   distanceInto;
-		Coordinate closestPoint;
+	public static class ClosestManeuver {
+		public ManeuverMetrics metrics;
+		public double   distanceFrom;  // sideways displacement
+		public double   distanceFromStart; // from start of maneuver
+		public double   distanceToEnd;     // to end of maneuver
+		public LineSegment segment;
+		public double   distanceInto;      // from start of route to start of maneuver
+		public Coordinate closestPoint;    // nearest point on maneuver to current position
 		
 		public void update(Coordinate where) {
 			this.closestPoint = segment.closestPoint(where);
@@ -39,11 +39,20 @@ public class ManeuverMetrics {
 		}
 	}
 
-	Maneuver maneuver;
+	public Maneuver maneuver;
+	public double   totalDistance;
+	public double   totalTime;
 	ArrayList<LineSegment> segments = new ArrayList<>();
-	ArrayList<Double> distancesInto = new ArrayList<>();
+	ArrayList<Double> distancesInto = new ArrayList<>();  // from start of maneuver to start of corresponding segment
+	
 	public static HashMap<Maneuver, Maneuver> nextManeuverMap = null;
 	public static List<ManeuverMetrics> maneuverMetrics = null;
+	
+	@Override
+	public String toString() {
+		int n = distancesInto.size()-1;
+		return String.format("%10.0f %s %d %10.0f %10.0f %s", totalDistance, maneuver.getId(), segments.size(), distancesInto.get(0), distancesInto.get(n), maneuver.getInstruction() );
+	}
 
 	public ManeuverMetrics(Maneuver maneuver) {
 		this.maneuver = maneuver;
@@ -89,17 +98,25 @@ public class ManeuverMetrics {
 		maneuverMetrics = new ArrayList<>();
 		nextManeuverMap = new HashMap<>();
 		Maneuver lastManeuver = null;
+		double totalDistance = 0.0;
+		double totalTime = 0.0;
 		for (Leg leg : days.get(currentDay).getLeg()) {
 			for (Maneuver maneuver : leg.getManeuver()) {
 				List<GeoPosition> points = maneuver.getShape();
 				if (!points.isEmpty()) {
-					maneuverMetrics.add(new ManeuverMetrics(maneuver));
+					ManeuverMetrics mm = new ManeuverMetrics(maneuver);
+					mm.totalDistance = totalDistance;
+					mm.totalTime = totalTime;
+					maneuverMetrics.add(mm);
 				}
 				if (lastManeuver != null) {
 					nextManeuverMap.put(lastManeuver, maneuver);
 				}
+				totalDistance += maneuver.getLength();
+				totalTime += maneuver.getTravelTime();
 				lastManeuver = maneuver;
 			}
 		}
+		maneuverMetrics.forEach(System.out::println);
 	}
 }

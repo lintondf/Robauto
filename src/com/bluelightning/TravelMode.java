@@ -73,6 +73,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.bluelightning.gui.FuelPanel;
 import com.bluelightning.gui.TravelActivePanel;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
@@ -122,6 +123,7 @@ public class TravelMode extends JPanel {
 
 	protected JList<String> listOfDays;
 	protected TravelActivePanel activePanel;
+	protected FuelPanel fuelPanel;
 
 	public class UiHandler {
 		@Subscribe
@@ -208,6 +210,7 @@ public class TravelMode extends JPanel {
 			lastTime = event.fix.date;
 			currentFuel -= Here2.METERS_TO_MILES * event.fix.movement / Report.MPG;
 			UpcomingStop nextStop = travelStatus.update(timeSoFar, distanceTraveled, currentManeuver, ManeuverMetrics.maneuverMetrics);
+			fuelPanel.update(currentManeuver, ManeuverMetrics.maneuverMetrics);
 			
 			rotateMapView( event.fix, nextStop );
 
@@ -332,13 +335,26 @@ public class TravelMode extends JPanel {
 		this.add(buttonArea, BorderLayout.SOUTH);
 		JPanel buttonPanel = new JPanel();
         buttonArea.add(buttonPanel, new FlowLayout(FlowLayout.LEFT, 5, 5));
+        
         JButton drivingButton = new JButton("Driving");
         drivingButton.setFont(buttonFont);
         buttonPanel.add( drivingButton );
+        drivingButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				drivingMode();
+			}
+		});
         
         JButton fuelButton = new JButton("Fuel");
         fuelButton.setFont(buttonFont);
         buttonPanel.add( fuelButton );
+        fuelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				fuelMode();
+			}
+		});
         
  		JButton btnPauseResume = new JButton("Pause");
 		btnPauseResume.setFont(buttonFont);
@@ -386,6 +402,10 @@ public class TravelMode extends JPanel {
 			}
 		});
 		buttonPanel.add(btnSelectDay);
+		
+		fuelPanel = new FuelPanel();
+		this.add(fuelPanel, BorderLayout.CENTER);
+		fuelPanel.setVisible(false);
 
 		activePanel = new TravelActivePanel();
 		this.add(activePanel, BorderLayout.CENTER);
@@ -433,6 +453,31 @@ public class TravelMode extends JPanel {
 		// } catch (Exception e) {
 		// System.err.println("Server exception: " + e.toString());
 		// }
+	}
+
+	protected void fuelMode() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (fuelPanel != null) {
+					remove(fuelPanel);
+				}
+				activePanel.setVisible(false);
+				fuelPanel = new FuelPanel(tripPlan.getFuelStops(), lafFont );
+				fuelPanel.setVisible(true);
+				add(fuelPanel, BorderLayout.CENTER);
+			}
+		});
+	}
+
+	protected void drivingMode() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				fuelPanel.setVisible(false);
+				activePanel.setVisible(true);
+			}
+		});
 	}
 
 	protected void initialize(File tripPlanFile) {
@@ -485,8 +530,10 @@ public class TravelMode extends JPanel {
 	protected JScrollPane dayListScrollPane;
 	
 	protected List<ButtonWaypoint> waypoints;
+	protected Font lafFont;
 
-	private static void initLookAndFeel(double textSizeInPixels, double fontSize) {
+	public static Font initLookAndFeel(double textSizeInPixels, double fontSize) {
+		Font lafFont = null;
 		try {
 			RobautoMain.logger.debug(Toolkit.getDefaultToolkit().getScreenSize().toString());
 			// double fontSize = 0.8 * textSizeInPixels *
@@ -498,9 +545,9 @@ public class TravelMode extends JPanel {
 					UIManager.setLookAndFeel(info.getClassName());
 					NimbusLookAndFeel laf = (NimbusLookAndFeel) UIManager.getLookAndFeel();
 					// laf.getDefaults().entrySet().forEach(System.out::println);
-					Font font = new Font("Tahoma", Font.BOLD, (int) fontSize);
-					RobautoMain.logger.debug(font.toString());
-					laf.getDefaults().put("defaultFont", font);
+					lafFont = new Font("Tahoma", Font.BOLD, (int) fontSize);
+					RobautoMain.logger.debug(lafFont.toString());
+					laf.getDefaults().put("defaultFont", lafFont);
 					laf.getDefaults().put("ScrollBar.thumbHeight", (int) textSizeInPixels);
 					laf.getDefaults().put("Table.rowHeight", (int) textSizeInPixels);
 					break;
@@ -510,6 +557,7 @@ public class TravelMode extends JPanel {
 			// If Nimbus is not available, you can set the GUI to another look
 			// and feel.
 		}
+		return lafFont;
 	}
 
 	public static void main(String[] args) {
@@ -538,8 +586,7 @@ public class TravelMode extends JPanel {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					if (isSurface)
-						initLookAndFeel(60, 48);
+					Font lafFont = initLookAndFeel(60, 48);
 					frame = new JFrame();
 					frame.setTitle("Robauto - Travel Mode");
 					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -548,6 +595,7 @@ public class TravelMode extends JPanel {
 					frame.setIconImage(icon);
 
 					TravelMode travelMode = new TravelMode();
+					travelMode.lafFont = lafFont;
 
 					frame.setContentPane(travelMode);
 					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);

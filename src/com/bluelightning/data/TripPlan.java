@@ -62,6 +62,8 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	protected ArrayList<Integer> finalizedMarkers;
 
 	protected ArrayList<ArrayList<VisitedPlace>> finalizedPlaces;
+
+	private ArrayList<FuelStop> fuelStops;
 	
 	
 	public void tripPlanUpdated(String savePath) {
@@ -500,6 +502,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			out.writeObject(finalizedDays);
 			out.writeObject(finalizedMarkers);
 			out.writeObject(finalizedPlaces);
+			out.writeObject(fuelStops);
 			out.close();
 		} catch (Exception x) {
 			x.printStackTrace();
@@ -538,6 +541,12 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 				tripPlan.finalizedPlaces = (ArrayList<ArrayList<VisitedPlace>>) in.readObject();
 			} catch (Exception x) {
 				RobautoMain.logger.error("Missing finalized places ", x);
+			}
+			try {
+				tripPlan.fuelStops = (ArrayList<FuelStop>) in.readObject();
+			} catch (Exception x) {
+				tripPlan.fuelStops = new ArrayList<FuelStop>();
+				RobautoMain.logger.error("Missing fuel stops ", x);
 			}
 			in.close();
 
@@ -817,6 +826,10 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 		this.finalizedPlaces = allPlaces;
 	}
 
+	public void setFuelStops(ArrayList<FuelStop> stops) {
+		this.fuelStops = stops;
+	}
+
 	public ArrayList<Route> getFinalizedDays() {
 		if (finalizedDays == null)
 			finalizedDays = new ArrayList<>();
@@ -838,5 +851,11 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	public List<TripPlan.LegSummary> getLegSummary() {
 		return legSummary;
 	}
+
+
+	public ArrayList<FuelStop> getFuelStops() {
+		return fuelStops;
+	}
+
 
 }

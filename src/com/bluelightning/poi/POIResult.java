@@ -32,7 +32,8 @@ public class POIResult implements Comparable<POIResult>, Serializable {
 	}
 
 	public String toString() {
-		return String.format("POIResult: (%10.6f, %10.6f) away: %8.0f; %s; %s @ %d", center.getLatitude(),
+		return String.format("POIResult: %10.1f (%10.6f, %10.6f) away: %8.0f; %s; %s @ %d", totalProgress.distance / (0.3048 * 5280.0),
+				center.getLatitude(),
 				center.getLongitude(), distance, "" + poi, "" + maneuver.getInstruction(), index);
 	}
 

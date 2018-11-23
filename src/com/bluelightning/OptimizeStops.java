@@ -39,6 +39,7 @@ public class OptimizeStops {
 		return tripPlan.getTripLegData();
 	}
 
+	
 	public ArrayList<POIResult> getRouteSegmentPOI(Double start, Double finish) {
 		RobautoMain.logger.debug( String.format("gRSP %f %f", start, finish) );
 		ArrayList<POIResult> resultList = new ArrayList<>();
