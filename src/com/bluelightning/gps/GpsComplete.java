@@ -29,8 +29,10 @@ public class GpsComplete implements ISerialGps {
 		InputStream is;
 		try {
 			is = new FileInputStream(portName);
-			RobautoMain.logger.debug( String.format("GPS input available %d", is.available() ) );
 			LineIterator it = IOUtils.lineIterator(is, "UTF-8");
+			it.nextLine(); // lines come in pairs
+			it.nextLine();
+			RobautoMain.logger.debug( String.format("GPS input available" ) );
 	        Thread thread = new Thread(() -> {
 	        	
 	        	running = true;

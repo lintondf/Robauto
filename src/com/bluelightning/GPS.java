@@ -177,8 +177,8 @@ public class GPS {
 					RobautoMain.logger.warn(String.format("EDITED: %s %10.1f %10.0f", fix.toString(), speed*Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR, movement));
 					return false;
 				}
-			} else {
-				RobautoMain.logger.warn(String.format("BAD TIME: %s %10.1f", dt));
+			} else if (dt < 0.0) {
+				RobautoMain.logger.warn(String.format("BAD TIME: %s %10.1f", fix.toString(), dt));
 				return false;
 			}
 		}
@@ -204,6 +204,7 @@ public class GPS {
 			}
 		});
 		if (serialGps.start()) {
+			// started correctly, open recording file
 			try {
 				File file = new File("robauto-gps.obj");
 				FileOutputStream fos = new FileOutputStream(file);
