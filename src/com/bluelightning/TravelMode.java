@@ -200,8 +200,8 @@ public class TravelMode extends JPanel {
 				startTime = event.fix.date;
 				lastTime = startTime;
 			}
-			if (event.fix.getLatitude() != lastLat || event.fix.getLongitude() != lastLon) 
-				RobautoMain.logger.debug(String.format("%s %5.1f %6.4f", event.fix.toString(),
+			//if (event.fix.getLatitude() != lastLat || event.fix.getLongitude() != lastLon) 
+			RobautoMain.logger.debug(String.format("%s %5.1f %6.4f", event.fix.toString(),
 					Here2.METERS_TO_MILES * distanceTraveled, Here2.METERS_TO_MILES * event.fix.movement / Report.MPG));
 			lastLat = event.fix.getLatitude();
 			lastLon = event.fix.getLongitude();
