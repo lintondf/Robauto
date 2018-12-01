@@ -146,6 +146,18 @@ public class TruckStopPOI extends POIBase {
 			}
 		}
 	}
+	
+	public void setAddress( String address ) {
+		String[] fields = address.split(",");
+		this.address = fields[0].trim();
+		this.city = fields[1].trim();
+		this.state = fields[2].trim();
+		fields = this.state.split(";");
+		if (fields.length > 1) {
+			this.state = fields[0];
+			this.exit = fields[1];
+		}
+	}
 
 	@Override
 	public String getAddress() {

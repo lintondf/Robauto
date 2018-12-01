@@ -1,8 +1,13 @@
 package com.bluelightning;
 
+import java.io.File;
+
 import org.slf4j.Logger;
 
 import com.bluelightning.data.TripPlan;
+
+import ch.qos.logback.core.joran.spi.NoAutoStart;
+import ch.qos.logback.core.rolling.TriggeringPolicyBase;
 
 public class RobautoMain {
 	
@@ -10,7 +15,7 @@ public class RobautoMain {
 
 	public static TripPlan tripPlan;
 	public static Logger logger;
-
+	
 	public static boolean isMac = (System.getProperty("os.name").startsWith("Mac"));
 
 	public static String getJavaPath() {

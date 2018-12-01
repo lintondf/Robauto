@@ -33,6 +33,8 @@ import com.bluelightning.TravelStatus.UpcomingStop;
 import com.bluelightning.data.TripPlan;
 import com.google.common.eventbus.Subscribe;
 
+import ch.qos.logback.core.joran.spi.NoAutoStart;
+import ch.qos.logback.core.rolling.TriggeringPolicyBase;
 import seedu.addressbook.data.place.Address;
 import seedu.addressbook.data.place.VisitedPlace;
 
@@ -97,6 +99,20 @@ public class TravelMode extends JPanel {
 	private boolean displayRunning = true;
 
 	public TravelStatus travelStatus = null;
+	
+	@NoAutoStart
+	public static class StartupTriggeringPolicy<E> extends TriggeringPolicyBase<E> {
+	    private boolean triggerRollover = true;
+
+	    @Override
+	    public boolean isTriggeringEvent(final File activeFile, final E event) {
+	        if (!triggerRollover) { return false; }
+	        triggerRollover = false;
+	        return true;
+	    }
+	}
+
+
 
 	/**
 	 * HandleTripPlanUpdate - respond to RMI update() calls when PlannerMode

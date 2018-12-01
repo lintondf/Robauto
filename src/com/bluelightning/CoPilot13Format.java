@@ -104,7 +104,7 @@ public class CoPilot13Format  {
     
 	protected boolean isDataVersion(String line) {
         String data = line.charAt(0) == BYTE_ORDER_MARK ? line.substring(1) : line;
-		return data.startsWith("Data Version:13");
+		return data.startsWith("Data Version:14");
 	}
 
 //    public void read(InputStream source, ParserContext<Wgs84Route> context) throws Exception {
@@ -154,7 +154,15 @@ public class CoPilot13Format  {
                 continue;
 
             //noinspection StatementWithEmptyBody
-            if (isDataVersion(line) || line.startsWith(END_TRIP) || line.startsWith(END_STOP_OPT)) {
+            if (isDataVersion(line) || line.startsWith(END_STOP_OPT)) {
+            } else if (line.startsWith(END_TRIP)) {
+//                tripMapKeys.forEach(System.out::println);
+                String autoRoadSpeeds = map.get("DefAutoRoadSpeeds");
+//                System.out.println(autoRoadSpeeds);
+                map.put("DefRVRoadSpeeds", autoRoadSpeeds);
+                map.put("DefTruckRoadSpeeds", autoRoadSpeeds);
+                map.put("DefTruckMidsizeRoadSpeeds", autoRoadSpeeds);
+                map.put("DefTruckEditRoadSpeeds", autoRoadSpeeds);
             } else if (line.startsWith(START_TRIP)) {
                 //routeName = trim(parseValue(line));
                 map = tripMap;
@@ -216,6 +224,8 @@ public class CoPilot13Format  {
 //        String description = (state != null ? state + (zip != null ? "-" : " ") : "") +
 //                (zip != null ? zip + " " : "") + (city != null ? city : "") +
 //                (county != null ? ", " + county : "") + (streetAddress != null ? ", " + streetAddress : "");
+        if (name == null)
+        	name = address;
         VisitedPlace place = new VisitedPlace();
         try {
 			place.setName( new Name(name) );

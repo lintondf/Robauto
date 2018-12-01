@@ -20,19 +20,29 @@ import javax.swing.table.TableColumn;
 
 import org.slf4j.LoggerFactory;
 
+import com.bluelightning.CoPilot13Format;
 import com.bluelightning.Here2;
 import com.bluelightning.ManeuverMetrics;
 import com.bluelightning.RobautoMain;
 import com.bluelightning.TravelMode;
 import com.bluelightning.data.FuelStop;
 import com.bluelightning.data.TripPlan;
+import com.bluelightning.poi.POIBase;
+import com.bluelightning.poi.SamsClubPOI;
+import com.bluelightning.poi.TruckStopPOI;
+
+import seedu.addressbook.data.place.VisitedPlace;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -83,18 +93,19 @@ public class FuelPanel extends JPanel {
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		ListSelectionModel selectionModel = table.getSelectionModel();
 
-//		selectionModel.addListSelectionListener(new ListSelectionListener() {
-//			public void valueChanged(ListSelectionEvent e) {
-//				if (e.getValueIsAdjusting())
-//					return;
-//
-//				int i = firstAhead + e.getLastIndex();
-//				if (i >= 0 && i < fuelStops.size()) {
-//					FuelStop stop = fuelStops.get(i);
-//					launchMaps( stop.latitude, stop.longitude, stop.name );
-//				}
-//			}
-//		});
+		selectionModel.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting())
+					return;
+
+				int i = firstAhead + e.getLastIndex();
+				if (i >= 0 && i < fuelStops.size()) {
+					FuelStop stop = fuelStops.get(i);
+					launchCoPilot( stop );
+				}
+			}
+
+		});
 
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		TableColumnAdjuster tca = new TableColumnAdjuster(table);
@@ -222,6 +233,32 @@ public class FuelPanel extends JPanel {
 			return this;
 		}
 	}
+	
+	private void launchCoPilot(FuelStop stop) {
+		TruckStopPOI poi = new TruckStopPOI();
+		poi.setName( stop.name );
+		poi.setLatitude( stop.latitude );
+		poi.setLongitude( stop.longitude );
+		poi.setAddress( stop.address );
+		CoPilot13Format format = new CoPilot13Format();
+		String ipath = "gpstrip.trp.base";
+		String opath =  "\\\\Surfacepro3\\NA\\save\\gpstrip.trp";
+		try {
+			List<VisitedPlace> positions = format.read( new BufferedReader(new InputStreamReader( new FileInputStream(ipath), CoPilot13Format.UTF16LE_ENCODING)));//, );
+			positions.remove(1);
+			positions.add( new VisitedPlace( poi ) );
+		    PrintWriter stream = new PrintWriter(opath, CoPilot13Format.UTF16LE_ENCODING);
+			format.write("MyRoute", positions, stream, 0, positions.size() );
+			stream.close();
+			stream = new PrintWriter( System.out );
+			format.write("MyRoute", positions, stream, 0, positions.size() );
+			stream.close();			
+		} catch (Exception x ) {
+			x.printStackTrace();
+		}
+		
+	}
+	
 	
 	private void launchMaps( double latitude, double longitude, String name ) {
 		Runtime rt = Runtime.getRuntime();

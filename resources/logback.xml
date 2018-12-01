@@ -1,7 +1,8 @@
 <configuration>
   <!-- <statusListener class="ch.qos.logback.core.status.NopStatusListener" /> -->
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>robauto.log</file>
+	<triggeringPolicy class="com.bluelightning.TravelMode.StartupTriggeringPolicy"/>    
     <append>true</append>
     <!-- encoders are assigned the type
          ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
