@@ -242,15 +242,25 @@ public class FuelPanel extends JPanel {
 		poi.setAddress( stop.address );
 		CoPilot13Format format = new CoPilot13Format();
 		String ipath = "gpstrip.trp.base";
-		String opath =  "\\\\Surfacepro3\\NA\\save\\gpstrip.trp";
+		File ofile =  new File( "\\\\Surfacepro3\\NA\\save\\gpstrip.trp" );
+		final String cmd = "C:\\Program Files\\copilot.exe";  ///????
 		try {
-			List<VisitedPlace> positions = format.read( new BufferedReader(new InputStreamReader( new FileInputStream(ipath), CoPilot13Format.UTF16LE_ENCODING)));//, );
+			InputStreamReader reader = new InputStreamReader( new FileInputStream(ipath), CoPilot13Format.UTF16LE_ENCODING);
+			List<VisitedPlace> positions = format.read( new BufferedReader(reader));
 			positions.remove(1);
 			positions.add( new VisitedPlace( poi ) );
-		    PrintWriter stream = new PrintWriter(opath, CoPilot13Format.UTF16LE_ENCODING);
-			format.write("MyRoute", positions, stream, 0, positions.size() );
-			stream.close();
-			stream = new PrintWriter( System.out );
+			if (ofile.exists() && ofile.canWrite()) {
+			    PrintWriter stream = new PrintWriter(ofile, CoPilot13Format.UTF16LE_ENCODING);
+				format.write("MyRoute", positions, stream, 0, positions.size() );
+				stream.close();
+				Runtime rt = Runtime.getRuntime();
+				try {
+					rt.exec(cmd);
+				} catch (IOException e) {
+					RobautoMain.logger.error("Unable to run CoPilot", e);
+				}
+			}
+			PrintWriter stream = new PrintWriter( System.out );
 			format.write("MyRoute", positions, stream, 0, positions.size() );
 			stream.close();			
 		} catch (Exception x ) {
