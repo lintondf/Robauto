@@ -18,6 +18,19 @@ public class RobautoMain {
 	
 	public static boolean isMac = (System.getProperty("os.name").startsWith("Mac"));
 
+//	@NoAutoStart
+//	public static class StartupTriggeringPolicy<E> extends TriggeringPolicyBase<E> {
+//	    private boolean triggerRollover = true;
+//
+//	    @Override
+//	    public boolean isTriggeringEvent(final File activeFile, final E event) {
+//	        if (!triggerRollover) { return false; }
+//	        triggerRollover = false;
+//	        return true;
+//	    }
+//	}
+//
+
 	public static String getJavaPath() {
 		if (isMac) {
 			return "/usr/bin/java";

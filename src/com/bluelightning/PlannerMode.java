@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
@@ -62,6 +63,7 @@ import com.bluelightning.json.TopLeft;
 import com.bluelightning.map.ButtonWaypoint;
 import com.bluelightning.map.POIMarker;
 import com.bluelightning.map.StopMarker;
+import com.bluelightning.poi.AtlasObscura;
 import com.bluelightning.poi.MurphyPOI;
 import com.bluelightning.poi.POI;
 import com.bluelightning.poi.POIBase;
@@ -88,6 +90,11 @@ import seedu.addressbook.data.place.UniquePlaceList.DuplicatePlaceException;
 import seedu.addressbook.data.place.VisitedPlace;
 import seedu.addressbook.logic.Logic;
 import seedu.addressbook.storage.StorageFile.StorageOperationException;
+
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
 
@@ -310,21 +317,27 @@ public class PlannerMode extends JPanel {
 				map.updateWaypoints(nearby);
 				break;
 
-			case "ControlPanel.CoPilotOutput":
-				if (!RobautoMain.tripPlan.getFinalizedPlaces().isEmpty()) {
-					try {
-						outputToCopilot(RobautoMain.tripPlan.getFinalizedPlaces());
-					} catch (Exception x) {
-						x.printStackTrace();
-					}
-				}
-				BufferedImage i = getScreenShot(mapViewer);
-				try {
-					File outputfile = new File("saved.png");
-					ImageIO.write(i, "png", outputfile);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			case "ControlPanel.Attractions":
+				System.out.println("Loading");
+				POISet attractions = AtlasObscura.factory();
+				System.out.println( attractions.size() );
+				ArrayList<POIResult> near = attractions.getPointsOfInterestAlongRoute(RobautoMain.tripPlan.getRoute(), 30e3 );
+				System.out.println( near.size() );
+				near.forEach(System.out::println);
+//				if (!RobautoMain.tripPlan.getFinalizedPlaces().isEmpty()) {
+//					try {
+//						outputToCopilot(RobautoMain.tripPlan.getFinalizedPlaces());
+//					} catch (Exception x) {
+//						x.printStackTrace();
+//					}
+//				}
+//				BufferedImage i = getScreenShot(mapViewer);
+//				try {
+//					File outputfile = new File("saved.png");
+//					ImageIO.write(i, "png", outputfile);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
 				String html = RobautoMain.tripPlan.getTripReport().toHtml();
 				try {
 					PrintWriter out = new PrintWriter("report.html");
@@ -333,7 +346,6 @@ public class PlannerMode extends JPanel {
 				} catch (Exception x) {
 					x.printStackTrace();
 				}
-
 				break;
 
 			case "ControlPanel.ClearActions":
@@ -847,6 +859,7 @@ public class PlannerMode extends JPanel {
 			controller.getStorage().load();
 			addressBook = controller.getAddressBook();
 		} catch (Exception x) {
+			x.printStackTrace();
 			RobautoMain.logger.trace(x.getMessage());
 		}
 		Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteOpen", null));
@@ -857,15 +870,32 @@ public class PlannerMode extends JPanel {
 		RobautoMain.logger.info("Importing Basecamp route...");
 		ArrayList<BaseCamp> days = new ArrayList<>();
 		String basePath = file.getAbsolutePath();
-		basePath = basePath.substring(0, basePath.length() - 4); // drop
-																	// extension
-		for (int i = 0; i < garmin.days.size(); i++) {
-			String path = String.format("%s_Day_%d.pdf", basePath, i + 1);
-			RobautoMain.logger.info("  Loading BaseCamp details from: " + path);
-			BaseCamp baseCamp = new BaseCamp(garmin.days.get(i), path);
-			days.add(baseCamp);
+		basePath = basePath.substring(0, basePath.length() - 4); // drop extension
+		BaseCamp baseCamp = null;
+		if (garmin.days.size() == 1) {
+		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		    DataFlavor flavor = DataFlavor.stringFlavor;
+		    if (clipboard.isDataFlavorAvailable(flavor)) {
+		    	try {
+		            String text = (String) clipboard.getData(flavor);
+		            String[] lines = text.split("\n");
+		            RobautoMain.logger.info("  Loading BaseCamp details from clipboard, lines: " + lines.length);
+		            baseCamp = new BaseCamp(garmin.days.get(0), Arrays.asList(lines));
+					days.add(baseCamp);
+		    	} catch (Exception x) {
+		    		x.printStackTrace();
+		    	}
+		    }			
+		} 
+		if (baseCamp == null) {
+			for (int i = 0; i < garmin.days.size(); i++) {
+				String path = String.format("%s_Day_%d.csv", basePath, i + 1);
+				RobautoMain.logger.info("  Loading BaseCamp details from: " + path);
+				baseCamp = new BaseCamp(garmin.days.get(i), path);
+				days.add(baseCamp);
+			}
+			RobautoMain.logger.info(String.format("  %d days loaded", days.size()));
 		}
-		RobautoMain.logger.info(String.format("  %d days loaded", days.size()));
 		ArrayList<List<GeoPosition>> tracks = new ArrayList<>();
 		Route route = mergeRoutes(days);
 		route.setBoundingBox(generateBoundingBox(route.getShape()));
@@ -878,17 +908,19 @@ public class PlannerMode extends JPanel {
 			VisitedPlace place = places.get(i);
 			RobautoMain.logger.debug(place.toString());
 			// compare to address book entries
-			Iterator<Place> pit = addressBook.getAllPlaces().iterator();
 			boolean matched = false;
-			while (pit.hasNext()) {
-				Place bookPlace = pit.next();
-				double d = POIBase.distanceBetween(bookPlace.getLatitude(), bookPlace.getLongitude(), place.getLatitude(),
-						place.getLongitude());
-				if (d < MATCH_DISTANCE) {
-					RobautoMain.logger.debug(" -> Book: " + bookPlace);
-					places.set(i, new VisitedPlace(bookPlace));
-					matched = true;
-					break;
+			if (addressBook != null ) {
+				Iterator<Place> pit = addressBook.getAllPlaces().iterator();
+				while (pit.hasNext()) {
+					Place bookPlace = pit.next();
+					double d = POIBase.distanceBetween(bookPlace.getLatitude(), bookPlace.getLongitude(), place.getLatitude(),
+							place.getLongitude());
+					if (d < MATCH_DISTANCE) {
+						RobautoMain.logger.debug(" -> Book: " + bookPlace);
+						places.set(i, new VisitedPlace(bookPlace));
+						matched = true;
+						break;
+					}
 				}
 			}
 			GeoPosition position = new GeoPosition(place.getLatitude(), place.getLongitude());
@@ -1091,6 +1123,7 @@ public class PlannerMode extends JPanel {
 	}
 
 	public static JFrame frame;
+	public static boolean isSurface = true;
 
 	private static void initLookAndFeel(double textSizeInPixels, double fontSize) {
 		try {
@@ -1118,6 +1151,9 @@ public class PlannerMode extends JPanel {
 	}
 
 	public static void main(String[] args) {
+		// configured via resources/logback.xml
+		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
+		
 		java.net.InetAddress localMachine = null;
 		try {
 			localMachine = java.net.InetAddress.getLocalHost();
@@ -1126,10 +1162,11 @@ public class PlannerMode extends JPanel {
 			e1.printStackTrace();
 		}
 		final String hostName = (localMachine != null) ? localMachine.getHostName() : "localhost";
+		isSurface = hostName.toUpperCase().startsWith("SURFACE") || hostName.toUpperCase().startsWith("NOOK-PC");
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					if (hostName.toUpperCase().startsWith("SURFACE")) {
+					if (isSurface) {
 						initLookAndFeel(30, 24);
 						ButtonWaypoint.setDefaultPreferredSize(new Dimension(48, 48));
 					} else {

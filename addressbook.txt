@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <AddressBook>
     <persons>
+        <name>17281 Brenfield Ln</name>
+        <address></address>
+        <latitude>26.72212882898748</latitude>
+        <longitude>-81.67393430136144</longitude>
+    </persons>
+    <persons>
         <name>3560 Kendal Crossing Ter</name>
         <address></address>
         <latitude>37.54811089485884</latitude>
         <longitude>-77.64058009721339</longitude>
+    </persons>
+    <persons>
+        <name>Bob Sikes</name>
+        <address></address>
+        <latitude>30.726871490478516</latitude>
+        <longitude>-86.49709939956665</longitude>
     </persons>
     <persons>
         <name>Cabelas</name>
@@ -37,6 +49,18 @@
         <address>125 Riverside Dr, Banner Elk, NC</address>
         <latitude>36.1440102</latitude>
         <longitude>-81.7976193</longitude>
+    </persons>
+    <persons>
+        <name>Greenville</name>
+        <address></address>
+        <latitude>33.35326910018921</latitude>
+        <longitude>-91.04144811630249</longitude>
+    </persons>
+    <persons>
+        <name>Greenville Weston High School</name>
+        <address></address>
+        <latitude>33.39444637298584</latitude>
+        <longitude>-91.04702711105347</longitude>
     </persons>
     <persons>
         <name>Home Florida</name>

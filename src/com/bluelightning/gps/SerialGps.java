@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
+
 @SuppressWarnings({ "unused" })
 public class SerialGps implements ISerialGps {
 
@@ -35,7 +37,7 @@ public class SerialGps implements ISerialGps {
 	private NMEA nmea;
 
 	private boolean startGpsRead() {
-		gpsPort.setBaudRate(2*4800);
+		gpsPort.setBaudRate(9600);
 		gpsPort.openPort();
 		InputStream inStream = gpsPort.getInputStream();
 
@@ -190,7 +192,8 @@ public class SerialGps implements ISerialGps {
 	}
 
 	public static void main(String[] args) throws Exception {
-		SerialGps serialGps = new SerialGps("XGPS10M-4269F2-SPPDev");
+		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
+		SerialGps serialGps = new SerialGps("COM5");
 
 		serialGps.addStateListener(state -> System.out.println(state.toString()));
 		// state.lat + ", " + state.lon + " (" + (state.hasFix ? "got fix" : "no

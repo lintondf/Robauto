@@ -1,47 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <!-- <statusListener class="ch.qos.logback.core.status.NopStatusListener" /> -->
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>robauto.log</file>
-	<triggeringPolicy class="com.bluelightning.TravelMode.StartupTriggeringPolicy"/>    
-    <append>true</append>
-    <!-- encoders are assigned the type
-         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%file::%method:%line] %-5level - %msg%n</pattern>
-    </encoder>
-  </appender>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-          <level>DEBUG</level>
-          <onMatch>DENY</onMatch>
-        </filter>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-          <level>INFO</level>
-          <onMatch>DENY</onMatch>
-        </filter>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-          <level>TRACE</level>
-          <onMatch>DENY</onMatch>
-        </filter>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-          <level>WARN</level>
-          <onMatch>ACCEPT</onMatch>
-        </filter>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-          <level>ERROR</level>
-          <onMatch>ACCEPT</onMatch>
-        </filter>
-     <encoder>
-      <pattern>%d{HH:mm:ss.SSS} %-5level - %msg%n</pattern>
-    </encoder>
-  </appender>
-  
-        
-  <root level="TRACE">
-    <appender-ref ref="FILE" />
-  </root>
-  <root level="TRACE">
-    <appender-ref ref="STDOUT" />
-  </root>
-  
+	<!-- <statusListener class="ch.qos.logback.core.status.NopStatusListener" 
+		/> -->
+	<timestamp key="startTimestamp" datePattern="yyyyMMddHHmmss" />
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %-5level - %msg%n</pattern>
+		</encoder>
+
+		<file>robauto-${startTimestamp}.log</file>
+
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>robauto-${startTimestamp}-%d{yyyy-MM-dd}-%i.log
+			</fileNamePattern>
+			<maxFileSize>10MB</maxFileSize>
+			<!-- keep 7 days' worth of history -->
+			<maxHistory>7</maxHistory>
+			<totalSizeCap>20GB</totalSizeCap>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>DEBUG</level>
+			<onMatch>DENY</onMatch>
+		</filter>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>
+			<onMatch>DENY</onMatch>
+		</filter>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>TRACE</level>
+			<onMatch>DENY</onMatch>
+		</filter>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>WARN</level>
+			<onMatch>ACCEPT</onMatch>
+		</filter>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+		</filter>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %-5level - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="TRACE">
+		<appender-ref ref="FILE" />
+	</root>
+	<root level="TRACE">
+		<appender-ref ref="STDOUT" />
+	</root>
 </configuration>

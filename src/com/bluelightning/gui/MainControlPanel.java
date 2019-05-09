@@ -213,7 +213,7 @@ public class MainControlPanel extends JPanel {
 		});
 		
 		
-		JButton btnTravelMode = new JButton("CoPilot Output");
+		JButton btnTravelMode = new JButton("Find Attractions");
 		GridBagConstraints gbc_btnCopilotOutput = new GridBagConstraints();
 		gbc_btnCopilotOutput.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btnCopilotOutput.insets = new Insets(0, 0, 5, 0);
@@ -222,7 +222,7 @@ public class MainControlPanel extends JPanel {
 		add(btnTravelMode, gbc_btnCopilotOutput);
 		btnTravelMode.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				Events.eventBus.post( new Events.UiEvent("ControlPanel.CoPilotOutput", event));
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.Attractions", event));
 			}
 		});
 		

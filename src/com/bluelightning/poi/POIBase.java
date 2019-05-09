@@ -23,8 +23,8 @@ public abstract class POIBase implements POI, Serializable {
 
 	protected double latitude;
 	protected double longitude;
-	protected double tanLatitude;
-	protected double tanLongitude;
+	//protected double tanLatitude;
+	//protected double tanLongitude;
 	protected static Image image;
 
 	protected String name;
@@ -228,7 +228,7 @@ public abstract class POIBase implements POI, Serializable {
 
 	public void setLatitude(double latitude) {
 		this.latitude = latitude;
-		this.tanLatitude = Math.tan(latitude);
+		//this.tanLatitude = Math.tan(latitude);
 	}
 
 	public double getLongitude() {
@@ -237,7 +237,7 @@ public abstract class POIBase implements POI, Serializable {
 
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
-		this.tanLongitude = Math.tan(longitude);
+		//this.tanLongitude = Math.tan(longitude);
 	}
 
 	public String getName() {

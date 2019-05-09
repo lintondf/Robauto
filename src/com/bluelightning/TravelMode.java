@@ -100,19 +100,6 @@ public class TravelMode extends JPanel {
 
 	public TravelStatus travelStatus = null;
 	
-	@NoAutoStart
-	public static class StartupTriggeringPolicy<E> extends TriggeringPolicyBase<E> {
-	    private boolean triggerRollover = true;
-
-	    @Override
-	    public boolean isTriggeringEvent(final File activeFile, final E event) {
-	        if (!triggerRollover) { return false; }
-	        triggerRollover = false;
-	        return true;
-	    }
-	}
-
-
 
 	/**
 	 * HandleTripPlanUpdate - respond to RMI update() calls when PlannerMode

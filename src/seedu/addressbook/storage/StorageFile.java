@@ -71,6 +71,7 @@ public class StorageFile {
         try {
             jaxbContext = JAXBContext.newInstance(AdaptedAddressBook.class);
         } catch (JAXBException jaxbe) {
+        	jaxbe.printStackTrace();
             throw new RuntimeException("jaxb initialisation error");
         }
 

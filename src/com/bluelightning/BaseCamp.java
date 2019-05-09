@@ -5,7 +5,10 @@ package com.bluelightning;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,8 +20,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
+import org.slf4j.LoggerFactory;
 
 import com.bluelightning.BaseCampDirectionsParser.ParsedDirections;
+import com.bluelightning.Garmin.Day;
 import com.bluelightning.Garmin.TrackPoint;
 import com.bluelightning.json.BottomRight;
 import com.bluelightning.json.BoundingBox;
@@ -81,13 +86,58 @@ public class BaseCamp {
 		}
 		
 		protected String distance2String( double distance ) {
-			return String.format("%6.3f km", 0.001*distance);
+			return String.format("%6.3f mi", Here2.METERS_TO_MILES*distance);
 		}
 		
 		public String toString() {
 			return String.format("'%s' [%s @ %3.0f] {%s} (%s) %s", 
 					directions, distance2String(distance), heading, distance2String(totalDistance), duration2String(totalDuration),
 					(parsed != null) ? parsed.toString() : "null");
+		}
+		
+		public static double string2Distance( String d ) {
+			Matcher matcher = distancePattern.matcher(d);
+			if (matcher.find()) {			
+				String[] f = d.split(" ");
+				double x = Double.parseDouble(f[0]);
+				if (f.length > 1) {
+					if (f[1].equals("ft"))
+						x *= 0.3048;
+					if (f[1].equals("mi"))
+						x /= Here2.METERS_TO_MILES;
+				}
+				return x;
+			}
+			return 0.0;
+		}
+		
+		public static double string2Duration( String d ) {
+			double duration = 0;
+			Matcher matcher = durationPatternW.matcher(d);
+			if (matcher.find()) {
+//				for (int g = 0; g < matcher.groupCount(); g++) {
+//					System.out.printf("%5d: %s\n", g, matcher.group(g));
+//				}
+				if (matcher.group(10) != null) { // # s
+					duration = 1.0*Integer.parseInt(matcher.group(10));
+				} else if (matcher.group(8) != null) { // # min
+					duration = 60.0*Integer.parseInt(matcher.group(8));
+				} else if (matcher.group(3) != null) { // # h
+					duration = 3600.0*Integer.parseInt(matcher.group(3));
+					if (matcher.group(6) != null) { //, # min
+						duration += 60.0*Integer.parseInt(matcher.group(6));
+					}
+				}
+			}
+			return duration;
+		}
+		
+		public Turn( String directions, double distance, double duration, double distanceSoFar, double durationSoFar ) {
+			this.directions = directions;
+			this.distance = distance;
+			this.duration = duration;
+			this.totalDistance = distanceSoFar + this.distance;
+			this.totalDuration = durationSoFar + this.duration;
 		}
 		
 		public Turn( String text ) {
@@ -135,7 +185,7 @@ public class BaseCamp {
 			this.distance = 0;
 			this.duration = 0;
 			this.heading = 0;
-			matcher = interiorMatricsPattern.matcher(text);
+			matcher = interiorMetricsPattern.matcher(text);
 			if (matcher.find()) {
 //				System.out.println(text);
 //				System.out.print("In: ");
@@ -173,73 +223,89 @@ public class BaseCamp {
 		}
 	}
 	
-	
-	static final String pdfBox = "/Users/lintondf/GIT/Robauto/pdfbox-app-2.0.9.jar";
+	static final String pdfBox = "pdfbox-app-2.0.9.jar";
 	
 	public Garmin.Day day;
 	public Route route;
 	public ArrayList<Turn> turns = new ArrayList<>();
 	public ArrayList<ButtonWaypoint> vias;
 	
+	protected void loadRouteDetailLines( List<String> lines ) {
+		double totalDuration = 0.0;
+		double totalDistance = 0.0;
+		for (String line : lines) {
+			if (line.isBlank())
+				continue;
+			if (! Character.isDigit(line.charAt(0)))
+				line = line.substring(6);
+			System.out.println(line);
+			String[] fields = line.split(",");
+			for (int i = 0; i < fields.length; i++) {
+				fields[i] = fields[i].trim();
+			}
+			if (line.startsWith("1. ")) {
+				Turn turn = new Turn(fields[0].substring(3), 0.0, 0.0, totalDistance, totalDuration );
+				turns.add(turn);
+				System.out.println(turn.toString() );
+				continue;
+			}
+//			ArrayList<String> f = new ArrayList<>();
+			String directions = "";
+			Matcher matcher = numberedItemPattern.matcher(fields[0]);
+			if (matcher.find()) {
+				directions = matcher.group(2); 
+				int i = 1;
+				double segmentDistance = 0;
+				double segmentDuration = 0;
+				double v = getDistance(fields[i]);
+				if (v >= 0.0) {
+					segmentDistance += v;
+					i++;
+					v = getDuration(fields[i]);
+					while (v >= 0.0) {
+						segmentDuration += v;
+						i++;
+						v = getDuration(fields[i]);
+					}
+					Turn turn = new Turn(directions, segmentDistance, segmentDuration, totalDistance, totalDuration );
+					totalDistance += turn.distance;
+					totalDuration += turn.duration;
+					turns.add(turn);
+					System.out.println(turn.toString() );
+				}
+			}
+		}
+	}
+
+	protected void readCsvFile( String csvPath ) {
+		try {
+			List<String> lines = Files.readAllLines( Paths.get(csvPath) );
+			loadRouteDetailLines( lines );
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public BaseCamp() {} // for generics users only
 	
 	public BaseCamp( Garmin.Day day, String pdfPath ) {
 		this.day = day;
 		RobautoMain.logger.info("BASECAMP: " + pdfPath);
-		String htmlPath = pdfPath.replace(".pdf", ".html");
-		//String gpxPath = pdfPath.replace(".pdf", ".GPX");
-		File htmlFile = new File(htmlPath);
-		if (!htmlFile.exists()) {
-			String[] pdfBoxCommand = {
-				"/usr/bin/java",
-				"-jar",
-				pdfBox,
-				"ExtractText",
-				"-html",
-				pdfPath,
-				htmlPath
-			};
-			Execute.run(pdfBoxCommand);
-		}
-		try {
-			Document doc = Jsoup.parse(htmlFile, "UTF-8");
-			Elements body = doc.getElementsByTag("BODY");
-			if (!body.isEmpty()) {
-				Elements divs = body.first().children();
-				for (Element div : divs) {
-					//System.out.println(div.tagName().toUpperCase());
-					Elements ps = div.getElementsByTag("P");
-					Iterator<Element> pit = ps.iterator();
-					pit.next();  // skip column header
-					pit.next();  // title 
-					pit.next();  // page n of m
-					//Turn last = null;
-					while (pit.hasNext()) {
-						Element p = pit.next();
-						Turn turn = new Turn(p.text());
-//						if (last != null) {
-//							turn.totalDistance = last.totalDistance + turn.distance;
-//						}
-						//last = turn;
-						//System.out.println( turn );
-						turns.add(turn);
-					}
-				}
-			}
-			htmlFile.delete();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-//		garmin = new Garmin( gpxPath );
-//		garmin.setLayout(new BorderLayout());
-//		map = new com.bluelightning.Map();
-//		mapViewer = map.getMapViewer();
-//		garmin.add(mapViewer, BorderLayout.CENTER);
-////		for (int i = 0; i < 500; i++)
-////			System.out.println( garmin.trackPoints.get(i) );
-//		System.out.println( garmin.trackPoints.get(garmin.trackPoints.size()-1) );
 		
+		readCsvFile( pdfPath );
+		initialize(pdfPath);
+	}
+		
+	public BaseCamp(Day day, List<String> lines) {
+		this.day = day;
+		RobautoMain.logger.info("BASECAMP: From Clipboard");
+		
+		loadRouteDetailLines( lines );
+		initialize("Clipboard");
+	}
+	
+	protected void initialize( String source ) {
 		route = new Route();
 		List<Object> routeShape = new ArrayList<>();
 		for (TrackPoint point : day.trackPoints) {
@@ -265,13 +331,13 @@ public class BaseCamp {
 			RobautoMain.logger.error(String.format("Length mismatch: %.0f vs %.0f on %s",
 					dayLength * Here2.METERS_TO_MILES, 
 					turns.get(turns.size()-1).totalDistance * Here2.METERS_TO_MILES,
-					pdfPath ));
+					source ));
 		}
 		if (! turnsStart.equals( dayStart )) {
-			RobautoMain.logger.error(String.format("Start mismatch: %s vs %s on %s", dayStart, turnsStart, pdfPath ));
+			RobautoMain.logger.error(String.format("Start mismatch: %s vs %s on %s", dayStart, turnsStart, source ));
 		}
 		if (! turnsFinish.equals( dayFinish )) {
-			RobautoMain.logger.error(String.format("Finish mismatch: %s vs %s on %s", dayFinish, turnsFinish, pdfPath ));
+			RobautoMain.logger.error(String.format("Finish mismatch: %s vs %s on %s", dayFinish, turnsFinish, source ));
 		}
 		
 		
@@ -480,18 +546,92 @@ public class BaseCamp {
 		//System.out.printf( "BB %10.6f %10.6f  %10.6f %10.6f\n", tl.getLatitude(), br.getLatitude(), tl.getLongitude(), br.getLongitude() );
 		return box;
 	}
+	
+	protected double getDistance( String d ) {
+		if (d.isBlank())
+			return -1.0;
+		if (Character.isDigit(d.charAt(0))) {
+			if (d.endsWith(" ft")) {
+				return 0.3048 * Double.parseDouble(d.replace(" ft", ""));
+			} else if (d.endsWith(" mi")) {
+				return 0.3048 * 5280.0 * Double.parseDouble(d.replace(" mi", ""));
+			}
+		}
+		return -1.0;
+	}
+	protected double getDuration( String d ) {
+		if (d.isBlank())
+			return -1.0;
+		if (Character.isDigit(d.charAt(0))) {
+			if (d.endsWith(" h")) {
+				return 3600.0 * Double.parseDouble(d.replace(" h", ""));
+			} else if (d.endsWith(" min")) {
+				return 60.0 * Double.parseDouble(d.replace(" min", ""));
+			} else if (d.endsWith(" s")) {
+				return Double.parseDouble(d.replace(" s", ""));				
+			}
+		}
+		return -1.0;
+	}
 
-	// ((\d+)\sft)?(([1-9]\d*(\.\d+))\smi)?((\d+)\shour\(s\))?((,\s)?(\d+)\sminutes)?((\d+)\sseconds)?$
+	protected static Pattern numberedItemPattern = Pattern.compile("^(\\d+)\\.\\s(.+)");
+	protected static String durationPatternStrW = "(((\\d+)\\sh((,\\s)?(\\d+)\\smin)?)|((\\d+)\\smin)|((\\d+)\\ss))";
+	protected static Pattern durationPatternW = Pattern.compile(durationPatternStrW);
 	protected static String durationPatternStr = "(((\\d+)\\shour\\(s\\)((,\\s)?(\\d+)\\sminutes)?)|((\\d+)\\sminutes)|((\\d+)\\sseconds))";
 	protected static Pattern endingDurationPattern = Pattern.compile(durationPatternStr + "$");
-	protected static Pattern distancePattern = Pattern.compile("(((\\d+)\\sft)|((\\d*(\\.\\d+)?)\\smi))$");
+	protected static Pattern distancePattern = Pattern.compile("(((\\d+)\\sft)|((\\d*(\\.\\d+)?)\\smi))");
 	// (((\d+)\sft)|((\d*(\.\d+)?)\smi))(\s(\d+)° true)?
-	protected static Pattern interiorMatricsPattern = Pattern.compile("(((\\d+)\\sft)|((\\d*(\\.\\d+)?)\\smi))(\\s(\\d+)° true)?" +
+	protected static Pattern interiorMetricsPattern = Pattern.compile("(((\\d+)\\sft)|((\\d*(\\.\\d+)?)\\smi))(\\s(\\d+)° true)?" +
 	                 "\\s" + durationPatternStr + "?");
 	
 	/**
 	 * @param args
 	 */
+	
+	public static void main(String[] args) {
+		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
+
+		//	protected static String durationPatternStrW = "(((\\d+)\\sh\\(s\\)((,\\s)?(\\d+)\\smin)?)|((\\d+)\\smin)|((\\d+)\\ss))";
+		BaseCamp basecamp = new BaseCamp(null, "C:\\Users\\NOOK\\Documents\\Trip to West Gardiner Twn.pdf");
+//		String[] tests = {
+//				"1 min",
+//				"19 s",
+//				"2 h, 20 min",
+//				"3 h"
+//		};
+//		for (String test : tests) {
+//			System.out.println(test);
+//			Matcher matcher = durationPatternW.matcher(test);
+//			if (matcher.find()) {
+//				for (int i = 0; i <= matcher.groupCount(); i++) {
+//					System.out.print(" " + i + ":");
+//					System.out.print(matcher.group(i));
+//				}
+//				System.out.println();
+//			}
+//		}
+//		
+//		String[] tests2 = {
+//				"1. zot",
+//				"9. zot",
+//				"11. zot",
+//				"19. zot",
+//				"101. zot",
+//				"1. Home", 
+//				"163 ft"
+//		};
+//		for (String test : tests2) {
+//			System.out.println(test);
+//			Matcher matcher = numberedItemPattern.matcher(test);
+//			if (matcher.find()) {
+//				for (int i = 0; i <= matcher.groupCount(); i++) {
+//					System.out.print(" " + i + ":");
+//					System.out.print(matcher.group(i));
+//				}
+//				System.out.println();
+//			}
+//		}
+	}
 	
 //	protected static JFrame frame;
 //	protected static BaseCamp baseCamp;

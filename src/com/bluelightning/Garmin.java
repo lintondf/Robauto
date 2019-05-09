@@ -7,9 +7,12 @@ import static slash.common.helpers.JAXBHelper.newContext;
 import static slash.common.helpers.JAXBHelper.newMarshaller;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
@@ -214,8 +217,14 @@ public class Garmin extends JPanel {
 	
 	public Garmin( File file ) {
 		try {
-			FileReader fir = new FileReader(file);
-			GpxType gpx = GpxUtil.unmarshal11(fir);
+//			FileInputStream fis = new FileInputStream(file);
+//			InputStreamReader fir = new InputStreamReader(fis, "UTF8");
+			byte[] bytes = Files.readAllBytes(file.toPath());
+			String content = new String( bytes, "UTF-8");
+			System.out.println(content.substring(1, 5));
+			//FileReader fir = new FileReader(file, "UTF-8");
+			GpxType gpx = GpxUtil.unmarshal11(content.substring(1));
+			
 			List<RteType> rtes = gpx.getRte();
 			String text = "";
 			StopMarker stopMarker = null;
@@ -392,7 +401,7 @@ public class Garmin extends JPanel {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		//Garmin garmin = new Garmin( "/Users/lintondf/ME2FL_2018.GPX" ); 
+		Garmin garmin = new Garmin( "/Users/NOOK/Documents/Trip to 17281 Brenfield Ln.gpx" ); 
 //		Logic controller;
 //		AddressBook addressBook;
 //
