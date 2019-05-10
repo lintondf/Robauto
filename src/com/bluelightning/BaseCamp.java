@@ -234,11 +234,11 @@ public class BaseCamp {
 		double totalDuration = 0.0;
 		double totalDistance = 0.0;
 		for (String line : lines) {
-			if (line.isBlank())
+			System.out.println("lRDL: " + line);
+			if (line.trim().isEmpty())
 				continue;
 			if (! Character.isDigit(line.charAt(0)))
 				line = line.substring(6);
-			System.out.println(line);
 			String[] fields = line.split(",");
 			for (int i = 0; i < fields.length; i++) {
 				fields[i] = fields[i].trim();
@@ -246,7 +246,7 @@ public class BaseCamp {
 			if (line.startsWith("1. ")) {
 				Turn turn = new Turn(fields[0].substring(3), 0.0, 0.0, totalDistance, totalDuration );
 				turns.add(turn);
-				System.out.println(turn.toString() );
+				System.out.println("1. " +turn.toString() );
 				continue;
 			}
 //			ArrayList<String> f = new ArrayList<>();
@@ -271,7 +271,7 @@ public class BaseCamp {
 					totalDistance += turn.distance;
 					totalDuration += turn.duration;
 					turns.add(turn);
-					System.out.println(turn.toString() );
+					System.out.println("TURN: " + turn.toString() );
 				}
 			}
 		}
@@ -300,6 +300,7 @@ public class BaseCamp {
 	public BaseCamp(Day day, List<String> lines) {
 		this.day = day;
 		RobautoMain.logger.info("BASECAMP: From Clipboard");
+//		lines.forEach(System.out::println);
 		
 		loadRouteDetailLines( lines );
 		initialize("Clipboard");
@@ -548,7 +549,7 @@ public class BaseCamp {
 	}
 	
 	protected double getDistance( String d ) {
-		if (d.isBlank())
+		if (d.trim().isEmpty())
 			return -1.0;
 		if (Character.isDigit(d.charAt(0))) {
 			if (d.endsWith(" ft")) {
@@ -560,7 +561,7 @@ public class BaseCamp {
 		return -1.0;
 	}
 	protected double getDuration( String d ) {
-		if (d.isBlank())
+		if (d.trim().isEmpty())
 			return -1.0;
 		if (Character.isDigit(d.charAt(0))) {
 			if (d.endsWith(" h")) {

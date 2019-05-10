@@ -25,6 +25,12 @@
         <longitude>-70.37061</longitude>
     </persons>
     <persons>
+        <name>Camping Transit</name>
+        <address></address>
+        <latitude>46.812269976362586</latitude>
+        <longitude>-71.05076998472214</longitude>
+    </persons>
+    <persons>
         <name>Exxon</name>
         <address>446 W Reservoir Rd, Woodstock, VA 22664</address>
         <latitude>38.87228</latitude>
@@ -159,6 +165,12 @@
         <address>836 Palmer Avenue, Falmouth, MA</address>
         <latitude>41.57739</latitude>
         <longitude>-70.62898</longitude>
+    </persons>
+    <persons>
+        <name>Sullivan Twn</name>
+        <address></address>
+        <latitude>44.52012062072754</latitude>
+        <longitude>-68.19546461105347</longitude>
     </persons>
     <persons>
         <name>Titusville Camping</name>

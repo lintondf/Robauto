@@ -878,9 +878,23 @@ public class PlannerMode extends JPanel {
 		    if (clipboard.isDataFlavorAvailable(flavor)) {
 		    	try {
 		            String text = (String) clipboard.getData(flavor);
-		            String[] lines = text.split("\n");
-		            RobautoMain.logger.info("  Loading BaseCamp details from clipboard, lines: " + lines.length);
-		            baseCamp = new BaseCamp(garmin.days.get(0), Arrays.asList(lines));
+		            ArrayList<String> lines = new ArrayList<>();
+		            String[] array = text.split("\n");
+		            RobautoMain.logger.info("  Loading BaseCamp details from clipboard, lines: " + array.length);
+		            for (int i = 0; i < array.length; i++) {
+			            if (array[i].startsWith("\tDirections")) {
+			            	continue;
+			            }
+		            	if (array[i].startsWith("\t")) {
+		            		String prefix = String.format("%d. ", i);
+		            		lines.add(prefix + array[i].substring(1)
+		            				.replaceAll("\t", ",")
+		            				.replace("\"", "") ); // Mac BaseCamp sends Tab separated to clipboard
+		            		System.out.println(i + ": " + lines.get(lines.size()-1));
+		            	}
+		            }
+		        
+		            baseCamp = new BaseCamp(garmin.days.get(0), lines );
 					days.add(baseCamp);
 		    	} catch (Exception x) {
 		    		x.printStackTrace();
