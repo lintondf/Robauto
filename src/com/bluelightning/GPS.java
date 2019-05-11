@@ -190,10 +190,10 @@ public class GPS {
 	ISerialGps serialGps = null;
 
 	public void initialize(JFrame frame, boolean isSurface) {
-		String port = (isSurface) ? "COM4" : "XGPS10M-4269F2-SPPDev";
+		String port = (isSurface) ? "COM7" : "XGPS10M-4269F2-SPPDev";
 		
 		//serialGps = new SerialGps(port);
-		serialGps = new GpsComplete("COM5");
+		serialGps = new GpsComplete(port);
 		serialGps.addStateListener(state -> {
 			//RobautoMain.logger.debug(state.toString());
 			if (state.hasFix && state.quality > 0) {

@@ -333,7 +333,7 @@ public class TravelMode extends JPanel {
 	public TravelMode() {
 		setLayout(new BorderLayout());
 		
-		Font buttonFont = new Font("Arial", Font.BOLD, 72 );
+		Font buttonFont = new Font("Arial", Font.BOLD, 32);
         JPanel buttonArea = new JPanel(); 
 		this.add(buttonArea, BorderLayout.SOUTH);
 		JPanel buttonPanel = new JPanel();
@@ -589,7 +589,7 @@ public class TravelMode extends JPanel {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Font lafFont = initLookAndFeel(60, 48);
+					Font lafFont =  initLookAndFeel(48,32); //(60, 48);
 					frame = new JFrame();
 					frame.setTitle("Robauto - Travel Mode");
 					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

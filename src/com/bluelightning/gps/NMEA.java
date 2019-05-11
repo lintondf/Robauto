@@ -17,6 +17,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
 
+import com.bluelightning.Report;
 import com.bluelightning.GPS.Fix;
 
 public class NMEA {
@@ -53,10 +54,10 @@ public class NMEA {
             position.lat = Latitude2Decimal(tokens[3], tokens[4]);
             position.lon = Longitude2Decimal(tokens[5], tokens[6]);
             position.velocity = Float.parseFloat(tokens[7]);
-            position.dir = Float.parseFloat(tokens[8]);
+            position.dir = (tokens[8].isEmpty()) ? 0.0f : Float.parseFloat(tokens[8]);
             position.date = Float.parseFloat(tokens[9]);
             position.updatefix();
-            
+            System.out.println(position.toString());
             return true;
         }
     }
@@ -141,7 +142,7 @@ public class NMEA {
     private static final Map<String, SentenceParser> sentenceParsers = new HashMap<>();
     
     private static File nemaLog = new File("nemalog.txt");
-    private static PrintStream logout = null;
+    private static PrintStream logout = null; //System.out;
 
     NMEA() {
     	try {
@@ -149,10 +150,12 @@ public class NMEA {
 		} catch (IOException e) {
 		}
         sentenceParsers.put("GPGGA", new GPGGA());
-        //sentenceParsers.put("GPGGL", new GPGGL());
         sentenceParsers.put("GPRMC", new GPRMC());
+        //sentenceParsers.put("GPGGL", new GPGGL());
         //sentenceParsers.put("GPRMZ", new GPRMZ());
         //sentenceParsers.put("GPVTG", new GPVTG());
+        sentenceParsers.put("GNGGA", new GPGGA());
+        sentenceParsers.put("GNRMC", new GPRMC());
     }
 
     private String checksum( String nmea) {

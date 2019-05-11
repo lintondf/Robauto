@@ -32,6 +32,16 @@ public class Report implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	final static String HEADER_FONT = "48pt";
+	final static String ROW_FONT = "32pt";
+	final static String DETAIL_FONT = "24pt";
+	
+	protected static void setFonts( Chunk c) {
+		c.set("headerFontSize", HEADER_FONT);
+		c.set("rowFontSize", ROW_FONT);
+		c.set("detailFontSize", DETAIL_FONT);			
+	}
+	
 	List<Day> days;
 	static Theme theme;
 
@@ -96,6 +106,7 @@ public class Report implements Serializable {
 
 		public String toHtml() {
 			Chunk c = theme.makeChunk("report#day");
+			setFonts(c);
 			c.set("dayName", day);
 			c.set("dayDuration", duration);
 			c.set("dayDistance", distance);
@@ -104,6 +115,7 @@ public class Report implements Serializable {
 				sb.append(step.toHtml());
 			}
 			Chunk t = theme.makeChunk("report#dayTotalRow");
+			setFonts(c);
 			t.set("imbalance", imbalance);
 			t.set("leg1Total", driver0Total);
 			t.set("leg2Total", driver1Total);
@@ -151,6 +163,7 @@ public class Report implements Serializable {
 		public String toHtml() {
 			StringBuffer sb = new StringBuffer();
 			Chunk t = theme.makeChunk("report#titleRow");
+			setFonts(t);
 			t.set("stepName", stepName);
 			t.set("placeName", placeName);
 			t.set("placeAddress", placeAddress);
@@ -174,6 +187,7 @@ public class Report implements Serializable {
 
 		public String toHtml() {
 			Chunk d = theme.makeChunk("report#detailRow");
+			setFonts(d);
 			d.set("leg1Duration", leg1Duration);
 			d.set("leg2Duration", leg2Duration);
 			d.set("totalDuration", totalDuration);
@@ -311,6 +325,7 @@ public class Report implements Serializable {
 			theme = new Theme();
 		}
 		Chunk c = theme.makeChunk("report#report");
+		setFonts(c);
 		StringBuffer sb = new StringBuffer();
 		for (Day day : days) {
 			sb.append(day.toHtml());
@@ -329,6 +344,7 @@ public class Report implements Serializable {
 			theme = new Theme();
 		}
 		Chunk c = theme.makeChunk("report#report");
+		setFonts(c);
 		StringBuffer sb = new StringBuffer();
 		sb.append(day.toHtml());
 		c.set("body", sb.toString());

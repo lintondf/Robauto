@@ -243,7 +243,7 @@ public class FuelPanel extends JPanel {
 		CoPilot13Format format = new CoPilot13Format();
 		String ipath = "gpstrip.trp.base";
 		File ofile =  new File( "\\\\Surfacepro3\\NA\\save\\gpstrip.trp" );
-		final String cmd = "C:\\Program Files\\copilot.exe";  ///????
+		final String cmd = "C:\\Program Files (x86)\\Alk Technologies\\CoPilot v9 Laptop\\copilot.exe";
 		try {
 			InputStreamReader reader = new InputStreamReader( new FileInputStream(ipath), CoPilot13Format.UTF16LE_ENCODING);
 			List<VisitedPlace> positions = format.read( new BufferedReader(reader));

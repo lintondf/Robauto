@@ -305,7 +305,9 @@ public class TravelStatus {
 			theme = new Theme();
 		}
 		Chunk c = theme.makeChunk("report#report");
+		Report.setFonts(c);
 		Chunk t = theme.makeChunk("report#driving");
+		Report.setFonts(t);
 		
 		Date now = new Date();
 		if (lastFix != null) {

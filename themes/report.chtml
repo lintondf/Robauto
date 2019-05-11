@@ -24,12 +24,12 @@
 	<table class="bpTable">
 	<thead>
 	<TR>
-		<TD colspan="3" style='font-size:96pt;font-weight:bolder;text-align:center'>{$time}</TD>
+		<TD colspan="3" style='font-size:{$headerFontSize};font-weight:bolder;text-align:center'>{$time}</TD>
 	</TR>
 	<TR>
-		<TD colspan = '1' style='font-size:64pt;font-weight:bolder;text-align:center'>{$drivingTime}</TD>
-		<TD colspan = '1' style='font-size:64pt;font-weight:bolder;text-align:center'>{$drivingDistance}</TD>
-		<TD colspan = '1' style='font-size:64pt;font-weight:bolder;text-align:center'>{$stoppedTime}</TD>
+		<TD colspan = '1' style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$drivingTime}</TD>
+		<TD colspan = '1' style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$drivingDistance}</TD>
+		<TD colspan = '1' style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$stoppedTime}</TD>
 	</TR>
 	</thead>
 	</table>
@@ -51,8 +51,8 @@
 	<table class="bpTable">
 	<thead>
 	<TR>
-		<TD colspan="4" style='font-size:96pt;font-weight:bolder;text-align:center'>{$time}</TD>
-		<TD hidden colspan="1" style='font-size:48pt;font-weight:bolder;text-align:center'>{$where}</TD>
+		<TD colspan="4" style='font-size:{$headerFontSize};font-weight:bolder;text-align:center'>{$time}</TD>
+		<TD hidden colspan="1" style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$where}</TD>
 	</TR>
 	</thead>
 	</table>
@@ -64,10 +64,10 @@
 	<table class="bpTable">
 	<thead style="display:none">
 	<TR>
-		<TD style='font-size:48pt;font-weight:bolder;text-align:center'>Speed [mph]</TD>
-		<TD style='font-size:48pt;font-weight:bolder;text-align:center'>{$currentSpeed}</TD>
-		<TD style='font-size:48pt;font-weight:bolder;text-align:center'>{$legAverageSpeed}</TD>
-		<TD style='font-size:48pt;font-weight:bolder;text-align:center'>{$legExpectedSpeed}</TD>
+		<TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>Speed [mph]</TD>
+		<TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$currentSpeed}</TD>
+		<TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$legAverageSpeed}</TD>
+		<TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$legExpectedSpeed}</TD>
 	</TR>
 	</thead>
 	</table>
@@ -75,15 +75,15 @@
 	<table class="bpTable" hidden>
 	<thead>
 	<TR>
-		<TD style='font-size:48pt;font-weight:bolder;text-align:center'>{$distanceToNext}</TD>
-		<TD style='font-size:30pt;font-weight:bolder;text-align:center'>{$nextManeuver}</TD>
+		<TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$distanceToNext}</TD>
+		<TD style='font-size:[$detailFontSize};font-weight:bolder;text-align:center'>{$nextManeuver}</TD>
 	</TR>
 	</thead>
 	</table>
 <br/>	
 	<table class="bpTable" hidden>
 	<thead>
-	<TR><TD style='font-size:48pt;font-weight:bolder;text-align:center'></TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>So Far</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Total</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Delta</TD></TR>
+	<TR><TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'></TD><TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>So Far</TD><TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>Total</TD><TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>Delta</TD></TR>
 	</thead>
 		<tbody>
 			{$trackerRows}
@@ -92,7 +92,7 @@
 <br/>	
 	<table class="bpTable">
 	<thead>
-	<TR><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Planned Stops</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Time</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Distance</TD></TR>
+	<TR><TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>Planned Stops</TD><TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>Time</TD><TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>Distance</TD></TR>
 	</thead>
 		<tbody>
 			{$upcomingRows}
@@ -101,7 +101,7 @@
 <br/>	
 	<table class="bpTable">
 	<thead>
-	<TR><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Available Stops</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Time</TD><TD style='font-size:48pt;font-weight:bolder;text-align:center'>Distance</TD></TR>
+	<TR><TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>Available Stops</TD><TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>Time</TD><TD style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>Distance</TD></TR>
 	</thead>
 		<tbody>
 			{$availableRows}
