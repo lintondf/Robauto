@@ -556,7 +556,7 @@ public class PlannerMode extends JPanel {
 			PlannerMode.loadPOIMap(poiMap);
 			nearbyMap.clear();
 			poiMap.forEach((kind, set) -> {
-				POISet.contains("optimizeStops1", set);
+				POISet.contains("optimizeStops1 ", set);
 				nearbyMap.put(kind, set.getPointsOfInterestAlongRoute(RobautoMain.tripPlan.getRoute(), 2e3));
 			});
 //			for (ArrayList<POIResult> near : nearbyMap.values()) {
@@ -890,8 +890,10 @@ public class PlannerMode extends JPanel {
 		            		lines.add(prefix + array[i].substring(1)
 		            				.replaceAll("\t", ",")
 		            				.replace("\"", "") ); // Mac BaseCamp sends Tab separated to clipboard
-		            		System.out.println(i + ": " + lines.get(lines.size()-1));
+		            	} else {
+		            		lines.add(array[i]);
 		            	}
+	            		System.out.println(lines.get(lines.size()-1));
 		            }
 		        
 		            baseCamp = new BaseCamp(garmin.days.get(0), lines );
@@ -1007,7 +1009,7 @@ public class PlannerMode extends JPanel {
 				if (longitude < tl.getLongitude()) {
 					tl.setLongitude(longitude);
 				}
-				if (longitude > br.getLatitude()) {
+				if (longitude > br.getLongitude()) {
 					br.setLongitude(longitude);
 				}
 			}

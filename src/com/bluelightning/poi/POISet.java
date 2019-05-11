@@ -167,7 +167,7 @@ public class POISet extends ArrayList<POI> {
 
 	public ArrayList<POIResult> getPointsOfInterestAlongRoute(Route route, double radiusMeters) {
 		POISet pset = filter(route.getBoundingBox());
-		contains( "gPOIAR", this );
+		contains( "gPOIAR ", this );
 		ArrayList<POIResult> output = new ArrayList<>();
 		CumulativeTravel totalProgress = new CumulativeTravel();
 		//System.out.printf("POISet::gPOIAR %d\n", route.getLeg().size());

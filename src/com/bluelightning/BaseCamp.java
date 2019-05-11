@@ -537,7 +537,7 @@ public class BaseCamp {
 				if (longitude < tl.getLongitude()) {
 					tl.setLongitude(longitude);
 				}
-				if (longitude > br.getLatitude()) {
+				if (longitude > br.getLongitude()) {
 					br.setLongitude(longitude);
 				}
 			}
