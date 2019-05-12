@@ -74,9 +74,14 @@ public class GpsComplete implements ISerialGps {
 					break;
 				}
 	        }
-	        RobautoMain.logger.debug( String.format("GPS input running " + deltaT ) );
 	        try {
-	        	thread.join(20000);
+	        	for (int i = 0; i < 20; i++) {
+	        		if (deltaT > 0)
+	        			break;
+	        		System.out.println(i + " Waiting for GPS");
+	        		thread.join(1000);
+	        	}
+		        RobautoMain.logger.debug( String.format("GPS input running " + deltaT ) );
 		        return deltaT > 0;
 	        } catch (Exception x) {
 	        	if (deltaT == 0) {
@@ -122,7 +127,7 @@ public class GpsComplete implements ISerialGps {
 
       serialGps.start();
       try {
-      	Thread.sleep(10000);
+      	Thread.sleep(1000);
       } catch (Exception x) {
       }
 	}
