@@ -115,7 +115,7 @@ public class SerialGps implements ISerialGps {
 			}
 		}
 	}
-
+	
 	public boolean start() {
 		nmea = new NMEA();
 

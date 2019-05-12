@@ -13,6 +13,18 @@
         <longitude>-77.64058009721339</longitude>
     </persons>
     <persons>
+        <name>47 Hogan Rd</name>
+        <address></address>
+        <latitude>44.81567566283047</latitude>
+        <longitude>-68.73804347589612</longitude>
+    </persons>
+    <persons>
+        <name>Blvd N</name>
+        <address></address>
+        <latitude>41.756621645763516</latitude>
+        <longitude>-72.6208134368062</longitude>
+    </persons>
+    <persons>
         <name>Bob Sikes</name>
         <address></address>
         <latitude>30.726871490478516</latitude>

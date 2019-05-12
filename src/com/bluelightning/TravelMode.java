@@ -333,7 +333,7 @@ public class TravelMode extends JPanel {
 	public TravelMode() {
 		setLayout(new BorderLayout());
 		
-		Font buttonFont = new Font("Arial", Font.BOLD, 72 );
+		Font buttonFont = new Font("Arial", Font.BOLD, 60 );
         JPanel buttonArea = new JPanel(); 
 		this.add(buttonArea, BorderLayout.SOUTH);
 		JPanel buttonPanel = new JPanel();
