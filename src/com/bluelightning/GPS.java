@@ -27,6 +27,7 @@ import com.bluelightning.gps.SerialGps;
 import com.bluelightning.gps.GpsComplete;
 import com.bluelightning.gps.ISerialGps;
 import com.bluelightning.gps.NMEA.GpsState;
+import com.fazecast.jSerialComm.SerialPort;
 
 public class GPS {
 
@@ -190,32 +191,42 @@ public class GPS {
 	ISerialGps serialGps = null;
 
 	public void initialize(JFrame frame, boolean isSurface) {
-		String port = (isSurface) ? "COM4" : "XGPS10M-4269F2-SPPDev";
-		
-		//serialGps = new SerialGps(port);
-		serialGps = new GpsComplete("COM5");
-		serialGps.addStateListener(state -> {
-			//RobautoMain.logger.debug(state.toString());
-			if (state.hasFix && state.quality > 0) {
-				Fix fix = new Fix(state);
-				if (!addObservation(fix)) {
-					RobautoMain.logger.debug(fix.toString() + " / " + state.toString());
-				}
+		String port = null;
+		SerialPort[] serialPorts = SerialPort.getCommPorts();
+		for (SerialPort serialPort : serialPorts) {
+			if (serialPort.getPortDescription().contains("GNSS")) {
+				port = serialPort.getSystemPortName();
+				break;
 			}
-		});
-		if (serialGps.start()) {
-			// started correctly, open recording file
-			try {
-				File file = new File("robauto-gps.obj");
-				FileOutputStream fos = new FileOutputStream(file);
-				gpsOos = new ObjectOutputStream( fos );
-			} catch (IOException e) {
-				e.printStackTrace();
-				gpsOos = null;
-			}
-			return;
 		}
-
+		
+		if (port != null ) {
+		
+			//serialGps = new GpsComplete(port);
+			serialGps = new SerialGps( port, 9600 );
+			serialGps.addStateListener(state -> {
+				//RobautoMain.logger.debug(state.toString());
+				if (state.hasFix && state.quality > 0) {
+					Fix fix = new Fix(state);
+					if (!addObservation(fix)) {
+						RobautoMain.logger.debug(fix.toString() + " / " + state.toString());
+					}
+				}
+			});
+			if (serialGps.start()) {
+				// started correctly, open recording file
+				try {
+					File file = new File("robauto-gps.obj");
+					FileOutputStream fos = new FileOutputStream(file);
+					gpsOos = new ObjectOutputStream( fos );
+				} catch (IOException e) {
+					e.printStackTrace();
+					gpsOos = null;
+				}
+				return;
+			}
+	
+		}
 		// Create a file chooser
 		final JFileChooser fileChooser = new JFileChooser( new File(".") );
 		fileChooser.setDialogTitle("No GPS Detected; Select Playback File");

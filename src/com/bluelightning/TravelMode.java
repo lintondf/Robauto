@@ -79,6 +79,7 @@ import com.bluelightning.gui.FuelPanel;
 import com.bluelightning.gui.TravelActivePanel;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
+import com.fazecast.jSerialComm.SerialPort;
 
 public class TravelMode extends JPanel {
 
@@ -249,8 +250,8 @@ public class TravelMode extends JPanel {
 		final Iterator<GeoPosition> it = path.iterator();
 		final ButtonWaypoint buttonWaypoint = new ButtonWaypoint("You Are Here", new ImageIcon(image), it.next());
 		map.setYouAreHere(buttonWaypoint);
-		Events.eventBus.register(new GpsHandler());
-		gps.initialize(frame, isSurface);
+//		Events.eventBus.register(new GpsHandler());
+//		gps.initialize(frame, isSurface);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -333,7 +334,7 @@ public class TravelMode extends JPanel {
 	public TravelMode() {
 		setLayout(new BorderLayout());
 		
-		Font buttonFont = new Font("Arial", Font.BOLD, 60 );
+		Font buttonFont = new Font("Arial", Font.BOLD, 32);
         JPanel buttonArea = new JPanel(); 
 		this.add(buttonArea, BorderLayout.SOUTH);
 		JPanel buttonPanel = new JPanel();
@@ -520,6 +521,8 @@ public class TravelMode extends JPanel {
 			}
 		});
 		t.start();
+		Events.eventBus.register(new GpsHandler());
+		gps.initialize(frame, isSurface);
 	}
 
 	/**
@@ -567,6 +570,7 @@ public class TravelMode extends JPanel {
 		// configured via resources/logback.xml
 		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
 
+		
 		java.net.InetAddress localMachine = null;
 		try {
 			localMachine = java.net.InetAddress.getLocalHost();
@@ -589,7 +593,7 @@ public class TravelMode extends JPanel {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Font lafFont = initLookAndFeel(60, 48);
+					Font lafFont =  initLookAndFeel(48,32); //(60, 48);
 					frame = new JFrame();
 					frame.setTitle("Robauto - Travel Mode");
 					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

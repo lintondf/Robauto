@@ -46,7 +46,6 @@ public class GpsComplete implements ISerialGps {
 		        	String line = it.nextLine();
 	
 		        	NMEA.GpsState gpsState = nmea.getUpdatedStatus(line);
-	
 		        	if (gpsState.hasFix) {
 		        		if (firstT == null) {
 		        			firstT = (double) gpsState.date * 1e6 + (double) gpsState.time;
@@ -54,6 +53,7 @@ public class GpsComplete implements ISerialGps {
 		        			double t = (double) gpsState.date * 1e6 + (double) gpsState.time;
 		        			deltaT = t - firstT;
 		        		}
+		        		System.out.println(deltaT + " " + gpsState.toString());
 		        	}
 		        	updateState(gpsState);
 		        	
@@ -74,9 +74,14 @@ public class GpsComplete implements ISerialGps {
 					break;
 				}
 	        }
-	        RobautoMain.logger.debug( String.format("GPS input running " + deltaT ) );
 	        try {
-	        	thread.join(5000);
+	        	for (int i = 0; i < 20; i++) {
+	        		if (deltaT > 0)
+	        			break;
+	        		System.out.println(i + " Waiting for GPS");
+	        		thread.join(1000);
+	        	}
+		        RobautoMain.logger.debug( String.format("GPS input running " + deltaT ) );
 		        return deltaT > 0;
 	        } catch (Exception x) {
 	        	if (deltaT == 0) {
@@ -116,11 +121,15 @@ public class GpsComplete implements ISerialGps {
 
 	public static void main(String[] args) {
 		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
-		GpsComplete serialGps = new GpsComplete("COM5");
+		GpsComplete serialGps = new GpsComplete("COM7");
 
       serialGps.addStateListener(state -> System.out.println( state.toString() ) );
 
       serialGps.start();
+      try {
+      	Thread.sleep(1000);
+      } catch (Exception x) {
+      }
 	}
 
 }
