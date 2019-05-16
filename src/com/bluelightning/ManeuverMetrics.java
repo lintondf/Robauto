@@ -50,10 +50,14 @@ public class ManeuverMetrics {
 	
 	@Override
 	public String toString() {
-		if (distancesInto.isEmpty())
-			return "";
-		int n = distancesInto.size()-1;
-		return String.format("%10.0f %s %d %10.0f %10.0f %s", totalDistance, maneuver.getId(), segments.size(), distancesInto.get(0), distancesInto.get(n), maneuver.getInstruction() );
+		double from = 0.0;
+		double to = 0.0;
+		if (! distancesInto.isEmpty()) {
+			int n = distancesInto.size()-1;
+			from = distancesInto.get(0);
+			to = distancesInto.get(n);
+		}
+		return String.format("%10.0f %s %d %10.0f %10.0f %s", totalDistance, maneuver.getId(), segments.size(), from, to, maneuver.getInstruction() );
 	}
 
 	public ManeuverMetrics(Maneuver maneuver) {
