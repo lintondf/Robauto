@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -504,6 +505,16 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			out.writeObject(finalizedPlaces);
 			out.writeObject(fuelStops);
 			out.close();
+			String html = getTripReport().toHtml();
+			try {
+				String path = file.getAbsolutePath().replace(".robauto", ".html");
+				PrintWriter rpt = new PrintWriter(path);
+				rpt.println(html);
+				rpt.close();
+			} catch (Exception x) {
+				x.printStackTrace();
+			}
+			
 		} catch (Exception x) {
 			x.printStackTrace();
 		}

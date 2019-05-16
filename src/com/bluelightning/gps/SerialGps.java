@@ -13,18 +13,18 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings({ "unused" })
 public class SerialGps implements ISerialGps {
 
-	private String portName;
+	private SerialPort portName;
 	private int baudRate;
 	private boolean isRunning = false;
 	private List<StateListener> stateListeners = new ArrayList<>();
 
-	public SerialGps(String portName, int baudRate) {
+	public SerialGps(SerialPort portName, int baudRate) {
 		this.portName = portName;
 		this.baudRate = baudRate;
 	}
 
-	public SerialGps(String portName) {
-		this(portName, 4800);
+	public SerialGps(SerialPort portName) {
+		this(portName, 9600);
 	}
 
 	public void addStateListener(StateListener stateListener) {
@@ -122,15 +122,16 @@ public class SerialGps implements ISerialGps {
 		SerialPort[] serialPorts = SerialPort.getCommPorts();
 		gpsPort = null;
 
-		RobautoMain.logger.debug(portName);
-		for (SerialPort serialPort : serialPorts) {
-			RobautoMain.logger
-					.debug("Serial Port: " + serialPort.getDescriptivePortName() + " " + serialPort.toString());
-			if (serialPort.getDescriptivePortName().equalsIgnoreCase(portName)
-					|| serialPort.getDescriptivePortName().contains(portName)) {
-				gpsPort = serialPort;
-			}
-		}
+		RobautoMain.logger.debug(portName.getDescriptivePortName());
+		gpsPort = portName;
+//		for (SerialPort serialPort : serialPorts) {
+//			RobautoMain.logger
+//					.debug("Serial Port: " + serialPort.getDescriptivePortName() + " " + serialPort.toString());
+//			if (serialPort.getDescriptivePortName().equalsIgnoreCase(portName)
+//					|| serialPort.getDescriptivePortName().toUpperCase().contains(portName)) {
+//				gpsPort = serialPort;
+//			}
+//		}
 
 		if (gpsPort == null) {
 			RobautoMain.logger.warn("failed to find gps serial port");
@@ -191,15 +192,15 @@ public class SerialGps implements ISerialGps {
 		stateListeners.forEach(stateListener -> stateListener.onGpsStateUpdated(gpsState));
 	}
 
-	public static void main(String[] args) throws Exception {
-		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
-		SerialGps serialGps = new SerialGps("COM5");
-
-		serialGps.addStateListener(state -> System.out.println(state.toString()));
-		// state.lat + ", " + state.lon + " (" + (state.hasFix ? "got fix" : "no
-		// fix") + ")"
-		// ));
-
-		serialGps.start();
-	}
+//	public static void main(String[] args) throws Exception {
+//		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
+//		SerialGps serialGps = new SerialGps("COM5");
+//
+//		serialGps.addStateListener(state -> System.out.println(state.toString()));
+//		// state.lat + ", " + state.lon + " (" + (state.hasFix ? "got fix" : "no
+//		// fix") + ")"
+//		// ));
+//
+//		serialGps.start();
+//	}
 }

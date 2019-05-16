@@ -21,15 +21,15 @@
 <br/>	
 {#}
 {#driving}
-	<table class="bpTable">
+	<table class="blueTable">
 	<thead>
 	<TR>
-		<TD colspan="3" style='font-size:{$headerFontSize};font-weight:bolder;text-align:center'>{$time}</TD>
+		<TD class="bpGreyTD" colspan="3" style='font-size:{$headerFontSize};font-weight:bolder;text-align:center;background-color:cyan'>{$time}</TD>
 	</TR>
 	<TR>
-		<TD colspan = '1' style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$drivingTime}</TD>
-		<TD colspan = '1' style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$drivingDistance}</TD>
-		<TD colspan = '1' style='font-size:{$rowFontSize};font-weight:bolder;text-align:center'>{$stoppedTime}</TD>
+		<TD colspan = '1' style='font-size:{$rowFontSize};font-weight:bolder;text-align:center;background-color:cyan'>{$drivingTime}</TD>
+		<TD colspan = '1' style='font-size:{$rowFontSize};font-weight:bolder;text-align:center;background-color:cyan'>{$drivingDistance}</TD>
+		<TD colspan = '1' style='font-size:{$rowFontSize};font-weight:bolder;text-align:center;background-color:cyan'>{$stoppedTime}</TD>
 	</TR>
 	</thead>
 	</table>
@@ -40,7 +40,7 @@
 		</tbody>
 	</table>
 <br/>	
-	<table class="bpTable">
+	<table class="greyTable">
 		<tbody>
 			{$availableRows}
 		</tbody>

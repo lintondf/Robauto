@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import org.jxmapviewer.JXMapViewer;
@@ -44,6 +45,7 @@ import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
@@ -585,11 +587,6 @@ public class TravelMode extends JPanel {
 		localHostAddress = localMachine.getHostAddress();
 		File file = new File("pwm-trace.obj");
 
-		String path = "RobautoTripPlan.obj";
-		if (args.length > 0)
-			path = args[0];
-		RobautoMain.logger.debug(path);
-		final File tripPlanFile = new File(path);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -625,6 +622,41 @@ public class TravelMode extends JPanel {
 							}
 						}
 					});
+					String path = null;
+					if (args.length > 0)
+						path = args[0];
+					else {
+						// Create a file chooser
+						final JFileChooser fileChooser = new JFileChooser();
+						fileChooser.setFileFilter(new FileFilter() {
+							@Override
+							public boolean accept(File f) {
+								if (f.isDirectory())
+									return true;
+								String name = f.getName().toLowerCase();
+								if (name.endsWith(".robauto"))
+									return true;
+								return false;
+							}
+
+							@Override
+							public String getDescription() {
+								return "Robauto TripPlans";
+							}
+						});
+						// In response to a button click:
+						int returnVal = fileChooser.showOpenDialog(frame);
+						if (returnVal == JFileChooser.APPROVE_OPTION) {
+							path = fileChooser.getSelectedFile().getAbsolutePath();
+							// This is where a real application would open the file.
+						}
+					}
+					if (path == null) {
+						System.err.println("No trip plan file specified");
+						System.exit(0);
+					}
+					RobautoMain.logger.debug(path);
+					final File tripPlanFile = new File(path);
 					travelMode.initialize(tripPlanFile);
 
 				} catch (Exception e) {

@@ -35,9 +35,17 @@ public class TravelStatus {
 	protected static final String oTDs = "<TD colspan='2'>";
 	protected static final String oTDf = "<TD style='font-size:48pt'>";
 	protected static final String obcTD = "<TD style='font-size:48pt;font-weight:bolder;text-align:center'>";
-	protected static final String oblTD = "<TD style='font-size:48pt;font-weight:bolder;text-align:left'>";
+	//protected static final String oblTD = "<TD style='font-size:48pt;font-weight:bolder;text-align:left'>";
 	protected static final String orTD = "<TD style='font-size:48pt;text-align:right'>";
 	protected static final String cTD = "</TD>";
+	
+	protected static String oblTD( String addedStyles ) {
+		return String.format("<TD style='font-size:48pt;font-weight:bolder;text-align:left%s'>", addedStyles);
+	}
+	
+	protected static String oblTD() {
+		return oblTD("");
+	}
 	
 	public static String toDeltaPeriod( double seconds ) {
 		String prefix = "+";
@@ -73,7 +81,7 @@ public class TravelStatus {
 		}
 		public String toHtmlRow() {
 			return String.format("%s%s%s%s%.1f%s%s%.1f%s%s%.1f%s", 
-					oblTD, title, cTD,
+					oblTD(), title, cTD,
 					orTD, planned, cTD, orTD, actual, cTD, oTDf, (actual-planned), cTD );
 		}
 	}
@@ -91,7 +99,7 @@ public class TravelStatus {
 		@Override
 		public String toHtmlRow() {
 			return String.format("%s%s%s%s%.1f%s%s%.1f%s%s%.1f%s", 
-					oblTD, title, cTD,
+					oblTD(), title, cTD,
 					orTD, Here2.METERS_TO_MILES*actual, cTD, 
 					orTD, Here2.METERS_TO_MILES*planned, cTD,
 					orTD, Here2.METERS_TO_MILES*(actual-planned), cTD );
@@ -110,7 +118,7 @@ public class TravelStatus {
 		@Override
 		public String toHtmlRow() {
 			return String.format("%s%s%s%s%s%s%s%s%s%s%s%s", 
-					oblTD, title, cTD,
+					oblTD(), title, cTD,
 					orTD, Here2.toPeriod(actual), cTD,
 					orTD, Here2.toPeriod(planned), cTD,
 					orTD, toDeltaPeriod(actual-planned), cTD );
@@ -169,9 +177,9 @@ public class TravelStatus {
 			};
 		}
 		
-		public String toHtmlRow() {
+		public String toHtmlRow(String addedStyles) {
 			return String.format("%s%s%s%s%s%s%s%.1f%s", 
-					oblTD, markedUpName, cTD,
+					oblTD(addedStyles), markedUpName, cTD,
 					orTD, Here2.toPeriod(timeRemaining), cTD,
 					orTD, Here2.METERS_TO_MILES*distanceRemaining, cTD);
 		}
@@ -321,16 +329,17 @@ public class TravelStatus {
 		
 		StringBuffer sb = new StringBuffer();
 		for (UpcomingStop upcomingStop : upcomingStops) {
-			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
+			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow("")) );			
 		}
 		t.set("upcomingRows", sb.toString() );
 		sb = new StringBuffer();
 		for (UpcomingStop upcomingStop : availableStops) {
-			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
+			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow(";background-color:grey")) );			
 		}
 		t.set("availableRows", sb.toString() );
 				
 		c.set("body", t.toString());
+//		System.out.println(c.toString());
 		try {
 			String css = IOUtils.toString(new FileInputStream("themes/style.css"));
 			c.set("styles", css);
@@ -373,10 +382,10 @@ public class TravelStatus {
 		t.set("onDeck", sb.toString());
 		
 		c.set("body", t.toString());
-		try {
-			String css = IOUtils.toString(new FileInputStream("themes/style.css"));
-			c.set("styles", css);
-		} catch (Exception x) {}
+//		try {
+//			String css = IOUtils.toString(new FileInputStream("themes/style.css"));
+//			c.set("styles", css);
+//		} catch (Exception x) {}
 		return c.toString();
 	}
 	
@@ -420,12 +429,12 @@ public class TravelStatus {
 		
 		sb = new StringBuffer();
 		for (UpcomingStop upcomingStop : upcomingStops) {
-			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
+			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow("")) );			
 		}
 		t.set("upcomingRows", sb.toString() );
 		sb = new StringBuffer();
 		for (UpcomingStop upcomingStop : availableStops) {
-			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow()) );			
+			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow("")) );			
 		}
 		t.set("availableRows", sb.toString() );
 		c.set("body", t.toString());

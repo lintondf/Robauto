@@ -191,11 +191,11 @@ public class GPS {
 	ISerialGps serialGps = null;
 
 	public void initialize(JFrame frame, boolean isSurface) {
-		String port = null;
+		SerialPort port = null;
 		SerialPort[] serialPorts = SerialPort.getCommPorts();
 		for (SerialPort serialPort : serialPorts) {
-			if (serialPort.getPortDescription().contains("GNSS")) {
-				port = serialPort.getSystemPortName();
+			if (serialPort.getPortDescription().toUpperCase().contains("GNSS")) {
+				port = serialPort;
 				break;
 			}
 		}
