@@ -32,9 +32,9 @@ public class Report implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	final static String HEADER_FONT = "48pt";
-	final static String ROW_FONT = "32pt";
-	final static String DETAIL_FONT = "24pt";
+	final static String HEADER_FONT = "80pt";
+	final static String ROW_FONT = "48pt";
+	final static String DETAIL_FONT = "48pt";
 	
 	protected static void setFonts( Chunk c) {
 		c.set("headerFontSize", HEADER_FONT);

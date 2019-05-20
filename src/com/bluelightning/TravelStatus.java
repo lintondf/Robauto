@@ -382,10 +382,10 @@ public class TravelStatus {
 		t.set("onDeck", sb.toString());
 		
 		c.set("body", t.toString());
-//		try {
-//			String css = IOUtils.toString(new FileInputStream("themes/style.css"));
-//			c.set("styles", css);
-//		} catch (Exception x) {}
+		try {
+			String css = IOUtils.toString(new FileInputStream("themes/style.css"));
+			c.set("styles", css);
+		} catch (Exception x) {}
 		return c.toString();
 	}
 	
