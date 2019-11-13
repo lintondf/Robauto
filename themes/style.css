@@ -147,7 +147,7 @@ br:before{content:"\A";white-space:pre-line}
             	text-align: center;
             }
             .bpTable thead td {
-                background-color: #007fff;
+                background-color: #000fff;
             }
             .bpTable tr:first-child td:first-child {
                 border-width: 0px 0px 1px 0px;
@@ -364,7 +364,7 @@ br:before{content:"\A";white-space:pre-line}
                 font-size: 12px;
                 font-family: Arial;
                 font-weight: normal;
-                color: #000000;
+                color: yellow;
                 background-color: #007fff;
             }
             .blueTable tr:last-child td {
