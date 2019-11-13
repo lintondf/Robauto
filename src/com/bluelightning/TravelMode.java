@@ -617,6 +617,7 @@ public class TravelMode extends JPanel {
 						// }
 						@Override
 						public void windowClosing(WindowEvent e) {
+							System.out.println(frame.getBounds() );
 							if (travelMode.gps != null) {
 								travelMode.gps.shutdown();
 							}
