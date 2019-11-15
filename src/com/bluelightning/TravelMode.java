@@ -9,7 +9,10 @@ java.util.ConcurrentModificationException
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
  */
 
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -45,6 +48,7 @@ import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -53,6 +57,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -61,13 +68,20 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -83,6 +97,14 @@ import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.fazecast.jSerialComm.SerialPort;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+
 public class TravelMode extends JPanel {
 
 	/**
@@ -95,9 +117,13 @@ public class TravelMode extends JPanel {
 	public static String hostName = "localhost";
 	public static boolean isSurface = true;
 
+	// current active
 	public TripPlan tripPlan = null;
 	public Report report = null;
 	protected Map map;
+	// plans and reports for all days
+	public ArrayList<TripPlan> tripPlans = new ArrayList<>();
+	public ArrayList<Report> reports = new ArrayList<>();
 	protected JXMapViewer mapViewer;
 	private boolean displayRunning = true;
 
@@ -144,17 +170,22 @@ public class TravelMode extends JPanel {
 		}
 	}
 
+	protected final int dayInTrip = 0;
 	protected int currentDay = 0;
 
 	protected void nextDay() {
 		int n = listOfDays.getModel().getSize();
 		currentDay = (currentDay + 1) % n;
+		tripPlan = tripPlans.get(currentDay);
+		report = reports.get(currentDay);
 		setDay();
 	}
 
 	protected void priorDay() {
 		int n = listOfDays.getModel().getSize();
 		currentDay = (currentDay - 1) % n;
+		tripPlan = tripPlans.get(currentDay);
+		report = reports.get(currentDay);
 		setDay();
 	}
 
@@ -284,16 +315,16 @@ public class TravelMode extends JPanel {
 	}
 
 	protected void setDay() {
-		final Report.Day day = report.getDays().get(currentDay);
+		final Report.Day day = report.getDays().get(dayInTrip);
 		final ArrayList<Route> days = tripPlan.getFinalizedDays();
 		final ArrayList<Integer> markers = tripPlan.getFinalizedMarkers();
 		final ArrayList<ArrayList<VisitedPlace>> allPlaces = tripPlan.getFinalizedPlaces();
 		Drive drive = day.steps.get(0).drive;
 		currentFuel = Double.parseDouble(drive.fuelRemaining) + Double.parseDouble(drive.fuelUsed);
 		distanceTraveled = 0.0;
-		ManeuverMetrics.initializeMetrics( currentDay, days );
-		setupGps(days.get(currentDay));
-		travelStatus = new TravelStatus(tripPlan.getTripLeg(currentDay));
+		ManeuverMetrics.initializeMetrics( dayInTrip, days );
+		setupGps(days.get(dayInTrip));
+		travelStatus = new TravelStatus(tripPlan.getTripLeg(dayInTrip));
 		activePanel.getTextPane().setContentType("text/html");
 		activePanel.getTextPane().setEditable(false);
 		SwingUtilities.invokeLater(new Runnable() {
@@ -304,7 +335,7 @@ public class TravelMode extends JPanel {
 				} catch (Exception x) {
 				}
 				map.clearRoute();
-				waypoints = map.showRoute(days, markers, allPlaces, currentDay);
+				waypoints = map.showRoute(days, markers, allPlaces, dayInTrip);
 				activePanel.getSplitPane().setDividerLocation(0.4);
 				activePanel.getTextPane().setContentType("text/html");
 				activePanel.getTextPane().setText(travelStatus.toDrivingHtml());
@@ -326,6 +357,8 @@ public class TravelMode extends JPanel {
 			activePanel.setVisible(true);
 			map.clearRoute();
 			currentDay = listOfDays.getSelectedIndex();
+			tripPlan = tripPlans.get(currentDay);
+			report = reports.get(currentDay);
 			setDay();
 		}
 	}
@@ -486,6 +519,53 @@ public class TravelMode extends JPanel {
 		});
 	}
 
+	protected void initialize(final Path base, final List<String> dayfiles) {
+		activePanel.getProgressBar().setValue(-1);
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				int dayNo = 1;
+				DefaultListModel<String> model = new DefaultListModel<>();
+				for (String dayfile : dayfiles) {
+					File tripPlanFile = base.resolve(dayfile).toFile();
+					tripPlan = TripPlan.load(tripPlanFile, frame);
+					tripPlans.add(tripPlan);
+					// Here2.reportRoute(tripPlan.getRoute());
+					report = tripPlan.getTripReport();
+					reports.add(report);
+					ArrayList<ArrayList<VisitedPlace>> placesByDay = tripPlan.getFinalizedPlaces();
+					for (ArrayList<VisitedPlace> stops : placesByDay) {
+						int iLast = stops.size() - 1;
+						Address from = stops.get(0).getAddress();
+						RobautoMain.logger.debug(from.toString());
+						Address to = stops.get(iLast).getAddress();
+						RobautoMain.logger.debug(to.toString());
+						String entry = String.format("Day %02d: %s", dayNo++, dayfile);
+						RobautoMain.logger.debug(entry);
+						model.addElement(entry);
+					}
+				}
+				if (model.isEmpty()) {
+					model.addElement("No Finalized Route Stops Found");
+				}
+				System.out.printf("%d, %d, %d\n", model.size(), reports.size(), tripPlans.size());
+				tripPlan = tripPlans.get(0);
+				report = reports.get(0);
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						if (model.size() > 0)
+							listOfDays.setModel(model);
+						map.clearRoute();
+					}
+				});
+			}
+		});
+		t.start();
+		Events.eventBus.register(new GpsHandler());
+		gps.initialize(frame, isSurface);
+	}
+	
 	protected void initialize(File tripPlanFile) {
 		activePanel.getProgressBar().setValue(-1);
 		Thread t = new Thread(new Runnable() {
@@ -568,11 +648,37 @@ public class TravelMode extends JPanel {
 		return lafFont;
 	}
 
+	public class ReportHandler extends AbstractHandler
+	{
+	    @Override
+	    public void handle(String target,
+	                       Request baseRequest,
+	                       HttpServletRequest request,
+	                       HttpServletResponse response) throws IOException,
+	        ServletException
+	    {
+	        // Declare response encoding and types
+	        response.setContentType("text/html; charset=utf-8");
+
+	        // Declare response status code
+	        response.setStatus(HttpServletResponse.SC_OK);
+
+	        // Write back response
+	        int dn = 1;
+	        for (Report report : reports ) {
+	        	Report.Day day = report.getDays().get(0);
+	        	day.day = String.format("Day %d", dn++);
+	        	response.getWriter().println(report.toHtml(day));
+	        }
+
+	        // Inform jetty that this request has now been handled
+	        baseRequest.setHandled(true);
+	    }
+	}
+	
 	public static void main(String[] args) {
 		// configured via resources/logback.xml
 		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
-
-		
 		java.net.InetAddress localMachine = null;
 		try {
 			localMachine = java.net.InetAddress.getLocalHost();
@@ -586,7 +692,7 @@ public class TravelMode extends JPanel {
 		RobautoMain.logger.info("Hostname of local machine: " + isSurface + " " + localMachine);
 		localHostAddress = localMachine.getHostAddress();
 		File file = new File("pwm-trace.obj");
-
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -600,6 +706,17 @@ public class TravelMode extends JPanel {
 
 					TravelMode travelMode = new TravelMode();
 					travelMode.lafFont = lafFont;
+					
+			        int port = 8080;
+			        Server server = new Server(port);
+			        server.setHandler(travelMode.new ReportHandler());
+			        try {
+				        server.start();
+//				        server.join();
+			        } catch (Exception x) {
+			        	x.printStackTrace();
+			        }
+					
 
 					frame.setContentPane(travelMode);
 					frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -618,6 +735,7 @@ public class TravelMode extends JPanel {
 						@Override
 						public void windowClosing(WindowEvent e) {
 							System.out.println(frame.getBounds() );
+							// 1455x935 on Surface Pro 3
 							if (travelMode.gps != null) {
 								travelMode.gps.shutdown();
 							}
@@ -656,9 +774,25 @@ public class TravelMode extends JPanel {
 						System.err.println("No trip plan file specified");
 						System.exit(0);
 					}
-					RobautoMain.logger.debug(path);
-					final File tripPlanFile = new File(path);
-					travelMode.initialize(tripPlanFile);
+					if (path.endsWith(".dayfile")) {
+						List<String> lines = Files.readAllLines( Paths.get(path) );
+						RobautoMain.logger.debug(path);
+						for (String day : lines) 
+							RobautoMain.logger.debug(day);
+						travelMode.initialize(Paths.get(path).getParent(), lines);
+					} else {
+						RobautoMain.logger.debug(path);
+						final File tripPlanFile = new File(path);
+						travelMode.initialize(tripPlanFile);
+					}
+					EventQueue.invokeLater(new Runnable() {
+						public void run() {
+							JPanel glass = (JPanel) frame.getGlassPane();
+							glass.setLayout(new BorderLayout());
+							glass.add(new Overlay(), BorderLayout.CENTER);
+							glass.setVisible(true);							
+						}
+					});
 
 				} catch (Exception e) {
 					e.printStackTrace();

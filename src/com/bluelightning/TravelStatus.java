@@ -39,6 +39,10 @@ public class TravelStatus {
 	protected static final String orTD = "<TD style='font-size:48pt;text-align:right'>";
 	protected static final String cTD = "</TD>";
 	
+	protected static String orTD( String addedStyles ) {
+		return String.format("<TD style='font-size:48pt;text-align:right%s'>", addedStyles);
+	}
+	
 	protected static String oblTD( String addedStyles ) {
 		return String.format("<TD style='font-size:48pt;font-weight:bolder;text-align:left%s'>", addedStyles);
 	}
@@ -46,6 +50,7 @@ public class TravelStatus {
 	protected static String oblTD() {
 		return oblTD("");
 	}
+	
 	
 	public static String toDeltaPeriod( double seconds ) {
 		String prefix = "+";
@@ -146,7 +151,11 @@ public class TravelStatus {
 //			System.out.printf("%10.7f,%10.7f,%10.7f,%10.7f,%s\n", latitude, longitude, 
 //					closest.closestPoint.y, closest.closestPoint.x, name );
 			this.name = name;
-			this.markedUpName = name;
+			this.name = this.name.replace("REST AREA", "RA");
+			this.name = this.name.replace("WELCOME CENTER", "WC");
+			this.name = this.name.replace("TOURIST INFO CENTER", "WC");
+			this.name = this.name.replace("SERVICE PLAZA", "SP");
+			this.markedUpName = this.name;
 			this.hasGas = false;
 			if (! fuelAvailable.equals("None")) {
 				this.markedUpName = "<b>" + this.markedUpName + "</b>";
@@ -180,8 +189,8 @@ public class TravelStatus {
 		public String toHtmlRow(String addedStyles) {
 			return String.format("%s%s%s%s%s%s%s%.1f%s", 
 					oblTD(addedStyles), markedUpName, cTD,
-					orTD, Here2.toPeriod(timeRemaining), cTD,
-					orTD, Here2.METERS_TO_MILES*distanceRemaining, cTD);
+					orTD(addedStyles), Here2.toPeriod(timeRemaining), cTD,
+					orTD(addedStyles), Here2.METERS_TO_MILES*distanceRemaining, cTD);
 		}
 	}
 	
@@ -306,7 +315,7 @@ public class TravelStatus {
 		}
 	}
 
-	final static SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss EEE MM/dd");
+	final static SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss EE MM/dd");
 	
 	public String toDrivingHtml() {
 		if (theme == null) {
@@ -322,7 +331,9 @@ public class TravelStatus {
 			now = lastFix.date;
 			//t.set("where", String.format("%10.6f %10.6f", lastFix.getLatitude(), lastFix.getLongitude()));
 		}
-		t.set("time", format.format(now) );
+		String d = format.format(now);
+		d = d.replace("Mon", "Mo").replace("Tue", "Tu").replace("Wed", "We").replace("Thu", "Th").replace("Fri", "Fr").replace("Sat", "Sa").replace("Sun", "Su");
+		t.set("time", d );
 		t.set("drivingTime", drivingTime.value() );
 		t.set("drivingDistance", distanceDriven.value() );
 		t.set("stoppedTime", stoppedTime.value() );
@@ -334,7 +345,7 @@ public class TravelStatus {
 		t.set("upcomingRows", sb.toString() );
 		sb = new StringBuffer();
 		for (UpcomingStop upcomingStop : availableStops) {
-			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow(";background-color:grey")) );			
+			sb.append( String.format("<TR>%s</TR>\n", upcomingStop.toHtmlRow(";color: white;background-color:grey")) );			
 		}
 		t.set("availableRows", sb.toString() );
 				
