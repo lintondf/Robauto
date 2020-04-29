@@ -572,8 +572,10 @@ public class TravelMode extends JPanel {
 			@Override
 			public void run() {
 				tripPlan = TripPlan.load(tripPlanFile, frame);
+				tripPlans.add(tripPlan);
 				// Here2.reportRoute(tripPlan.getRoute());
 				report = tripPlan.getTripReport();
+				reports.add(report);
 
 				ArrayList<ArrayList<VisitedPlace>> placesByDay = tripPlan.getFinalizedPlaces();
 				int dayNo = 1;
@@ -669,6 +671,7 @@ public class TravelMode extends JPanel {
 	        	Report.Day day = report.getDays().get(0);
 	        	day.day = String.format("Day %d", dn++);
 	        	response.getWriter().println(report.toHtml(day));
+	        	response.getWriter().println(tripPlan.getObscuraHtml());
 	        }
 
 	        // Inform jetty that this request has now been handled

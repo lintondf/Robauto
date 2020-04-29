@@ -66,7 +66,19 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 
 	private ArrayList<FuelStop> fuelStops;
 	
+	private String obscuraHtml;
 	
+	
+	public String getObscuraHtml() {
+		return obscuraHtml;
+	}
+
+
+	public void setObscuraHtml(String obscuraHtml) {
+		this.obscuraHtml = obscuraHtml;
+	}
+
+
 	public void tripPlanUpdated(String savePath) {
 //		try {
 //		    Registry registry = LocateRegistry.getRegistry("192.168.0.13", RobautoMain.REGISTRY_PORT);
@@ -504,6 +516,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			out.writeObject(finalizedMarkers);
 			out.writeObject(finalizedPlaces);
 			out.writeObject(fuelStops);
+			out.writeObject(obscuraHtml);
 			out.close();
 			String html = getTripReport().toHtml();
 			try {
@@ -558,6 +571,12 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			} catch (Exception x) {
 				tripPlan.fuelStops = new ArrayList<FuelStop>();
 				RobautoMain.logger.error("Missing fuel stops ", x);
+			}
+			try {
+				tripPlan.obscuraHtml = (String) in.readObject();
+			} catch (Exception x) {
+				RobautoMain.logger.error("Missing obscura html ", x);
+				tripPlan.obscuraHtml = "";
 			}
 			in.close();
 

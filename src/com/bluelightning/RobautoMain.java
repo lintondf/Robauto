@@ -17,6 +17,8 @@ public class RobautoMain {
 	public static Logger logger;
 	
 	public static boolean isMac = (System.getProperty("os.name").startsWith("Mac"));
+	
+	public static double startingFuel = Report.FUEL_CAPACITY;
 
 //	@NoAutoStart
 //	public static class StartupTriggeringPolicy<E> extends TriggeringPolicyBase<E> {

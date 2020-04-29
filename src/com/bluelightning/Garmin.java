@@ -6,6 +6,9 @@ package com.bluelightning;
 import static slash.common.helpers.JAXBHelper.newContext;
 import static slash.common.helpers.JAXBHelper.newMarshaller;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;

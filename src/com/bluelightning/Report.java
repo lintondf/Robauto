@@ -156,6 +156,8 @@ public class Report implements Serializable {
 		String placeAddress;
 		String refuel;
 		Drive drive;
+		public double latitude;
+		public double longitude;
 
 		public Step() {
 		}
@@ -164,8 +166,10 @@ public class Report implements Serializable {
 			StringBuffer sb = new StringBuffer();
 			Chunk t = theme.makeChunk("report#titleRow");
 			setFonts(t);
+			//	https://www.google.com/maps/@35.5377787,-78.2506305,16.29z?shorturl=1
+			String placeLink = String.format("<A TARGET='_blank' HREF='https://www.google.com/maps/@%.7f,%.7f,16.29z/data=!5m1!1e1'>%s</A>", latitude, longitude, placeName );
 			t.set("stepName", stepName);
-			t.set("placeName", placeName);
+			t.set("placeName", placeLink);
 			t.set("placeAddress", placeAddress);
 			t.set("refuel", refuel);
 			sb.append(t.toString());
@@ -208,6 +212,7 @@ public class Report implements Serializable {
 	}
 
 	public Report() {
+		fuelLevel = RobautoMain.startingFuel;
 		this.days = new ArrayList<Day>();
 	}
 
@@ -274,11 +279,15 @@ public class Report implements Serializable {
 		lastDay.lastStep.drive = d;
 	}
 
-	public void stop(String toPlace, String toAddress, double refuel) {
+	public void stop(TripPlan.StopData stop, double refuel) {
+		String toPlace = stop.name;
+		String toAddress = stop.getAddress(); 
 		Step step = new Step();
 		int n = lastDay.steps.size();
 		step.placeName = toPlace;
 		step.placeAddress = toAddress;
+		step.latitude = stop.getLatitude();
+		step.longitude = stop.getLongitude();
 		if (refuel > 0.0) {
 			fuelLevel += refuel;
 			step.refuel = String.format("+%.0f", refuel);
@@ -313,7 +322,7 @@ public class Report implements Serializable {
 			lastDistance = stopData.distance;
 			this.drive(turn.driver, hours, minutes, stepDistance * Here2.METERS_TO_MILES);
 			double refuel = (stopData.refuel) ? this.fillUp() : 0.0;
-			this.stop(stopData.name, stopData.getAddress(), refuel );
+			this.stop(stopData, refuel );
 		}
 		this.arrive(0.0, formatUserLabel(legData.endLabel), "");
 	}
@@ -495,43 +504,6 @@ public class Report implements Serializable {
 	}
 	
 	
-	public static void main(String[] args) {
-		Report report = new Report();
-		report.depart("Home", "3533 Carambola Circle, Melbourne, FL", 0.0);
-		report.drive(0, 2, 48, 195);
-		report.stop("Pilot", "491 St Marys Rd, St Marys, GA", report.fillUp());
-		report.drive(1, 0, 48, 45);
-		report.arrive(0.0, "Jekyll Island SP",
-				"1199 Beach View Dr N, Jekyll Island, GA");
-
-		report.depart(0.0);
-		report.drive(0, 4, 4, 281);
-		report.stop("Pilot", "1504 SC-38, Latta, SC 29565, USA",
-				report.fillUp());
-		report.drive(1, 1, 44, 116);
-		report.arrive(0.0, "Walmart", "1299 N Brightleaf Blvd, Smithfield, NC");
-
-		report.depart(0.0);
-		report.drive(0, 3, 39, 250);
-		report.stop("Costco", "2708 Potomac Mills Cir, Woodbridge, VA",
-				report.fillUp());
-		report.drive(1, 1, 18, 65);
-		report.arrive(0.0, "Patapsco SP",
-				"8099 Park Dr, Ellicott City, MD 21043, USA");
-
-
-		try {
-			PrintWriter out = new PrintWriter("report.html");
-			out.println(report.toHtml());
-			out.close();
-		} catch (Exception x) {
-			x.printStackTrace();
-		}
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		String json = gson.toJson(report);
-		System.out.println(json);
-	}
-
 	public List<Day> getDays() {
 		return days;
 	}

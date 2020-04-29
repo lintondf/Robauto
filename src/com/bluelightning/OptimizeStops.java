@@ -24,7 +24,7 @@ import seedu.addressbook.logic.Logic;
 public class OptimizeStops {
 
 	protected double minDrive = 45.0 * 60.0; // [s]
-	protected double maxDrive = 120.0 * 60.0; // [s]
+	protected double maxDrive = 100.0 * 60.0; // [s]
 	protected double driveFuzz = 15.0 * 60.0;
 	protected double nDrivers = 2;
 

@@ -27,6 +27,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -317,35 +318,9 @@ public class PlannerMode extends JPanel {
 				map.updateWaypoints(nearby);
 				break;
 
-			case "ControlPanel.Attractions":
-				System.out.println("Loading");
-				POISet attractions = AtlasObscura.factory();
-				System.out.println( attractions.size() );
-				ArrayList<POIResult> near = attractions.getPointsOfInterestAlongRoute(RobautoMain.tripPlan.getRoute(), 30e3 );
-				System.out.println( near.size() );
-				near.forEach(System.out::println);
-//				if (!RobautoMain.tripPlan.getFinalizedPlaces().isEmpty()) {
-//					try {
-//						outputToCopilot(RobautoMain.tripPlan.getFinalizedPlaces());
-//					} catch (Exception x) {
-//						x.printStackTrace();
-//					}
-//				}
-//				BufferedImage i = getScreenShot(mapViewer);
-//				try {
-//					File outputfile = new File("saved.png");
-//					ImageIO.write(i, "png", outputfile);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-				String html = RobautoMain.tripPlan.getTripReport().toHtml();
-				try {
-					PrintWriter out = new PrintWriter("report.html");
-					out.println(html);
-					out.close();
-				} catch (Exception x) {
-					x.printStackTrace();
-				}
+			case "ControlPanel.SetFuel":
+				String gallons = JOptionPane.showInputDialog("Starting Fuel in Gallons: ");
+				RobautoMain.startingFuel = Double.parseDouble(gallons);
 				break;
 
 			case "ControlPanel.ClearActions":
@@ -426,6 +401,16 @@ public class PlannerMode extends JPanel {
 			}
 			gasStops.forEach(System.out::println);
 			RobautoMain.tripPlan.setFuelStops( new ArrayList<FuelStop>( gasStops ) );
+			
+			POISet attractions = AtlasObscura.factory();
+			System.out.println( attractions.size() );
+			ArrayList<POIResult> near = attractions.getPointsOfInterestAlongRoute(RobautoMain.tripPlan.getRoute(), 30e3 );
+			StringBuilder sb = new StringBuilder();
+			for (POIResult result : near ) {
+				AtlasObscura ao = (AtlasObscura) result.poi;
+				sb.append(ao.toHtml());
+			}
+			RobautoMain.tripPlan.setObscuraHtml(sb.toString());
 
 			RobautoMain.logger.info("  Route shown on map");
 			RobautoMain.tripPlan.save(tripPlanFile);

@@ -53,9 +53,21 @@ public class AtlasObscura extends POIBase {
 		this.longitude = Double.parseDouble(fields[5].trim());
 		this.placeId = fields[6].trim();
 		this.href = fields[7].trim();
-		
 	}
 
+	public String toHtml() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<H2>"); sb.append(name); sb.append("</H2>");
+		sb.append("<P>");
+		sb.append(String.format("<A TARGET='_blank' HREF='https://www.atlasobscura.com/%s'>%s</A>", href, subtitle));
+		sb.append("</P>");
+		sb.append("<P>");
+		String placeLink = String.format("<A TARGET='_blank' HREF='https://www.google.com/maps/@%.7f,%.7f,16.29z/data=!5m1!1e1'>%s, %s</A>", latitude, longitude, city, state );
+		sb.append(placeLink);
+		sb.append("</P>");
+		return sb.toString();
+	}
+	
 	@Override
 	public String getAddress() {
 		return String.format("%s, %s; %10.6f, %10.6f", city, state, latitude, longitude );
