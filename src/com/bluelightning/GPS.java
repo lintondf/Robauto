@@ -194,6 +194,7 @@ public class GPS {
 		SerialPort port = null;
 		SerialPort[] serialPorts = SerialPort.getCommPorts();
 		for (SerialPort serialPort : serialPorts) {
+			System.out.println(serialPort.getPortDescription());
 			if (serialPort.getPortDescription().toUpperCase().contains("GNSS")) {
 				port = serialPort;
 				break;

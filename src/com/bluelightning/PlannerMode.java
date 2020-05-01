@@ -432,8 +432,10 @@ public class PlannerMode extends JPanel {
 		}
 
 		private void routeOpen() {
+			String where = System.getProperty("user.home") + "/Google Drive/0Robauto";
+			System.out.println(where);
 			// Create a file chooser
-			final JFileChooser fileChooser = new JFileChooser();
+			final JFileChooser fileChooser = new JFileChooser(where);
 			fileChooser.setFileFilter(new FileFilter() {
 				@Override
 				public boolean accept(File f) {

@@ -93,6 +93,7 @@ import java.util.TreeSet;
 
 import com.bluelightning.gui.FuelPanel;
 import com.bluelightning.gui.TravelActivePanel;
+import com.bluelightning.gui.TravelFileChooser;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.fazecast.jSerialComm.SerialPort;
@@ -746,38 +747,21 @@ public class TravelMode extends JPanel {
 					});
 					String path = null;
 					if (args.length > 0)
-						path = args[0];
+						path = args[0]; // can be .robauto or .dayfile (list of .robauto abs paths
 					else {
-						// Create a file chooser
-						final JFileChooser fileChooser = new JFileChooser();
-						fileChooser.setFileFilter(new FileFilter() {
-							@Override
-							public boolean accept(File f) {
-								if (f.isDirectory())
-									return true;
-								String name = f.getName().toLowerCase();
-								if (name.endsWith(".robauto"))
-									return true;
-								return false;
-							}
-
-							@Override
-							public String getDescription() {
-								return "Robauto TripPlans";
-							}
-						});
-						// In response to a button click:
-						int returnVal = fileChooser.showOpenDialog(frame);
-						if (returnVal == JFileChooser.APPROVE_OPTION) {
-							path = fileChooser.getSelectedFile().getAbsolutePath();
-							// This is where a real application would open the file.
-						}
+						// Create a file chooser to choose a single .robauto
+						String where = System.getProperty("user.home") + "/Google Drive/0Robauto";
+		                TravelFileChooser dialog = new TravelFileChooser(frame, where);
+		                dialog.setVisible(true);
+		                if (dialog.getSelection() != null) {
+		                	path = dialog.getSelection().getAbsolutePath();
+		                }
 					}
 					if (path == null) {
 						System.err.println("No trip plan file specified");
 						System.exit(0);
 					}
-					if (path.endsWith(".dayfile")) {
+					if (path.endsWith(".dayfile")) {  // list of files by day
 						List<String> lines = Files.readAllLines( Paths.get(path) );
 						RobautoMain.logger.debug(path);
 						for (String day : lines) 
@@ -786,16 +770,10 @@ public class TravelMode extends JPanel {
 					} else {
 						RobautoMain.logger.debug(path);
 						final File tripPlanFile = new File(path);
-						travelMode.initialize(tripPlanFile);
+						List<String> lines = new ArrayList<>();
+						lines.add( path );
+						travelMode.initialize(Paths.get(tripPlanFile.getAbsolutePath()).getParent(), lines );
 					}
-					EventQueue.invokeLater(new Runnable() {
-						public void run() {
-							JPanel glass = (JPanel) frame.getGlassPane();
-							glass.setLayout(new BorderLayout());
-							glass.add(new Overlay(), BorderLayout.CENTER);
-							glass.setVisible(true);							
-						}
-					});
 
 				} catch (Exception e) {
 					e.printStackTrace();
