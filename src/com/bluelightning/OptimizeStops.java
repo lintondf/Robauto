@@ -44,7 +44,7 @@ public class OptimizeStops {
 		RobautoMain.logger.debug( String.format("gRSP %f %f", start, finish) );
 		ArrayList<POIResult> resultList = new ArrayList<>();
 		poiMap.forEach((kind, pset) -> {
-			resultList.addAll(pset.getPointsOfInterestAlongRoute(route, 500));
+			resultList.addAll(pset.getPointsOfInterestAlongRoute(route, 1500));
 		});
 		Iterator<POIResult> it = resultList.iterator();
 		while (it.hasNext()) {

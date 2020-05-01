@@ -19,7 +19,7 @@
 -86.732984,41.40581,AMBEST Express - Hank's Truck Stop,219-797-2244,1799 W. US 30,Hanna,IN,46340,USA
 -99.42719,36.43385,AMBEST Express - Hutch's 113,580-256-2650,Hwy. 270 at Hwy. 412 183 15,Woodward,OK,73801,USA
 -107.083739,41.773853,AMBEST Express - I-80 Travel Plaza,307-324-4407,I-80 Exit 221,Sinclair,WY,82334,USA
--69.61645,44.594197,AMBEST Express - Irving Fairfield,207-238-9979,I-95 Exit 132,Fairfield,ME,04937,USA
+-69.61645,44.594197,AMBEST Express - Irving Fairfield,207-238-9979,I-95 Exit 132,Fairfield,ME,4937,USA
 -100.86901,39.18601,AMBEST Express - JJ Travel Stop,785-672-3900,I-70 Exit 70,Oakley,KS,67748,USA
 -121.263762,37.538409,AMBEST Express - Joe's Travel Plaza 11,209-894-3040,I-5 Exit 441 / 4415 Howard Road,Westley,CA,95387,USA
 -76.181447,40.019602,AMBEST Express - Lancaster Travel Plaza,717-687-6112,2622 Lincoln Hwy East,Ronks,PA,17572,USA
@@ -77,7 +77,7 @@
 -98.41886,35.86132,AMBEST Fuel Stop - Hutch's 118,580-623-2444,Hwy. 281 & Hwy 270,Watonga,OK,73772,USA
 -97.723598,35.518083,AMBEST Fuel Stop - Hutch's 119,580-303-4515,20207 E. 1110 Rd,Elk City,OK,73644,USA
 -99.632587,35.309241,AMBEST Fuel Stop - Hutch's 120,580-928-3847,I-40 Exit 25,Sayre,OK,73662,USA
--74.165318,41.100279,AMBEST Fuel Stop - Kings Mahwah Truck Stop,201-252-8889,I-287 Exit 66,Mahwah,NJ,07430,USA
+-74.165318,41.100279,AMBEST Fuel Stop - Kings Mahwah Truck Stop,201-252-8889,I-287 Exit 66,Mahwah,NJ,7430,USA
 -75.312109,41.343295,AMBEST Fuel Stop - Lakewood Travel Plaza,570-676-4303,I-81 Exit 20 1414 Route 507,Greentown,PA,18426,USA
 -75.684404,41.787984,AMBEST Fuel Stop - Liberty Travel Plaza,570-434-2330,I-81 Exit 217 5085 SR 547,Harford,PA,18823,USA
 -120.54433,39.30958,AMBEST Fuel Stop - Luckys Travel Plaza,530-426-0328,I-80 Exit 165,Cisco Grove,CA,95728,USA
@@ -90,7 +90,7 @@
 -75.684028,41.786508,AMBEST Fuel Stop - Penn Can Travel Plaza,570-434-2608,I-81 Exit 217 5076 SR 547,Harford,PA,18823,USA
 -122.270719,47.484878,AMBEST Fuel Stop - Petersons Diesel Fueling,206-433-0149,I-5 Exit 156,Tukwila,WA,98168,USA
 -94.475063,39.156498,AMBEST Fuel Stop - Pour Boy's 3,816-453-0076,I-435 Exit 55,Kansas City,MO,64161,USA
--72.6106,42.11002,AMBEST Fuel Stop - Pride Travel Center I-91,413-733-6126,I-91 at RTE 20 W,Springfield,MA,01104,USA
+-72.6106,42.11002,AMBEST Fuel Stop - Pride Travel Center I-91,413-733-6126,I-91 at RTE 20 W,Springfield,MA,1104,USA
 -75.200946,41.362762,AMBEST Fuel Stop - Promised Land Truck Stop,570-8571515,I-84 Exit 26 624 Route 390,Tafton,PA,18464,USA
 -98.451424,41.210701,AMBEST Fuel Stop - Pump & Pantry 13 - St. Paul,308-754-4439,US Hwy 281 @ US Hwy 92/514 2nd Street,St. Paul,NE,68873,USA
 -99.620026,41.401752,AMBEST Fuel Stop - Pump & Pantry 14 - Broken Bow,308-872-6842,US Hwy 2/1037 E. South E Street,Broken Bow,NE,68822,USA
@@ -147,7 +147,7 @@
 -99.8579,28.5197,AMBEST Fuel Stop - Stripes 2280 - Carrizo Springs,830-876-3359,US 83 @ US 277 / 101 S 1st Street,Carrizo Springs,TX,78834,USA
 -102.0382,31.9824,AMBEST Fuel Stop - Stripes 2285 - Midland,432-684-7338,I-20 Exit 138/3200 E. Hwy 158/Garden City Hwy,Midland,TX,79702,USA
 -95.4217,29.9815,AMBEST Fuel Stop - Stripes 2286 - Houston,281-209-0918,I-45 Exit 63,Houston,TX,77090,USA
--97.27421136573,28.306352533401,AMBEST Fuel Stop - Stripes 2288 - Refugio,361-526-2251,108 North Alamo Street,Refugio,TX,78377,USA
+-97.27421137,28.30635253,AMBEST Fuel Stop - Stripes 2288 - Refugio,361-526-2251,108 North Alamo Street,Refugio,TX,78377,USA
 -98.4186629,30.084515,AMBEST Fuel Stop - Stripes 2290 - Blanco,830-833-5874,1138 US Hwy 281 South,Blanco,TX,78606,USA
 -99.5287,27.6307,AMBEST Fuel Stop - Stripes 2409 - Laredo,956-718-2088,14118 FM 1472,Laredo,TX,78045,USA
 -97.89473,28.864954,AMBEST Fuel Stop - Stripes 2417 - Karnes City,830-780-2854,1905 S. US Hwy 181,Karnes City,TX,78118,USA
@@ -159,7 +159,7 @@
 -97.30392,31.5815,AMBEST Fuel Stop - Stripes 2448 - Waco,254-848-2726,TX 6 @ CR 185 / 8256 N State Hwy 6,Waco,TX,76712,USA
 -96.2609,29.1803,AMBEST Fuel Stop - Stripes 2450 - El Campo,979-543-7701,US 59 FM 1162 @ TX 71 / 1710 S. Mechanic St.,El Campo,TX,77437,USA
 -97.2794,29.1201,AMBEST Fuel Stop - Stripes 2456 - Cuero,361-275-8200,US Hwy 183 / 4200 N. Esplanade,Cuero,TX,77954,USA
--97.584341783076,27.947361739352,AMBEST Fuel Stop - Stripes 2458 - Odem,361-368-2387,800 Voss Avenue,Odem,TX,78370,USA
+-97.58434178,27.94736174,AMBEST Fuel Stop - Stripes 2458 - Odem,361-368-2387,800 Voss Avenue,Odem,TX,78370,USA
 -98.6741,30.7371,AMBEST Fuel Stop - Stripes 2464 - Llano,325-247-1010,TX 71 @ TX 16 / 200 Hwy 71 E,Llano,TX,78643,USA
 -99.0004,31.6872,AMBEST Fuel Stop - Stripes 2473 - Brownwood,325-646-7209,US 377 @ CR 2376 / 3801 Hwy 377 S,Brownwood,TX,76801,USA
 -98.13984,27.22637,AMBEST Fuel Stop - Stripes 2476 - Falfurrias,361-325-2560,US Hwy 281 @ TX 285 / 112 N. Highway 281,Falfurrias,TX,78335,USA
@@ -176,8 +176,8 @@
 -103.3175,33.257,AMBEST Fuel Stop - Stripes 5060 - Tatum,575-398-2432,US 380 @ NM 206/10 E. Broadway,Tatum,NM,88267,USA
 -96.978,28.7673,AMBEST Fuel Stop - Stripes 5064 -Victoria,361-579-0087,US 59 @ TX185 / 3204 S. Laurent Street,Victoria,TX,77901,USA
 -95.4013,29.9654,AMBEST Fuel Stop - Stripes 5078 - Houston,281-821-0290,I-45 Exit 62,Houston,TX,77073,USA
--97.742241583765,28.429444385692,AMBEST Fuel Stop - Stripes 5092 - Beeville,361-354-5459,1620 FM 351 East,Beeville,TX,78102,USA
--98.025806732476,28.339042458683,AMBEST Fuel Stop - Stripes 5098 - George West,361-449-3766,I-37 Exit 56 @ US Hwy 59,George West,TX,78022,USA
+-97.74224158,28.42944439,AMBEST Fuel Stop - Stripes 5092 - Beeville,361-354-5459,1620 FM 351 East,Beeville,TX,78102,USA
+-98.02580673,28.33904246,AMBEST Fuel Stop - Stripes 5098 - George West,361-449-3766,I-37 Exit 56 @ US Hwy 59,George West,TX,78022,USA
 -97.460666,27.756222,AMBEST Fuel Stop - Stripes 5216 - Corpus Christi,361-814-8206,TX358/601 South Padre Island Dr.,Corpus Christi,TX,78405,USA
 -97.937297,27.956511,AMBEST Fuel Stop - Stripes 7134 - Orange Grove,361-384-2722,104 S. Reynolds,Orange Grove,TX,78372,USA
 -98.1826,26.2043,AMBEST Fuel Stop - Stripes 9101 - Pharr,956-787-8631,US 83 - 809 N. Cage,Pharr,TX,78577,USA
@@ -223,26 +223,26 @@
 -80.58686,40.93847,AMBEST Fuel Stop - Sunoco 7764 Glacier Hill Plaza,330-542-9615,I-76E Exit 235,New Springfield,OH,44443,USA
 -81.65652,29.65509,AMBEST Fuel Stop - Sunoco Co-op 2572 Palatka,386-328-0043,2600 Reid St,Palatka,FL,32177,USA
 -80.63231,27.99815,AMBEST Fuel Stop - Sunoco Co-op 2573 Palm Bay,321-951-3333,1180 Malabar Rd,Palm Bay,FL,32907,USA
--75.39609,39.69746,AMBEST Fuel Stop - Sunoco Co-op 7005 Clara Barton Plaza,856-299-4005,I-95/NJ TPKMP 5.4 Southbound,Penns Grove,NJ,08069,USA
--75.39563,39.69625,AMBEST Fuel Stop - Sunoco Co-op 7006 John Fenwick Plaza,856-299-4004,I-95/NJ TPKMP 5.4 Northbound,Penns Grove,NJ,08069,USA
--75.00199,39.88577,AMBEST Fuel Stop - Sunoco Co-op 7007 Walt Whitman Plaza,856-428-1250,I-95/NJ TPKMP 30.2 Southbound,Cherry Hill,NJ,08002,USA
--74.88814,39.98174,AMBEST Fuel Stop - Sunoco Co-op 7008 James F Cooper Plaza,856-234-5222,I-95/NJ TPKMP 39.4 Northbound,Mount Laurel,NJ,08054,USA
--74.63056,40.17777,AMBEST Fuel Stop - Sunoco Co-op 7009 Rich Stockton Plaza,609-585-5414,I-95/NJ TPKMP 58.7 Southbound,Hamilton,NJ,08620,USA
--74.62932,40.17647,AMBEST Fuel Stop - Sunoco Co-op 7010 Woodrow Wilson Plaza,609-585-5750,I-95/NJ TPKMP 58.7 Northbound,Hamilton,NJ,08620,USA
--74.48287,40.33054,AMBEST Fuel Stop - Sunoco Co-op 7011 Molly Pitcher Plaza,609-395-1947,I-95/NJ TPKMP 71.7 Southbound,Cranbury,NJ,08512,USA
--74.44409,40.41815,AMBEST Fuel Stop - Sunoco Co-op 7012 Joyce Kilmer Plaza,732-257-6103,I-95/NJ TPKMP 78.7 Northbound,E. Brunswick,NJ,08816,USA
--74.26493,40.55881,AMBEST Fuel Stop - Sunoco Co-op 7013 Thomas Edison Plaza,732-636-0580,I-95/NJ TPKMP 92.9 Southbound,Woodbridge,NJ,07095,USA
--74.26324,40.55847,AMBEST Fuel Stop - Sunoco Co-op 7014 Grover Cleveland Plaza,732-636-1298,I-95/NJ TPKMP 92.9 Northbound,Woodbridge,NJ,07095,USA
--74.11946,40.75396,AMBEST Fuel Stop - Sunoco Co-op 7016 Alex Hamilton Plaza,201-348-0656,I-95/NJ TPKMP 111.6 Southbound,Secaucus,NJ,07094,USA
--74.02572,40.82893,AMBEST Fuel Stop - Sunoco Co-op 7017 Vince Lombardi Plaza,201-945-5112,I-95/NJ TPKMP 116E 115.5W,Ridgefield,NJ,07657,USA
+-75.39609,39.69746,AMBEST Fuel Stop - Sunoco Co-op 7005 Clara Barton Plaza,856-299-4005,I-95/NJ TPKMP 5.4 Southbound,Penns Grove,NJ,8069,USA
+-75.39563,39.69625,AMBEST Fuel Stop - Sunoco Co-op 7006 John Fenwick Plaza,856-299-4004,I-95/NJ TPKMP 5.4 Northbound,Penns Grove,NJ,8069,USA
+-75.00199,39.88577,AMBEST Fuel Stop - Sunoco Co-op 7007 Walt Whitman Plaza,856-428-1250,I-95/NJ TPKMP 30.2 Southbound,Cherry Hill,NJ,8002,USA
+-74.88814,39.98174,AMBEST Fuel Stop - Sunoco Co-op 7008 James F Cooper Plaza,856-234-5222,I-95/NJ TPKMP 39.4 Northbound,Mount Laurel,NJ,8054,USA
+-74.63056,40.17777,AMBEST Fuel Stop - Sunoco Co-op 7009 Rich Stockton Plaza,609-585-5414,I-95/NJ TPKMP 58.7 Southbound,Hamilton,NJ,8620,USA
+-74.62932,40.17647,AMBEST Fuel Stop - Sunoco Co-op 7010 Woodrow Wilson Plaza,609-585-5750,I-95/NJ TPKMP 58.7 Northbound,Hamilton,NJ,8620,USA
+-74.48287,40.33054,AMBEST Fuel Stop - Sunoco Co-op 7011 Molly Pitcher Plaza,609-395-1947,I-95/NJ TPKMP 71.7 Southbound,Cranbury,NJ,8512,USA
+-74.44409,40.41815,AMBEST Fuel Stop - Sunoco Co-op 7012 Joyce Kilmer Plaza,732-257-6103,I-95/NJ TPKMP 78.7 Northbound,E. Brunswick,NJ,8816,USA
+-74.26493,40.55881,AMBEST Fuel Stop - Sunoco Co-op 7013 Thomas Edison Plaza,732-636-0580,I-95/NJ TPKMP 92.9 Southbound,Woodbridge,NJ,7095,USA
+-74.26324,40.55847,AMBEST Fuel Stop - Sunoco Co-op 7014 Grover Cleveland Plaza,732-636-1298,I-95/NJ TPKMP 92.9 Northbound,Woodbridge,NJ,7095,USA
+-74.11946,40.75396,AMBEST Fuel Stop - Sunoco Co-op 7016 Alex Hamilton Plaza,201-348-0656,I-95/NJ TPKMP 111.6 Southbound,Secaucus,NJ,7094,USA
+-74.02572,40.82893,AMBEST Fuel Stop - Sunoco Co-op 7017 Vince Lombardi Plaza,201-945-5112,I-95/NJ TPKMP 116E 115.5W,Ridgefield,NJ,7657,USA
 -78.49227,40.03065,AMBEST Fuel Stop - Sunoco Co-op 7079 North Midway Plaza,814-623-6203,I-76 WB MM150,Bedford,PA,15522,USA
 -76.01518,40.20221,AMBEST Fuel Stop - Sunoco Co-op 7092 Bowmansville Plaza,717-445-9791,I-76E MM 290,Bowmansville,PA,17507,USA
 -75.440141,40.083063,AMBEST Fuel Stop - Sunoco Co-op 7094 Valley Forge Plaza,610-687-9964,I-76 at MM 380,Wayne,PA,19087,USA
--73.9966,40.84159,AMBEST Fuel Stop - Sunoco Co-op 7123 Palisades Park,201-945-9640,US 46 & US1/Route 46E & Abbott Avenue,Palisades Park,NJ,07650,USA
+-73.9966,40.84159,AMBEST Fuel Stop - Sunoco Co-op 7123 Palisades Park,201-945-9640,US 46 & US1/Route 46E & Abbott Avenue,Palisades Park,NJ,7650,USA
 -76.81226,41.237104,AMBEST Fuel Stop - Sunoco Co-op 7263 Muncy,570-940-0140,I-180 Exit 15 at US 220,Muncy,PA,17756,USA
 -77.477039,40.060681,AMBEST Fuel Stop - Sunoco Co-op 7577 Shippensburg,717-532-7788,I-81 Exit 29 (PA 174E),Shippensburg,PA,17257,USA
 -75.690264,39.662904,AMBEST Fuel Stop - Sunoco Co-op 7687 Newark - DE Plaza,302-266-0230,I-95 MM2,Newark DE,DE,19702,USA
--74.458988,40.371474,AMBEST Fuel Stop - Sunoco Co-op 7704 Jamesburg,732-521-5387,I-95/NJ TPK Exit 8A,Jamesburg,NJ,08831,USA
+-74.458988,40.371474,AMBEST Fuel Stop - Sunoco Co-op 7704 Jamesburg,732-521-5387,I-95/NJ TPK Exit 8A,Jamesburg,NJ,8831,USA
 -95.911513,41.550795,AMBEST Fuel Stop - Taylor Quik-Pik,712-642-4305,I-29 Exit 75 at US Hwy 30,Missouri Valley,IA,51555,USA
 -100.802471,36.373074,AMBEST Fuel Stop - Toot N Totum 100 - Perryton,806-434-1831,2401 S Main St,Perryton,TX,79070,USA
 -102.5074,36.05588,AMBEST Fuel Stop - Toot n Totum 104,806-244-6496,1107 US Hwy 87,Dalhart,TX,79022,USA
@@ -279,7 +279,7 @@
 -75.747906,41.062331,AMBEST TC - Hickory Run Travel Plaza,570-443-4437,I-80 Exit 274 at State Rt. 534,White Haven,PA,18661,USA
 -94.22763,35.5397,AMBEST TC - Hilltop Travel Center,479-632-1356,I-540 North Exit 24 at Hwy. 282,Alma,AR,72921,USA
 -95.59128,30.73791,AMBEST TC - Hitchin' Post Truck Terminal,936-295-2488,I-45 Exit 118,Huntsville,TX,77320,USA
--70.74811,43.09922,AMBEST TC - Irving Kittery,207-451-9780,I-95 Exit 2 Rt. 1 & I-236,Kittery,ME,03904,USA
+-70.74811,43.09922,AMBEST TC - Irving Kittery,207-451-9780,I-95 Exit 2 Rt. 1 & I-236,Kittery,ME,3904,USA
 -86.86285,34.11671,AMBEST TC - Jacks Truck Stop,256-739-0220,I-65 Exit 304 at Hwy. 69 North,Cullman,AL,35055,USA
 -78.75973,42.90773,AMBEST TC - Jim's Truck Plaza,716-683-9931,I-90 Exit 52E,Buffalo,NY,14225,USA
 -92.725903,34.481392,AMBEST TC - JJs Truck Stop,501-778-2295,I-30 Exit 106,Benton,AR,72105,USA
@@ -289,7 +289,7 @@
 -93.9756188,45.3667339,AMBEST TC - Olsons Truck Stop,763-878-1655,I-94 Exit 183,Hasty/Clearwater,MN,55320,USA
 -101.09127,30.69899,AMBEST TC - Ozona Express,325-392-2637,I-10 Exit 372,Ozona,TX,76943,USA
 -111.838662,39.678266,AMBEST TC - Park N Pump Circle C,435-623-2085,I-15 Exit 222,Nephi,UT,84648,USA
--72.54494,42.16638,AMBEST TC - Pride Travel Center I-90,413-592-6190,I-90/Mass Pike Exit 6,Chicopee,MA,01020,USA
+-72.54494,42.16638,AMBEST TC - Pride Travel Center I-90,413-592-6190,I-90/Mass Pike Exit 6,Chicopee,MA,1020,USA
 -101.83529,33.54918,AMBEST TC - Rip Griffin Travel Centers,806-747-2505,I-27 at 50th Street/Ave A,Lubbock,TX,79404,USA
 -112.25623,41.71952,AMBEST TC - RJ's Fuel Stop,435-257-3530,I-84/I-15 Exit 40 at West Main,Tremonton,UT,84337,USA
 -103.1036,35.1754,AMBEST TC - Russell's Endee Truck & Travel Center,575-576-8700,I-40 Exit 369,Glenrio,NM,88434,USA
@@ -431,7 +431,7 @@
 -98.338396,49.974994,Flying J; #0803; 40 Truck Parking Spots,(204) 857-9997,32120 Hwy #1 East,Portage La Prairie,MB,R1N 3B2,CAN
 -97.229308,49.942178,Flying J; #0804; 20 Truck Parking Spots,(204 ) 633-0663,1747 Brookside Blvd.,Winnipeg,MB,R2C 2E8,CAN
 -75.806,39.637,Flying J; #0875; 230 Truck Parking Spots,(410) 398-0287,I-95 Exit 109A; 221 Belle Hill Rd,Elkton,MD,21921,USA
--75.95,39.625556,Flying J; RV Lanes/RV Dump/Propane; #0784; 200 Truck Parking Spots/RV Parking,(410) 287-7110,I-95 Exit 100; One Center Dr,North East,MD,21901,USA
+-75.949189,39.625393,Flying J; RV Lanes/RV Dump/Propane; #0784; 200 Truck Parking Spots/RV Parking,(410) 287-7110,I-95 Exit 100; One Center Dr,North East,MD,21901,USA
 -84.678808,42.78689,Flying J; RV Lanes/RV Dump/Propane; #0667; 265 Truck Parking Spots/RV Parking,(517) 627-7504,I-96 Exit 90/I-69 Exit 81; 7800 West Grand River Ave,Grand Ledge,MI,48837,USA
 -83.8944,43.45139,Flying J; RV Lanes/RV Dump/Propane; #0668; 50 Truck Parking Spots/RV Parking,(989) 752-6350,I-75 Exit 151; 3475 East Washington,Saginaw,MI,48601,USA
 -83.239258,42.135722,Flying J; RV Lanes; #0895; 225 Truck Parking Spots,(734) 675-0222,I-75 Exit 32A; 21055 West Rd,Woodhaven,MI,48183,USA
@@ -462,7 +462,7 @@
 -102.0704372,41.05216935,Flying J; Propane; #0904; 500 Truck Parking Spots,(308) 889-3686,I-80 Exit 107; 109 Circle Rd,Big Springs,NE,69122,USA
 -96.253416,41.092828,Flying J; RV Lanes/RV Dump/Propane; #0686; 150 Truck Parking Spots/RV Parking,(402) 332-4483,I-80 Exit 432; 15010 South Hwy 31,Gretna,NE,68028,USA
 -100.727,41.10167,Flying J; RV Lanes/RV Dump/Propane; #0687; 123 Truck Parking Spots/RV Parking,(308) 532-4555,I-80 Exit 179; 3400 South Newberry Rd,North Platte,NE,69101,USA
--75.485,39.68417,Flying J; RV Lanes/RV Dump/Propane; #0688; 360 Truck Parking Spots/RV Parking,(856) 351-0080,I-295 Exit 2C; 326 Slapes Corner,Carney's Point,NJ,08069,USA
+-75.485,39.68417,Flying J; RV Lanes/RV Dump/Propane; #0688; 360 Truck Parking Spots/RV Parking,(856) 351-0080,I-295 Exit 2C; 326 Slapes Corner,Carney's Point,NJ,8069,USA
 -106.74631,35.080049,Flying J; RV Lanes/RV Dump/Propane; #0689; 165 Truck Parking Spots/RV Parking,(505) 831-2001,I-40 Exit 153; 9911 Avalon Rd NW,Albuquerque,NM,87105,USA
 -108.6774057,32.34142109,Flying J; RV Lanes/RV Dump/Propane; #0690; 285 Truck Parking Spots/RV Parking,(505) 542-3320,I-10 Exit 24; 11 Old Hwy 70,Lordsburg,NM,88045,USA
 -103.7037357,35.15901915,Flying J; RV Lanes/RV Dump/Propane; #0691; 136 Truck Parking Spots/RV Parking,(575) 461-6590,I-40 Exit 333; 2021 South Mountain Rd,Tucumcari,NM,88401,USA
@@ -769,7 +769,7 @@
 -102.949834,41.109473,Love's; RV Dump; #0625; 90 Truck Parking Spots,(308) 254-4832,I-80 Exit 59; 645 Chase Dr.,Sidney,NE,69162,USA
 -96.178763,40.673531,Love's; RV Dump; #0676; 68 Truck Parking Spots,(402) 269-2194,188 N 30 Rd,Syracuse,NE,68446,USA
 -96.323438,41.312564,Love's; RV Dump; #0631; 70 Truck Parking Spots,(402) 359-2399,Hwy 275 Exit 64; 26120 E Meigs St,Valley,NE,68064,USA
--74.707648,40.119963,Love's; #0404; 100 Truck Parking Spots,(609) 324-1005,I-295 Exit 57; 2008 US 206,Bordentown,NJ,08505,USA
+-74.707648,40.119963,Love's; #0404; 100 Truck Parking Spots,(609) 324-1005,I-295 Exit 57; 2008 US 206,Bordentown,NJ,8505,USA
 -106.785837,35.064039,Love's; RV Dump; #0614; 70 Truck Parking Spots,(505) 831-5533,I-40 Exit 149; 12605 Central Ave NW,Albuquerque,NM,87121,USA
 -106.649523,35.107718,Love's; RV Lanes/Propane; #0210; 10 Truck Parking Spots,(505) 842-6514,I-40 Exit 158; 2200 6th N.W.,Albuquerque,NM,87102,USA
 -103.179966,36.444994,Love's; RV Dump; #0022 20 Truck Parking Spots,(575) 374-9548,Hwy 87; 703 South 1st,Clayton,NM,88415,USA
@@ -1131,8 +1131,8 @@
 -122.382875,41.39532,Pilot Travel Center; RV Lanes/RV Dump/Propane; #0137; 80 Truck Parking Spots,(530) 938-9600,I-5 Exit 745; 395 e Vista Dr,Weed,CA,96094,USA
 -104.949799,39.780349,Pilot Travel Center; #0316; 100 Truck Parking Spots,(303) 292-6303,I-70 Exit 276A; 4640 Steele St,Denver,CO,80216,USA
 -108.648641,39.11307,Pilot Travel Center; RV Lanes; #0592; 69 Truck Parking Spots,(970) 245-1495,I-70 Exit 26; 2195 Hwy 6/50,Grand Junction,CO,81505,USA
--73.024429,41.236887,Pilot Travel Center; #0255; 150 Truck Parking Spots,(203) 876-1266,I-95 Exit 40; 433 Old Gate Rd,Milford,CT,06460,USA
--71.800071,41.441448,Pilot Travel Center; #0882; 120 Truck Parking Spots,(860) 599-2020,I-95 Exit 93; 273 Clarks Falls Rd,North Stonington,CT,06359,USA
+-73.024429,41.236887,Pilot Travel Center; #0255; 150 Truck Parking Spots,(203) 876-1266,I-95 Exit 40; 433 Old Gate Rd,Milford,CT,6460,USA
+-71.800071,41.441448,Pilot Travel Center; #0882; 120 Truck Parking Spots,(860) 599-2020,I-95 Exit 93; 273 Clarks Falls Rd,North Stonington,CT,6359,USA
 -81.983546,30.283593,Pilot Travel Center; #0087; 50 Truck Parking Spots,(904) 266-4238,I-10 Exit 343; 1050 US 301 South,Baldwin,FL,32234,USA
 -80.793033,28.3597,Pilot Travel Center; #0088; 25 Truck Parking Spots,(321) 639-0346,I-95 Exit 201; 4455 King St,Cocoa,FL,32926,USA
 -82.513041,27.5269,Pilot Travel Center; #0089; 10 Truck Parking Spots,(941) 729-6288,I-75 Exit 224; 1526 51st Ave East,Ellenton,FL,34222,USA
@@ -1275,7 +1275,7 @@
 -90.45497,30.083187,Pilot Travel Center; #0082; 150 Truck Parking Spots,(985) 652-0531,I-10/55 Exit 209; 4301 South Main St,LaPlace,LA,70068,USA
 -91.7597,32.459933,Pilot Travel Center; #0335; 85 Truck Parking Spots,(318) 728-4100,I-20 Exit 138; 103 Grimshaw St,Rayville,LA,71269,USA
 -92.191999,32.508099,Pilot Travel Center; RV Dump; #0428; 100 Truck Parking Spots,(318) 329-3590,I-20 Exit 112; 300 Well Rd,West Monroe,LA,71292,USA
--72.1141,42.0609,Pilot Travel Center; #0222; 250 Truck Parking Spots,(508) 347-9104,I-84 Exit 1; 400 Rte 15,Sturbridge,MA,01566,USA
+-72.1141,42.0609,Pilot Travel Center; #0222; 250 Truck Parking Spots,(508) 347-9104,I-84 Exit 1; 400 Rte 15,Sturbridge,MA,1566,USA
 -79.100307,39.693059,Pilot Travel Center; #0408; 65 Truck Parking Spots,(301) 895-4536,I-68 Exit 22; 3000 Chestnut Ridge Rd,Grantsville,MD,21536,USA
 -77.808185,39.633217,Pilot Travel Center; #0150; 90 Truck Parking Spots,(301) 582-9004,I-70 & US 63; 11633 Greencastle Pike,Hagerstown,MD,21740,USA
 -77.779553,39.628765,Pilot Travel Center; #0179; 111 Truck Parking Spots,(301) 582-6111,I-81 Exit 5B; 16921 Halfway Blvd,Hagerstown,MD,21740,USA
@@ -1325,13 +1325,13 @@
 -103.785086,48.134726,Pilot Travel Center; Propane; #0589; 75 Truck Parking Spots,(701) 875-2500,13553 Hwy 2,Williston,ND,58801,USA
 -99.38,40.692,Pilot Travel Center; #0901; 75 Truck Parking Spots,(308) 856-4330,I-80 Exit 257; 5085 Buffalo Creek Rd,Elm Creek,NE,68836,USA
 -98.588,40.76,Pilot Travel Center; #0912; 65 Truck Parking Spots,(308) 583-2493,I-80 Exit 300; 11775 S Hwy 11,Wood River,NE,68883,USA
--71.480164,43.121975,Pilot Travel Center; #0896; 62 Truck Parking Spots,(603) 223-6885,I-93 Exit 11/12C; 728 Rte 3A,Bow,NH,03304,USA
--75.071901,40.659299,Pilot Travel Center; #0280; 30 Truck Parking Spots,(908) 479-6443,I-78 Exit 7; 979 Rte 173,Bloomsbury,NJ,08804,USA
--75.478201,39.681501,Pilot Travel Center; #0253; 25 Parking Spots,(856) 299-5700,I-295 Exit 2B NJT; 600 Pennsville-Auburn Rd,Carneys Point,NJ,08069,USA
--74.981476,40.638718,Pilot Travel Center; #0190; 95 Truck Parking Spots,(908) 735-7711,I-78 Exit 12 (westbound only); 66 Rte 173 West,Hampton,NJ,08827,USA
--74.155197,41.092499,Pilot Travel Center; #0210; 8 Truck Parking Spots,(201) 529-2704,I-287 Exit 64; 230 Rte 17 South,Mahwah,NJ,07430,USA
--74.686389,41.349728,Pilot Travel Center; #0880; 4 Parking Spots,(973) 293-3477,I-84 Exit 1; 15 Rte 23,Montague,NJ,07827,USA
--74.686,40.892,Pilot Travel Center; #0891; 10 Truck Parking Spots,(973) 347-8770,I-80 Exit 27; 1470 Rte 46 E,Roxbury,NJ,07852,USA
+-71.480164,43.121975,Pilot Travel Center; #0896; 62 Truck Parking Spots,(603) 223-6885,I-93 Exit 11/12C; 728 Rte 3A,Bow,NH,3304,USA
+-75.071901,40.659299,Pilot Travel Center; #0280; 30 Truck Parking Spots,(908) 479-6443,I-78 Exit 7; 979 Rte 173,Bloomsbury,NJ,8804,USA
+-75.478201,39.681501,Pilot Travel Center; #0253; 25 Parking Spots,(856) 299-5700,I-295 Exit 2B NJT; 600 Pennsville-Auburn Rd,Carneys Point,NJ,8069,USA
+-74.981476,40.638718,Pilot Travel Center; #0190; 95 Truck Parking Spots,(908) 735-7711,I-78 Exit 12 (westbound only); 66 Rte 173 West,Hampton,NJ,8827,USA
+-74.155197,41.092499,Pilot Travel Center; #0210; 8 Truck Parking Spots,(201) 529-2704,I-287 Exit 64; 230 Rte 17 South,Mahwah,NJ,7430,USA
+-74.686389,41.349728,Pilot Travel Center; #0880; 4 Parking Spots,(973) 293-3477,I-84 Exit 1; 15 Rte 23,Montague,NJ,7827,USA
+-74.686,40.892,Pilot Travel Center; #0891; 10 Truck Parking Spots,(973) 347-8770,I-80 Exit 27; 1470 Rte 46 E,Roxbury,NJ,7852,USA
 -104.215,32.388,Pilot Travel Center; #0490; 155 Truck Parking Spots,(575) 887-7033,3202 S Canal St,Carlsbad,NM,88221,USA
 -103.181,32.697,Pilot Travel Center; #0557; 97 Truck Parking Spots,(575) 391-0120,3710 W Carlsbad Hwy,Hobbs,NM,88240,USA
 -108.4366,35.4812,Pilot Travel Center; RV Lanes; #0305; 450 Truck Parking Spots,(505) 722-6655,I-40 Exit 39; 1 Giant Crossing,Jamestown,NM,87347,USA
