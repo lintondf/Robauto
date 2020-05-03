@@ -465,7 +465,7 @@ public class TravelMode extends JPanel {
 		map = new com.bluelightning.Map();
 		mapViewer = map.getMapViewer();
 		activePanel.getMapPanel().add(mapViewer, BorderLayout.CENTER);
-		activePanel.getNextTextPane().setText("Hello");
+		activePanel.getNextTextPane().setText("Loading...");
 
 		// try {
 		// Image image = ImageIO.read(new File("images/compass.jpg"));
