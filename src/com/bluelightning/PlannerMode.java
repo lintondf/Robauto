@@ -408,7 +408,7 @@ public class PlannerMode extends JPanel {
 			StringBuilder sb = new StringBuilder();
 			for (POIResult result : near ) {
 				AtlasObscura ao = (AtlasObscura) result.poi;
-				sb.append(ao.toHtml());
+				sb.append(ao.toHtml(result.distance));
 			}
 			RobautoMain.tripPlan.setObscuraHtml(sb.toString());
 

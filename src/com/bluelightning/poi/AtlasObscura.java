@@ -55,12 +55,14 @@ public class AtlasObscura extends POIBase {
 		this.href = fields[7].trim();
 	}
 
-	public String toHtml() {
+	public String toHtml(double distance) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<H2>"); sb.append(name); sb.append("</H2>");
 		sb.append("<P>");
 		sb.append(String.format("<A TARGET='_blank' HREF='https://www.atlasobscura.com/%s'>%s</A>", href, subtitle));
+		sb.append(String.format(" %.1f miles", distance/1600.0));
 		sb.append("</P>");
+
 		sb.append("<P>");
 		String placeLink = String.format("<A TARGET='_blank' HREF='https://www.google.com/maps/@%.7f,%.7f,16.29z/data=!5m1!1e1'>%s, %s</A>", latitude, longitude, city, state );
 		sb.append(placeLink);

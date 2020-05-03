@@ -129,17 +129,18 @@ public class POISet extends ArrayList<POI> {
 				result.leg = leg;
 				result.legProgress = leg.getProgress(result);
 				result.totalProgress = legStart.plus(result.legProgress);
-//				POIResult last = neighbors.get(maneuver);
-//				if (last != null) {
-//					if (last.distance < result.distance) {
-//						last.maneuver = maneuver;
-//						neighbors.replace(poi, last);
-//					} else {
-//						neighbors.replace(poi, result);
-//					}
-//					continue;
-//				}
-				neighbors.put(poi, result);
+				if (poi instanceof AtlasObscura) { //TODO why not for all? 5/3/20
+					POIResult last = neighbors.get(poi);
+					if (last != null) {
+						if (last.distance > result.distance) {
+							neighbors.replace(poi, result);
+						}
+					} else {
+						neighbors.put(poi, result);						
+					}
+				} else {
+					neighbors.put(poi, result);
+				}
 				RobautoMain.logger.debug(poi.toString());
 			}
 		}
