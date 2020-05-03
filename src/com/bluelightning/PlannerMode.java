@@ -436,7 +436,7 @@ public class PlannerMode extends JPanel {
 			System.out.println(where);
 			// Create a file chooser
 			final JFileChooser fileChooser = new JFileChooser(where);
-			fileChooser.setFileFilter(new FileFilter() {
+			fileChooser.addChoosableFileFilter(new FileFilter() {
 				@Override
 				public boolean accept(File f) {
 					if (f.isDirectory())
@@ -452,6 +452,54 @@ public class PlannerMode extends JPanel {
 				@Override
 				public String getDescription() {
 					return "Robauto TripPlans and BaseCamp routes";
+				}
+			});
+			fileChooser.addChoosableFileFilter(new FileFilter() {
+				@Override
+				public boolean accept(File f) {
+					if (f.isDirectory())
+						return true;
+					String name = f.getName().toLowerCase();
+					if (name.endsWith(".robauto"))
+						return true;
+					return false;
+				}
+
+				@Override
+				public String getDescription() {
+					return "Robauto TripPlans";
+				}
+			});
+			fileChooser.addChoosableFileFilter(new FileFilter() {
+				@Override
+				public boolean accept(File f) {
+					if (f.isDirectory())
+						return true;
+					String name = f.getName().toLowerCase();
+					if (name.endsWith(".gpx"))
+						return true;
+					return false;
+				}
+
+				@Override
+				public String getDescription() {
+					return "BaseCamp routes";
+				}
+			});
+			fileChooser.addChoosableFileFilter(new FileFilter() {
+				@Override
+				public boolean accept(File f) {
+					if (f.isDirectory())
+						return true;
+					String name = f.getName().toLowerCase();
+					if (name.endsWith(".dayfile"))
+						return true;
+					return false;
+				}
+
+				@Override
+				public String getDescription() {
+					return "Robauto TripPlans Day by Day Lists";
 				}
 			});
 			// In response to a button click:
