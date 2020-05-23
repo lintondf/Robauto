@@ -288,14 +288,17 @@ public class TravelMode extends JPanel {
 //		gps.initialize(frame, isSurface);
 	}
 	
+	static int cycle = 0;
+	
 	@SuppressWarnings("deprecation")
 	public void rotateMapView(Fix fix, UpcomingStop nextStop) {
+		cycle++;
 		if (nextStop !=null && waypoints != null && !waypoints.isEmpty() &&
-				(fix.date.getSeconds() % 10) == 0) {
+				(cycle % 10) == 0) {
 			Set<GeoPosition> positions = new HashSet<GeoPosition>();
 			positions.add(new GeoPosition(fix.getLatitude(), fix.getLongitude()));
-			int n = waypoints.size()-1;
-			if ((fix.date.getSeconds() % 20) == 0) {
+			int n = waypoints.size()-1; // default to show from here to end
+			if ((cycle % 20) == 0) { // every 20 seconds zoom to here to next stop
 				String match = nextStop.name.toLowerCase();
 				for (n = 0; n < waypoints.size()-1; n++) {
 					//System.out.println(n + ": " + match + " / " + waypoints.get(n).getName().toLowerCase());
