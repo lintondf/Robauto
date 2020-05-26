@@ -24,8 +24,8 @@ import com.x5.template.Theme;
 
 public class Report implements Serializable {
 
-	public static double MPG = 7.0;
-	public static double FUEL_CAPACITY = 80.0;
+	public static double MPG = Configuration.getSingleton().milesPerGallon;
+	public static double FUEL_CAPACITY = Configuration.getSingleton().fuelInGallons;
 
 	/**
 	 * 

@@ -23,9 +23,9 @@ import seedu.addressbook.logic.Logic;
  */
 public class OptimizeStops {
 
-	protected double minDrive = 45.0 * 60.0; // [s]
-	protected double maxDrive = 100.0 * 60.0; // [s]
-	protected double driveFuzz = 15.0 * 60.0;
+	protected double minDrive = Configuration.getSingleton().minimumDriveMinutes * 60.0; // [s]
+	protected double maxDrive = Configuration.getSingleton().maximumDriveMinutes * 60.0; // [s]
+	protected double driveFuzz = Configuration.getSingleton().driveMinutesFuzz * 60.0;
 	protected double nDrivers = 2;
 
 	protected Route route;
@@ -77,7 +77,7 @@ public class OptimizeStops {
 
 	public static double scoreTime( double time ) {
 		//https://en.wikipedia.org/wiki/Logistic_function
-		final double MIN_TIME = 45;
+		final double MIN_TIME = 45; //TODO? vs config values
 		final double MAX_TIME = 120;
 		final double L = 1000;
 		final double k = 0.5;

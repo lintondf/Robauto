@@ -1,5 +1,6 @@
 package com.bluelightning;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -69,8 +70,8 @@ public class GPS {
 		}
 
 		public String toString() {
-			return String.format("%s, %12.8f, %12.8f, %5.0f, %6.1f %6.1f", date.toString(), latitude, longitude, heading,
-					Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR * speed, Here2.METERS_TO_MILES * movement);
+			return String.format("%s, %12.8f, %12.8f, %5.0f, %6.2f %6.2f", date.toString(), latitude, longitude, heading,
+					Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR * speed, movement);
 		}
 
 		@SuppressWarnings("deprecation")
@@ -161,7 +162,8 @@ public class GPS {
 			double dt = 1e-3 * (double) (fix.date.getTime() - lastFix.date.getTime());
 			if (dt > 0.0 && Double.isFinite(curve.getEllipsoidalDistance())) {
 				double movement = curve.getEllipsoidalDistance();
-				double speed = fix.movement / dt;
+				double speed = movement / dt;
+				//System.out.println(fix.toString() + " : " + movement + ", " + speed);
 				if (speed < 120.0 / Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR) {
 					fix.movement = movement;
 					fix.speed = speed;
@@ -309,8 +311,8 @@ public class GPS {
 				while (!Thread.interrupted()) {
 					try {
 						GPS.Fix nextFix = (GPS.Fix) ois.readObject();
-						if (nextFix.getLatitude() == lastLat && nextFix.getLongitude() == lastLon)
-							continue;
+//						if (nextFix.getLatitude() == lastLat && nextFix.getLongitude() == lastLon)
+//							continue;
 						lastLat = nextFix.getLatitude();
 						lastLon = nextFix.getLongitude();
 						long msRemaining = nextFix.date.getTime() - lastFix.date.getTime();
@@ -361,7 +363,7 @@ public class GPS {
 
 	public static void main(String[] args) {
 		// GPS gps = new GPS();
-		File file = new File("pwm-trace.obj");
+		File file = new File("updated-gps.obj"); //"ma2me-gps.obj");
 		ObjectInputStream gpsOis = null;
 		try {
 			FileInputStream fis = new FileInputStream(file);
@@ -371,7 +373,7 @@ public class GPS {
 				GPS.Fix nextFix = (GPS.Fix) gpsOis.readObject();
 				System.out.println(nextFix);
 			}
-
+		} catch (EOFException f) {
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		} finally {

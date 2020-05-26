@@ -1,0 +1,23 @@
+{
+	"milesPerGallon": "7.5",
+	"fuelInGallons": "80.0",
+	"mapCyclesPerMapUpdate": "10",
+	"mapCyclesPerMapRotation": "20",
+	
+	"minimumDriveMinutes": "45.0",
+	"maximumDriveMinutes": "100.0",
+	"driveMinutesFuzz": "15.0",
+	"abbreviations": [
+		{"from": "INFORMATION", "to": "INFO"},
+		{"from": "TOURIST", "to": "VISITOR"},
+		{"from": "REST AREA", "to": "RA"},
+		{"from": "WELCOME CENTER", "to": "WC"},
+		{"from": "VISITOR INFO CENTER", "to": "VIC"},
+		{"from": "SERVICE PLAZA", "to": "SP"},
+		{"from": "NORTH", "to": "N"},
+		{"from": "SOUTH", "to": "S"},
+		{"from": "EAST", "to": "E"},
+		{"from": "WEST", "to": "W"},
+		{"from": "FOLLOW SIGNS", "to": ""}
+	]
+}

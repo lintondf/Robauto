@@ -130,6 +130,14 @@ public class TravelStatus {
 		}
 	}
 	
+	public static String shortenName( String name ) {
+		List<Configuration.Abbreviation> abbreviations = Configuration.getSingleton().abbreviations;
+		for (Configuration.Abbreviation abbreviation : abbreviations) {
+			name = name.replace(abbreviation.from, abbreviation.to);
+		}
+		return name;
+	}
+	
 	protected class UpcomingStop {
 		GeoPosition where;
 		ClosestManeuver closest;
@@ -150,11 +158,7 @@ public class TravelStatus {
 			this.closest = ManeuverMetrics.findCurrentManeuver( this.where );
 //			System.out.printf("%10.7f,%10.7f,%10.7f,%10.7f,%s\n", latitude, longitude, 
 //					closest.closestPoint.y, closest.closestPoint.x, name );
-			this.name = name;
-			this.name = this.name.replace("REST AREA", "RA");
-			this.name = this.name.replace("WELCOME CENTER", "WC");
-			this.name = this.name.replace("TOURIST INFO CENTER", "WC");
-			this.name = this.name.replace("SERVICE PLAZA", "SP");
+			this.name = shortenName(name.toUpperCase());
 			this.markedUpName = this.name;
 			this.hasGas = false;
 			if (! fuelAvailable.equals("None")) {

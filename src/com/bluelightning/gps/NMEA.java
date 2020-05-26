@@ -57,7 +57,7 @@ public class NMEA {
             position.dir = (tokens[8].isEmpty()) ? 0.0f : Float.parseFloat(tokens[8]);
             position.date = Float.parseFloat(tokens[9]);
             position.updatefix();
-            System.out.println(position.toString());
+            //System.out.println(position.toString());
             return true;
         }
     }
@@ -201,8 +201,8 @@ public class NMEA {
     	File playback = new File("nemalog.txt");
     	nemaLog = new File("/dev/null");
     	NMEA nmea = new NMEA();
-    	nmea.logout = System.out;
-		File file = new File("robauto-gps.obj");
+    	nmea.logout = new PrintStream(nemaLog); // System.out;
+		File file = new File("updated-gps.obj");
 		FileOutputStream fos = new FileOutputStream(file);
 		ObjectOutputStream gpsOos = new ObjectOutputStream( fos );
     	
@@ -212,12 +212,14 @@ public class NMEA {
 	    		GpsState state = nmea.getUpdatedStatus(line);
     			try {
     				Fix fix = new Fix(state);
+    				if (state.toDate().before(new Date("Mon May 18 06:08:00 EDT 2020")))
+    					continue;
     				gpsOos.writeObject(fix);
     			} catch (Exception x) {
     				x.printStackTrace();
     			}
 	    		if (state.hasFix) {
-	    			System.out.println( state );
+	    			System.out.println(">" + state );
 	    		}
     		}
     	}

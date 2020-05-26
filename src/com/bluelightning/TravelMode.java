@@ -9,23 +9,57 @@ java.util.ConcurrentModificationException
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
  */
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.LoggerFactory;
@@ -35,76 +69,15 @@ import com.bluelightning.GPS.Fix;
 import com.bluelightning.Report.Drive;
 import com.bluelightning.TravelStatus.UpcomingStop;
 import com.bluelightning.data.TripPlan;
-import com.google.common.eventbus.Subscribe;
-
-import ch.qos.logback.core.joran.spi.NoAutoStart;
-import ch.qos.logback.core.rolling.TriggeringPolicyBase;
-import seedu.addressbook.data.place.Address;
-import seedu.addressbook.data.place.VisitedPlace;
-
-import java.awt.FlowLayout;
-
-import javax.imageio.ImageIO;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import javax.swing.JScrollPane;
-import javax.swing.JList;
-import javax.swing.ListSelectionModel;
-
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import com.bluelightning.gui.FuelPanel;
 import com.bluelightning.gui.TravelActivePanel;
 import com.bluelightning.gui.TravelFileChooser;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
-import com.fazecast.jSerialComm.SerialPort;
+import com.google.common.eventbus.Subscribe;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import seedu.addressbook.data.place.Address;
+import seedu.addressbook.data.place.VisitedPlace;
 
 public class TravelMode extends JPanel {
 
@@ -236,10 +209,12 @@ public class TravelMode extends JPanel {
 				travelStatus.update(event.fix.speed, currentManeuver.metrics.maneuver, ManeuverMetrics.nextManeuverMap.get(currentManeuver.metrics.maneuver));
 			}
 			double dt = 0.001 * (event.fix.date.getTime() - lastTime.getTime());
+			//System.out.println(dt + " " + event.fix.toString() + " " + firstMotion );
 			if (event.fix.speed < 0.1) {
 				if (firstMotion) {
 					timeStopped += dt;
 					travelStatus.stopped(timeStopped);
+					//System.out.println("STOPPED " +dt+" "+travelStatus.toDrivingHtml());
 				}
 			} else {
 				firstMotion = true;
@@ -294,18 +269,21 @@ public class TravelMode extends JPanel {
 	public void rotateMapView(Fix fix, UpcomingStop nextStop) {
 		cycle++;
 		if (nextStop !=null && waypoints != null && !waypoints.isEmpty() &&
-				(cycle % 10) == 0) {
+				(cycle % Configuration.getSingleton().mapCyclesPerMapUpdate) == 0) {
 			Set<GeoPosition> positions = new HashSet<GeoPosition>();
 			positions.add(new GeoPosition(fix.getLatitude(), fix.getLongitude()));
 			int n = waypoints.size()-1; // default to show from here to end
-			if ((cycle % 20) == 0) { // every 20 seconds zoom to here to next stop
+//			System.out.println("rotate " + cycle + " " + n);
+			if ((cycle % Configuration.getSingleton().mapCyclesPerMapRotation) == 0) { // every 20 seconds zoom to here to next stop
 				String match = nextStop.name.toLowerCase();
 				for (n = 0; n < waypoints.size()-1; n++) {
-					//System.out.println(n + ": " + match + " / " + waypoints.get(n).getName().toLowerCase());
-					if (waypoints.get(n).getName().toLowerCase().startsWith(match)) {
+//					System.out.println(n + ": " + match + " / " + waypoints.get(n).getName().toLowerCase());
+					String name = TravelStatus.shortenName(waypoints.get(n).getName().toUpperCase());
+					if (name.toLowerCase().startsWith(match)) {
 						break;
 					}
 				}
+//				System.out.println(n + " " + match + " " + waypoints.get(n).getName());
 			}
 			positions.add(waypoints.get(n).getPosition());
 			SwingUtilities.invokeLater(new Runnable() {
@@ -686,6 +664,7 @@ public class TravelMode extends JPanel {
 	public static void main(String[] args) {
 		// configured via resources/logback.xml
 		RobautoMain.logger = LoggerFactory.getLogger("com.bluelightning.RobautoTravel");
+		
 		java.net.InetAddress localMachine = null;
 		try {
 			localMachine = java.net.InetAddress.getLocalHost();
