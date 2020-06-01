@@ -926,10 +926,10 @@ public class PlannerMode extends JPanel {
 		basePath = basePath.substring(0, basePath.length() - 4); // drop extension
 		BaseCamp baseCamp = null;
 		Garmin garmin = null;
-		if (file.getAbsoluteFile().toString().toLowerCase().endsWith(".gdb")) {
-			System.out.println(System.getProperty("os.name"));
-			String which = "bin/" + System.getProperty("os.name").toLowerCase().substring(0,3) + "/gpsbabel";
-			//./gpsbabel -i gdb -f ~/Google\ Drive/Sturbridge\ \ to\ 7\ Manor\ Ln.GDB -o gpx,garminextensions -F seabrook.gpx
+		if (file.getAbsoluteFile().toString().toLowerCase().endsWith(".gdb")) {  // GDB file
+			String which = (System.getProperty("os.name").toLowerCase().startsWith("mac")) ? 
+					"bin/mac/gpsbabel" :
+					"bin/win/GPSBabel.exe";
 			try {
 				File tmp = File.createTempFile("gpsbabel-out", ".gpx");
 				String[] cmd = {
@@ -943,6 +943,7 @@ public class PlannerMode extends JPanel {
 				file = tmp;
 				garmin = new Garmin(file);
 				ArrayList<BaseCamp.Turn> turns = new ArrayList<>();
+				// build turn list from embedded RTEPT durations and maneuvers
 				double durationSoFar = 0.0;
 				for (Garmin.TrackPoint tp : garmin.days.get(0).trackPoints) {
 					if (tp.maneuver != null) {
