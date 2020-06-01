@@ -43,7 +43,7 @@ public class ButtonWaypoint extends JButton implements Waypoint {
 				name = name.trim();
 			}
 		}
-		System.out.println(userLabel.trim() + " -> " + name);
+		//System.out.println(userLabel.trim() + " => " + name);
 	}
 	
 	public ButtonWaypoint(String label, Icon icon, GeoPosition geoPosition) {

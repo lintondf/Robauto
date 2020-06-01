@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.BaseCamp.Turn;
 import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.StopsCommitEvent;
@@ -442,6 +443,8 @@ public class PlannerMode extends JPanel {
 					if (f.isDirectory())
 						return true;
 					String name = f.getName().toLowerCase();
+					if (name.endsWith(".gdb"))
+						return true;
 					if (name.endsWith(".gpx"))
 						return true;
 					if (name.endsWith(".robauto"))
@@ -451,7 +454,7 @@ public class PlannerMode extends JPanel {
 
 				@Override
 				public String getDescription() {
-					return "Robauto TripPlans and BaseCamp routes";
+					return "Robauto TripPlans and BaseCamp exports and routes";
 				}
 			});
 			fileChooser.addChoosableFileFilter(new FileFilter() {
@@ -468,6 +471,22 @@ public class PlannerMode extends JPanel {
 				@Override
 				public String getDescription() {
 					return "Robauto TripPlans";
+				}
+			});
+			fileChooser.addChoosableFileFilter(new FileFilter() {
+				@Override
+				public boolean accept(File f) {
+					if (f.isDirectory())
+						return true;
+					String name = f.getName().toLowerCase();
+					if (name.endsWith(".gdb"))
+						return true;
+					return false;
+				}
+
+				@Override
+				public String getDescription() {
+					return "BaseCamp exports";
 				}
 			});
 			fileChooser.addChoosableFileFilter(new FileFilter() {
@@ -509,7 +528,7 @@ public class PlannerMode extends JPanel {
 				// This is where a real application would open the file.
 				RobautoMain.logger.trace("Opening: " + file.getName() + ".");
 				if (file.exists() && file.isFile()) {
-					if (file.getName().toUpperCase().endsWith(".GPX")) {
+					if (! file.getName().toLowerCase().endsWith(".robauto")) {
 						tripPlanFile = file;
 						Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteFromBaseCamp", null));
 					} else {
@@ -901,43 +920,78 @@ public class PlannerMode extends JPanel {
 	}
 
 	private File createTripPlanFromBaseCamp(File file) {
-		Garmin garmin = new Garmin(file);
 		RobautoMain.logger.info("Importing Basecamp route...");
 		ArrayList<BaseCamp> days = new ArrayList<>();
 		String basePath = file.getAbsolutePath();
 		basePath = basePath.substring(0, basePath.length() - 4); // drop extension
 		BaseCamp baseCamp = null;
-		if (garmin.days.size() == 1) {
-		    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		    DataFlavor flavor = DataFlavor.stringFlavor;
-		    if (clipboard.isDataFlavorAvailable(flavor)) {
-		    	try {
-		            String text = (String) clipboard.getData(flavor);
-		            ArrayList<String> lines = new ArrayList<>();
-		            String[] array = text.split("\n");
-		            RobautoMain.logger.info("  Loading BaseCamp details from clipboard, lines: " + array.length);
-		            for (int i = 0; i < array.length; i++) {
-			            if (array[i].startsWith("\tDirections")) {
-			            	continue;
+		Garmin garmin = null;
+		if (file.getAbsoluteFile().toString().toLowerCase().endsWith(".gdb")) {
+			System.out.println(System.getProperty("os.name"));
+			String which = "bin/" + System.getProperty("os.name").toLowerCase().substring(0,3) + "/gpsbabel";
+			//./gpsbabel -i gdb -f ~/Google\ Drive/Sturbridge\ \ to\ 7\ Manor\ Ln.GDB -o gpx,garminextensions -F seabrook.gpx
+			try {
+				File tmp = File.createTempFile("gpsbabel-out", ".gpx");
+				String[] cmd = {
+						which,
+						"-i", "gdb",
+						"-f", file.getAbsolutePath(),
+						"-o", "gpx,garminextensions",
+						"-F", tmp.getAbsolutePath()
+				};
+				Execute.run(cmd);
+				file = tmp;
+				garmin = new Garmin(file);
+				ArrayList<BaseCamp.Turn> turns = new ArrayList<>();
+				double durationSoFar = 0.0;
+				for (Garmin.TrackPoint tp : garmin.days.get(0).trackPoints) {
+					if (tp.maneuver != null) {
+						System.out.println( tp.toString() );
+						BaseCamp.Turn turn = new BaseCamp.Turn(tp.maneuver, 
+								tp.distancePriorToHere, tp.duration, tp.distanceStartToHere, durationSoFar);
+						durationSoFar += tp.duration;
+						turns.add(turn);
+					}
+				}
+				
+				baseCamp = new BaseCamp(garmin.days.get(0), turns );
+				days.add(baseCamp);
+			} catch (Exception x) {
+				x.printStackTrace();
+			}
+		} else { // GPX file
+			if (garmin.days.size() == 1) {
+			    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			    DataFlavor flavor = DataFlavor.stringFlavor;
+			    if (clipboard.isDataFlavorAvailable(flavor)) {
+			    	try {
+			            String text = (String) clipboard.getData(flavor);
+			            ArrayList<String> lines = new ArrayList<>();
+			            String[] array = text.split("\n");
+			            RobautoMain.logger.info("  Loading BaseCamp details from clipboard, lines: " + array.length);
+			            for (int i = 0; i < array.length; i++) {
+				            if (array[i].startsWith("\tDirections")) {
+				            	continue;
+				            }
+			            	if (array[i].startsWith("\t")) {
+			            		String prefix = String.format("%d. ", i);
+			            		lines.add(prefix + array[i].substring(1)
+			            				.replaceAll("\t", ",") // Mac BaseCamp sends Tab separated to clipboard
+			            				.replace("\"", "") );  // unquote strings
+			            	} else {
+			            		lines.add(array[i]);
+			            	}
+		            		System.out.println(lines.get(lines.size()-1));
 			            }
-		            	if (array[i].startsWith("\t")) {
-		            		String prefix = String.format("%d. ", i);
-		            		lines.add(prefix + array[i].substring(1)
-		            				.replaceAll("\t", ",")
-		            				.replace("\"", "") ); // Mac BaseCamp sends Tab separated to clipboard
-		            	} else {
-		            		lines.add(array[i]);
-		            	}
-	            		System.out.println(lines.get(lines.size()-1));
-		            }
-		        
-		            baseCamp = new BaseCamp(garmin.days.get(0), lines );
-					days.add(baseCamp);
-		    	} catch (Exception x) {
-		    		x.printStackTrace();
-		    	}
-		    }			
-		} 
+			        
+			            baseCamp = new BaseCamp(garmin.days.get(0), lines );
+						days.add(baseCamp);
+			    	} catch (Exception x) {
+			    		x.printStackTrace();
+			    	}
+			    }			
+			} 
+		}
 		if (baseCamp == null) {
 			for (int i = 0; i < garmin.days.size(); i++) {
 				String path = String.format("%s_Day_%d.csv", basePath, i + 1);

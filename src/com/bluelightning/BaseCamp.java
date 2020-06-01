@@ -306,6 +306,13 @@ public class BaseCamp {
 		initialize("Clipboard");
 	}
 	
+	public BaseCamp(Day day, ArrayList<Turn> turns) {
+		this.day = day;
+		this.turns = turns;
+		RobautoMain.logger.info("BASECAMP: From GDB");
+		initialize("GDB");
+	}
+
 	protected void initialize( String source ) {
 		route = new Route();
 		List<Object> routeShape = new ArrayList<>();

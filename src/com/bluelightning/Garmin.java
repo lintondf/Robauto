@@ -73,23 +73,30 @@ public class Garmin extends JPanel {
 		public double distancePriorToHere;
 		public double distanceStartToHere;
 		public double heading;
+		public double duration; //[s]
+		public String maneuver;
 
-		public TrackPoint(LatLon where) {
+		public TrackPoint(LatLon where, String maneuver) {
 			super(where);
 			this.distanceStartToHere = 0.0;
 			this.distancePriorToHere = 0.0;
 			this.heading = 0.0;
+			this.duration = 0.0;
+			this.maneuver = maneuver;
 		}
 		
 		public String toString() {
-			return String.format("%s; %7.3f km; %5.0f deg; %6.3f km", super.toString(), 0.001*distanceStartToHere, heading, 0.001*this.distancePriorToHere );
+			return String.format("%s; %7.3f km; %5.0f deg; %6.3f km; %4.0f s; %s", 
+					super.toString(), 0.001*distanceStartToHere, heading, 0.001*this.distancePriorToHere, this.duration,
+					(this.maneuver == null) ? "" : this.maneuver);
 		}
 	}
 
 	
 	public static class Day {
-		protected void add(LatLon point) {
-			TrackPoint tp = new TrackPoint(point);
+		protected void add(LatLon point, String description, double duration) {
+			TrackPoint tp = new TrackPoint(point, description);
+			tp.duration = duration;
 			if (track.isEmpty()) {
 				track.add(tp);
 				trackPoints.add(tp);
@@ -248,41 +255,45 @@ public class Garmin extends JPanel {
 							+ rtept.getLon());
 					LatLon where = new LatLon(rtept.getLat().doubleValue(),
 							rtept.getLon().doubleValue());
-					day.add(where);
+					double duration = extractDuration( rtept );
+					day.add(where, (rtept.getName().contentEquals(rtept.getCmt())) ? null : rtept.getDesc(), duration);
 					text = rtept.getCmt();
+					String name = rtept.getName();
 					if (stopMarker == null) {
-						stopMarker = new StopMarker(StopMarker.OVERNIGHT, rtept.getName(), text, where);
+						stopMarker = new StopMarker(StopMarker.OVERNIGHT, name, text, where);
 						addPlace( new VisitedPlace( stopMarker ) );
 					} else {
-						stopMarker = new StopMarker(StopMarker.OVERNIGHT, rtept.getName(), text, where);						
+						stopMarker = new StopMarker(StopMarker.OVERNIGHT, name, text, where);						
 					}
 					
 					ExtensionsType extensions = rtept.getExtensions();
-					List<Object> any = extensions.getAny();
-					for (Object ext : any) {
-						if (ext instanceof JAXBElement) {
-							JAXBElement element = (JAXBElement) ext;
-							switch (element.getName().toString()) {
-							case "{http://www.garmin.com/xmlschemas/GpxExtensions/v3}RoutePointExtension":
-								RoutePointExtensionT rpext = (RoutePointExtensionT) element
-										.getValue();
-								RobautoMain.logger.debug("AutoroutePointT #"
-										+ rpext.getRpt().size());
-								List<AutoroutePointT> points = rpext.getRpt();
-								for (AutoroutePointT point : points) {
-									where = new LatLon(point.getLat()
-											.doubleValue(), point.getLon()
-											.doubleValue());
-									day.add(where);
+					if (extensions != null) {
+						List<Object> any = extensions.getAny();
+						for (Object ext : any) {
+							if (ext instanceof JAXBElement) {
+								JAXBElement element = (JAXBElement) ext;
+								switch (element.getName().toString()) {
+								case "{http://www.garmin.com/xmlschemas/GpxExtensions/v3}RoutePointExtension":
+									RoutePointExtensionT rpext = (RoutePointExtensionT) element
+											.getValue();
+									RobautoMain.logger.debug("AutoroutePointT #"
+											+ rpext.getRpt().size());
+									List<AutoroutePointT> points = rpext.getRpt();
+									for (AutoroutePointT point : points) {
+										where = new LatLon(point.getLat()
+												.doubleValue(), point.getLon()
+												.doubleValue());
+										day.add(where, null, 0.0);
+									}
+									break;
+								default:
+									break;
 								}
-								break;
-							default:
-								break;
+							} else {
+								RobautoMain.logger.debug("UNKNOWN: " + ext);
 							}
-						} else {
-							RobautoMain.logger.debug("UNKNOWN: " + ext);
-						}
-					} // for ext
+						} // for ext
+					}
 				} // for wpt
 				day.waylist.add(stopMarker);
 				addPlace( new VisitedPlace( stopMarker ) );
@@ -293,6 +304,21 @@ public class Garmin extends JPanel {
 
 	}
 	
+	private double extractDuration(WptType rtept) {
+		if (rtept.getSrc() != null) {
+			if (rtept.getSrc().startsWith("AUTOROUTE")) {
+				String[] parameters = rtept.getSrc().substring(10).split(";");
+				for (String parameter : parameters) {
+					String[] fields = parameter.split("=");
+					if (fields.length == 2 && fields[0].contentEquals("duration")) {
+						return Double.parseDouble(fields[1]);
+					}
+				}
+			}
+		}
+		return 0;
+	}
+
 	private void addPlace( VisitedPlace place ) {
 		if (! places.isEmpty()) {
 			if (places.get(places.size()-1).getName().equals(place.getName()))
