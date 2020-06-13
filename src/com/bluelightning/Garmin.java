@@ -16,6 +16,7 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
@@ -104,6 +105,12 @@ public class Garmin extends JPanel {
 				TrackPoint last = (TrackPoint) track.get(track.size() - 1);
 				if (last.getLatitude() == point.getLatitude()
 						&& last.getLongitude() == point.getLongitude()) {
+					if (last.duration == 0.0) {
+						last.duration = tp.duration;
+					}
+					if (last.maneuver == null) {
+						last.maneuver = tp.maneuver;
+					}
 					return;
 				}
 				GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84,
@@ -256,13 +263,13 @@ public class Garmin extends JPanel {
 					LatLon where = new LatLon(rtept.getLat().doubleValue(),
 							rtept.getLon().doubleValue());
 					double duration = extractDuration( rtept );
-					day.add(where, (rtept.getName().contentEquals(rtept.getCmt())) ? null : rtept.getDesc(), duration);
-					text = rtept.getCmt();
+					day.add(where, (rtept.getCmt() == null) ? null : rtept.getCmt(), duration);
+					text = (rtept.getCmt() == null) ? "" : rtept.getCmt();
 					String name = rtept.getName();
 					if (stopMarker == null) {
 						stopMarker = new StopMarker(StopMarker.OVERNIGHT, name, text, where);
-						addPlace( new VisitedPlace( stopMarker ) );
-					} else {
+						addPlace( new VisitedPlace( stopMarker ) ); // add the first
+					} else {  // the last will be added and intermediate discarded
 						stopMarker = new StopMarker(StopMarker.OVERNIGHT, name, text, where);						
 					}
 					
@@ -305,13 +312,16 @@ public class Garmin extends JPanel {
 	}
 	
 	private double extractDuration(WptType rtept) {
-		if (rtept.getSrc() != null) {
-			if (rtept.getSrc().startsWith("AUTOROUTE")) {
-				String[] parameters = rtept.getSrc().substring(10).split(";");
-				for (String parameter : parameters) {
-					String[] fields = parameter.split("=");
-					if (fields.length == 2 && fields[0].contentEquals("duration")) {
-						return Double.parseDouble(fields[1]);
+		if (rtept.getDesc() != null) {
+			if (rtept.getDesc().startsWith("[P")) {
+				String[] durationString = rtept.getDesc().substring(1).split("]");
+				if (durationString.length >= 1) {
+					try {
+						Duration duration = Duration.parse(durationString[0]);
+						//System.out.printf("%s %s %f %s\n", rtept.getName(), durationString[0], 1.0e-3 * (double) duration.toMillis(), rtept.getCmt());
+						return 1.0e-3 * (double) duration.toMillis();
+					} catch (Exception x) {
+						return 0.0;
 					}
 				}
 			}

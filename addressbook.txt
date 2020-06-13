@@ -62,17 +62,17 @@
         <tagged>Gas</tagged>
     </persons>
     <persons>
-        <name>Flying J VA</name>
-        <address>23826 Rogers Clark Blvd, Ruther Glen, VA 22546</address>
-        <latitude>37.9390189</latitude>
-        <longitude>-77.4655422</longitude>
-        <tagged>Fuel</tagged>
-    </persons>
-    <persons>
         <name>Flying J MD</name>
         <address>1 Center Drive, North East, MD 21901</address>
         <latitude>39.625226</latitude>
         <longitude>-75.949345</longitude>
+        <tagged>Fuel</tagged>
+    </persons>
+    <persons>
+        <name>Flying J VA</name>
+        <address>23826 Rogers Clark Blvd, Ruther Glen, VA 22546</address>
+        <latitude>37.9390189</latitude>
+        <longitude>-77.4655422</longitude>
         <tagged>Fuel</tagged>
     </persons>
     <persons>
@@ -155,6 +155,12 @@
         <longitude>-70.31044006347656</longitude>
     </persons>
     <persons>
+        <name>Post Office-Gouldsboro</name>
+        <address></address>
+        <latitude>44.472033978</latitude>
+        <longitude>-68.095214367</longitude>
+    </persons>
+    <persons>
         <name>Presnick</name>
         <address>96 Willard Street, Cocoa, FL</address>
         <latitude>28.35648</latitude>
@@ -184,6 +190,12 @@
         <address>516 Schodack Landing Rd, Shodack Landing, NY</address>
         <latitude>42.4775773</latitude>
         <longitude>-73.7573471</longitude>
+    </persons>
+    <persons>
+        <name>Schoodic Woods Campground</name>
+        <address></address>
+        <latitude>44.380860329</latitude>
+        <longitude>-68.068499565</longitude>
     </persons>
     <persons>
         <name>Shell Point</name>

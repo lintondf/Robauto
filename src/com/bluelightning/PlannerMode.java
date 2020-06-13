@@ -406,6 +406,7 @@ public class PlannerMode extends JPanel {
 			POISet attractions = AtlasObscura.factory();
 			System.out.println( attractions.size() );
 			ArrayList<POIResult> near = attractions.getPointsOfInterestAlongRoute(RobautoMain.tripPlan.getRoute(), 30e3 );
+			RobautoMain.tripPlan.setObscuraPlaces(near);
 			StringBuilder sb = new StringBuilder();
 			for (POIResult result : near ) {
 				AtlasObscura ao = (AtlasObscura) result.poi;
@@ -934,7 +935,7 @@ public class PlannerMode extends JPanel {
 				File tmp = File.createTempFile("gpsbabel-out", ".gpx");
 				String[] cmd = {
 						which,
-						"-i", "gdb",
+						"-i", "gdb,dropwpt",
 						"-f", file.getAbsolutePath(),
 						"-o", "gpx,garminextensions",
 						"-F", tmp.getAbsolutePath()
@@ -945,14 +946,21 @@ public class PlannerMode extends JPanel {
 				ArrayList<BaseCamp.Turn> turns = new ArrayList<>();
 				// build turn list from embedded RTEPT durations and maneuvers
 				double durationSoFar = 0.0;
+				BaseCamp.Turn prior = null;
 				for (Garmin.TrackPoint tp : garmin.days.get(0).trackPoints) {
+					//System.out.println(durationSoFar + " : " + tp.toString());
 					if (tp.maneuver != null) {
-						System.out.println( tp.toString() );
 						BaseCamp.Turn turn = new BaseCamp.Turn(tp.maneuver, 
 								tp.distancePriorToHere, tp.duration, tp.distanceStartToHere, durationSoFar);
-						durationSoFar += tp.duration;
+						if (prior != null) {
+							turn.distance = turn.totalDistance - prior.totalDistance;
+							turn.duration = turn.totalDuration - prior.totalDuration;
+						}
+						prior = turn;
+						System.out.println(turns.size() + ": " + turn.toString() );
 						turns.add(turn);
 					}
+					durationSoFar += tp.duration;
 				}
 				
 				baseCamp = new BaseCamp(garmin.days.get(0), turns );

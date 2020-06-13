@@ -68,7 +68,25 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 	
 	private String obscuraHtml;
 	
+	private ArrayList<POIResult> obscuraPlaces;
 	
+
+	/**
+	 * @return the obscuraPlaces
+	 */
+	public ArrayList<POIResult> getObscuraPlaces() {
+		return obscuraPlaces;
+	}
+
+
+	/**
+	 * @param obscuraPlaces the obscuraPlaces to set
+	 */
+	public void setObscuraPlaces(ArrayList<POIResult> obscuraPlaces) {
+		this.obscuraPlaces = obscuraPlaces;
+	}
+
+
 	public String getObscuraHtml() {
 		return obscuraHtml;
 	}
@@ -517,6 +535,7 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			out.writeObject(finalizedPlaces);
 			out.writeObject(fuelStops);
 			out.writeObject(obscuraHtml);
+			out.writeObject(obscuraPlaces);
 			out.close();
 			String html = getTripReport().toHtml();
 			try {
@@ -577,6 +596,12 @@ public class TripPlan implements Comparable<TripPlan>, Serializable {
 			} catch (Exception x) {
 				RobautoMain.logger.error("Missing obscura html ", x);
 				tripPlan.obscuraHtml = "";
+			}
+			try {
+				tripPlan.obscuraPlaces = (ArrayList<POIResult>) in.readObject();
+			} catch (Exception x) {
+				tripPlan.obscuraPlaces = new ArrayList<POIResult>();
+				RobautoMain.logger.error("Missing Atlas Obscura Places ", x);
 			}
 			in.close();
 

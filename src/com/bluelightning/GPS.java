@@ -297,6 +297,7 @@ public class GPS {
 		debugClear();
 		try {
 			lastFix = (GPS.Fix) ois.readObject();
+			System.out.println("DEBUG First: " + lastFix.toString() );
 		} catch (Exception x) {
 			x.printStackTrace();
 			return;
