@@ -288,7 +288,6 @@ public class TravelStatus {
 				double timeToStop = currentManeuver.distanceToEnd / nowSpeed;
 				double distanceToStop = currentManeuver.distanceToEnd;
 				int iStop = maneuverMetrics.indexOf( upcomingStop.closest.metrics );
-//				System.out.printf("%d,%d,%s\n",iNow, iStop, upcomingStop.name );
 				if (iStop == iNow) {
 					timeToStop -= upcomingStop.closest.distanceToEnd / nowSpeed;
 					distanceToStop -= upcomingStop.closest.distanceToEnd;
@@ -302,8 +301,10 @@ public class TravelStatus {
 					timeToStop += upcomingStop.closest.distanceFromStart / stopSpeed;
 					distanceToStop += upcomingStop.closest.distanceFromStart;
 				}
+//				System.out.printf("%d,%d,%f,%f,%s\n",iNow, iStop, timeToStop, distanceToStop, upcomingStop.name );
 				upcomingStop.update(timeToStop, distanceToStop);
-				if (upcomingStop.distanceRemaining < 0) {
+				if (upcomingStop.distanceRemaining < 0 || 
+					upcomingStop.closest.metrics.ordinal < currentManeuver.metrics.ordinal) { // distance check sometimes fails; failsafe removal if passed
 					it.remove();
 				}
 			}

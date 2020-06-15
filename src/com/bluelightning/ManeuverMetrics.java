@@ -44,6 +44,7 @@ public class ManeuverMetrics {
 	public double   totalTime;
 	ArrayList<LineSegment> segments = new ArrayList<>();
 	ArrayList<Double> distancesInto = new ArrayList<>();  // from start of maneuver to start of corresponding segment
+	public int      ordinal;           // ordering
 	
 	public static HashMap<Maneuver, Maneuver> nextManeuverMap = null;
 	public static List<ManeuverMetrics> maneuverMetrics = null;
@@ -113,6 +114,7 @@ public class ManeuverMetrics {
 					ManeuverMetrics mm = new ManeuverMetrics(maneuver);
 					mm.totalDistance = totalDistance;
 					mm.totalTime = totalTime;
+					mm.ordinal = maneuverMetrics.size();
 					maneuverMetrics.add(mm);
 				}
 				if (lastManeuver != null) {

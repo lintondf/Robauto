@@ -302,7 +302,7 @@ public class GPS {
 			x.printStackTrace();
 			return;
 		}
-		long SPEED_UP = 10;
+		long SPEED_UP = 20;
 		debugThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
