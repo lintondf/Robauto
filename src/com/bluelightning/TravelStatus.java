@@ -24,12 +24,14 @@ import com.bluelightning.data.TripPlan;
 import com.bluelightning.data.TripPlan.TripLeg;
 import com.bluelightning.gui.FuelPanel;
 import com.bluelightning.json.Maneuver;
+import com.bluelightning.poi.AtlasObscura;
+import com.bluelightning.poi.POIResult;
 import com.x5.template.Chunk;
 import com.x5.template.Theme;
 
 public class TravelStatus {
 	
-	static Theme theme;
+	public static Theme theme;
 	
 	protected static final String oTD = "<TD>";
 	protected static final String oTDs = "<TD colspan='2'>";
@@ -459,6 +461,19 @@ public class TravelStatus {
 			c.set("styles", css);
 		} catch (Exception x) {}
 		return c.toString();
+	}
+
+	public String getObscuraHtml(TripPlan tripPlan) {
+		ArrayList<POIResult> aop = tripPlan.getObscuraPlaces();
+		StringBuffer sb = new StringBuffer();
+		for (POIResult aor : aop) {
+			AtlasObscura ao = (AtlasObscura) aor.poi;
+			if (aor.totalProgress.distance >= distanceDriven.actual) {
+				String aos = ao.toHtml(lastFix, aor, distanceDriven.actual);
+				sb.append( aos );
+			}
+		}
+		return sb.toString();
 	}
 
 }

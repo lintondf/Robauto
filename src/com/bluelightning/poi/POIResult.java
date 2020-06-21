@@ -15,14 +15,17 @@ public class POIResult implements Comparable<POIResult>, Serializable {
 	
 	public POI poi;
 	public GlobalCoordinates center;
-	public double distance;
+	public double distance;  // [m] lateral from route
 	public Leg      leg;
 	public Maneuver maneuver;
-	public int index;
+	public int index;   // index into maneuver shape
 	public CumulativeTravel legProgress;
 	public CumulativeTravel totalProgress;
 
-	public POIResult() {}
+	public POIResult() {
+		totalProgress = new CumulativeTravel();
+		legProgress = new CumulativeTravel();
+	}
 	
 	public String toReport() {
 		return String.format("%6.1f mi %5s / %5.1f mi %5s: %4.1f mi: %s",
@@ -34,7 +37,11 @@ public class POIResult implements Comparable<POIResult>, Serializable {
 	public String toString() {
 		return String.format("POIResult: %10.1f (%10.6f, %10.6f) away: %8.0f; %s; %s @ %d", totalProgress.distance / (0.3048 * 5280.0),
 				center.getLatitude(),
-				center.getLongitude(), distance, "" + poi, "" + maneuver.getInstruction(), index);
+				center.getLongitude(), 
+				distance, 
+				"" + poi, 
+				"" + ((maneuver != null) ? maneuver.getInstruction() : ""), 
+				index);
 	}
 
 	@Override
@@ -50,5 +57,5 @@ public class POIResult implements Comparable<POIResult>, Serializable {
 			return null;
 		return results.get(0);
 	}
-	
+
 }

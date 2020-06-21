@@ -47,7 +47,7 @@ public class POISet extends ArrayList<POI> {
 				neighbors.put(p, result);
 			}
 		}
-		for (POIResult r : neighbors.values()) {
+		for (POIResult r : neighbors.values()) { // update to distance from current position
 			r.distance = r.poi.distance(r.center);
 		}
 		return neighbors;
@@ -66,13 +66,15 @@ public class POISet extends ArrayList<POI> {
 				result.maneuver = null;
 				result.leg = null;
 				POIResult last = neighbors.get(p);
-				if (last != null) {
-					if (last.distance > result.distance) {
-						neighbors.replace(p, result);
-					}
-					continue;
+				if (last != null && (last.distance > result.distance) ) {
+//					if (p instanceof AtlasObscura)
+//						RobautoMain.logger.debug( String.format("POISet::nBpp rep %d %6.0f <- %6.0f", i, d, last.distance ) );
+					neighbors.replace(p, result);
+				} else {
+//					if (p instanceof AtlasObscura)
+//						RobautoMain.logger.debug( String.format("POISet::nBpp new %d %6.0f", i, d ) );
+					neighbors.put(p, result);
 				}
-				neighbors.put(p, result);
 			}
 		}
 		return neighbors;
@@ -84,14 +86,25 @@ public class POISet extends ArrayList<POI> {
 		for (int i = 1; i < list.size(); i++) {
 			GeoPosition p0 = list.get(i-1);
 			GeoPosition p1 = list.get(i);
-			neighbors.putAll(nearBy(p0, p1, i-1, rangeMeters));
+			Map<POI, POIResult> S = nearBy(p0, p1, i-1, rangeMeters);
+			for (POI poi : S.keySet()) {
+				POIResult r = S.get(poi);
+				if (neighbors.containsKey(poi)) {
+					POIResult c = neighbors.get(poi);
+					if (r.distance < c.distance) {
+						neighbors.replace(poi, r);
+					}
+				} else {
+					neighbors.put(poi, r);
+				}
+			}
 		}
 		return neighbors;
 	}
 
 	public static void contains(String where, Collection<POI> collection ) {
 		for (POI p : collection) {
-			if (p.getName().startsWith("DILLON")) {
+			if (p.getName().startsWith(where)) {
 				RobautoMain.logger.debug(String.format("%s contains %s", where, p.toString() ));
 			}
 		}
@@ -109,7 +122,7 @@ public class POISet extends ArrayList<POI> {
 	
 	public static void containsPOIResult(String where, Collection<POIResult> collection ) {
 		for (POIResult p : collection) {
-			if (p.poi.getName().startsWith("DILLON")) {
+			if (p.poi.getName().startsWith(where)) {
 				RobautoMain.logger.debug(String.format("%s contains %s", where, p.toString() ));
 			}
 		}
@@ -129,19 +142,15 @@ public class POISet extends ArrayList<POI> {
 				result.leg = leg;
 				result.legProgress = leg.getProgress(result);
 				result.totalProgress = legStart.plus(result.legProgress);
-				if (poi instanceof AtlasObscura) { //TODO why not for all? 5/3/20
-					POIResult last = neighbors.get(poi);
-					if (last != null) {
-						if (last.distance > result.distance) {
-							neighbors.replace(poi, result);
-						}
-					} else {
-						neighbors.put(poi, result);						
+				POIResult last = neighbors.get(poi);
+				if (last != null) {
+					if (last.distance > result.distance) {
+						neighbors.replace(poi, result);
 					}
 				} else {
-					neighbors.put(poi, result);
+					neighbors.put(poi, result);						
 				}
-				RobautoMain.logger.debug(poi.toString());
+				RobautoMain.logger.debug(result.toString());
 			}
 		}
 		contains("nearBy2", neighbors.keySet() );

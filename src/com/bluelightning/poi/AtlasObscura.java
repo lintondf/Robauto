@@ -21,6 +21,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.jxmapviewer.viewer.GeoPosition;
 
+import com.bluelightning.GPS.Fix;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
@@ -70,6 +71,23 @@ public class AtlasObscura extends POIBase {
 		return sb.toString();
 	}
 	
+	public String toHtml( Fix lastFix, POIResult result, double distanceDriven ) {
+		double remaining = result.totalProgress.distance - distanceDriven;
+		StringBuilder sb = new StringBuilder();
+		sb.append("<H2>"); sb.append(name); sb.append("</H2>");
+		sb.append("<P>");
+		sb.append(String.format("<A TARGET='_blank' HREF='https://www.atlasobscura.com/%s'>%s</A>", href, subtitle));
+		sb.append("</P>");
+		sb.append(String.format("<P>%.1f miles ahead; %.1f mile away</P>", remaining/1600.0, result.distance/1600.0));
+
+		sb.append("<P>"); //https://www.google.com/maps/dir/44.5283735,-68.2202801/44.528129,+-68.251952/
+		String placeLink = String.format("<A TARGET='_blank' HREF='https://www.google.com/maps/dir/%.7f,%.7f/%.7f,%.7f'>Directions to: %s, %s</A>", 
+				lastFix.getLatitude(), lastFix.getLongitude(), latitude, longitude, city, state );
+		sb.append(placeLink);
+		sb.append("</P>");
+		return sb.toString();		
+	}
+	
 	@Override
 	public String getAddress() {
 		return String.format("%s, %s; %10.6f, %10.6f", city, state, latitude, longitude );
@@ -104,6 +122,16 @@ public class AtlasObscura extends POIBase {
 	public static POISet factory() {
 		return factory("POI/AtlasObscura.csv");
 	}
+	
+	public static POISet factory(int only) {
+		POISet list = factory("POI/AtlasObscura.csv");
+		while (list.size() > only+1) 
+			list.remove(only+1);
+		for (int i = 0; i < only; i++)
+			list.remove(0);
+		return list;
+	}
+
 	
 	public static void mainNormal(String[] args) {
 		POISet set = factory();

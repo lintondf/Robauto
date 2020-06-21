@@ -404,7 +404,6 @@ public class PlannerMode extends JPanel {
 			RobautoMain.tripPlan.setFuelStops( new ArrayList<FuelStop>( gasStops ) );
 			
 			POISet attractions = AtlasObscura.factory();
-			System.out.println( attractions.size() );
 			ArrayList<POIResult> near = attractions.getPointsOfInterestAlongRoute(RobautoMain.tripPlan.getRoute(), 30e3 );
 			RobautoMain.tripPlan.setObscuraPlaces(near);
 			StringBuilder sb = new StringBuilder();

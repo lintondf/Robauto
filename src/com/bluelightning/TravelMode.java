@@ -75,6 +75,7 @@ import com.bluelightning.gui.TravelFileChooser;
 import com.bluelightning.json.Route;
 import com.bluelightning.map.ButtonWaypoint;
 import com.google.common.eventbus.Subscribe;
+import com.x5.template.Chunk;
 
 import seedu.addressbook.data.place.Address;
 import seedu.addressbook.data.place.VisitedPlace;
@@ -647,14 +648,19 @@ public class TravelMode extends JPanel {
 	        // Declare response status code
 	        response.setStatus(HttpServletResponse.SC_OK);
 
-	        // Write back response
+	        Chunk c = TravelStatus.theme.makeChunk("report#tabbed");
+	        Date now = new Date();
+	        String d = TravelStatus.format.format(now);
+	        c.set("lastUpdated", d);
 	        int dn = 1;
 	        for (Report report : reports ) {
 	        	Report.Day day = report.getDays().get(0);
 	        	day.day = String.format("Day %d", dn++);
-	        	response.getWriter().println(report.toHtml(day));
-	        	response.getWriter().println(tripPlan.getObscuraHtml());
+	        	c.set("planTab", report.toHtml(day));
+	        	c.set("obscuraTab", travelStatus.getObscuraHtml(tripPlan));
+	        	c.set("realtimeTab", travelStatus.toDrivingHtml() );
 	        }
+	        response.getWriter().println(c.toString());
 
 	        // Inform jetty that this request has now been handled
 	        baseRequest.setHandled(true);
