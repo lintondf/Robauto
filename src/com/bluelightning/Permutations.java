@@ -12,13 +12,13 @@ public class Permutations {
 	
 	public Permutations(int number) {
 		this.number = number;
-		RobautoMain.logger.trace("Permutations " + number);
+		//RobautoMain.logger.trace("Permutations " + number);
 	}
 
 	public ArrayList<Integer[]> monotonic() {
-		RobautoMain.logger.trace("monotonic");
+		//RobautoMain.logger.trace("monotonic");
 		int N = 1 << number;
-		RobautoMain.logger.trace("monotonic " + N);
+		//RobautoMain.logger.trace("monotonic " + N);
 		ArrayList<Integer[]> results = new ArrayList<>();
 		if (number <= 1) {
 			results.add( new Integer[]{0} );

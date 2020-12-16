@@ -688,7 +688,9 @@ public class TravelMode extends JPanel {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Font lafFont =  initLookAndFeel(48,32); //(60, 48);
+					Font lafFont =  initLookAndFeel(24, 16); // RPi3
+					if (isSurface)
+						lafFont =  initLookAndFeel(48,32); // surface Pro
 					frame = new JFrame();
 					frame.setTitle("Robauto - Travel Mode");
 					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -734,9 +736,9 @@ public class TravelMode extends JPanel {
 						}
 					});
 					String path = null;
-					if (args.length > 0)
-						path = args[0]; // can be .robauto or .dayfile (list of .robauto abs paths
-					else {
+//					if (args.length > 0)
+//						path = args[0]; // can be .robauto or .dayfile (list of .robauto abs paths
+//					else {
 						// Create a file chooser to choose a single .robauto
 						String where = System.getProperty("user.home") + "/Google Drive/0Robauto";
 		                TravelFileChooser dialog = new TravelFileChooser(frame, where);
@@ -744,7 +746,7 @@ public class TravelMode extends JPanel {
 		                if (dialog.getSelection() != null) {
 		                	path = dialog.getSelection().getAbsolutePath();
 		                }
-					}
+//					}
 					if (path == null) {
 						System.err.println("No trip plan file specified");
 						System.exit(0);

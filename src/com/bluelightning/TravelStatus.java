@@ -31,22 +31,26 @@ import com.x5.template.Theme;
 
 public class TravelStatus {
 	
+	public static final int SIZE1 = 32;
+	public static final int SIZE2 = 48;
+	
+	
 	public static Theme theme;
 	
 	protected static final String oTD = "<TD>";
 	protected static final String oTDs = "<TD colspan='2'>";
-	protected static final String oTDf = "<TD style='font-size:48pt'>";
-	protected static final String obcTD = "<TD style='font-size:48pt;font-weight:bolder;text-align:center'>";
+	protected static final String oTDf = String.format("<TD style='font-size:%dpt'>", SIZE1);
+	protected static final String obcTD = String.format("<TD style='font-size:%dpt;font-weight:bolder;text-align:center'>", SIZE1 );
 	//protected static final String oblTD = "<TD style='font-size:48pt;font-weight:bolder;text-align:left'>";
-	protected static final String orTD = "<TD style='font-size:48pt;text-align:right'>";
+	protected static final String orTD = String.format("<TD style='font-size:%dpt;text-align:right'>", SIZE1 );
 	protected static final String cTD = "</TD>";
 	
 	protected static String orTD( String addedStyles ) {
-		return String.format("<TD style='font-size:48pt;text-align:right%s'>", addedStyles);
+		return String.format("<TD style='font-size:%dpt;text-align:right%s'>", SIZE1, addedStyles);
 	}
 	
 	protected static String oblTD( String addedStyles ) {
-		return String.format("<TD style='font-size:48pt;font-weight:bolder;text-align:left%s'>", addedStyles);
+		return String.format("<TD style='font-size:%dpt;font-weight:bolder;text-align:left%s'>", SIZE1, addedStyles);
 	}
 	
 	protected static String oblTD() {
@@ -151,8 +155,8 @@ public class TravelStatus {
 		double   distanceRemaining;
 		boolean  hasGas;
 		
-		final static String onDeckRow1Style = "<TD colspan='2' style='font-size:48pt;font-weight:bolder;text-align:left;background-color:cyan'>";
-		final static String onDeckRow2Style = "<TD style='font-size:96pt;font-weight:bolder;text-align:right;background-color:cyan'>";
+		final String onDeckRow1Style = String.format("<TD colspan='2' style='font-size:%dpt;font-weight:bolder;text-align:left;background-color:cyan'>", SIZE1 );
+		final String onDeckRow2Style = String.format("<TD style='font-size:%dpt;font-weight:bolder;text-align:right;background-color:cyan'>", SIZE2 );
 
 		
 		public UpcomingStop( double latitude, double longitude, String name, double totalTime, double totalDistance, String fuelAvailable ) {
