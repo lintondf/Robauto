@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Enumeration;
 import java.util.List;
@@ -50,10 +51,11 @@ public class Configuration {
 	 */
 	public static Configuration getSingleton() {
 		if (singleton == null) {
-			String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-			String appConfigPath = rootPath + "robauto.json";
+			java.io.InputStream is = Thread.currentThread().getClass().getResourceAsStream("/resources/robauto.json");
+			//String appConfigPath = Thread.currentThread().getContextClassLoader().getResource("resources/robauto.json").getPath();
+			//String appConfigPath = rootPath + "robauto.json";
 			Gson gson = new Gson();
-			try (Reader reader = new FileReader(appConfigPath)) {
+			try (Reader reader = new InputStreamReader(is)) { //new FileReader(appConfigPath)) {
 				singleton = gson.fromJson(reader, Configuration.class);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
