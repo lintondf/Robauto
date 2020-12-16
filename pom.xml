@@ -14,26 +14,7 @@
           <target>1.8</target>
         </configuration>
       </plugin>
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-install-plugin</artifactId>
-    <version>2.5.2</version>
-    <executions>
-        <execution>
-            <phase>initialize</phase>
-            <goals>
-                <goal>install-file</goal>
-            </goals>
-            <configuration>
-                <file>RouteConverterCmdLine.jar</file>
-                <groupId>com.somegroup.id</groupId>
-                <artifactId>artefact-id</artifactId>
-                <version>x.y.z</version>
-                <packaging>jar</packaging>
-            </configuration>
-        </execution>
-    </executions>
-</plugin>      
+
     </plugins>
   </build>
     <repositories>
@@ -44,6 +25,32 @@
     </repositories>
   
   <dependencies>
+<dependency>
+    <groupId>com.routeconverter</groupId>
+    <artifactId>CmdLine</artifactId>
+    <version>0.0.1r</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/RouteConverterCmdLine.jar</systemPath>
+</dependency>
+<dependency>
+    <groupId>com.pdfbox</groupId>
+    <artifactId>app</artifactId>
+    <version>0.0.1r</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/pdfbox-app-2.0.9.jar</systemPath>
+</dependency> 
+<dependency>
+    <groupId>javax.xml.bind</groupId>
+    <artifactId>jaxb-api</artifactId>
+    <version>2.3.1</version>
+</dependency>
+<dependency>
+    <groupId>org.glassfish.jaxb</groupId>
+    <artifactId>jaxb-runtime</artifactId>
+    <version>2.3.1</version>
+    <scope>runtime</scope>
+</dependency>
+  
 <dependency>
     <groupId>com.sun.xml.bind</groupId>
     <artifactId>jaxb-impl</artifactId>
