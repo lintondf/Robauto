@@ -694,7 +694,8 @@ public class TravelMode extends JPanel {
 					frame = new JFrame();
 					frame.setTitle("Robauto - Travel Mode");
 					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-					java.io.InputStream is = Thread.currentThread().getClass().getResourceAsStream("/resources/images/icon-travel.jpg");
+					//java.io.InputStream is = Thread.currentThread().getClass().getResourceAsStream("resources/images/icon-travel.jpg");
+                                        File is = new File("images/icon-travel.jpg");
 					Image icon = ImageIO.read(is).getScaledInstance((int) 64, (int) 64,
 							Image.SCALE_SMOOTH);
 					frame.setIconImage(icon);

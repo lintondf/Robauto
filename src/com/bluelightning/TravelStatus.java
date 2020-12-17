@@ -31,8 +31,8 @@ import com.x5.template.Theme;
 
 public class TravelStatus {
 	
-	public static final int SIZE1 = 32;
-	public static final int SIZE2 = 48;
+	public static final int SIZE1 = 24;
+	public static final int SIZE2 = 32;
 	
 	
 	public static Theme theme;

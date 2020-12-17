@@ -51,11 +51,11 @@ public class Configuration {
 	 */
 	public static Configuration getSingleton() {
 		if (singleton == null) {
-			java.io.InputStream is = Thread.currentThread().getClass().getResourceAsStream("/resources/robauto.json");
+			java.io.InputStream is = Thread.currentThread().getClass().getResourceAsStream("resources/robauto.json");
 			//String appConfigPath = Thread.currentThread().getContextClassLoader().getResource("resources/robauto.json").getPath();
-			//String appConfigPath = rootPath + "robauto.json";
+			String appConfigPath = "src/resources/" + "robauto.json";
 			Gson gson = new Gson();
-			try (Reader reader = new InputStreamReader(is)) { //new FileReader(appConfigPath)) {
+			try (Reader reader = new FileReader(appConfigPath)) {
 				singleton = gson.fromJson(reader, Configuration.class);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
