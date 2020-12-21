@@ -19,5 +19,11 @@
 		{"from": "EAST", "to": "E"},
 		{"from": "WEST", "to": "W"},
 		{"from": "FOLLOW SIGNS", "to": ""}
-	]
+	],
+	"htmlHeaderFont" : "60pt",
+	"htmlrowFont" : "32pt",
+	"htmldetailFont" : "32pt",
+	"htmlFontSize1" : "24pt",
+	"htmlFontSize2" : "32pt"
+
 }

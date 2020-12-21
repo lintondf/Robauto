@@ -238,7 +238,7 @@ public class Garmin extends JPanel {
 //			InputStreamReader fir = new InputStreamReader(fis, "UTF8");
 			byte[] bytes = Files.readAllBytes(file.toPath());
 			String content = new String( bytes, "UTF-8");
-			System.out.println(content.substring(0, 5));
+			//System.out.println(content.substring(0, 5));
 			//FileReader fir = new FileReader(file, "UTF-8");
 			int offset = (content.startsWith("<?xml")) ? 0 : 1;
 			GpxType gpx = GpxUtil.unmarshal11(content.substring(offset)); // 1 for Windows?s

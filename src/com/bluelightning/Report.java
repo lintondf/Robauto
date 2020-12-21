@@ -32,14 +32,10 @@ public class Report implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	final static String HEADER_FONT = "80pt";
-	final static String ROW_FONT = "48pt";
-	final static String DETAIL_FONT = "48pt";
-	
 	protected static void setFonts( Chunk c) {
-		c.set("headerFontSize", HEADER_FONT);
-		c.set("rowFontSize", ROW_FONT);
-		c.set("detailFontSize", DETAIL_FONT);			
+		c.set("headerFontSize", TravelStatus.HEADER_FONT);
+		c.set("rowFontSize", TravelStatus.ROW_FONT);
+		c.set("detailFontSize", TravelStatus.DETAIL_FONT);			
 	}
 	
 	List<Day> days;

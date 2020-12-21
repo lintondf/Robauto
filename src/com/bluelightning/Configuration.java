@@ -33,6 +33,12 @@ public class Configuration {
 	
 	public List<Abbreviation> abbreviations;
 	
+	public String htmlHeaderFont;
+	public String htmlrowFont;
+	public String htmldetailFont;
+	public String htmlFontSize1;
+	public String htmlFontSize2;
+	
 	private static Configuration singleton;
 	
 	private Configuration() {

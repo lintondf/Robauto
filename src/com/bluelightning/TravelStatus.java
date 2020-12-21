@@ -31,26 +31,30 @@ import com.x5.template.Theme;
 
 public class TravelStatus {
 	
-	public static final int SIZE1 = 24;
-	public static final int SIZE2 = 32;
+	public static final String SIZE1 = Configuration.getSingleton().htmlFontSize1;
+	public static final String SIZE2 = Configuration.getSingleton().htmlFontSize2;
 	
 	
 	public static Theme theme;
 	
+	final static String DETAIL_FONT = Configuration.getSingleton().htmldetailFont;
+	final static String ROW_FONT = Configuration.getSingleton().htmlrowFont;
+	final static String HEADER_FONT = Configuration.getSingleton().htmlHeaderFont;
+
 	protected static final String oTD = "<TD>";
 	protected static final String oTDs = "<TD colspan='2'>";
-	protected static final String oTDf = String.format("<TD style='font-size:%dpt'>", SIZE1);
-	protected static final String obcTD = String.format("<TD style='font-size:%dpt;font-weight:bolder;text-align:center'>", SIZE1 );
+	protected static final String oTDf = String.format("<TD style='font-size:%s'>", SIZE1);
+	protected static final String obcTD = String.format("<TD style='font-size:%s;font-weight:bolder;text-align:center'>", SIZE1 );
 	//protected static final String oblTD = "<TD style='font-size:48pt;font-weight:bolder;text-align:left'>";
-	protected static final String orTD = String.format("<TD style='font-size:%dpt;text-align:right'>", SIZE1 );
+	protected static final String orTD = String.format("<TD style='font-size:%s;text-align:right'>", SIZE1 );
 	protected static final String cTD = "</TD>";
 	
 	protected static String orTD( String addedStyles ) {
-		return String.format("<TD style='font-size:%dpt;text-align:right%s'>", SIZE1, addedStyles);
+		return String.format("<TD style='font-size:%s;text-align:right%s'>", SIZE1, addedStyles);
 	}
 	
 	protected static String oblTD( String addedStyles ) {
-		return String.format("<TD style='font-size:%dpt;font-weight:bolder;text-align:left%s'>", SIZE1, addedStyles);
+		return String.format("<TD style='font-size:%s;font-weight:bolder;text-align:left%s'>", SIZE1, addedStyles);
 	}
 	
 	protected static String oblTD() {
@@ -155,8 +159,8 @@ public class TravelStatus {
 		double   distanceRemaining;
 		boolean  hasGas;
 		
-		final String onDeckRow1Style = String.format("<TD colspan='2' style='font-size:%dpt;font-weight:bolder;text-align:left;background-color:cyan'>", SIZE1 );
-		final String onDeckRow2Style = String.format("<TD style='font-size:%dpt;font-weight:bolder;text-align:right;background-color:cyan'>", SIZE2 );
+		final String onDeckRow1Style = String.format("<TD colspan='2' style='font-size:%s;font-weight:bolder;text-align:left;background-color:cyan'>", SIZE1 );
+		final String onDeckRow2Style = String.format("<TD style='font-size:%s;font-weight:bolder;text-align:right;background-color:cyan'>", SIZE2 );
 
 		
 		public UpcomingStop( double latitude, double longitude, String name, double totalTime, double totalDistance, String fuelAvailable ) {

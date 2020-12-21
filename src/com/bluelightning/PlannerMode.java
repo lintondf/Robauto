@@ -929,7 +929,8 @@ public class PlannerMode extends JPanel {
 		if (file.getAbsoluteFile().toString().toLowerCase().endsWith(".gdb")) {  // GDB file
 			String which = (System.getProperty("os.name").toLowerCase().startsWith("mac")) ? 
 					"bin/mac/gpsbabel" :
-					"bin/win/GPSBabel.exe";
+					"C:/Program Files (x86)/GPSBabel/gpsbabel.exe";
+					//"bin/win/GPSBabel.exe";
 			try {
 				File tmp = File.createTempFile("gpsbabel-out", ".gpx");
 				String[] cmd = {
