@@ -1,0 +1,308 @@
+{
+  "routes": [
+    {
+      "id": "29be8e76-fe5d-4b13-8574-494981168fad",
+      "sections": [
+        {
+          "id": "a9859364-ac97-44d8-a314-4bc95f53c3dd",
+          "type": "vehicle",
+          "actions": [
+            {
+              "action": "depart",
+              "duration": 26,
+              "length": 28,
+              "instruction": "Head toward US Hwy 1 on Manor Ln. Go for 28 m.",
+              "offset": 0
+            },
+            {
+              "action": "turn",
+              "duration": 1216,
+              "length": 16856,
+              "instruction": "Turn right onto US Hwy 1 (US-1). Go for 16.9 km.",
+              "offset": 2,
+              "direction": "right",
+              "severity": "quite"
+            },
+            {
+              "action": "arrive",
+              "duration": 0,
+              "length": 0,
+              "instruction": "Arrive at Downeast Hwy (US-1).",
+              "offset": 274
+            }
+          ],
+          "turnByTurnActions": [
+            {
+              "action": "depart",
+              "duration": 26,
+              "length": 28,
+              "offset": 0,
+              "currentRoad": {
+                "type": "rural"
+              },
+              "nextRoad": {
+                "type": "rural",
+                "name": [
+                  {
+                    "value": "Manor Ln",
+                    "language": "en"
+                  }
+                ]
+              }
+            },
+            {
+              "action": "turn",
+              "duration": 1216,
+              "length": 16856,
+              "offset": 2,
+              "direction": "right",
+              "severity": "quite",
+              "currentRoad": {
+                "type": "rural",
+                "name": [
+                  {
+                    "value": "Manor Ln",
+                    "language": "en"
+                  }
+                ]
+              },
+              "nextRoad": {
+                "type": "rural",
+                "name": [
+                  {
+                    "value": "US Hwy 1",
+                    "language": "en"
+                  },
+                  {
+                    "value": "Schoodic Scenic Bywy",
+                    "language": "en"
+                  }
+                ],
+                "number": [
+                  {
+                    "value": "US-1",
+                    "language": "en"
+                  }
+                ]
+              }
+            },
+            {
+              "action": "arrive",
+              "duration": 0,
+              "length": 0,
+              "offset": 274,
+              "currentRoad": {
+                "name": [
+                  {
+                    "value": "Downeast Hwy",
+                    "language": "en"
+                  }
+                ],
+                "number": [
+                  {
+                    "value": "US-1",
+                    "language": "en"
+                  }
+                ]
+              },
+              "nextRoad": {
+                "type": "rural"
+              }
+            }
+          ],
+          "departure": {
+            "time": "2021-01-05T06:02:43-05:00",
+            "place": {
+              "type": "place",
+              "location": {
+                "lat": 44.5228252,
+                "lng": -68.2088999
+              },
+              "originalLocation": {
+                "lat": 44.522825,
+                "lng": -68.208898
+              }
+            }
+          },
+          "arrival": {
+            "time": "2021-01-05T06:23:25-05:00",
+            "place": {
+              "type": "place",
+              "location": {
+                "lat": 44.53164,
+                "lng": -68.40617
+              },
+              "originalLocation": {
+                "lat": 44.531643,
+                "lng": -68.406179
+              }
+            }
+          },
+          "summary": {
+            "duration": 1242,
+            "length": 16884,
+            "baseDuration": 1234
+          },
+          "polyline": "BGy0u90CnwkjiExG7B3I3DwH_dsJ7kB4XvoCgKjc0KzZsJzU0KzU4SvbgezjBgUzZ8f3mB8Vze0UvgB8V7pB8anzBoQzegP7fgPnfkN3ckrB_oDwbz8BkS3wBgP3rBoLzjBgPn4BkDjN0KnuB0Fze4DjcU3IUvMTvWvCriB7GvqB7BrJ_EvR7GrT7GvRvHrOzKvRjN7Q7QjSzjBvlB_EzFvtC72CvvBv0B7GjIvoC3uC_OvR7LnQ_JvRjNvbrJrYjIjc_E7f7BvRTzUAzFU3SUrEoBzU8BvRwH_d0F_TwMvlBofvhDwHjX0Z3uCwoCvjH4iD_wJ0F7QoL_iBwM3mBsJjcof39CwHrYofvhD4hBnqD8kBnlDoGnQsYzhC4IzZ0KrdkI7VoQn4BoQ_2BwMjwB4SnsC8V39CwC_JgP3_B4N74BoG7akSjuCU7B4D_O4I3mB8QzmCsiBnyEosCjjK4N7iCgPzwC0K79BkI7zB0F7pBoGnzBUrEwH3_BoG7nCsE_xBwCnkBoBzZ8BnuBwM7yJ8BvqBoBnpBAjDoBn8EA36BArJUzUAzFwC_7BsE39C4IzkDsEr2B8BriB8B3uCoBvlBAvHwC_qCAjDU3X8BnpBA3NoBnzBwC7lDU3cUrYoB7foBv0BUjXkI_jIUrY0F_uFU_d8BroDU_YUjXUzUkDvwDU7aTrOjD3hBjDrY_EriB3IzyB_iB_iGvb_4F_EnfrdnkGjrBrmJnB3IvHn4B_E3rBnL3iDvHn9BnG31BrE3XrEvWTjDnGzUnB3DzF_O7BnG7GnQvMvb7GjNjD_EzP3XnL_O3InL7LnL7L_JvW7Q7f3XvMnLvM3N3NrTjNvWnLrYjD3IzF7QjDnLjDvMrEna7Bnf7BnfnBzZjDvW_E_YzF3X3NnpB7G_TnLrdjInaTnB7BvH3DzP3D_T7B3NA7GTrOoB3rBoBnQoBnQ4DjwBgK3nD8BzoBAzZnB_dTjI7BrT3D3XnG_dvR3kCzK_nBzPrgC7Q7xC3hBzlF3Sz6CnG3mBzFrnB3Xz5FvH_xB_EzZvH_nBvW_tDrE7VjD_TjDrdT_iBwC3hBsE3hB0K3mBoG7QwWnzBkN7f8BrEkI7VoLvlBwHvb8GzjB0FrdsE7awHvvB0FrYwH7pB0FrdoBnGoGvboG_Y4N36BgPj6B0Z7lDkD7L8Vj9CsJrnBgFjX0FzZwC_J8BzK",
+          "spans": [
+            {
+              "offset": 0,
+              "names": [
+                {
+                  "value": "Manor Ln",
+                  "language": "en"
+                }
+              ],
+              "length": 28,
+              "duration": 26
+            },
+            {
+              "offset": 2,
+              "names": [
+                {
+                  "value": "US Hwy 1",
+                  "language": "en"
+                },
+                {
+                  "value": "Schoodic Scenic Bywy",
+                  "language": "en"
+                }
+              ],
+              "length": 2895,
+              "duration": 215,
+              "speedLimit": 20.0
+            },
+            {
+              "offset": 60,
+              "names": [
+                {
+                  "value": "US Hwy 1",
+                  "language": "en"
+                }
+              ],
+              "length": 29,
+              "duration": 2,
+              "speedLimit": 20.0
+            },
+            {
+              "offset": 62,
+              "names": [
+                {
+                  "value": "US Hwy 1",
+                  "language": "en"
+                }
+              ],
+              "length": 1944,
+              "duration": 177,
+              "speedLimit": 17.7777786
+            },
+            {
+              "offset": 81,
+              "names": [
+                {
+                  "value": "US Hwy 1",
+                  "language": "en"
+                }
+              ],
+              "length": 4161,
+              "duration": 278,
+              "speedLimit": 24.7222233
+            },
+            {
+              "offset": 135,
+              "names": [
+                {
+                  "value": "US Hwy 1",
+                  "language": "en"
+                }
+              ],
+              "length": 797,
+              "duration": 62,
+              "speedLimit": 17.7777786
+            },
+            {
+              "offset": 145,
+              "names": [
+                {
+                  "value": "US Hwy 1",
+                  "language": "en"
+                }
+              ],
+              "length": 2811,
+              "duration": 165,
+              "speedLimit": 22.2222233
+            },
+            {
+              "offset": 185,
+              "names": [
+                {
+                  "value": "US Hwy 1",
+                  "language": "en"
+                },
+                {
+                  "value": "US Hwy One",
+                  "language": "en"
+                }
+              ],
+              "length": 1030,
+              "duration": 68,
+              "speedLimit": 22.2222233
+            },
+            {
+              "offset": 219,
+              "names": [
+                {
+                  "value": "US Hwy 1",
+                  "language": "en"
+                }
+              ],
+              "length": 1444,
+              "duration": 88,
+              "speedLimit": 22.2222233
+            },
+            {
+              "offset": 237,
+              "names": [
+                {
+                  "value": "Downeast Hwy",
+                  "language": "en"
+                }
+              ],
+              "length": 34,
+              "duration": 2,
+              "speedLimit": 22.2222233
+            },
+            {
+              "offset": 238,
+              "names": [
+                {
+                  "value": "Downeast Hwy",
+                  "language": "en"
+                }
+              ],
+              "length": 626,
+              "duration": 50,
+              "speedLimit": 17.7777786
+            },
+            {
+              "offset": 251,
+              "names": [
+                {
+                  "value": "Downeast Hwy",
+                  "language": "en"
+                }
+              ],
+              "length": 1085,
+              "duration": 109,
+              "speedLimit": 15.5555563
+            }
+          ],
+          "language": "en-us",
+          "transport": {
+            "mode": "truck"
+          }
+        }
+      ]
+    }
+  ]
+}

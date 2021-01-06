@@ -23,8 +23,6 @@ import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.LoggerFactory;
 
 import com.bluelightning.BaseCampDirectionsParser.ParsedDirections;
-import com.bluelightning.Garmin.Day;
-import com.bluelightning.Garmin.TrackPoint;
 import com.bluelightning.json.BottomRight;
 import com.bluelightning.json.BoundingBox;
 import com.bluelightning.json.End;
@@ -225,7 +223,7 @@ public class BaseCamp {
 	
 	static final String pdfBox = "pdfbox-app-2.0.9.jar";
 	
-	public Garmin.Day day;
+	public Day day;
 	public Route route;
 	public ArrayList<Turn> turns = new ArrayList<>();
 	public ArrayList<ButtonWaypoint> vias;
@@ -289,7 +287,7 @@ public class BaseCamp {
 	
 	public BaseCamp() {} // for generics users only
 	
-	public BaseCamp( Garmin.Day day, String pdfPath ) {
+	public BaseCamp( Day day, String pdfPath ) {
 		this.day = day;
 		RobautoMain.logger.info("BASECAMP: " + pdfPath);
 		

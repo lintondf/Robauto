@@ -28,11 +28,8 @@ import javax.xml.namespace.QName;
 
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
-import org.gavaghan.geodesy.GeodeticCurve;
-import org.gavaghan.geodesy.GlobalCoordinates;
 import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.viewer.GeoPosition;
-import com.bluelightning.map.ButtonWaypoint;
+
 import com.bluelightning.map.StopMarker;
 import seedu.addressbook.data.AddressBook;
 import seedu.addressbook.data.place.Place;
@@ -49,7 +46,7 @@ import slash.navigation.gpx.garmin3.RoutePointExtensionT;
  * @author lintondf 1. Use Basecamp to plan day-by-day route. Export to GPX 2.
  *         In Robauto plan driver and fuel stops.
  */
-public class Garmin extends JPanel {
+public class Garmin extends JPanel implements TripSource {
 
 	/**
 	 * 
@@ -66,73 +63,17 @@ public class Garmin extends JPanel {
 //	protected int dups = 0;
 //	protected int nearby = 0;
 
-	public static class TrackPoint extends LatLon {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		public double distancePriorToHere;
-		public double distanceStartToHere;
-		public double heading;
-		public double duration; //[s]
-		public String maneuver;
-
-		public TrackPoint(LatLon where, String maneuver) {
-			super(where);
-			this.distanceStartToHere = 0.0;
-			this.distancePriorToHere = 0.0;
-			this.heading = 0.0;
-			this.duration = 0.0;
-			this.maneuver = maneuver;
-		}
-		
-		public String toString() {
-			return String.format("%s; %7.3f km; %5.0f deg; %6.3f km; %4.0f s; %s", 
-					super.toString(), 0.001*distanceStartToHere, heading, 0.001*this.distancePriorToHere, this.duration,
-					(this.maneuver == null) ? "" : this.maneuver);
-		}
+	private ArrayList<Day> days = new ArrayList<>();
+	private ArrayList<VisitedPlace> places = new ArrayList<>();
+	
+	public ArrayList<Day> getDays() {
+		return days;
 	}
 
-	
-	public static class Day {
-		protected void add(LatLon point, String description, double duration) {
-			TrackPoint tp = new TrackPoint(point, description);
-			tp.duration = duration;
-			if (track.isEmpty()) {
-				track.add(tp);
-				trackPoints.add(tp);
-			} else {
-				TrackPoint last = (TrackPoint) track.get(track.size() - 1);
-				if (last.getLatitude() == point.getLatitude()
-						&& last.getLongitude() == point.getLongitude()) {
-					if (last.duration == 0.0) {
-						last.duration = tp.duration;
-					}
-					if (last.maneuver == null) {
-						last.maneuver = tp.maneuver;
-					}
-					return;
-				}
-				GeodeticCurve curve = geoCalc.calculateGeodeticCurve(wgs84,
-						new GlobalCoordinates(last), new GlobalCoordinates(point));
-				tp.distancePriorToHere = curve.getEllipsoidalDistance();
-				tp.distanceStartToHere = last.distanceStartToHere
-						+ curve.getEllipsoidalDistance();
-				tp.heading = curve.getAzimuth();
-				track.add(tp);
-				trackPoints.add(tp);
-			}
-		}
-		
-		public List<WptType> wpts = new ArrayList<>();
-		public ArrayList<ButtonWaypoint> waylist = new ArrayList<>();
-		public List<GeoPosition> track = new ArrayList<>();
-		public List<TrackPoint> trackPoints = new ArrayList<>();		
+	public ArrayList<VisitedPlace> getPlaces() {
+		return places;
 	}
-	
-	public ArrayList<Day> days = new ArrayList<>();
-	public ArrayList<VisitedPlace> places = new ArrayList<>();
-	
+
 	static JAXBContext context11 =
         newContext(slash.navigation.gpx.binding11.ObjectFactory.class,
                 slash.navigation.gpx.garmin3.ObjectFactory.class,
@@ -253,8 +194,8 @@ public class Garmin extends JPanel {
 				RobautoMain.logger.debug("RTE: " + rte.getName());
 				List<WptType> rtepts = rte.getRtept();
 				if (! rtepts.isEmpty()) {
-					day.wpts.add( rtepts.get(0) ); // from first waypoint to last waypoint
-					day.wpts.add( rtepts.get(rtepts.size()-1) );
+					day.addWaypoint( rtepts.get(0) ); // from first waypoint to last waypoint
+					day.addWaypoint( rtepts.get(rtepts.size()-1) );
 				}
 				for (WptType rtept : rtepts) {
 					RobautoMain.logger.debug("RTEPT: " + rtept.getName() + " "

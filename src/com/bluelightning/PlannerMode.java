@@ -47,7 +47,6 @@ import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
-import com.bluelightning.Garmin.TrackPoint;
 import com.bluelightning.data.FuelStop;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.gui.AddAddressDialog;
@@ -925,7 +924,7 @@ public class PlannerMode extends JPanel {
 		String basePath = file.getAbsolutePath();
 		basePath = basePath.substring(0, basePath.length() - 4); // drop extension
 		BaseCamp baseCamp = null;
-		Garmin garmin = null;
+		TripSource garmin = null;
 		if (file.getAbsoluteFile().toString().toLowerCase().endsWith(".gdb")) {  // GDB file
 			String which = (System.getProperty("os.name").toLowerCase().startsWith("mac")) ? 
 					"bin/mac/gpsbabel" :
@@ -947,7 +946,7 @@ public class PlannerMode extends JPanel {
 				// build turn list from embedded RTEPT durations and maneuvers
 				double durationSoFar = 0.0;
 				BaseCamp.Turn prior = null;
-				for (Garmin.TrackPoint tp : garmin.days.get(0).trackPoints) {
+				for (TrackPoint tp : garmin.getDays().get(0).trackPoints) {
 					//System.out.println(durationSoFar + " : " + tp.toString());
 					if (tp.maneuver != null) {
 						BaseCamp.Turn turn = new BaseCamp.Turn(tp.maneuver, 
@@ -963,13 +962,13 @@ public class PlannerMode extends JPanel {
 					durationSoFar += tp.duration;
 				}
 				
-				baseCamp = new BaseCamp(garmin.days.get(0), turns );
+				baseCamp = new BaseCamp(garmin.getDays().get(0), turns );
 				days.add(baseCamp);
 			} catch (Exception x) {
 				x.printStackTrace();
 			}
 		} else { // GPX file
-			if (garmin.days.size() == 1) {
+			if (garmin.getDays().size() == 1) {
 			    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			    DataFlavor flavor = DataFlavor.stringFlavor;
 			    if (clipboard.isDataFlavorAvailable(flavor)) {
@@ -993,7 +992,7 @@ public class PlannerMode extends JPanel {
 		            		System.out.println(lines.get(lines.size()-1));
 			            }
 			        
-			            baseCamp = new BaseCamp(garmin.days.get(0), lines );
+			            baseCamp = new BaseCamp(garmin.getDays().get(0), lines );
 						days.add(baseCamp);
 			    	} catch (Exception x) {
 			    		x.printStackTrace();
@@ -1001,15 +1000,15 @@ public class PlannerMode extends JPanel {
 			    }			
 			} 
 		}
-		if (baseCamp == null) {
-			for (int i = 0; i < garmin.days.size(); i++) {
-				String path = String.format("%s_Day_%d.csv", basePath, i + 1);
-				RobautoMain.logger.info("  Loading BaseCamp details from: " + path);
-				baseCamp = new BaseCamp(garmin.days.get(i), path);
-				days.add(baseCamp);
-			}
-			RobautoMain.logger.info(String.format("  %d days loaded", days.size()));
-		}
+//		if (baseCamp == null) {
+//			for (int i = 0; i < garmin.getDays().size(); i++) {
+//				String path = String.format("%s_Day_%d.csv", basePath, i + 1);
+//				RobautoMain.logger.info("  Loading BaseCamp details from: " + path);
+//				baseCamp = new BaseCamp(garmin.getDays().get(i), path);
+//				days.add(baseCamp);
+//			}
+//			RobautoMain.logger.info(String.format("  %d days loaded", days.size()));
+//		}
 		ArrayList<List<GeoPosition>> tracks = new ArrayList<>();
 		Route route = mergeRoutes(days);
 		route.setBoundingBox(generateBoundingBox(route.getShape()));
@@ -1017,7 +1016,7 @@ public class PlannerMode extends JPanel {
 
 		final double MATCH_DISTANCE = 500.0;
 
-		ArrayList<VisitedPlace> places = new ArrayList<>(garmin.places);
+		ArrayList<VisitedPlace> places = new ArrayList<>(garmin.getPlaces());
 		for (int i = 0; i < places.size(); i++) {
 			VisitedPlace place = places.get(i);
 			RobautoMain.logger.debug(place.toString());

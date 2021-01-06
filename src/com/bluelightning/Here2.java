@@ -82,9 +82,10 @@ public class Here2 {
 	}
 	
 	protected static String routingXmlUrl = "https://route.cit.api.here.com/routing/7.2/calculateroute.xml";
-	protected static String routingUrl = "https://route.cit.api.here.com/routing/7.2/calculateroute.json";
+	protected static String routingUrl = "https://router.hereapi.com/v8/calculateroute.json";
 	protected static String geocodeUrl = "https://geocoder.cit.api.here.com/6.2/geocode.json";
 	protected static String reverseGeocodeUrl = "https://reverse.geocoder.cit.api.here.com/6.2/reversegeocode.json";
+	protected static String routing8Url = "https://router.hereapi.com/v8/routes";
 
 	protected static JsonElement getNestedJsonElement( JsonElement element, List<String> fields ) {
 		if (element == null)
@@ -110,9 +111,8 @@ public class Here2 {
 	
 	protected static List<BasicNameValuePair> getBasicValuePair() {
 		List<BasicNameValuePair> nvps = new ArrayList <>();
-		nvps.add(new BasicNameValuePair("app_id", 
-				"gf6QHsctHY6MXZxazFDC"));
-		nvps.add(new BasicNameValuePair("app_code", "nH-rpKYk_bREera8aWsXrQ"));
+		nvps.add(new BasicNameValuePair("app_id", "E5W4fEoFZkdKqwnqBUpf"));
+		nvps.add(new BasicNameValuePair("apikey", "z9U3Xu_xv_qohIg8yn8wYBNjdiHDR0G5QukenNZrcSQ"));
 		return nvps;
 	}
 	
@@ -121,8 +121,17 @@ public class Here2 {
 		String response = null;
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
+			parameters = getBasicValuePair();
+			//?&&&
+			parameters.add( new BasicNameValuePair("transportMode","truck"));
+
+			parameters.add( new BasicNameValuePair("origin","44.522825,-68.208898"));
+			parameters.add( new BasicNameValuePair("destination","44.531643,-68.406179"));
+			parameters.add( new BasicNameValuePair("spans","names,speedLimit,duration,length"));
+			parameters.add( new BasicNameValuePair("return","summary,polyline,turnbyturnactions,actions,instructions"));
 			UrlEncodedFormEntity x = new UrlEncodedFormEntity(parameters);
-			String url = String.format("%s?%s", urlBase, IOUtils.toString(x.getContent()));
+			String url = String.format("%s?%s", routing8Url, IOUtils.toString(x.getContent()));
+//			url = String.format("%s&%s=%s&%s=%s", , "app_id", "E5W4fEoFZkdKqwnqBUpf", "apikey", "z9U3Xu_xv_qohIg8yn8wYBNjdiHDR0G5QukenNZrcSQ");
 			HttpGet httpGet = new HttpGet(url);
 			CloseableHttpResponse response2 = httpclient.execute(httpGet);
 			if (response2.getStatusLine().getStatusCode() != 200) {
@@ -215,7 +224,7 @@ public class Here2 {
 		String json = getRestResponse( routingUrl, nvps );
 		if (json == null)
 			return null;
-		RobautoMain.logger.debug("REST bytes: " + json.length() );
+		//RobautoMain.logger.debug("REST bytes: " + json.length() );
 	    JsonElement jelement = new JsonParser().parse(json);
 	    try {
 	    	PrintStream out = new PrintStream("route.json");
@@ -468,7 +477,11 @@ M3   :  10.5 mi /  0:16;     0.0 mi /  0:01;    39; 130 [DOWNEAST HWY/DOWNEAST H
 M4   :  24.1 mi /  0:33;    10.5 mi /  0:17;    44; 229 [I-395 W RAMP/I-395 W RAMP/] Take the I-395 W ramp to the right
       44.531643,   -68.406179		 
 		 */
-		RobautoMain.logger.debug( Here2.geocodeReverseLookup( new GeoPosition(44.522588,   -68.208983) ));
+		//RobautoMain.logger.debug( Here2.geocodeReverseLookup( new GeoPosition(44.522588,   -68.208983) ));
+		LatLon from = new LatLon(44.522825,   -68.208898);
+		LatLon to = new LatLon(44.531643,   -68.406179);
+		HereRoutePlus route = getRoute(from, to, "truck");
+		System.out.println(route);
 	}
 
 }
