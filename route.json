@@ -1,41 +1,75 @@
 {
   "routes": [
     {
-      "id": "29be8e76-fe5d-4b13-8574-494981168fad",
+      "id": "5f122117-6ce8-4721-bc9d-df0568e85a4e",
       "sections": [
         {
-          "id": "a9859364-ac97-44d8-a314-4bc95f53c3dd",
+          "id": "aa93a463-5856-4bfa-9ab8-7b5cadcefaf2",
           "type": "vehicle",
           "actions": [
             {
               "action": "depart",
-              "duration": 26,
-              "length": 28,
-              "instruction": "Head toward US Hwy 1 on Manor Ln. Go for 28 m.",
+              "duration": 39,
+              "length": 361,
+              "instruction": "Head southwest on State Road 206 W (SR-206). Go for 361 m.",
               "offset": 0
             },
             {
-              "action": "turn",
-              "duration": 1216,
-              "length": 16856,
-              "instruction": "Turn right onto US Hwy 1 (US-1). Go for 16.9 km.",
-              "offset": 2,
+              "action": "ramp",
+              "duration": 6806,
+              "length": 183361,
+              "instruction": "Turn left and take ramp onto I-95 S (SR-9) toward Miami. Go for 183 km.",
+              "offset": 12,
+              "direction": "left"
+            },
+            {
+              "action": "exit",
+              "duration": 134,
+              "length": 1263,
+              "instruction": "Take exit 191 toward CR-509/Wickham Road/Viera/Hospital onto N Wickham Rd. Go for 1.3 km.",
+              "offset": 1373,
+              "direction": "right"
+            },
+            {
+              "action": "roundaboutExit",
+              "duration": 198,
+              "length": 2254,
+              "instruction": "Take the 2nd exit from roundabout onto N Wickham Rd toward Wickham Rd. Go for 2.3 km.",
+              "offset": 1409,
               "direction": "right",
+              "exit": 2
+            },
+            {
+              "action": "turn",
+              "duration": 144,
+              "length": 584,
+              "instruction": "Turn right onto Legacy Blvd. Go for 584 m.",
+              "offset": 1451,
+              "direction": "right",
+              "severity": "quite"
+            },
+            {
+              "action": "turn",
+              "duration": 115,
+              "length": 537,
+              "instruction": "Turn left onto Carambola Cir. Go for 537 m.",
+              "offset": 1462,
+              "direction": "left",
               "severity": "quite"
             },
             {
               "action": "arrive",
               "duration": 0,
               "length": 0,
-              "instruction": "Arrive at Downeast Hwy (US-1).",
-              "offset": 274
+              "instruction": "Arrive at Carambola Cir. Your destination is on the left.",
+              "offset": 1475
             }
           ],
           "turnByTurnActions": [
             {
               "action": "depart",
-              "duration": 26,
-              "length": 28,
+              "duration": 39,
+              "length": 361,
               "offset": 0,
               "currentRoad": {
                 "type": "rural"
@@ -44,7 +78,191 @@
                 "type": "rural",
                 "name": [
                   {
-                    "value": "Manor Ln",
+                    "value": "State Road 206 W",
+                    "language": "en"
+                  },
+                  {
+                    "value": "Sr-206 W",
+                    "language": "en"
+                  }
+                ],
+                "number": [
+                  {
+                    "value": "SR-206",
+                    "language": "en"
+                  }
+                ]
+              }
+            },
+            {
+              "action": "enterHighway",
+              "duration": 46,
+              "length": 538,
+              "offset": 12,
+              "direction": "left",
+              "severity": "quite",
+              "currentRoad": {
+                "type": "rural",
+                "name": [
+                  {
+                    "value": "State Road 206 W",
+                    "language": "en"
+                  },
+                  {
+                    "value": "Sr-206 W",
+                    "language": "en"
+                  }
+                ],
+                "number": [
+                  {
+                    "value": "SR-206",
+                    "language": "en"
+                  }
+                ],
+                "toward": [
+                  {
+                    "value": "I-95",
+                    "language": "en"
+                  },
+                  {
+                    "value": "S",
+                    "language": "en"
+                  },
+                  {
+                    "value": "Miami",
+                    "language": "en"
+                  }
+                ]
+              },
+              "nextRoad": {
+                "type": "highway",
+                "name": [
+                  {
+                    "value": "SR-9",
+                    "language": "en"
+                  }
+                ],
+                "number": [
+                  {
+                    "value": "I-95",
+                    "language": "en"
+                  }
+                ]
+              }
+            },
+            {
+              "action": "enterHighway",
+              "duration": 5905,
+              "length": 159685,
+              "offset": 30,
+              "direction": "middle",
+              "currentRoad": {
+                "type": "highway"
+              },
+              "nextRoad": {
+                "type": "highway",
+                "name": [
+                  {
+                    "value": "SR-9",
+                    "language": "en"
+                  }
+                ],
+                "number": [
+                  {
+                    "value": "I-95",
+                    "language": "en"
+                  }
+                ]
+              }
+            },
+            {
+              "action": "continueHighway",
+              "duration": 855,
+              "length": 23138,
+              "offset": 1207,
+              "direction": "left",
+              "currentRoad": {
+                "type": "highway",
+                "name": [
+                  {
+                    "value": "SR-9",
+                    "language": "en"
+                  }
+                ],
+                "number": [
+                  {
+                    "value": "I-95",
+                    "language": "en"
+                  }
+                ]
+              },
+              "nextRoad": {
+                "type": "highway",
+                "name": [
+                  {
+                    "value": "SR-9",
+                    "language": "en"
+                  }
+                ],
+                "number": [
+                  {
+                    "value": "I-95",
+                    "language": "en"
+                  }
+                ]
+              }
+            },
+            {
+              "action": "exit",
+              "duration": 56,
+              "length": 641,
+              "offset": 1373,
+              "direction": "right",
+              "currentRoad": {
+                "type": "highway",
+                "name": [
+                  {
+                    "value": "SR-9",
+                    "language": "en"
+                  }
+                ],
+                "number": [
+                  {
+                    "value": "I-95",
+                    "language": "en"
+                  }
+                ],
+                "toward": [
+                  {
+                    "value": "CR-509",
+                    "language": "en"
+                  },
+                  {
+                    "value": "Wickham Road",
+                    "language": "en"
+                  },
+                  {
+                    "value": "Viera",
+                    "language": "en"
+                  },
+                  {
+                    "value": "Hospital",
+                    "language": "en"
+                  }
+                ]
+              },
+              "nextRoad": {
+                "name": [
+                  {
+                    "value": "N Wickham Rd",
+                    "language": "en"
+                  }
+                ]
+              },
+              "exitSign": {
+                "number": [
+                  {
+                    "value": "191",
                     "language": "en"
                   }
                 ]
@@ -52,16 +270,65 @@
             },
             {
               "action": "turn",
-              "duration": 1216,
-              "length": 16856,
-              "offset": 2,
+              "duration": 78,
+              "length": 622,
+              "offset": 1386,
+              "direction": "right",
+              "severity": "quite",
+              "currentRoad": {
+                "type": "highway"
+              },
+              "nextRoad": {
+                "name": [
+                  {
+                    "value": "N Wickham Rd",
+                    "language": "en"
+                  }
+                ]
+              }
+            },
+            {
+              "action": "roundaboutExit",
+              "duration": 198,
+              "length": 2254,
+              "offset": 1409,
+              "direction": "right",
+              "exit": 2,
+              "currentRoad": {
+                "name": [
+                  {
+                    "value": "N Wickham Rd",
+                    "language": "en"
+                  }
+                ],
+                "toward": [
+                  {
+                    "value": "Wickham Rd",
+                    "language": "en"
+                  }
+                ]
+              },
+              "nextRoad": {
+                "name": [
+                  {
+                    "value": "N Wickham Rd",
+                    "language": "en"
+                  }
+                ]
+              }
+            },
+            {
+              "action": "turn",
+              "duration": 144,
+              "length": 584,
+              "offset": 1451,
               "direction": "right",
               "severity": "quite",
               "currentRoad": {
                 "type": "rural",
                 "name": [
                   {
-                    "value": "Manor Ln",
+                    "value": "N Wickham Rd",
                     "language": "en"
                   }
                 ]
@@ -70,17 +337,31 @@
                 "type": "rural",
                 "name": [
                   {
-                    "value": "US Hwy 1",
-                    "language": "en"
-                  },
-                  {
-                    "value": "Schoodic Scenic Bywy",
+                    "value": "Legacy Blvd",
                     "language": "en"
                   }
-                ],
-                "number": [
+                ]
+              }
+            },
+            {
+              "action": "turn",
+              "duration": 115,
+              "length": 537,
+              "offset": 1462,
+              "direction": "left",
+              "severity": "quite",
+              "currentRoad": {
+                "name": [
                   {
-                    "value": "US-1",
+                    "value": "Legacy Blvd",
+                    "language": "en"
+                  }
+                ]
+              },
+              "nextRoad": {
+                "name": [
+                  {
+                    "value": "Carambola Cir",
                     "language": "en"
                   }
                 ]
@@ -90,17 +371,12 @@
               "action": "arrive",
               "duration": 0,
               "length": 0,
-              "offset": 274,
+              "offset": 1475,
               "currentRoad": {
+                "type": "rural",
                 "name": [
                   {
-                    "value": "Downeast Hwy",
-                    "language": "en"
-                  }
-                ],
-                "number": [
-                  {
-                    "value": "US-1",
+                    "value": "Carambola Cir",
                     "language": "en"
                   }
                 ]
@@ -111,190 +387,213 @@
             }
           ],
           "departure": {
-            "time": "2021-01-05T06:02:43-05:00",
+            "time": "2021-01-08T12:50:43-05:00",
             "place": {
               "type": "place",
               "location": {
-                "lat": 44.5228252,
-                "lng": -68.2088999
+                "lat": 29.7491336,
+                "lng": -81.3438259
               },
               "originalLocation": {
-                "lat": 44.522825,
-                "lng": -68.208898
+                "lat": 29.749812,
+                "lng": -81.3441881
               }
             }
           },
           "arrival": {
-            "time": "2021-01-05T06:23:25-05:00",
+            "time": "2021-01-08T14:54:39-05:00",
             "place": {
               "type": "place",
               "location": {
-                "lat": 44.53164,
-                "lng": -68.40617
+                "lat": 28.23469,
+                "lng": -80.7532
               },
               "originalLocation": {
-                "lat": 44.531643,
-                "lng": -68.406179
+                "lat": 28.2344599,
+                "lng": -80.7531501
               }
             }
           },
           "summary": {
-            "duration": 1242,
-            "length": 16884,
-            "baseDuration": 1234
+            "duration": 7436,
+            "length": 188360,
+            "baseDuration": 7420
           },
-          "polyline": "BGy0u90CnwkjiExG7B3I3DwH_dsJ7kB4XvoCgKjc0KzZsJzU0KzU4SvbgezjBgUzZ8f3mB8Vze0UvgB8V7pB8anzBoQzegP7fgPnfkN3ckrB_oDwbz8BkS3wBgP3rBoLzjBgPn4BkDjN0KnuB0Fze4DjcU3IUvMTvWvCriB7GvqB7BrJ_EvR7GrT7GvRvHrOzKvRjN7Q7QjSzjBvlB_EzFvtC72CvvBv0B7GjIvoC3uC_OvR7LnQ_JvRjNvbrJrYjIjc_E7f7BvRTzUAzFU3SUrEoBzU8BvRwH_d0F_TwMvlBofvhDwHjX0Z3uCwoCvjH4iD_wJ0F7QoL_iBwM3mBsJjcof39CwHrYofvhD4hBnqD8kBnlDoGnQsYzhC4IzZ0KrdkI7VoQn4BoQ_2BwMjwB4SnsC8V39CwC_JgP3_B4N74BoG7akSjuCU7B4D_O4I3mB8QzmCsiBnyEosCjjK4N7iCgPzwC0K79BkI7zB0F7pBoGnzBUrEwH3_BoG7nCsE_xBwCnkBoBzZ8BnuBwM7yJ8BvqBoBnpBAjDoBn8EA36BArJUzUAzFwC_7BsE39C4IzkDsEr2B8BriB8B3uCoBvlBAvHwC_qCAjDU3X8BnpBA3NoBnzBwC7lDU3cUrYoB7foBv0BUjXkI_jIUrY0F_uFU_d8BroDU_YUjXUzUkDvwDU7aTrOjD3hBjDrY_EriB3IzyB_iB_iGvb_4F_EnfrdnkGjrBrmJnB3IvHn4B_E3rBnL3iDvHn9BnG31BrE3XrEvWTjDnGzUnB3DzF_O7BnG7GnQvMvb7GjNjD_EzP3XnL_O3InL7LnL7L_JvW7Q7f3XvMnLvM3N3NrTjNvWnLrYjD3IzF7QjDnLjDvMrEna7Bnf7BnfnBzZjDvW_E_YzF3X3NnpB7G_TnLrdjInaTnB7BvH3DzP3D_T7B3NA7GTrOoB3rBoBnQoBnQ4DjwBgK3nD8BzoBAzZnB_dTjI7BrT3D3XnG_dvR3kCzK_nBzPrgC7Q7xC3hBzlF3Sz6CnG3mBzFrnB3Xz5FvH_xB_EzZvH_nBvW_tDrE7VjD_TjDrdT_iBwC3hBsE3hB0K3mBoG7QwWnzBkN7f8BrEkI7VoLvlBwHvb8GzjB0FrdsE7awHvvB0FrYwH7pB0FrdoBnGoGvboG_Y4N36BgPj6B0Z7lDkD7L8Vj9CsJrnBgFjX0FzZwC_J8BzK",
+          "polyline": "BG84334Bj16k7EvQ7oB3Nze3DjIvCnG7B_E3DnL_E3N_EjN_OjhBnBjD_EjNjNjhB_EAnGAvH8BrJ4DvM4I_JwHnBU_TkNjhBoVjD8BvgBgUjXsOvM8G_O8GnV4I7a8LrOoG3SwMzoBwRrO8G7kBgPv5BkXvxFonCzhH06C3nD8pB_qCge_iG4uCjyK0nEv3CgjB70D8uB_E8BrO0FjrBwRrzK0nE_TkIjwBsTr3DkwBnmF8iC73E08B31BoVnV4IvCoBzPoG_OoGj_BgZjnI0pD7zB0U3rBwR3pC4cn_FwtC36B4XzmMo8EvvBgUnkBkS_dwR_YsOjc4SnfoV3c8V7aoVriB0ezU4SnV8Vjcge7kBwqB3XofnVkcvW4hBjSkczZssB7iCw1D_yDgtGvzEolIz_CspFv5GghMvoC4gE3XkrB3DoG7pBkpCze41Bz8BsoD_7BovD7G0KvkE4kH7VkmBrOkX_OsTzjBgyBjX8a3S8V7pBwqBzZsYnpBgjB3c8VvlB0ZzUsOrO4IrdoQ7kBwWjcoQv5B0e_sBsYrxB8a79BkhB75DoiC7sC8pBzwC4rBruFs-CjhG0pDnjEonCnzBwbvhDw0BntEwtCzpDo4B_8D4kCvnF06Cr-C8zB7xCssBjkC8kBrrE0rCj8FwmDv-B4hBze8Q7BoBrYkNzjBsT34CwvB_nGstD3uH4gE7-DslC7fwRnQ4IzyBwbvlGwrDnqD03Bz8BwgB_sBsYvgBkS7V8L3wBkcn4BsiBnVkN3iDk_B3kCgtB3SwMna8QjhBoVz2EwhD7iC8pB_xBkhBrtD8nC7jEg1CvyCo4Br-C89Bn8E8lD7vD8sC_jD0hCn-DkzC7jJo_F_qHs6EnLwH_TkNr8DoxCzrCw0BrlCssBjxDwoC72C03BvHgF7wFgzDr2B0jB7awRzKwHnQoLvbsTrd4SnGsEnVgPjNsJ_O0KvMkI3S8LzegU3DwC7akSnfoV7uB0evRoL3wB8fjhBoV7QoLriBwWze0UnQgK7foVnQ0KnQ0KnQ0KnQoLnQgKzP0KnQ0K3NsJ_iBwWnxCk1BvgBoVjhBoVriB0U7QgK7QsJ_iBwR_iBoQvRwHvR8Grd0KzyBsTj_BsYzjBkN_lCoazyBgUnf8LzwC0evlBsO_nB0P_7BwW7kBsOzZ4I79BsYvgB8LvgBwMvgBwMnpBoQvvBkSvWkIzjB4N79BkX7pBoQ3coLv0BgU3hBkNrxB4SzoBgPnLsEj1B0Uv0BsT75D0tBvlBgP7kBsOrdoL7VkI_iBkNztBkS7pBgPnQoGvgBwMzUkInzBgU7fwM3hBkN7VwH3wBkS3IkD_vC8fztB8Q_qC4crnBgP3mBgPvMgFnBUrO0F7VkI3_B4X31B0U_5CsiBrqCkc3pCkc_nB0PnlD4mBzmCoaz6CsiBnpB8Q3SwH7xC0er2B0UnGwC3DoB_xB4S3coL_E8BzK4DrYsJrxB4SjmBgPj4C4hB34CkhBnkB4NzK4DzoB0PzjB4NrE8B3uCgevqBoQzeoL_7BwWz3BoV3hBkNnagKrsB8Q3hBwMrJ4D_4F0mC3rB8Qn8Es7B_tDopBr8DkwB70DssB77CgjBz9DouBzyB0Uz1CwgBnlDsnBr1E03BnkBkNvgBkNzFwCjrBoQn5DouB3pCkc_vC0e_qCkc7nCgZ_2B0PzKkDna8GvoCsTj1B4NjrB8LvbwH_lCwWrgC4Xn2CwgB3wBsTrxB0UrxBkXnzBsYnxC4rB7iCokBjhB8QnQwHvmD0tB35EwjCvyC0jB_YoL3IkD_YoLzZoL3uC4hB_gCkc3xDgyBj_BwbvtC4hBnuBgU_7Boar0C8kB7uBgUjqE08B7VsJvxF8sC_7BoanpBkSjhBsO77CgoBzekN3mB8Q3zCokBn0D0yB_mOwlG7iHkiD7vD4wB3mGo2C3xDsxBzzI04D71P84G37D41BnvNw7FnmFwoCjuC4hB_7B0Z7VwH_ToG3X0FvboG3csEjhB4D3hB8BrxBnB3wBnB7vD7BvRTniCnBvMAz1C7Bz2E3D7fT7QAvgBT3DAzKT79BnBvbTnGAjrBnB_dnB7LUrdTj6BnBz1C7B3lEjD_jD7BroD7BrnLvHv-Q7LzrC7BvjH_EnzBTzjBAvgBwCvgBkDjhBsEriBgFriBkI79BwRr2BkSjkC4XriG4kCnsCoa7Q0FzwCwbr7G8sCnsC0Zj7D8pB3gEwlB_0C0Z_nB4NnpBsOvmDwlBnlD0oB3uCof7gDgjBnnC0Z_xB8Qn1Fk_BvzEozBrqC0Zz0Fk_Br7B0UrdgKv5BgUzK4DjSoG7GwCj4H01C7GwCnlDgjB32D0oB_2BsTnLsEjSoG_T8G7kBwMjgE4rBvuJ0pDvzJ8qD7jE0tBvxPsuFr1E8zB7foL_nGslCz4D8pBvlBkNnQ0FvW8GvHkDvR8G_Y4InkBwM_tDwlBvbsJr2B4Sz4DopBnfoL7hK8vDzlKkxDrgCwW36GosC7GwCj2D0oBvlLg9D7BUr0CsdntE4wB3pC0ZvmD0jBnVwHjmBkN_T8G7LsEnBU_Y4I_dgK_sBkNjckI_vCgej1BoVrnB0PrO8GzjBsT_Y0PrxBgjB31BgoBj9ConCna4SjhB8VriBkSnLwHzegPzZkNjNgFnqDwqB_d8L_dsOv0BwW3rBgZrYkNjmB0U3pC8pBv0B0e3zC0tBzrCgtB_yD8iC_xBsdvgB4S7LoG34C4wBzU8LzZgPrOkIrEkDrJ0FjhBsTn0DkkCjhBkS_oDk6BzU8L_doQzyB4cnLoGjoF8gD7VwM7uBwbj9C41BniCkmBjkCsnB3sDk_BrYsOrEwCztBoav-B0jBr0C4wBjlE0rCv5BwgB3hB8V_iB4XnQwMnf8avW0UnQ8QvMsOjSoV_YkhB3NsTjhBw0B3wBsvCj1B44C39Cg7E7zBs0C3-EknInpBkkCzoB8iCzKwR3mB4_Bv5B0_C77C83E7zBo2Cj6Bg_Cv0B4zCnkBg8B3SofzPkXnQ4XnQgUnQgUjSsTzP8Qna4XzFgF_YoVjX4S7agUjhB4XnQoL3XwMjhBoQvWoL7iCwgB7f0PvbgPnkB8Q3IsE_nBsTniCkhB_nBsTriB8Q_YwM_T4Ij_B8a3cwR3rB8VrlCgjB_EwCvhDsxB7xCopBnpG4iDzjBkSrlCsiBjcsOrjDkwB3_Bofj4CsnB_5CgoB7iCge75Ds7BzgKk-EjhGg_C7tEgmC_-C8uB_0CsnB7kB8QzhCoa7sCoarvC4XzjBsJnuB8LrgC8L3iD0Pv5B0Fr-C4IvmDgK3-EsOv0G4S_nGkS3IU_JU_zFgPrqCwHrsB8G_dgFvgBsJvW8G3SwHrdoL7pBgUrxBkcjhB8V7mFguD3hG8-Dj5EgkD78TkiN7uB0evqBkc74B8kB_YoQvbwRjrBkc_gCwqB3csT7VsO7iCwqB7LkI3DwCvMwHnL8G_OoLzPoL7VsOrgCopB3wBof3I0Fv5BgjB_JwHvR8LjnD4kC_iBkX3NsJ_TwM_Y8Q74B8kBr8DoxCjiD4_BrnBgZ3rBsdnpB8a7gD4_BvhD4_BjlE82Cr-C89BrxGooE_vCw0B36B4mBjhBoV3c4SzhCkrB3nDwjCn2Co4BvjCssBrgC8pB_gC8pBjX0P7iC4rB7kBsYzUkN7LkI3rB4c_0Cg3BvgBoVv0BsiB_-C89BzoB8a_2BgjBnpBoa7uBoa3c0PrnBsT7akNjckN3XoLrnGw8Cr5Mg-FvWgKzZ0KznEghCze4N36B8ajrBgUvHkDzKgFnpBgUrlCkhBjrBsTnkB8QjNoGnVkI31BgZvlBwRzPwHzKgF7QkIzFwCjNoGn9Bwb3uC8kB3NoGnL0Fn7CwqBjlE89BzrCgjB3kH0pDjiD0tBvlBwRnnCwgBzZwM7kBoQrsBoV7kB8QrYoLzKgFnVgKzP8G7GkDna8L3SkI7LgFnVkIjrBgP7pB4N7zB0PvqB4N3_B4SzrCkXn4BwRnvD4hBjjFsxBz8BkSv2F03B_nBwM36BwRzegK3ckIrnBwMnxCsY3rBkN3wBgPnuBsO_T0FzjBoLrsBgPrdsJnuBoQ_nBgPzoBgPrdwMr7BkX34CgjB3qEs2B3wB0U7uBkS3SwHrTwH3c8LrdoL7kB4NjwBsTvvBsTjwGgwCjXsJrTkIvhDwlBvpEs2BjmBsO_YgKrTkIjS8G3coL74BwW_-C8kB3XsJ7pB8QvtC0enpBoQ_jD4mB3XgKztB8Q7kB8Lr2BgPn4B0KrgCgKj4CgP3kC0KzjG0e7zG4hBv5BgKr5CsOz1C4N7nCgK79BoL70DkSj8FgejwB8G36B0K7pB8G36BgK3rBsJvvB8Lj_BwRnuBsOvbkI_sB4N30EouB_nB8Lna4IjlEopBzpDwgBzjB0K7Q0Fj6BkS3_BsT_xBgPj6BkS_gCgUnuBsO7wFs2BrEoB7tJ49CzoG89B7xCgZ_0Coa77Ckc7zBoQjS0F3S0FzZkIj1BoQriB0KvR0F3mBoL3mBoLjhBsJ36B8QjwB4Nv5BoQ3rBwMnpBoLnnCgUvoC0U3hBsJnLkDnVoGzjBgK3sD0ejvEgoB_2G08B74BoQvoCgUnQsEv8HonC_8Ng9D7xCkXjcwH_sBwMrsB8LnrFsxBnnC0UjIwCnkB0K7uBwMjuCwW74B8Lj_BgUrToGztBwMvbkIjwB4NjyFgyB_sBwM3uH8iCz5F8zB_qC8V7pB8LzZ8G72CsY7zBsO3uH8iC3zC4X3wB4NjX8G7xCkXrYoG_jD8anpBsJrnB4DrsBoBnVnBnVnBzjBzFvvB7L31BvRvwDnkBz0Fj6Bn2Cjc3wBnQ_YvHvhDnfzgFnzB36BrT3XvH7lDjhBzUzF7a7GvCTnfzFzoBrE7pBTnpB8Bjc4DjNkDnpBgKnkB8L3_BoanlDopBj1B8VjcoL_nGkzCv8CwlBv3C0jBnuBgU7lD8pBnnHs-C3pCger2Ls6EnoEo4B_qCgeriGgwC7qDssBvlBsOvgB4N7pBwR_kFkkCn2CsiB_dkNzpDkrBjuCkhB_zF8nCvboLnzBoVzU4IjxD0tBnyEs7BjnDkrB34CwlBjXgK_E8BzmCsd_E8BrJ4DnLsEnVkI3hB4NnkB0PnfkNvjC4cz0F8nCj6Gg6C_sBkS_zKgsEvsF0mCrjI0pDngD0oBr0CgjBj1L83EnxCkhBvjCkczsEk6B31B8VjkCkcztBkSzoB0PvgBkIjI8BrYoGnGoB_T8B_YwCzUoBnzBUjnDnBnuBA3NU3mBAzpDTzzDnB_dTzpDA_YArnBA_nBA_5CT_gCAj8F7B7oET_7BA3pMvC_7BTrzFnBz1HnBzzDTr0HnBrjI7BvlGnBrlWrEn2H7B3cA_7BTz6HTzKA30EnB_gCT7iCTv-BA31BTnjETz6HnBvvQjDnnCTjtKvC_mEnB_-CA3SUjSoBrTwCvRwCjS4DjSsEjSsE_iB8L_iBgP3hBwRnQsJnQgKzP0Kze4X_d4XnuBwlB79BsxB3sDw3C_8D0kDzwCsgCzPwM7kBsdjyF4vE35Ek7DzUoQvWwRnLsJnVwR_-CosCnpB4hBzsEkxDv5BouBvwD06CvwIk6GvqBsiB7tE4xDjrGkjF3wBsnB_O8LnQ8LzUsOvMkInQsJvRgKvR4IvR4IjSwH3SwHjS8GjSoGrT0FjSsErTsE3S4D3SwCzUwC_T8B3SUrTU_TArmE7B3iI3DvwD7Bj4CnBz3BTrxBT3ITnuBTzkDT73E_E_gC7BniC4D7sCA74B8B74B8BrgCwCvHUvtC4DvoCkDnnC4DnnC4DzmCU31BsE3c8B_7BkD_sB8BzkD4DntJgP_OUv_D0F7vD4D_-CoBj9CA30EArjIU_tDA7xCUr7BAzeAvvBUzlPUrOA_gCUr2BAnkBAvvBA_sBArdoBjSUrT8BnQ8BvM8B_Y0FrTgFzPsEzyBwRjX4IjkCsY74B8VzjBkN_iGsqC3uHk4Cv3CkhBz6C4hBvyCof_nBwRjX8L7pBkX3ckS3DwC7pBoa3mB0ZrzFk2Djc4SnvDsqCn9BsnBzmCouBnawRrsBgevgBgU31G8tEjI0F3nDwjC_jD0hC_J8GnfgUvbwRr0Co4BnzBkhB74B8kBztG8oEzP0K7jE82C7foV31BgjB_JoG7qD0mC3rB4c7pBwb_OgK3XoQrY0P3X0PrlCgtBzjB4XrOsJr-Cw-B3sD8nCvpE06CjzCg3Bv-B0oBvvBof3tFsyDviFwrDjlEw3CjiDsgC72C84B_OsJ77C89BrxGooE_7B0oB3_B8pBnpGwkEr0Cg3Bv2Fg4Dv-B8pBzrHs6Ev8C08B7zB0jB34Cw5BjsD0mCnjEo2CrtDkpCniC0tB36BgtBzyBwqB3NoLvqBkmBna4XvqB8pB74Bs7B7f0jB7asdnzBsgCjhB8pBvlBs2B3XkhB3Ssd7aopB7xC8jEn4B06C_xBgwCnQ0Z3c0tBvH8LvMgUnQoa7Qwbv5Bk9CzoBw5BvgBopBjrBsxBrdsd3SkS7L0K3XoV3XsTzP8LjD8BjNgKvWoQrJ8G3XgP_Y0P_nB8VnuB8Vj6BsY3rBgPrsBkN75D4hBjyF8zB7f4Ij2DsiBn0DsiB7jEwlBj1B0P31B0PjxDwgBnQgF_gC4S7nC0UvgBsJjXwHrtDofn1Fw0Bn1Fw0BvpJo2C7kGw5Bv0BgP3zH0mCriGo4B77CoanzBgPzUoG7kB0K3hBgK7L7BnQ8Brd8GnzB0Kj6BwMzoBwH_J8B7foG_dsE_YkDvCA_O8BriBwCzFvCrEvC_E3D_ErEU3SUvRU7fUzUUrYwC7kBnBrTnB7LnG7pBvC3N_ErYjDjNzFjXvCzK3D_Y7BrOAvHAnGoBnGsEnGU_EAnG7BnGjD3DvCjITvHTj_BArYAzUnBjcArEA_JAzFAjDA7fAzKAnLAnQTv5BAnQTvWAnGA3IAvHTrOT7fArJTvgBTvgBTzUTnanBz1CAjrBT7V_E3SnGzsEnBjoFAvHArJAzUnGzoLoGAghCUoQU0tB7B8LoBsOkDkNoG0hCoasT8GkSkDouBvCTjIT_YkD_OgF3XgF7fTn4BoB3c8Bnf0FzZwCjXnBzU_EnavHvW",
           "spans": [
             {
               "offset": 0,
               "names": [
                 {
-                  "value": "Manor Ln",
-                  "language": "en"
-                }
-              ],
-              "length": 28,
-              "duration": 26
-            },
-            {
-              "offset": 2,
-              "names": [
-                {
-                  "value": "US Hwy 1",
+                  "value": "State Road 206 W",
                   "language": "en"
                 },
                 {
-                  "value": "Schoodic Scenic Bywy",
+                  "value": "Sr-206 W",
                   "language": "en"
                 }
               ],
-              "length": 2895,
-              "duration": 215,
-              "speedLimit": 20.0
-            },
-            {
-              "offset": 60,
-              "names": [
-                {
-                  "value": "US Hwy 1",
-                  "language": "en"
-                }
-              ],
-              "length": 29,
-              "duration": 2,
-              "speedLimit": 20.0
-            },
-            {
-              "offset": 62,
-              "names": [
-                {
-                  "value": "US Hwy 1",
-                  "language": "en"
-                }
-              ],
-              "length": 1944,
-              "duration": 177,
-              "speedLimit": 17.7777786
-            },
-            {
-              "offset": 81,
-              "names": [
-                {
-                  "value": "US Hwy 1",
-                  "language": "en"
-                }
-              ],
-              "length": 4161,
-              "duration": 278,
+              "length": 361,
+              "duration": 39,
               "speedLimit": 24.7222233
             },
             {
-              "offset": 135,
-              "names": [
-                {
-                  "value": "US Hwy 1",
-                  "language": "en"
-                }
-              ],
-              "length": 797,
-              "duration": 62,
-              "speedLimit": 17.7777786
+              "offset": 12,
+              "length": 538,
+              "duration": 46,
+              "speedLimit": 31.3888893
             },
             {
-              "offset": 145,
+              "offset": 30,
               "names": [
                 {
-                  "value": "US Hwy 1",
+                  "value": "SR-9",
                   "language": "en"
                 }
               ],
-              "length": 2811,
-              "duration": 165,
-              "speedLimit": 22.2222233
+              "length": 58431,
+              "duration": 2139,
+              "speedLimit": 31.3888893
             },
             {
-              "offset": 185,
+              "offset": 464,
               "names": [
                 {
-                  "value": "US Hwy 1",
-                  "language": "en"
-                },
-                {
-                  "value": "US Hwy One",
+                  "value": "SR-9",
                   "language": "en"
                 }
               ],
-              "length": 1030,
-              "duration": 68,
-              "speedLimit": 22.2222233
+              "length": 15415,
+              "duration": 610,
+              "speedLimit": 29.1666679
             },
             {
-              "offset": 219,
+              "offset": 578,
               "names": [
                 {
-                  "value": "US Hwy 1",
+                  "value": "SR-9",
                   "language": "en"
                 }
               ],
-              "length": 1444,
-              "duration": 88,
-              "speedLimit": 22.2222233
+              "length": 108977,
+              "duration": 4011,
+              "speedLimit": 31.3888893
             },
             {
-              "offset": 237,
-              "names": [
-                {
-                  "value": "Downeast Hwy",
-                  "language": "en"
-                }
-              ],
-              "length": 34,
-              "duration": 2,
-              "speedLimit": 22.2222233
-            },
-            {
-              "offset": 238,
-              "names": [
-                {
-                  "value": "Downeast Hwy",
-                  "language": "en"
-                }
-              ],
-              "length": 626,
-              "duration": 50,
-              "speedLimit": 17.7777786
-            },
-            {
-              "offset": 251,
-              "names": [
-                {
-                  "value": "Downeast Hwy",
-                  "language": "en"
-                }
-              ],
-              "length": 1085,
-              "duration": 109,
+              "offset": 1373,
+              "length": 641,
+              "duration": 56,
               "speedLimit": 15.5555563
+            },
+            {
+              "offset": 1386,
+              "length": 41,
+              "duration": 12,
+              "speedLimit": 17.7777786
+            },
+            {
+              "offset": 1390,
+              "names": [
+                {
+                  "value": "N Wickham Rd",
+                  "language": "en"
+                }
+              ],
+              "length": 470,
+              "duration": 46,
+              "speedLimit": 17.7777786
+            },
+            {
+              "offset": 1403,
+              "names": [
+                {
+                  "value": "N Wickham Rd",
+                  "language": "en"
+                }
+              ],
+              "length": 111,
+              "duration": 20,
+              "speedLimit": 8.8888893
+            },
+            {
+              "offset": 1409,
+              "length": 49,
+              "duration": 10,
+              "speedLimit": 8.8888893
+            },
+            {
+              "offset": 1414,
+              "names": [
+                {
+                  "value": "N Wickham Rd",
+                  "language": "en"
+                }
+              ],
+              "length": 162,
+              "duration": 11,
+              "speedLimit": 20.0
+            },
+            {
+              "offset": 1418,
+              "names": [
+                {
+                  "value": "N Wickham Rd",
+                  "language": "en"
+                }
+              ],
+              "length": 494,
+              "duration": 35,
+              "speedLimit": 17.7777786
+            },
+            {
+              "offset": 1437,
+              "names": [
+                {
+                  "value": "N Wickham Rd",
+                  "language": "en"
+                }
+              ],
+              "length": 442,
+              "duration": 36,
+              "speedLimit": 20.0
+            },
+            {
+              "offset": 1445,
+              "names": [
+                {
+                  "value": "N Wickham Rd",
+                  "language": "en"
+                }
+              ],
+              "length": 1107,
+              "duration": 106
+            },
+            {
+              "offset": 1451,
+              "names": [
+                {
+                  "value": "Legacy Blvd",
+                  "language": "en"
+                }
+              ],
+              "length": 584,
+              "duration": 144
+            },
+            {
+              "offset": 1462,
+              "length": 13,
+              "duration": 3
+            },
+            {
+              "offset": 1463,
+              "names": [
+                {
+                  "value": "Carambola Cir",
+                  "language": "en"
+                }
+              ],
+              "length": 524,
+              "duration": 112
             }
           ],
           "language": "en-us",

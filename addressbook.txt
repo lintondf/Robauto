@@ -270,6 +270,12 @@
         <latitude>42.89538860321045</latitude>
         <longitude>-70.87100028991699</longitude>
     </persons>
+    <persons>
+        <name>Popeyes</name>
+        <address>9177 Atlee Rd, Mechanicsville, VA 23116</address>
+        <latitude>37.6506223</latitude>
+        <longitude>-77.3993666</longitude>
+    </persons>
     <tags>Gas</tags>
     <tags>Fuel</tags>
 </AddressBook>

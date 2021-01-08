@@ -11,6 +11,11 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
@@ -47,6 +52,7 @@ import com.bluelightning.Events.AddWaypointEvent;
 import com.bluelightning.Events.POIClickEvent;
 import com.bluelightning.Events.StopsCommitEvent;
 import com.bluelightning.Events.UiEvent;
+import com.bluelightning.Here2.HereRoutePlus;
 import com.bluelightning.data.FuelStop;
 import com.bluelightning.data.TripPlan;
 import com.bluelightning.gui.AddAddressDialog;
@@ -55,6 +61,7 @@ import com.bluelightning.gui.MainPanel;
 import com.bluelightning.gui.OptimizeStopsDialog;
 import com.bluelightning.gui.RoutePanel;
 import com.bluelightning.gui.AddAddressDialog.AddAddressActionListener;
+import com.bluelightning.gui.HereRouteDialog;
 import com.bluelightning.json.BottomRight;
 import com.bluelightning.json.BoundingBox;
 import com.bluelightning.json.Leg;
@@ -223,6 +230,14 @@ public class PlannerMode extends JPanel {
 			 * finalizeRoute() fires RouteReport fires Route* route() fires
 			 * RouteReport
 			 */
+			case "ControlPanel.RouteHere":
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						routeHere();
+					}
+				});
+				break;
 			case "ControlPanel.RouteOpen":
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
@@ -430,9 +445,52 @@ public class PlannerMode extends JPanel {
 			tripPlanFile = createTripPlanFromBaseCamp(tripPlanFile);
 			Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteLoad", null));
 		}
+		
+		private void routeHere() {
+			final HereRouteDialog dialog = new HereRouteDialog();
+			dialog.getFromPlusCode().setText("PMX4+W8 St. Augustine, Florida"); // TODO REMOVE THIS
+			dialog.getToAddress().setText("3533 Carambola Cirle, Melbourne, FL"); // TODO REMOVE THIS
+			dialog.getOkButton().addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					LatLon from = null;
+					if (! dialog.getFromLatLon().getText().isEmpty()) {
+						String[] fields = dialog.getFromLatLon().getText().split(",");
+						from = new LatLon(Double.parseDouble(fields[0].trim()), Double.parseDouble(fields[1].trim()));
+					} else if (! dialog.getFromPlusCode().getText().isEmpty()) {
+						from = Here2.decodePlusCode(dialog.getFromPlusCode().getText());
+					} else if (! dialog.getFromAddress().getText().isEmpty()) {
+						from = Here2.geocodeLookup(dialog.getFromAddress().getText());
+					}
+					LatLon to = null;
+					if (! dialog.getToLatLon().getText().isEmpty()) {
+						String[] fields = dialog.getToLatLon().getText().split(",");
+						to = new LatLon(Double.parseDouble(fields[0].trim()), Double.parseDouble(fields[1].trim()));
+					} else if (! dialog.getToPlusCode().getText().isEmpty()) {
+						to = Here2.decodePlusCode(dialog.getToPlusCode().getText());
+					} else if (! dialog.getToAddress().getText().isEmpty()) {
+						to = Here2.geocodeLookup(dialog.getToAddress().getText());
+					}
+					System.out.println(from);
+					System.out.println(to);
+					if (from != null && to != null) {
+						HereRoutePlus plus = Here2.getRoute( from, to, "truck");
+						tripPlanFile = createTripPlanFromHereRoute(plus);
+						Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteLoad", null));
+					}
+ 					dialog.setVisible(false);
+ 					
+				}});
+			dialog.getCancelButton().addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					dialog.setVisible(false);
+				}});
+			dialog.setVisible(true);
+		}
 
 		private void routeOpen() {
-			String where = System.getProperty("user.home") + "/Google Drive/0Robauto";
+			String where = RobautoMain.getDataPath();
 			System.out.println(where);
 			// Create a file chooser
 			final JFileChooser fileChooser = new JFileChooser(where);
@@ -537,8 +595,8 @@ public class PlannerMode extends JPanel {
 				}
 			} else {
 				RobautoMain.logger.trace("Open command cancelled by user.");
-				RobautoMain.logger.info("Loading previous trip plan: " + tripPlanFile.getName());
-				Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteLoad", null));
+//				RobautoMain.logger.info("Loading previous trip plan: " + tripPlanFile.getName());
+//				Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteLoad", null));
 			}
 		}
 
@@ -573,22 +631,22 @@ public class PlannerMode extends JPanel {
 		private void route() {
 			RobautoMain.tripPlan.setFinalizedRoute(null, null, null);
 			Route route = RobautoMain.tripPlan.getRoute();
-			if (route == null) {
-				RobautoMain.logger.info("Planning route...");
-				if (RobautoMain.tripPlan.getPlacesChanged()) {
-					RobautoMain.tripPlan.setRoute(null);
-					RobautoMain.tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
-					RobautoMain.logger.info("  Route points saved");
-				}
-				route = Here2.computeRoute(RobautoMain.tripPlan); // will reload
-																	// from
-				// routeJson if not
-				// empty
-				RobautoMain.logger.info("  Route planned");
-				RobautoMain.tripPlan.save(tripPlanFile);
-				RobautoMain.tripPlan.tripPlanUpdated(tripPlanFile.getAbsolutePath());
-				RobautoMain.logger.info("  Trip plan saved");
-			}
+//			if (route == null) {
+//				RobautoMain.logger.info("Planning route...");
+//				if (RobautoMain.tripPlan.getPlacesChanged()) {
+//					RobautoMain.tripPlan.setRoute(null);
+//					RobautoMain.tripPlan.setPlaces(routePanel.getWaypointsModel().getData());
+//					RobautoMain.logger.info("  Route points saved");
+//				}
+//				route = Here2.computeRoute(RobautoMain.tripPlan); // will reload
+//																	// from
+//				// routeJson if not
+//				// empty
+//				RobautoMain.logger.info("  Route planned");
+//				RobautoMain.tripPlan.save(tripPlanFile);
+//				RobautoMain.tripPlan.tripPlanUpdated(tripPlanFile.getAbsolutePath());
+//				RobautoMain.logger.info("  Trip plan saved");
+//			}
 			if (route != null) {
 				waypoints = map.showRoute(route);
 				int index = mainPanel.getRightTabbedPane().indexOfTab("Map");
@@ -917,6 +975,19 @@ public class PlannerMode extends JPanel {
 		}
 		Events.eventBus.post(new Events.UiEvent("ControlPanel.RouteOpen", null));
 	}
+	
+	protected File createTripPlanFromHereRoute(HereRoutePlus plus) {
+		RobautoMain.logger.info("Importing Basecamp route...");
+		ArrayList<BaseCamp> days = new ArrayList<>();
+		BaseCamp baseCamp = null;
+		TripSource garmin = null;
+		baseCamp = new BaseCamp( plus.route.getDays().get(0), plus.route.getTurns() );
+		days.add(baseCamp);
+		String basePath = RobautoMain.getDataPath() + "/hereRoute";
+		return finishCreation( plus.route, basePath, days );
+	}
+
+	
 
 	private File createTripPlanFromBaseCamp(File file) {
 		RobautoMain.logger.info("Importing Basecamp route...");
@@ -1009,6 +1080,10 @@ public class PlannerMode extends JPanel {
 //			}
 //			RobautoMain.logger.info(String.format("  %d days loaded", days.size()));
 //		}
+		return finishCreation( garmin, basePath, days);
+	}
+	
+	private File finishCreation( TripSource tripSource, String basePath, ArrayList<BaseCamp> days) {
 		ArrayList<List<GeoPosition>> tracks = new ArrayList<>();
 		Route route = mergeRoutes(days);
 		route.setBoundingBox(generateBoundingBox(route.getShape()));
@@ -1016,7 +1091,7 @@ public class PlannerMode extends JPanel {
 
 		final double MATCH_DISTANCE = 500.0;
 
-		ArrayList<VisitedPlace> places = new ArrayList<>(garmin.getPlaces());
+		ArrayList<VisitedPlace> places = new ArrayList<>(tripSource.getPlaces());
 		for (int i = 0; i < places.size(); i++) {
 			VisitedPlace place = places.get(i);
 			RobautoMain.logger.debug(place.toString());
@@ -1302,7 +1377,7 @@ public class PlannerMode extends JPanel {
 					frame.addWindowListener(new WindowAdapter() {
 						@Override
 						public void windowClosing(WindowEvent e) {
-							if (plannerMode.tripPlanFile != null) {
+							if (plannerMode.tripPlanFile != null && RobautoMain.tripPlan != null) {
 								RobautoMain.tripPlan.setPlaces(plannerMode.routePanel.getWaypointsModel().getData());
 								RobautoMain.tripPlan.save(plannerMode.tripPlanFile);
 								RobautoMain.tripPlan.tripPlanUpdated(plannerMode.tripPlanFile.getAbsolutePath());

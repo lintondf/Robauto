@@ -1,11 +1,11 @@
 
-package com.example;
+package com.bluelightning.here;
 
 import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Location_ implements Serializable
+public class Location implements Serializable
 {
 
     @SerializedName("lat")
@@ -14,7 +14,7 @@ public class Location_ implements Serializable
     @SerializedName("lng")
     @Expose
     private Double lng;
-    private final static long serialVersionUID = 6717538619192345296L;
+    private final static long serialVersionUID = -5299537703656356528L;
 
     public Double getLat() {
         return lat;

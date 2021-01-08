@@ -64,6 +64,7 @@ body {font-family: Arial;}
 <div class="tab">
   <button class="tablinks" onclick="openCity(event, 'RealTime')", id="defaultOpen">RealTime</button>
   <button class="tablinks" onclick="openCity(event, 'Plan')">Plan</button>
+  <button class="tablinks" onclick="openCity(event, 'Fuel')">Fuel</button>
   <button class="tablinks" onclick="openCity(event, 'Obscura')">Obscura</button>
 </div>
 
@@ -75,6 +76,11 @@ body {font-family: Arial;}
 <div id="Plan" class="tabcontent">
   <h1>Plan</h1>
   {$planTab}
+</div>
+
+<div id="Fuel" class="tabcontent">
+  <h1>Fuel</h1>
+  {$fuelTab}
 </div>
 
 <div id="Obscura" class="tabcontent">

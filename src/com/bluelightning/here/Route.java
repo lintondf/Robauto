@@ -1,5 +1,5 @@
 
-package com.example;
+package com.bluelightning.here;
 
 import java.io.Serializable;
 import java.util.ArrayList;

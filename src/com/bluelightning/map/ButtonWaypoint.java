@@ -27,20 +27,20 @@ public class ButtonWaypoint extends JButton implements Waypoint {
 		ButtonWaypoint.preferredSize = preferredSize;
 	}
 
-	public String name;
+	private String buttonName;
 	
 	protected Dimension size = preferredSize;
 	
 	void extractName(String userLabel ) {
-		name = userLabel.trim();
-		if (name.charAt(0) == '-' || Character.isDigit(name.charAt(0))) {
-			String[] fields = name.replaceAll("  ",  " ").split(" ");
+		buttonName = userLabel.trim();
+		if (buttonName.charAt(0) == '-' || Character.isDigit(buttonName.charAt(0))) {
+			String[] fields = buttonName.replaceAll("  ",  " ").split(" ");
 			if (fields.length >= 4) {
-				name = "";
+				buttonName = "";
 				for (int i = 3; i < fields.length; i++) {
-					name += fields[i] + " ";
+					buttonName += fields[i] + " ";
 				}
-				name = name.trim();
+				buttonName = buttonName.trim();
 			}
 		}
 		//System.out.println(userLabel.trim() + " => " + name);
@@ -74,7 +74,7 @@ public class ButtonWaypoint extends JButton implements Waypoint {
 	}
 	
 	public String getName() {
-		return name;
+		return buttonName;
 	}
 	
 

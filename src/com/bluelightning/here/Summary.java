@@ -1,7 +1,9 @@
 
-package com.example;
+package com.bluelightning.here;
 
 import java.io.Serializable;
+
+import com.bluelightning.Here2;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -43,4 +45,7 @@ public class Summary implements Serializable
         this.baseDuration = baseDuration;
     }
 
+    public String toString() {
+    	return String.format("%d m; %s; %.1f MPH", length, Here2.toPeriod(duration), (double)length/(double)duration * Here2.METERS_PER_SECOND_TO_MILES_PER_HOUR );
+    }
 }

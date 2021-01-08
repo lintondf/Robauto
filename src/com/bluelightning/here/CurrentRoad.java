@@ -1,5 +1,5 @@
 
-package com.example;
+package com.bluelightning.here;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class NextRoad implements Serializable
+public class CurrentRoad implements Serializable
 {
 
     @SerializedName("type")
@@ -15,11 +15,11 @@ public class NextRoad implements Serializable
     private String type;
     @SerializedName("name")
     @Expose
-    private List<Name_> name = new ArrayList<Name_>();
+    private List<Name> name = new ArrayList<Name>();
     @SerializedName("number")
     @Expose
-    private List<Number_> number = new ArrayList<Number_>();
-    private final static long serialVersionUID = 9148266183544450710L;
+    private List<Number> number = new ArrayList<Number>();
+    private final static long serialVersionUID = 8925420832530807568L;
 
     public String getType() {
         return type;
@@ -29,19 +29,19 @@ public class NextRoad implements Serializable
         this.type = type;
     }
 
-    public List<Name_> getName() {
+    public List<Name> getName() {
         return name;
     }
 
-    public void setName(List<Name_> name) {
+    public void setName(List<Name> name) {
         this.name = name;
     }
 
-    public List<Number_> getNumber() {
+    public List<Number> getNumber() {
         return number;
     }
 
-    public void setNumber(List<Number_> number) {
+    public void setNumber(List<Number> number) {
         this.number = number;
     }
 

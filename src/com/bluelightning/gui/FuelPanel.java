@@ -142,6 +142,31 @@ public class FuelPanel extends JPanel {
 			model.fireTableDataChanged();
 		}
 	}
+	
+	public String getFuelHtml() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<table class='greyTable'>");
+		sb.append("<thead>\n");
+		sb.append("<tr>\n");
+		for (int i = 0; i < model.getColumnCount(); i++) {
+			sb.append(String.format("<td>%s</td>", model.getColumnName(i)));
+		}
+		sb.append("</tr>\n");
+		sb.append("</thead>\n");
+		sb.append("<tbody>\n");
+		for (int r = 0; r < model.getRowCount(); r++) {
+			sb.append("<tr>\n");
+			for (int c = 0; c < model.getColumnCount(); c++) {
+				sb.append(String.format("<td>%s</td>", (String) model.getValueAt(r,c)));				
+			}
+			sb.append("</tr>\n");
+		}
+		sb.append("</tbody>\n");
+		sb.append("</table>\n");
+
+		return sb.toString();
+	}
+	
 
 	class MyTableModel extends AbstractTableModel {
 
@@ -322,4 +347,5 @@ public class FuelPanel extends JPanel {
 		// }
 		// });
 	}
+
 }

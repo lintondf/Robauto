@@ -1,11 +1,11 @@
 
-package com.example;
+package com.bluelightning.here;
 
 import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Departure implements Serializable
+public class Arrival implements Serializable
 {
 
     @SerializedName("time")
@@ -14,7 +14,7 @@ public class Departure implements Serializable
     @SerializedName("place")
     @Expose
     private Place place;
-    private final static long serialVersionUID = -6217590620752586597L;
+    private final static long serialVersionUID = -70633855491068625L;
 
     public String getTime() {
         return time;

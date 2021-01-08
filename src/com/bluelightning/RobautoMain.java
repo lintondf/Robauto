@@ -1,6 +1,7 @@
 package com.bluelightning;
 
 import java.io.File;
+import java.net.UnknownHostException;
 
 import org.slf4j.Logger;
 
@@ -45,6 +46,19 @@ public class RobautoMain {
 		return "C:\\Program Files\\Java\\jre1.8.0_91\\bin\\rmiregistry.exe";
 	}
 
+	public static String getDataPath() {
+		String where = System.getProperty("user.home") + "/Google Drive/0Robauto";
+		java.net.InetAddress localMachine = null;
+		try {
+			localMachine = java.net.InetAddress.getLocalHost();
+		} catch (UnknownHostException e1) {
+		}
+		final String hostName = (localMachine != null) ? localMachine.getHostName() : "localhost";
+		if (hostName.equals("raspberrypi")) {
+			where = System.getProperty("user.home") + "/0Robauto";
+		}
+		return where;
+	}
 
 	public static void main(String[] args) {
 		String classPath = "Robauto.jar";

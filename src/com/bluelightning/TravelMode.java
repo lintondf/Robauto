@@ -547,6 +547,7 @@ public class TravelMode extends JPanel {
 		t.start();
 		Events.eventBus.register(new GpsHandler());
 		gps.initialize(frame, isSurface);
+		fuelPanel = new FuelPanel(tripPlan.getFuelStops(), lafFont );
 	}
 	
 	protected void initialize(File tripPlanFile) {
@@ -659,6 +660,7 @@ public class TravelMode extends JPanel {
 	        	c.set("planTab", report.toHtml(day));
 	        	c.set("obscuraTab", travelStatus.getObscuraHtml(tripPlan));
 	        	c.set("realtimeTab", travelStatus.toDrivingHtml() );
+	        	c.set("fuelTab", fuelPanel.getFuelHtml());
 	        }
 	        response.getWriter().println(c.toString());
 
@@ -742,7 +744,7 @@ public class TravelMode extends JPanel {
 //						path = args[0]; // can be .robauto or .dayfile (list of .robauto abs paths
 //					else {
 						// Create a file chooser to choose a single .robauto
-						String where = System.getProperty("user.home") + "/Google Drive/0Robauto";
+						String where = RobautoMain.getDataPath();
 		                TravelFileChooser dialog = new TravelFileChooser(frame, where);
 		                dialog.setVisible(true);
 		                if (dialog.getSelection() != null) {

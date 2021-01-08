@@ -147,6 +147,19 @@ public class MainControlPanel extends JPanel {
 //		});
 //		add(bthStopsToBasecamp, gbc_bthStopsToBasecamp);
 		
+		JButton bthHereRoute = new JButton("Plan...");
+		GridBagConstraints gbc_bthHereRoute = new GridBagConstraints();
+		gbc_bthHereRoute.fill = GridBagConstraints.HORIZONTAL;
+		gbc_bthHereRoute.insets = new Insets(0, 0, 5, 0);
+		gbc_bthHereRoute.gridx = 0;
+		gbc_bthHereRoute.gridy = 1;
+		bthHereRoute.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				Events.eventBus.post( new Events.UiEvent("ControlPanel.RouteHere", event));
+			}
+		});
+		add(bthHereRoute, gbc_bthHereRoute);
+		
 		JButton bthPlanRoute = new JButton("Open...");
 		GridBagConstraints gbc_bthPlanRoute = new GridBagConstraints();
 		gbc_bthPlanRoute.fill = GridBagConstraints.HORIZONTAL;

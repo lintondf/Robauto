@@ -6,6 +6,8 @@ package com.bluelightning.gui;
 import java.io.File;
 import java.util.ArrayList;
 
+import com.bluelightning.RobautoMain;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -121,7 +123,7 @@ public class TravelFileChooser extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-            	String where = System.getProperty("user.home") + "/Google Drive/0Robauto";
+            	String where = RobautoMain.getDataPath();
                 TravelFileChooser dialog = new TravelFileChooser(new javax.swing.JFrame(), where);
                 dialog.setVisible(true);
                 System.out.println("after visible: " + dialog.getSelection());

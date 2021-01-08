@@ -16,6 +16,9 @@ import javax.swing.JTextField;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.SwingConstants;
 
 public class HereRouteDialog extends JDialog {
@@ -23,28 +26,19 @@ public class HereRouteDialog extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private JTextField fromPlusCode;
 	private JTextField fromLatLon;
+	private JTextField fromAddress;
 	private JTextField toPlusCode;
 	private JTextField toLatLon;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			HereRouteDialog dialog = new HereRouteDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	private JTextField toAddress;
+	private JButton okButton;
+	private JButton cancelButton;
 
 	/**
 	 * Create the dialog.
 	 */
 	public HereRouteDialog() {
 		setTitle("Here.com Routing");
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 400);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -100,6 +94,26 @@ public class HereRouteDialog extends JDialog {
 				fromPanel.add(fromLatLon, gbc_fromLatLon);
 				fromLatLon.setColumns(10);
 			}
+			{
+				JLabel lblLatlon = new JLabel("Address:");
+				GridBagConstraints gbc_lblLatlon = new GridBagConstraints();
+				gbc_lblLatlon.anchor = GridBagConstraints.EAST;
+				gbc_lblLatlon.insets = new Insets(5, 5, 5, 5);
+				gbc_lblLatlon.gridx = 0;
+				gbc_lblLatlon.gridy = 2;
+				fromPanel.add(lblLatlon, gbc_lblLatlon);
+			}
+			{
+				fromAddress = new JTextField();
+				GridBagConstraints gbc_fromAddress = new GridBagConstraints();
+				gbc_fromAddress.gridwidth = 4;
+				gbc_fromAddress.insets = new Insets(5, 5, 5, 5);
+				gbc_fromAddress.fill = GridBagConstraints.HORIZONTAL;
+				gbc_fromAddress.gridx = 1;
+				gbc_fromAddress.gridy = 2;
+				fromPanel.add(fromAddress, gbc_fromAddress);
+				fromAddress.setColumns(20);
+			}
 		}
 		{
 			JPanel toPanel = new JPanel();
@@ -152,23 +166,99 @@ public class HereRouteDialog extends JDialog {
 				toPanel.add(toLatLon, gbc_fromLatLon);
 				toLatLon.setColumns(10);
 			}
+			{
+				JLabel lblLatlon = new JLabel("Address:");
+				GridBagConstraints gbc_lblLatlon = new GridBagConstraints();
+				gbc_lblLatlon.anchor = GridBagConstraints.EAST;
+				gbc_lblLatlon.insets = new Insets(5, 5, 5, 5);
+				gbc_lblLatlon.gridx = 0;
+				gbc_lblLatlon.gridy = 2;
+				toPanel.add(lblLatlon, gbc_lblLatlon);
+			}
+			{
+				toAddress = new JTextField();
+				GridBagConstraints gbc_toAddress = new GridBagConstraints();
+				gbc_toAddress.gridwidth = 4;
+				gbc_toAddress.insets = new Insets(5, 5, 5, 5);
+				gbc_toAddress.fill = GridBagConstraints.HORIZONTAL;
+				gbc_toAddress.gridx = 1;
+				gbc_toAddress.gridy = 2;
+				toPanel.add(toAddress, gbc_toAddress);
+				toAddress.setColumns(20);
+			}
 		}
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("OK");
+				okButton = new JButton("OK");
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
-				JButton cancelButton = new JButton("Cancel");
+				cancelButton = new JButton("Cancel");
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
 		}
+	}
+
+	/**
+	 * @return the fromPlusCode
+	 */
+	public JTextField getFromPlusCode() {
+		return fromPlusCode;
+	}
+
+	/**
+	 * @return the fromLatLon
+	 */
+	public JTextField getFromLatLon() {
+		return fromLatLon;
+	}
+
+	/**
+	 * @return the toPlusCode
+	 */
+	public JTextField getToPlusCode() {
+		return toPlusCode;
+	}
+
+	/**
+	 * @return the toLatLon
+	 */
+	public JTextField getToLatLon() {
+		return toLatLon;
+	}
+
+	/**
+	 * @return the okButton
+	 */
+	public JButton getOkButton() {
+		return okButton;
+	}
+
+	/**
+	 * @return the cancelButton
+	 */
+	public JButton getCancelButton() {
+		return cancelButton;
+	}
+
+	/**
+	 * @return the fromAddress
+	 */
+	public JTextField getFromAddress() {
+		return fromAddress;
+	}
+
+	/**
+	 * @return the toAddress
+	 */
+	public JTextField getToAddress() {
+		return toAddress;
 	}
 
 }

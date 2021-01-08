@@ -34,7 +34,7 @@ public class Day {
 		}
 	}
 	
-	protected void add(LatLon point, String description, double duration) {
+	public void add(LatLon point, String description, double duration) {
 		TrackPoint tp = new TrackPoint(point, description);
 		tp.duration = duration;
 		if (track.isEmpty()) {
@@ -61,6 +61,10 @@ public class Day {
 			track.add(tp);
 			trackPoints.add(tp);
 		}
+	}
+	
+	public void addWaypoint( Waypoint wp) {
+		wpts.add(wp);
 	}
 	
 	public void addWaypoint(WptType wt) {

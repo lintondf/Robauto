@@ -1,11 +1,11 @@
 
-package com.example;
+package com.bluelightning.here;
 
 import java.io.Serializable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Action implements Serializable
+public class TurnByTurnAction implements Serializable
 {
 
     @SerializedName("action")
@@ -17,19 +17,22 @@ public class Action implements Serializable
     @SerializedName("length")
     @Expose
     private Integer length;
-    @SerializedName("instruction")
-    @Expose
-    private String instruction;
     @SerializedName("offset")
     @Expose
     private Integer offset;
+    @SerializedName("currentRoad")
+    @Expose
+    private CurrentRoad currentRoad;
+    @SerializedName("nextRoad")
+    @Expose
+    private NextRoad nextRoad;
     @SerializedName("direction")
     @Expose
     private String direction;
     @SerializedName("severity")
     @Expose
     private String severity;
-    private final static long serialVersionUID = -2166595419598938450L;
+    private final static long serialVersionUID = -2214989185480899024L;
 
     public String getAction() {
         return action;
@@ -55,20 +58,28 @@ public class Action implements Serializable
         this.length = length;
     }
 
-    public String getInstruction() {
-        return instruction;
-    }
-
-    public void setInstruction(String instruction) {
-        this.instruction = instruction;
-    }
-
     public Integer getOffset() {
         return offset;
     }
 
     public void setOffset(Integer offset) {
         this.offset = offset;
+    }
+
+    public CurrentRoad getCurrentRoad() {
+        return currentRoad;
+    }
+
+    public void setCurrentRoad(CurrentRoad currentRoad) {
+        this.currentRoad = currentRoad;
+    }
+
+    public NextRoad getNextRoad() {
+        return nextRoad;
+    }
+
+    public void setNextRoad(NextRoad nextRoad) {
+        this.nextRoad = nextRoad;
     }
 
     public String getDirection() {

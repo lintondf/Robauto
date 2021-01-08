@@ -1,5 +1,6 @@
 package com.bluelightning;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -22,6 +23,11 @@ import org.apache.http.util.EntityUtils;
 import org.jxmapviewer.viewer.GeoPosition;
 
 import com.bluelightning.data.TripPlan;
+import com.bluelightning.googlemaps.OpenLocationCode;
+import com.bluelightning.googlemaps.PlusCodes;
+import com.bluelightning.googlemaps.Position;
+import com.bluelightning.googlemaps.OpenLocationCode.CodeArea;
+import com.bluelightning.here.HereJsonRoute;
 import com.bluelightning.json.*;
 import com.bluelightning.json.Leg.CumulativeTravel;
 import com.google.gson.Gson;
@@ -82,10 +88,9 @@ public class Here2 {
 	}
 	
 	protected static String routingXmlUrl = "https://route.cit.api.here.com/routing/7.2/calculateroute.xml";
-	protected static String routingUrl = "https://router.hereapi.com/v8/calculateroute.json";
-	protected static String geocodeUrl = "https://geocoder.cit.api.here.com/6.2/geocode.json";
+	protected static String geocodeUrl = "https://geocode.search.hereapi.com/v1/geocode";
 	protected static String reverseGeocodeUrl = "https://reverse.geocoder.cit.api.here.com/6.2/reversegeocode.json";
-	protected static String routing8Url = "https://router.hereapi.com/v8/routes";
+	protected static String routingUrl = "https://router.hereapi.com/v8/routes";
 
 	protected static JsonElement getNestedJsonElement( JsonElement element, List<String> fields ) {
 		if (element == null)
@@ -121,27 +126,21 @@ public class Here2 {
 		String response = null;
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
-			parameters = getBasicValuePair();
-			//?&&&
-			parameters.add( new BasicNameValuePair("transportMode","truck"));
-
-			parameters.add( new BasicNameValuePair("origin","44.522825,-68.208898"));
-			parameters.add( new BasicNameValuePair("destination","44.531643,-68.406179"));
-			parameters.add( new BasicNameValuePair("spans","names,speedLimit,duration,length"));
-			parameters.add( new BasicNameValuePair("return","summary,polyline,turnbyturnactions,actions,instructions"));
 			UrlEncodedFormEntity x = new UrlEncodedFormEntity(parameters);
-			String url = String.format("%s?%s", routing8Url, IOUtils.toString(x.getContent()));
-//			url = String.format("%s&%s=%s&%s=%s", , "app_id", "E5W4fEoFZkdKqwnqBUpf", "apikey", "z9U3Xu_xv_qohIg8yn8wYBNjdiHDR0G5QukenNZrcSQ");
+			String url = String.format("%s?%s", urlBase, IOUtils.toString(x.getContent()));
+			System.out.println(url);
 			HttpGet httpGet = new HttpGet(url);
 			CloseableHttpResponse response2 = httpclient.execute(httpGet);
 			if (response2.getStatusLine().getStatusCode() != 200) {
-				RobautoMain.logger.debug( url );
-				RobautoMain.logger.debug( response2.getStatusLine().toString() );
-				RobautoMain.logger.debug( response2.getStatusLine().getReasonPhrase() );
-				RobautoMain.logger.debug( response2.getEntity().toString() );
-				RobautoMain.logger.debug( response2.getEntity().getContent().toString() );
-			    response = IOUtils.toString(response2.getEntity().getContent());
-			    RobautoMain.logger.debug(response);
+				System.err.println(response2);
+				System.err.println(IOUtils.toString(response2.getEntity().getContent()));
+//				RobautoMain.logger.debug( url );
+//				RobautoMain.logger.debug( response2.getStatusLine().toString() );
+//				RobautoMain.logger.debug( response2.getStatusLine().getReasonPhrase() );
+//				RobautoMain.logger.debug( response2.getEntity().toString() );
+//				RobautoMain.logger.debug( response2.getEntity().getContent().toString() );
+//			    response = IOUtils.toString(response2.getEntity().getContent());
+//			    RobautoMain.logger.debug(response);
 			    EntityUtils.consume(response2.getEntity());
 				return null;
 			}
@@ -173,29 +172,21 @@ public class Here2 {
 	
 	public static LatLon geocodeLookup( String address, boolean verbose ) {
 		List<BasicNameValuePair> nvps = getBasicValuePair();
-		nvps.add( new BasicNameValuePair("searchtext", address)); 
+		nvps.add( new BasicNameValuePair("q", address)); 
 		String response = getRestResponse( geocodeUrl, nvps );
-	    JsonElement jelement = new JsonParser().parse(response);
-	    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	    if (verbose) RobautoMain.logger.debug( gson.toJson(jelement).toString() );
-	    JsonArray view = getNestedJsonArray(jelement, Arrays.asList("Response", "View"));
-	    if (view != null && view.size() > 0) {
-	    	JsonArray result = getNestedJsonArray(view.get(0), Arrays.asList("Result"));
-	    	if (result != null) {
-	    		JsonArray navigationPosition = getNestedJsonArray(result.get(0), Arrays.asList("Location", "NavigationPosition"));
-	    		LatLon location = gson.fromJson(navigationPosition.get(0), LatLon.class);
-	    		return location;
-	    	}
-	    }
-	    RobautoMain.logger.debug(response);
-	    return null;
+        PlusCodes plus = gson.fromJson(response, PlusCodes.class); 
+        if (plus == null || plus.getItems().isEmpty())
+        	return null;
+        Position position = plus.getItems().get(0).getPosition();
+	    LatLon location = new LatLon(position.getLat(), position.getLng());
+	    return location;
 	}
 	
 	
 	protected static class HereRoutePlus {
-		HereRoute route;
+		HereJsonRoute route;
 		String json;
-		public HereRoutePlus( HereRoute route, String json) {
+		public HereRoutePlus( HereJsonRoute route, String json) {
 			this.route = route;
 			this.json = json;
 		}
@@ -203,6 +194,14 @@ public class Here2 {
 	
 
 	protected static HereRoutePlus getRouteBase(List<BasicNameValuePair> nvps, String mode) {
+		nvps.add( new BasicNameValuePair("transportMode", mode));
+		nvps.add( new BasicNameValuePair("spans","names,speedLimit,duration,length"));
+		nvps.add( new BasicNameValuePair("return","summary,polyline,turnbyturnactions,actions,instructions"));
+		nvps.add( new BasicNameValuePair("truck[grossWeight]", "7000"));
+		nvps.add( new BasicNameValuePair("truck[weightPerAxle]", "3500"));
+		nvps.add( new BasicNameValuePair("truck[height]", Integer.toString((int)(100*12.5*0.3048))));
+		nvps.add( new BasicNameValuePair("truck[length]", Integer.toString((int)(100*32.5*0.3048))));
+		/*
 		nvps.add(new BasicNameValuePair("mode", mode));
 		nvps.add(new BasicNameValuePair("alternatives", "3"));
 		nvps.add(new BasicNameValuePair("metricSystem", "imperial"));
@@ -221,6 +220,7 @@ public class Here2 {
 		nvps.add(new BasicNameValuePair("limitedWeight", "1"));  //TODO
 		nvps.add(new BasicNameValuePair("truckRestrictionPenalty", "soft"));
 		nvps.add(new BasicNameValuePair("height", Double.toString(146.0 / 12.0 * 0.3048)));          // TODO
+		*/
 		String json = getRestResponse( routingUrl, nvps );
 		if (json == null)
 			return null;
@@ -231,7 +231,10 @@ public class Here2 {
 		    out.println( Here2.gson.toJson(jelement) );
 	    	out.close();
 	    } catch (Exception x) {}
-	    HereRoute hereRoute = (HereRoute) Here2.gson.fromJson(jelement, HereRoute.class);
+	    //HereRoute hereRoute = (HereRoute) Here2.gson.fromJson(jelement, HereRoute.class);
+		HereJsonRoute hereRoute = gson.fromJson(json, HereJsonRoute.class);
+		hereRoute.parse();
+	    
 	    HereRoutePlus plus = new HereRoutePlus( hereRoute, json );
 	    return plus;
 	}
@@ -269,8 +272,8 @@ public class Here2 {
 	
 	protected static HereRoutePlus getRoute( LatLon from, LatLon to, String mode ) {
 		List<BasicNameValuePair> nvps = getBasicValuePair();
-		nvps.add(new BasicNameValuePair("waypoint0", from.toGeo()));
-		nvps.add(new BasicNameValuePair("waypoint1", to.toGeo()));
+		nvps.add( new BasicNameValuePair("origin",from.toString().replace(" ", "")));
+		nvps.add( new BasicNameValuePair("destination",to.toString().replace(" ", "")));
 		return getRouteBase( nvps, mode );
 	}
 	
@@ -342,55 +345,55 @@ public class Here2 {
 //	}
 	
 	
-	public static Route computeRoute(TripPlan tripPlan) {
-		if (tripPlan.getRoute() == null) {
-			Route route = new Route();
-			TreeSet<Leg> legs = new TreeSet<>();
-			ArrayList<Object> shape = new ArrayList<>();
-			double lastPoint = 0;
-			int n = tripPlan.getPlaces().size();
-			if (n < 2)
-				return null;
-			tripPlan.getPlaces().get(0).setPassThru(false);
-			tripPlan.getPlaces().get(n-1).setPassThru(false);
-			for (int i = 0; i < n-1; i++) {
-				int j = i + 1;
-				while (j < n-1 && !tripPlan.getPlaces().get(j).isOvernight()) {
-					j++;
-				}
-				HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces().subList(i, j+1), routeOptions  );
-				Route r = computeRouteBase( hereRoute.route );
-				Leg leg = r.getLeg().iterator().next(); 
-				leg.setFirstPoint( leg.getFirstPoint() + lastPoint );
-				leg.setLastPoint( leg.getLastPoint() + lastPoint);
-				lastPoint = leg.getLastPoint();
-				legs.add(leg);
-				shape.addAll( leg.getShape() );
-				i = j-1;
-			}
-			route.setLeg(legs);
-			route.setShape(shape);
-			route.postProcess();
-			return route;
-		} else {
-			return tripPlan.getRoute();
-		}
-	}
-
-
-	public static Route computeRoute0(TripPlan tripPlan) {
-		if (tripPlan.getRoute() == null) {
-			HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces(), routeOptions  );
-			return computeRouteBase( hereRoute.route );
-		} else {
-			return tripPlan.getRoute();
-		}
-	}
-
-	public static Route computeRoute( List<VisitedPlace> places ) {
-		HereRoutePlus hereRoute = getRouteFromPlaces( places, routeOptions  );
-		return computeRouteBase( hereRoute.route );
-	}
+//	public static Route computeRoute(TripPlan tripPlan) {
+//		if (tripPlan.getRoute() == null) {
+//			Route route = new Route();
+//			TreeSet<Leg> legs = new TreeSet<>();
+//			ArrayList<Object> shape = new ArrayList<>();
+//			double lastPoint = 0;
+//			int n = tripPlan.getPlaces().size();
+//			if (n < 2)
+//				return null;
+//			tripPlan.getPlaces().get(0).setPassThru(false);
+//			tripPlan.getPlaces().get(n-1).setPassThru(false);
+//			for (int i = 0; i < n-1; i++) {
+//				int j = i + 1;
+//				while (j < n-1 && !tripPlan.getPlaces().get(j).isOvernight()) {
+//					j++;
+//				}
+//				HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces().subList(i, j+1), routeOptions  );
+//				Route r = computeRouteBase( hereRoute.route );
+//				Leg leg = r.getLeg().iterator().next(); 
+//				leg.setFirstPoint( leg.getFirstPoint() + lastPoint );
+//				leg.setLastPoint( leg.getLastPoint() + lastPoint);
+//				lastPoint = leg.getLastPoint();
+//				legs.add(leg);
+//				shape.addAll( leg.getShape() );
+//				i = j-1;
+//			}
+//			route.setLeg(legs);
+//			route.setShape(shape);
+//			route.postProcess();
+//			return route;
+//		} else {
+//			return tripPlan.getRoute();
+//		}
+//	}
+//
+//
+//	public static Route computeRoute0(TripPlan tripPlan) {
+//		if (tripPlan.getRoute() == null) {
+//			HereRoutePlus hereRoute = getRouteFromPlaces( tripPlan.getPlaces(), routeOptions  );
+//			return computeRouteBase( hereRoute.route );
+//		} else {
+//			return tripPlan.getRoute();
+//		}
+//	}
+//
+//	public static Route computeRoute( List<VisitedPlace> places ) {
+//		HereRoutePlus hereRoute = getRouteFromPlaces( places, routeOptions  );
+//		return computeRouteBase( hereRoute.route );
+//	}
 	
 	public static void reportRoute( Route route ) {
 		System.out.printf("%d indicents\n", route.getIncident().size() );
@@ -466,6 +469,18 @@ public class Here2 {
 		return null;
 	}
 	
+	public static LatLon decodePlusCode( String plusCode ) {
+        int spc = plusCode.indexOf(' ');
+        String code = (plusCode.substring(0, spc));
+        String reference = (plusCode.substring(spc+1));
+		LatLon origin = geocodeLookup( reference );
+        OpenLocationCode olc0 = new OpenLocationCode(code);
+        OpenLocationCode olc2 = olc0.recover(origin.getLatitude(), origin.getLongitude());
+        CodeArea ca = olc2.decode();
+        return new LatLon(ca.getCenterLatitude(), ca.getCenterLongitude() );		
+		
+	}
+	
 	public static void main( String[] args ) {
 		/*
 M1   :   0.0 mi /  0:00;     0.0 mi /  0:00; Infinity; 1 [MANOR LN/MANOR LN/] Get on Manor Ln and drive south
@@ -478,10 +493,13 @@ M4   :  24.1 mi /  0:33;    10.5 mi /  0:17;    44; 229 [I-395 W RAMP/I-395 W RA
       44.531643,   -68.406179		 
 		 */
 		//RobautoMain.logger.debug( Here2.geocodeReverseLookup( new GeoPosition(44.522588,   -68.208983) ));
-		LatLon from = new LatLon(44.522825,   -68.208898);
-		LatLon to = new LatLon(44.531643,   -68.406179);
-		HereRoutePlus route = getRoute(from, to, "truck");
-		System.out.println(route);
+//		LatLon from = new LatLon(44.522825,   -68.208898);
+//		LatLon to = new LatLon(44.531643,   -68.406179);
+//		HereRoutePlus route = getRoute(from, to, "truck");
+//		System.out.println(route);
+		LatLon from = ( decodePlusCode("PMX4+W8 St. Augustine, Florida")); //"PQ2F+4G Manning, South Carolina"));
+		LatLon to = ( geocodeLookup("3533 Carambola Cirle, Melbourne, FL"));
+		HereRoutePlus plus = getRoute( from, to, "truck");
 	}
 
 }
