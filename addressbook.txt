@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <AddressBook>
     <persons>
+        <name>Vermont Country Deli</name>
+	<address>436 Western Ave, Brattleboro, VT 05301</address>
+	<latitude>42.85005122718423</latitude>
+	<longitude>-72.5824753782913</longitude>
+    </persons>
+    <persons>
         <name>100 Charlton Rd</name>
         <address></address>
         <latitude>42.126619555056095</latitude>
@@ -100,6 +106,18 @@
         <longitude>-91.04702711105347</longitude>
     </persons>
     <persons>
+        <name>Hanna Park</name>
+        <address></address>
+        <latitude>30.369901657</latitude>
+        <longitude>-81.398541927</longitude>
+    </persons>
+    <persons>
+        <name>Heartland VT</name>
+        <address></address>
+        <latitude>43.566683326</latitude>
+        <longitude>-72.417433346</longitude>
+    </persons>
+    <persons>
         <name>Home Florida</name>
         <address>3533 Carambola Cir, Melbourne, FL</address>
         <latitude>28.23469</latitude>
@@ -147,6 +165,12 @@
         <address>1601 Atlantic Beach Dr, Atlantic Beach, FL 32233</address>
         <latitude>30.34135</latitude>
         <longitude>-81.40743</longitude>
+    </persons>
+    <persons>
+        <name>Popeyes</name>
+        <address>9177 Atlee Rd, Mechanicsville, VA 23116</address>
+        <latitude>37.6506223</latitude>
+        <longitude>-77.3993666</longitude>
     </persons>
     <persons>
         <name>Portland International Jetport</name>
@@ -271,10 +295,10 @@
         <longitude>-70.87100028991699</longitude>
     </persons>
     <persons>
-        <name>Popeyes</name>
-        <address>9177 Atlee Rd, Mechanicsville, VA 23116</address>
-        <latitude>37.6506223</latitude>
-        <longitude>-77.3993666</longitude>
+        <name>Yogi Bear's Jellystone Park Camp-Resort14</name>
+        <address></address>
+        <latitude>38.673723713</latitude>
+        <longitude>-78.392330781</longitude>
     </persons>
     <tags>Gas</tags>
     <tags>Fuel</tags>
