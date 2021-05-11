@@ -106,7 +106,7 @@ import java.awt.datatransfer.StringSelection;
 
 // http://forecast.weather.gov/MapClick.php?lat=28.23&lon=-80.7&FcstType=digitalDWML
 
-// TODO:  Need to be able to stop for gas and not switch drivers
+// TODO:  Non-switch fuel stops should be in every choice
 
 public class PlannerMode extends JPanel {
 
